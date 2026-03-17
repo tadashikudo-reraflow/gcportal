@@ -6,17 +6,22 @@ export const metadata: Metadata = {
 };
 
 // クラウドバッジの色設定
-function getCloudBadgeStyle(platform: string | null, confirmed: boolean): { bg: string; text: string } {
+// platform が null/不明の場合は null を返し、呼び出し側で非表示にする
+function getCloudBadgeStyle(
+  platform: string | null,
+  confirmed: boolean
+): { bg: string; text: string } | null {
   const base: Record<string, { bg: string; text: string }> = {
-    AWS: { bg: "#ff9900", text: "#fff" },
-    GCP: { bg: "#1a73e8", text: "#fff" },
-    Azure: { bg: "#00b4ff", text: "#fff" },
-    OCI: { bg: "#c8102e", text: "#fff" },
-    Sakura: { bg: "#e91e8c", text: "#fff" },
+    AWS:    { bg: "#ff9900", text: "#fff" },
+    GCP:    { bg: "#1a73e8", text: "#fff" },
+    Azure:  { bg: "#00b4ff", text: "#fff" },
+    OCI:    { bg: "#b91c1c", text: "#fff" },   /* red-700 — 白地でコントラスト改善 */
+    Sakura: { bg: "#be185d", text: "#fff" },   /* pink-700 */
   };
-  if (!platform || !base[platform]) return { bg: "#9ca3af", text: "#fff" };
+  if (!platform || !base[platform]) return null;   // 不明は null → 非表示
   const style = base[platform];
-  if (!confirmed) return { bg: style.bg + "88", text: "#fff" };
+  // 未確認の場合は色を薄くしてラベルに「(未確認)」を付与（呼び出し側で対応）
+  if (!confirmed) return { bg: style.bg + "99", text: "#fff" };
   return style;
 }
 
@@ -75,13 +80,19 @@ export default async function PackagesPage() {
       </div>
 
       {/* ベンダーカード */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+      <div className="card p-6">
+        <h2
+          className="text-sm font-bold mb-4 flex items-center gap-2"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          <span
+            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
+            style={{ backgroundColor: "var(--color-gov-primary)" }}
+          />
           ベンダー一覧（{vendors.length}社）
         </h2>
         {vendors.length === 0 ? (
-          <p className="text-sm text-gray-400">データがありません。</p>
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>データがありません。</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {vendors.map((vendor) => {
@@ -89,32 +100,38 @@ export default async function PackagesPage() {
               return (
                 <div
                   key={vendor.id}
-                  className="rounded-lg border border-gray-200 p-4 flex flex-col gap-2 hover:shadow-md transition-shadow"
+                  className="card p-4 flex flex-col gap-2 hover:shadow transition-shadow"
                 >
                   {/* ベンダー名 */}
                   <div>
-                    <p className="font-bold text-gray-800 text-sm leading-tight">
+                    <p
+                      className="font-semibold text-sm leading-tight"
+                      style={{ color: "var(--color-text-primary)" }}
+                    >
                       {vendor.short_name ?? vendor.name}
                     </p>
                     {vendor.short_name && (
-                      <p className="text-xs text-gray-400 mt-0.5">{vendor.name}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                        {vendor.name}
+                      </p>
                     )}
                   </div>
 
-                  {/* バッジ群 */}
+                  {/* バッジ群 — cloud_platformがnullの場合はバッジなし */}
                   <div className="flex flex-wrap gap-1">
-                    {/* クラウドバッジ */}
-                    <span
-                      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold"
-                      style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                    >
-                      {vendor.cloud_platform ?? "不明"}
-                      {!vendor.cloud_confirmed && <span className="opacity-75">?</span>}
-                    </span>
-
-                    {/* マルチテナントバッジ */}
+                    {badgeStyle && (
+                      <span
+                        className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold"
+                        style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
+                      >
+                        {vendor.cloud_platform}
+                        {!vendor.cloud_confirmed && (
+                          <span className="opacity-80 text-xs ml-0.5">未確認</span>
+                        )}
+                      </span>
+                    )}
                     {vendor.multitenancy && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">
                         共同利用
                       </span>
                     )}
@@ -122,12 +139,15 @@ export default async function PackagesPage() {
 
                   {/* 採用自治体数 */}
                   {vendor.municipality_count != null && (
-                    <p className="text-xs text-gray-500">
-                      採用自治体:{" "}
-                      <span className="font-bold text-gray-700">
+                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                      採用{" "}
+                      <span
+                        className="font-bold"
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
                         {vendor.municipality_count.toLocaleString()}
                       </span>{" "}
-                      団体（判明分）
+                      団体
                     </p>
                   )}
                 </div>
@@ -138,11 +158,17 @@ export default async function PackagesPage() {
       </div>
 
       {/* 業務別パッケージ一覧 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+      <div className="card p-6">
+        <h2
+          className="text-sm font-bold mb-4 flex items-center gap-2"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          <span
+            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
+            style={{ backgroundColor: "var(--color-gov-primary)" }}
+          />
           業務別パッケージ一覧
-          <span className="text-xs font-normal text-gray-400 ml-1">
+          <span className="text-xs font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
             （{sortedBusinesses.length}業務 / 計{packages.length}件）
           </span>
         </h2>
@@ -193,16 +219,18 @@ export default async function PackagesPage() {
                                 {vendor?.short_name ?? vendor?.name ?? "—"}
                               </td>
                               <td className="py-2 px-3">
-                                {platform ? (
+                                {badgeStyle ? (
                                   <span
                                     className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold"
                                     style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
                                   >
                                     {platform}
-                                    {!confirmed && <span className="opacity-75">?</span>}
+                                    {!confirmed && (
+                                      <span className="opacity-80 text-xs ml-0.5">未確認</span>
+                                    )}
                                   </span>
                                 ) : (
-                                  <span className="text-xs text-gray-400">—</span>
+                                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>—</span>
                                 )}
                               </td>
                               <td className="py-2 px-3 text-xs text-gray-500">

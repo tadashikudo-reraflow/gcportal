@@ -54,128 +54,157 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* ① 緊急アラートバナー */}
-      <div
-        className="rounded-lg p-4 text-white"
-        style={{ backgroundColor: "#c8102e" }}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <p className="font-bold text-lg">
-                {summary.deadline} 移行期限まであと{" "}
-                <span className="text-3xl font-extrabold">{remainingDays}</span>{" "}
-                日
-              </p>
-              <p className="text-red-100 text-sm mt-0.5">
-                全国 {summary.total.toLocaleString()} 自治体のうち完了は{" "}
-                <strong>{summary.completed_count}</strong> 自治体（{completedPct}%）
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-red-100 text-xs">データ基準: {summary.data_month}</p>
-          </div>
+      {/* ① 緊急アラートバナー — controlled urgency（フルレッド背景を廃止） */}
+      <div className="alert-banner">
+        <svg
+          width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className="flex-shrink-0" style={{ color: "var(--color-status-critical)" }}
+          aria-hidden="true"
+        >
+          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold">
+            {summary.deadline} 移行期限まであと{" "}
+            <strong style={{ color: "var(--color-status-critical)", fontSize: "1rem" }}>
+              {remainingDays}日
+            </strong>
+          </p>
+          <p className="text-xs mt-0.5" style={{ color: "#991b1b" }}>
+            全国 {summary.total.toLocaleString()} 自治体のうち完了は{" "}
+            {summary.completed_count} 自治体（{completedPct}%）
+          </p>
         </div>
+        <p className="text-xs flex-shrink-0" style={{ color: "#991b1b" }}>
+          基準: {summary.data_month}
+        </p>
       </div>
 
-      {/* ② KPIカード 4つ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ② KPIカード 4つ — 統一 card クラス + トップアクセントボーダーでステータス区別 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* 全体完了率 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+        <div
+          className="card p-5"
+          style={{ borderTop: "3px solid var(--color-status-ok)" }}
+        >
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-text-muted)" }}>
             全体完了率
           </p>
           <p
             className="text-4xl font-extrabold leading-none"
-            style={{ color: "#1d6fa4" }}
+            style={{ color: "var(--color-status-ok)" }}
           >
             {completionPct}%
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             全 {summary.total.toLocaleString()} 自治体平均
           </p>
         </div>
 
         {/* 100%完了 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-1">
+        <div
+          className="card p-5"
+          style={{ borderTop: "3px solid var(--color-status-complete)" }}
+        >
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-text-muted)" }}>
             100%完了
           </p>
           <p
             className="text-4xl font-extrabold leading-none"
-            style={{ color: "#007a3d" }}
+            style={{ color: "var(--color-status-complete)" }}
           >
             {summary.completed_count}
-            <span className="text-base font-normal text-gray-400 ml-1">自治体</span>
+            <span className="text-base font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
+              自治体
+            </span>
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             全体の {completedPct}%
           </p>
         </div>
 
-        {/* 危機 */}
-        <div className="bg-white rounded-lg border-2 p-5 shadow-sm" style={{ borderColor: "#c8102e" }}>
-          <p className="text-xs font-medium uppercase tracking-wide mb-1" style={{ color: "#c8102e" }}>
+        {/* 危機 — border-top アクセントのみ、フルボーダー赤は廃止 */}
+        <div
+          className="card p-5"
+          style={{ borderTop: "3px solid var(--color-status-critical)" }}
+        >
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-status-critical)" }}>
             危機（50%未満）
           </p>
           <p
             className="text-4xl font-extrabold leading-none"
-            style={{ color: "#c8102e" }}
+            style={{ color: "var(--color-status-critical)" }}
           >
             {summary.critical_count}
-            <span className="text-base font-normal text-gray-400 ml-1">自治体</span>
+            <span className="text-base font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
+              自治体
+            </span>
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             全体の {((summary.critical_count / summary.total) * 100).toFixed(1)}%
           </p>
         </div>
 
         {/* 要注意 */}
-        <div className="bg-white rounded-lg border border-yellow-300 p-5 shadow-sm">
-          <p className="text-xs text-yellow-700 font-medium uppercase tracking-wide mb-1">
-            要注意（50-80%）
+        <div
+          className="card p-5"
+          style={{ borderTop: "3px solid var(--color-status-warn)" }}
+        >
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-status-warn)" }}>
+            要注意（50〜80%）
           </p>
-          <p className="text-4xl font-extrabold leading-none text-yellow-600">
+          <p
+            className="text-4xl font-extrabold leading-none"
+            style={{ color: "var(--color-status-warn)" }}
+          >
             {summary.at_risk_count}
-            <span className="text-base font-normal text-gray-400 ml-1">自治体</span>
+            <span className="text-base font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
+              自治体
+            </span>
           </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             全体の {((summary.at_risk_count / summary.total) * 100).toFixed(1)}%
           </p>
         </div>
       </div>
 
       {/* ③ 業務別完了率バーチャート */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="card p-6">
+        <h2
+          className="text-sm font-bold mb-4 flex items-center gap-2"
+          style={{ color: "var(--color-text-primary)" }}
+        >
           <span
-            className="w-1 h-5 rounded-full inline-block"
-            style={{ backgroundColor: "#003087" }}
+            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
+            style={{ backgroundColor: "var(--color-gov-primary)" }}
           />
           業務別完了率（20業務）
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {sortedBusinesses.map((biz) => {
             const pct = biz.avg_rate * 100;
             const barColor = getRateColor(biz.avg_rate);
             return (
               <div key={biz.business} className="flex items-center gap-3">
-                <span className="text-xs text-gray-600 w-32 flex-shrink-0 text-right">
+                {/* w-36 → min-w-fit に変えて長い業務名でも折れないようにする */}
+                <span
+                  className="text-xs w-36 flex-shrink-0 text-right truncate"
+                  style={{ color: "var(--color-text-secondary)" }}
+                  title={biz.business}
+                >
                   {biz.business}
                 </span>
-                <div className="flex-1 bg-gray-100 rounded-full h-5 relative overflow-hidden">
+                <div className="bar-track">
                   <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${pct}%`,
-                      backgroundColor: barColor,
-                    }}
+                    className="bar-fill"
+                    style={{ width: `${pct}%`, backgroundColor: barColor }}
                   />
                 </div>
                 <span
-                  className="text-xs font-bold w-12 flex-shrink-0"
+                  className="text-xs font-bold w-12 flex-shrink-0 text-right tabular-nums"
                   style={{ color: barColor }}
                 >
                   {pct.toFixed(1)}%
@@ -204,8 +233,8 @@ export default function DashboardPage() {
       </div>
 
       {/* ④ 都道府県別ランキングテーブル */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="card p-6">
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
           <span
             className="w-1 h-5 rounded-full inline-block"
             style={{ backgroundColor: "#003087" }}
@@ -299,8 +328,8 @@ export default function DashboardPage() {
       </div>
 
       {/* ⑤ 遅延リスク自治体TOP20テーブル */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="card p-6">
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
           <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#c8102e" }} />
           遅延リスク自治体 TOP20
           <span className="ml-1 text-xs text-gray-400 font-normal">（完了率下位100件より抜粋）</span>
