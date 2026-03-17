@@ -5,3 +5,4 @@ out/
 etl/shikucho_progress.xlsx
 etl/shichoson_progress.xlsx
 *.xlsm
+.env.local
