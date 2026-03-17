@@ -1,0 +1,28 @@
+name: Monthly ETL
+
+on:
+  schedule:
+    - cron: '0 21 1 * *'  # 毎月1日 JST 6:00
+  workflow_dispatch:
+
+jobs:
+  etl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install openpyxl
+      - name: Download latest Excel
+        run: |
+          curl -sL "https://www.soumu.go.jp/main_content/001057553.xlsx" -o etl/shikucho_progress.xlsx
+      - name: Run ETL
+        run: python etl/parse_soumu.py
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/standardization.json
+          git diff --cached --quiet || git commit -m "chore: monthly ETL update $(date +%Y-%m)"
+          git push

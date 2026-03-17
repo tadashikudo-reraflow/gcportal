@@ -1,0 +1,182 @@
+import type { Metadata } from "next";
+import data from "@/public/data/standardization.json";
+import { Municipality, BusinessSummary } from "@/lib/types";
+
+export const metadata: Metadata = {
+  title: "業務別 標準化進捗 | 自治体標準化ダッシュボード",
+};
+
+// 完了率に応じた枠線色（インラインスタイル用）
+function getBorderColor(rate: number): string {
+  if (rate >= 1.0) return "#007a3d";
+  if (rate >= 0.8) return "#1d6fa4";
+  if (rate >= 0.5) return "#d97706";
+  return "#c8102e";
+}
+
+function getBarColor(rate: number): string {
+  if (rate >= 1.0) return "#007a3d";
+  if (rate >= 0.8) return "#1d6fa4";
+  if (rate >= 0.5) return "#d97706";
+  return "#c8102e";
+}
+
+function getTextColor(rate: number): string {
+  if (rate >= 1.0) return "#007a3d";
+  if (rate >= 0.8) return "#1d6fa4";
+  if (rate >= 0.5) return "#d97706";
+  return "#c8102e";
+}
+
+function formatRate(rate: number): string {
+  return (rate * 100).toFixed(1) + "%";
+}
+
+export default function BusinessesPage() {
+  const businesses: BusinessSummary[] = [...data.businesses].sort(
+    (a, b) => a.avg_rate - b.avg_rate
+  );
+
+  const municipalities: Municipality[] = data.municipalities as Municipality[];
+
+  return (
+    <div className="space-y-6">
+      {/* ページヘッダー */}
+      <div className="border-b border-gray-200 pb-4">
+        <h1 className="text-2xl font-bold text-gray-800">業務別 標準化進捗</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          全20業務の完了率を低い順に表示。各業務で遅れている自治体を確認できます。
+        </p>
+      </div>
+
+      {/* 業務カード グリッド */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {businesses.map((biz, rank) => {
+          const borderColor = getBorderColor(biz.avg_rate);
+          const barColor = getBarColor(biz.avg_rate);
+          const textColor = getTextColor(biz.avg_rate);
+          const pct = biz.avg_rate * 100;
+
+          // この業務で遅れている自治体TOP10（business_rates[biz.business]が低い順）
+          const bottom10 = municipalities
+            .filter((m) => {
+              const r = m.business_rates[biz.business];
+              return r !== null && r !== undefined;
+            })
+            .sort((a, b) => {
+              const ra = a.business_rates[biz.business] as number;
+              const rb = b.business_rates[biz.business] as number;
+              return ra - rb;
+            })
+            .slice(0, 10);
+
+          return (
+            <div
+              key={biz.business}
+              className="bg-white rounded-lg border-2 p-5 shadow-sm"
+              style={{ borderColor }}
+            >
+              {/* 業務名 + 順位 */}
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <span className="text-xs text-gray-400 font-medium">
+                    完了率 {rank + 1}位（低）
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-800 mt-0.5">
+                    {biz.business}
+                  </h2>
+                </div>
+                <span
+                  className="text-2xl font-extrabold leading-none mt-1"
+                  style={{ color: textColor }}
+                >
+                  {formatRate(biz.avg_rate)}
+                </span>
+              </div>
+
+              {/* プログレスバー */}
+              <div className="mb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-500">全国平均完了率</span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${pct}%`, backgroundColor: barColor }}
+                  />
+                </div>
+              </div>
+
+              {/* 完了 / 危機 カウント */}
+              <div className="flex items-center gap-4 mb-4 text-sm">
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                  <span className="text-gray-600">
+                    完了:{" "}
+                    <strong className="text-green-600">{biz.completed}</strong>{" "}
+                    自治体
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+                  <span className="text-gray-600">
+                    危機:{" "}
+                    <strong className="text-red-600">{biz.critical}</strong>{" "}
+                    自治体
+                  </span>
+                </div>
+              </div>
+
+              {/* 遅れている自治体 TOP10 */}
+              <div>
+                <p className="text-xs font-semibold text-gray-500 mb-2">
+                  この業務で遅れている自治体 TOP10
+                </p>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-gray-100">
+                      <th className="text-left py-1 text-gray-400 font-medium w-6">
+                        #
+                      </th>
+                      <th className="text-left py-1 text-gray-400 font-medium">
+                        都道府県
+                      </th>
+                      <th className="text-left py-1 text-gray-400 font-medium">
+                        市区町村
+                      </th>
+                      <th className="text-right py-1 text-gray-400 font-medium">
+                        完了率
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bottom10.map((muni, i) => {
+                      const r = muni.business_rates[biz.business] as number;
+                      return (
+                        <tr
+                          key={`${muni.prefecture}-${muni.city}`}
+                          className="border-b border-gray-50"
+                        >
+                          <td className="py-1 text-gray-400">{i + 1}</td>
+                          <td className="py-1 text-gray-500">
+                            {muni.prefecture}
+                          </td>
+                          <td className="py-1 text-gray-800 font-medium">
+                            {muni.city}
+                          </td>
+                          <td className="py-1 text-right font-bold" style={{ color: getTextColor(r) }}>
+                            {formatRate(r)}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
