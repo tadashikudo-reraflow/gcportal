@@ -1,33 +1,34 @@
 @import "tailwindcss";
 
 /* ==========================================================
-   デザイントークン — gcportal × ReraFlow Brand
-   ReraFlow: #7FB8E6(メイン) / #4A90E2(強調) / #FFF5D1(アクセント)
+   デザイントークン — gcportal × freee-inspired Palette
+   Primary #2864F0 / Accent #FA6414 / FinOps #378445
    ========================================================== */
 :root {
-  /* ブランドカラー（ReraFlow準拠） */
-  --color-gov-primary:   #4A90E2;   /* ReraFlow 強調ブルー → ナビ・ボタン */
-  --color-gov-nav:       #357ABD;   /* ReraFlow 落ち着きブルー → ナビ背景 */
-  --color-gov-accent:    #7FB8E6;   /* ReraFlow メインカラー → アクセント */
+  /* Primary（freee公式 Primary P5） */
+  --color-gov-primary:   #2864F0;   /* Main Blue: ヘッダー・主要ボタン */
+  --color-gov-nav:       #1a4fd6;   /* やや濃いBlue: ナビ背景 */
+  --color-gov-accent:    #73A5FF;   /* Light Blue: サブアクセント・ホバー */
 
-  /* ステータスカラー（コントラスト確保済み） */
-  --color-status-complete: #007a3d; /* 完了 */
-  --color-status-ok:       #4A90E2; /* 順調 → ReraFlow強調ブルー */
+  /* ステータスカラー */
+  --color-status-complete: #378445; /* FinOps Green: 完了・成功 */
+  --color-status-ok:       #2864F0; /* Primary Blue: 順調 */
   --color-status-warn:     #b45309; /* 要注意 */
   --color-status-critical: #b91c1c; /* 危機 */
+  --color-accent-cta:      #FA6414; /* Accent Orange: CTAボタン */
 
-  /* サーフェス（ReraFlow準拠） */
-  --color-surface:       #FFF5D1;   /* ReraFlow バニラクリーム → ページ背景 */
-  --color-card:          #ffffff;
-  --color-border:        #E6E7EA;   /* ReraFlow ボックス背景色 → ボーダー */
-  --color-border-subtle: #f3f4f6;
+  /* サーフェス */
+  --color-surface:       #EBF3FF;   /* Soft BG: ページ背景（目が疲れにくい） */
+  --color-card:          #ffffff;   /* カード・本文背景 */
+  --color-border:        #d1dff9;   /* Primary系の薄いボーダー */
+  --color-border-subtle: #f0f5ff;
 
-  /* テキスト（ReraFlow準拠） */
-  --color-text-primary:   #333333;  /* ReraFlow 通常テキスト */
+  /* テキスト */
+  --color-text-primary:   #23221F;  /* Dark: 本文 */
   --color-text-secondary: #4b5563;
   --color-text-muted:     #9ca3af;
 
-  /* スペーシング基準 */
+  /* スペーシング */
   --space-card: 1.25rem;
 }
 
@@ -56,11 +57,11 @@ body {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgb(74 144 226 / 0.08); /* ReraFlowブルーの薄シャドウ */
+  box-shadow: 0 1px 3px 0 rgb(40 100 240 / 0.08);
 }
 
 /* ========== ステータスバッジ ========== */
-.badge-complete { background: #dcfce7; color: #166534; }
+.badge-complete { background: #d1fae5; color: #166534; }
 .badge-ok       { background: #dbeafe; color: #1e40af; }
 .badge-warn     { background: #fef3c7; color: #92400e; }
 .badge-critical { background: #fee2e2; color: #991b1b; }
@@ -70,17 +71,17 @@ body {
   display: inline-block;
   padding: 0.75rem 1.25rem;
   font-size: 0.9375rem;
-  color: #FFF5D1;              /* ReraFlow バニラクリーム */
+  color: #c7d9fd;               /* Primary系の薄色 */
   border-bottom: 2px solid transparent;
   transition: background-color 150ms, color 150ms;
 }
 .nav-link:hover {
-  background-color: rgb(74 144 226 / 0.3); /* ReraFlow強調ブルー薄め */
+  background-color: rgb(115 165 255 / 0.2); /* Light Blue薄め */
   color: #ffffff;
 }
 .nav-link-active {
   color: #ffffff;
-  border-bottom-color: #FFF5D1; /* バニラクリームのアンダーライン */
+  border-bottom-color: #FA6414; /* Accent Orangeのアンダーライン */
 }
 
 /* ========== 警告バナー（controlled urgency） ========== */
@@ -101,7 +102,7 @@ body {
 /* ========== バーチャート ========== */
 .bar-track {
   flex: 1;
-  background: #E6E7EA;          /* ReraFlow ボックス背景色 */
+  background: #d1dff9;          /* Primary系の薄いトラック */
   border-radius: 9999px;
   height: 1rem;
   overflow: hidden;
@@ -110,4 +111,24 @@ body {
   height: 100%;
   border-radius: 9999px;
   transition: width 400ms ease;
+}
+
+/* ========== CTAボタン（Accent Orange） ========== */
+.btn-cta {
+  background: var(--color-accent-cta);
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: background-color 150ms;
+}
+.btn-cta:hover {
+  background: #e5530a;
+}
+
+/* ========== FinOps Greenバッジ ========== */
+.badge-finops {
+  background: #d1fae5;
+  color: #378445;
+  font-weight: 600;
 }
