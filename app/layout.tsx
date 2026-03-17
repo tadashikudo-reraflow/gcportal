@@ -67,6 +67,12 @@ export default function RootLayout({
                   パッケージ一覧
                 </Link>
                 <Link
+                  href="/adoption"
+                  className="px-5 py-3 text-sm text-blue-200 hover:bg-blue-900 hover:text-white transition-colors border-b-2 border-transparent"
+                >
+                  導入実績
+                </Link>
+                <Link
                   href="/costs"
                   className="px-5 py-3 text-sm text-blue-200 hover:bg-blue-900 hover:text-white transition-colors border-b-2 border-transparent"
                 >
