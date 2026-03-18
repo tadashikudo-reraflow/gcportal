@@ -191,7 +191,7 @@ export default function DashboardPage() {
               <div key={biz.business} className="flex items-center gap-3">
                 {/* w-36 → min-w-fit に変えて長い業務名でも折れないようにする */}
                 <span
-                  className="text-xs w-36 flex-shrink-0 text-right truncate"
+                  className="text-sm w-36 flex-shrink-0 text-right truncate"
                   style={{ color: "var(--color-text-secondary)" }}
                   title={biz.business}
                 >
@@ -204,7 +204,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <span
-                  className="text-xs font-bold w-12 flex-shrink-0 text-right tabular-nums"
+                  className="text-sm font-bold w-14 flex-shrink-0 text-right tabular-nums"
                   style={{ color: barColor }}
                 >
                   {pct.toFixed(1)}%
