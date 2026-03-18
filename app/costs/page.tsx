@@ -37,6 +37,11 @@ const VENDOR_COST_ESTIMATE: Record<string, {
     mark: "◎", markColor: "#007a3d", cloud: "GCP",
     note: "Google Cloud Partner Top Engineer受賞。長野県系自治体DXはGCP中心（木曽町等）。",
   },
+  日立: {
+    ratioMin: 1.3, ratioMax: 2.2, ratioTypical: 1.6,
+    mark: "○", markColor: "#1d6fa4", cloud: "AWS",
+    note: "ADWORLD全20業務AWS対応。大規模自治体向け。",
+  },
 };
 
 export const metadata: Metadata = {
@@ -84,8 +89,8 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
     mark: "○", markColor: "#1d6fa4", cloud: "OCI", confirmed: true,
   },
   日立: {
-    label: "AWS標準○",
-    detail: "全20業務対応確認・AWS主軸。Azure主要8業務も検証済（日立システムズ 2024/8）",
+    label: "AWS全業務対応○",
+    detail: "ADWORLD全20業務AWS対応確認済。Azure主要8業務も検証済（日立システムズ 2024/8プレスリリース）",
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
   アイネス: {
@@ -111,6 +116,16 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
   JIP: {
     label: "AWS＋自社IaaS○",
     detail: "WizLIFEはAWS対応。自社IaaS「Jip-Base」（自治体専用）も提供（JIP公式）",
+    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+  },
+  "行政S": {
+    label: "AWS検証済○",
+    detail: "デジタル庁令和5年度検証事業でAWS上検証実施（2024/9報告）。共同利用・マルチベンダー連携対応",
+    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+  },
+  "京都GIS": {
+    label: "接続基盤（AWS基本）",
+    detail: "京都GC接続サービス（2024/7〜）。AWS Direct Connect基本。OCI/Azure/GCPもサポート。接続基盤提供",
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
 };
