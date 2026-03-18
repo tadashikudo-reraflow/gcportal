@@ -118,8 +118,8 @@ export default async function AdoptionPage() {
     <div className="space-y-6">
       {/* ページヘッダー */}
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">パッケージ導入実績マップ</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="page-title">パッケージ導入実績マップ</h1>
+        <p className="page-subtitle">
           自治体ごとに導入しているパッケージとガバメントクラウド基盤の調査データ。
           <span className="text-xs text-gray-400 ml-1">※独自調査・公開情報に基づく。順次拡充予定。</span>
         </p>

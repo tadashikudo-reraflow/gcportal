@@ -78,10 +78,10 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
               ← 都道府県一覧に戻る
             </Link>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="page-title">
             {prefectureName} の標準化進捗
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="page-subtitle">
             {municipalities.length} 市区町村 / データ基準: {data.summary.data_month}
           </p>
         </div>

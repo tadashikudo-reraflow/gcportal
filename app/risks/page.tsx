@@ -46,10 +46,10 @@ export default function RisksPage() {
     <div className="space-y-6">
       {/* ページヘッダー */}
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="page-title">
           遅延リスク 自治体一覧
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="page-subtitle">
           2026年3月31日の移行期限に向け、完了率50%未満の自治体一覧
         </p>
       </div>

@@ -1,11 +1,11 @@
 import data from "@/public/data/standardization.json";
 
-// 完了率に応じた色クラスを返す
+// 完了率に応じた色を返す（指定カラートークン準拠）
 function getRateColor(rate: number): string {
-  if (rate >= 1.0) return "#007a3d";
-  if (rate >= 0.8) return "#1d6fa4";
-  if (rate >= 0.5) return "#d97706";
-  return "#c8102e";
+  if (rate >= 0.9) return "#378445"; // FinOps Green: 90%以上
+  if (rate >= 0.7) return "#2864F0"; // Primary Blue: 70-89%
+  if (rate >= 0.5) return "#FA6414"; // Accent Orange: 50-69%
+  return "#b91c1c";                  // Red: 50%未満
 }
 
 function getRateBgClass(rate: number): string {
@@ -126,17 +126,17 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* 危機 — border-top アクセントのみ、フルボーダー赤は廃止 */}
+        {/* 危機 — border-top をオレンジに変更（赤より目を引く） */}
         <div
           className="card p-5"
-          style={{ borderTop: "3px solid var(--color-status-critical)" }}
+          style={{ borderTop: "3px solid var(--color-accent-cta)" }}
         >
-          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-status-critical)" }}>
+          <p className="text-xs font-medium mb-1" style={{ color: "var(--color-accent-cta)" }}>
             危機（50%未満）
           </p>
           <p
             className="text-4xl font-extrabold leading-none"
-            style={{ color: "var(--color-status-critical)" }}
+            style={{ color: "var(--color-accent-cta)" }}
           >
             {summary.critical_count}
             <span className="text-base font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
@@ -216,10 +216,10 @@ export default function DashboardPage() {
         <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
           <span className="text-xs text-gray-500">凡例:</span>
           {[
-            { label: "完了(100%)", color: "#007a3d" },
-            { label: "順調(80%+)", color: "#1d6fa4" },
-            { label: "要注意(50-80%)", color: "#d97706" },
-            { label: "危機(<50%)", color: "#c8102e" },
+            { label: "完了(90%+)", color: "#378445" },
+            { label: "順調(70-89%)", color: "#2864F0" },
+            { label: "要注意(50-69%)", color: "#FA6414" },
+            { label: "危機(<50%)", color: "#b91c1c" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1">
               <span

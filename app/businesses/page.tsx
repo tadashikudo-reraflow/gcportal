@@ -43,8 +43,8 @@ export default function BusinessesPage() {
     <div className="space-y-6">
       {/* ページヘッダー */}
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">業務別 標準化進捗</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="page-title">業務別 標準化進捗</h1>
+        <p className="page-subtitle">
           全20業務の完了率を低い順に表示。各業務で遅れている自治体を確認できます。
         </p>
       </div>

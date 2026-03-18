@@ -5,6 +5,19 @@ export const metadata: Metadata = {
   title: "パッケージ一覧 | 自治体標準化ダッシュボード",
 };
 
+// ベンダー名からトップボーダーカラーを返す（主要ベンダーのみ対応）
+function getVendorBorderColor(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("tkc") || n.includes("ティーケーシー")) return "#2864F0";   // TKC = ブルー
+  if (n.includes("アイネス") || n.includes("ines"))        return "#00b4ff";  // アイネス = 水色
+  if (n.includes("fujitsu") || n.includes("富士通"))       return "#c00000";  // 富士通 = 赤
+  if (n.includes("nec") || n.includes("日本電気"))         return "#0066cc";  // NEC = ネイビーブルー
+  if (n.includes("hitachi") || n.includes("日立"))         return "#e00000";  // 日立 = 赤
+  if (n.includes("ntt") || n.includes("エヌ・ティ"))       return "#0032a0";  // NTT = 濃いブルー
+  if (n.includes("oss") || n.includes("オープン"))         return "#378445";  // OSS系 = グリーン
+  return "var(--color-gov-primary)";                                           // デフォルト
+}
+
 // クラウドバッジの色設定
 // platform が null/不明の場合は null を返し、呼び出し側で非表示にする
 function getCloudBadgeStyle(
@@ -72,9 +85,9 @@ export default async function PackagesPage() {
   return (
     <div className="space-y-6">
       {/* ページヘッダー */}
-      <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">パッケージ・ベンダー一覧</h1>
-        <p className="text-sm text-gray-500 mt-1">
+      <div className="pb-4">
+        <h1 className="page-title">パッケージ・ベンダー一覧</h1>
+        <p className="page-subtitle">
           標準化対応パッケージを提供するベンダーと業務別パッケージの一覧。
         </p>
       </div>
@@ -97,10 +110,12 @@ export default async function PackagesPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {vendors.map((vendor) => {
               const badgeStyle = getCloudBadgeStyle(vendor.cloud_platform, vendor.cloud_confirmed);
+              const borderColor = getVendorBorderColor(vendor.name);
               return (
                 <div
                   key={vendor.id}
-                  className="card p-4 flex flex-col gap-2 hover:shadow transition-shadow"
+                  className="card p-4 flex flex-col gap-2 hover:shadow-md transition-shadow"
+                  style={{ borderTop: `3px solid ${borderColor}` }}
                 >
                   {/* ベンダー名 */}
                   <div>
@@ -131,24 +146,31 @@ export default async function PackagesPage() {
                       </span>
                     )}
                     {vendor.multitenancy && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-indigo-50 text-indigo-700">
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
+                        style={{ backgroundColor: "#d1fae5", color: "#166534" }}
+                      >
                         共同利用
                       </span>
                     )}
                   </div>
 
-                  {/* 採用自治体数 */}
+                  {/* 採用自治体数 — 数値を大きく表示 */}
                   {vendor.municipality_count != null && (
-                    <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                      採用{" "}
-                      <span
-                        className="font-bold"
-                        style={{ color: "var(--color-text-primary)" }}
+                    <div className="mt-auto pt-1">
+                      <p
+                        className="text-2xl font-extrabold leading-none tabular-nums"
+                        style={{ color: "var(--color-gov-primary)" }}
                       >
                         {vendor.municipality_count.toLocaleString()}
-                      </span>{" "}
-                      団体
-                    </p>
+                        <span
+                          className="text-xs font-normal ml-1"
+                          style={{ color: "var(--color-text-muted)" }}
+                        >
+                          団体採用
+                        </span>
+                      </p>
+                    </div>
                   )}
                 </div>
               );
