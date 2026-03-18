@@ -41,14 +41,14 @@
 
 /* ========== ベーススタイル ========== */
 html {
-  font-size: 16px;
+  font-size: 17px;   /* 16→17: text-xs=12.75px, text-sm=14.9px, text-base=17px */
 }
 body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: 1rem;   /* 17px: 全体を均一に底上げ */
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
