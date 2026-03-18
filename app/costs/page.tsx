@@ -85,8 +85,8 @@ export default async function CostsPage() {
     <div className="space-y-6">
       {/* ページヘッダー */}
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl font-bold text-gray-800">コスト効果分析</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="page-title">コスト効果分析</h1>
+        <p className="page-subtitle">
           標準化移行によるコスト変化の実態。TCO比較・ベンダー別評価。
         </p>
       </div>

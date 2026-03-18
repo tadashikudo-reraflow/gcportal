@@ -2,18 +2,12 @@ import Link from "next/link";
 import data from "@/public/data/standardization.json";
 import { PrefectureSummary } from "@/lib/types";
 
+// ダッシュボードと統一した色分けロジック（指定カラートークン準拠）
 function getRateColor(rate: number): string {
-  if (rate >= 1.0) return "text-green-600";
-  if (rate >= 0.8) return "text-blue-600";
-  if (rate >= 0.5) return "text-yellow-600";
-  return "text-red-600";
-}
-
-function getRateBarColor(rate: number): string {
-  if (rate >= 1.0) return "bg-green-500";
-  if (rate >= 0.8) return "bg-blue-400";
-  if (rate >= 0.5) return "bg-yellow-400";
-  return "bg-red-500";
+  if (rate >= 0.9) return "#378445"; // FinOps Green
+  if (rate >= 0.7) return "#2864F0"; // Primary Blue
+  if (rate >= 0.5) return "#FA6414"; // Accent Orange
+  return "#b91c1c";                  // Red
 }
 
 function getStatusLabel(rate: number): string {
@@ -23,11 +17,11 @@ function getStatusLabel(rate: number): string {
   return "危機";
 }
 
-function getStatusBadgeClass(rate: number): string {
-  if (rate >= 1.0) return "bg-green-100 text-green-700";
-  if (rate >= 0.8) return "bg-blue-100 text-blue-700";
-  if (rate >= 0.5) return "bg-yellow-100 text-yellow-700";
-  return "bg-red-100 text-red-700";
+function getStatusBadgeStyle(rate: number): { bg: string; text: string } {
+  if (rate >= 0.9) return { bg: "#d1fae5", text: "#166534" }; // Green
+  if (rate >= 0.7) return { bg: "#dbeafe", text: "#1e40af" }; // Blue
+  if (rate >= 0.5) return { bg: "#fff7ed", text: "#c2410c" }; // Orange
+  return { bg: "#fee2e2", text: "#991b1b" };                  // Red
 }
 
 function formatRate(rate: number): string {
@@ -43,10 +37,8 @@ export default function PrefecturesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          都道府県別 標準化進捗
-        </h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="page-title">都道府県別 標準化進捗</h1>
+        <p className="page-subtitle">
           完了率の低い順に表示（データ基準: {data.summary.data_month}）
         </p>
       </div>
@@ -55,26 +47,26 @@ export default function PrefecturesPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b-2 border-gray-200">
-                <th className="text-center py-3 px-3 text-xs text-gray-500 font-medium w-14">
+              <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
+                <th className="text-center py-3 px-3 text-xs font-medium w-14" style={{ color: "#ffffff" }}>
                   順位
                 </th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">
+                <th className="text-left py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   都道府県
                 </th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium min-w-[180px]">
+                <th className="text-left py-3 px-3 text-xs font-medium min-w-[180px]" style={{ color: "#ffffff" }}>
                   平均完了率
                 </th>
-                <th className="text-right py-3 px-3 text-xs text-gray-500 font-medium">
+                <th className="text-right py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   自治体数
                 </th>
-                <th className="text-right py-3 px-3 text-xs text-gray-500 font-medium">
+                <th className="text-right py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   完了数
                 </th>
-                <th className="text-right py-3 px-3 text-xs text-gray-500 font-medium">
+                <th className="text-right py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   危機数
                 </th>
-                <th className="text-center py-3 px-3 text-xs text-gray-500 font-medium">
+                <th className="text-center py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   ステータス
                 </th>
               </tr>
@@ -83,9 +75,8 @@ export default function PrefecturesPage() {
               {sortedPrefectures.map((pref, i) => {
                 const rank = i + 1;
                 const pct = pref.avg_rate * 100;
-                const textColor = getRateColor(pref.avg_rate);
-                const barColor = getRateBarColor(pref.avg_rate);
-                const badgeClass = getStatusBadgeClass(pref.avg_rate);
+                const color = getRateColor(pref.avg_rate);
+                const badgeStyle = getStatusBadgeStyle(pref.avg_rate);
                 const statusLabel = getStatusLabel(pref.avg_rate);
                 // URLエンコードした都道府県名でリンク先を生成
                 const href = `/prefectures/${encodeURIComponent(pref.prefecture)}`;
@@ -93,7 +84,7 @@ export default function PrefecturesPage() {
                 return (
                   <tr
                     key={pref.prefecture}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="table-row-hover border-b border-gray-100 transition-colors"
                   >
                     <td className="py-3 px-3 text-center text-xs text-gray-400 font-medium">
                       {rank}
@@ -101,7 +92,7 @@ export default function PrefecturesPage() {
                     <td className="py-3 px-3">
                       <Link
                         href={href}
-                        className="font-medium text-gray-800 hover:text-blue-600 hover:underline"
+                        className="font-medium hover:underline transition-colors"
                       >
                         {pref.prefecture}
                       </Link>
@@ -110,11 +101,17 @@ export default function PrefecturesPage() {
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden min-w-[100px]">
                           <div
-                            className={`h-full rounded-full ${barColor}`}
-                            style={{ width: `${Math.min(pct, 100)}%` }}
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${Math.min(pct, 100)}%`,
+                              backgroundColor: color,
+                            }}
                           />
                         </div>
-                        <span className={`text-xs font-bold w-12 flex-shrink-0 ${textColor}`}>
+                        <span
+                          className="text-xs font-bold w-12 flex-shrink-0"
+                          style={{ color }}
+                        >
                           {formatRate(pref.avg_rate)}
                         </span>
                       </div>
@@ -122,23 +119,23 @@ export default function PrefecturesPage() {
                     <td className="py-3 px-3 text-right text-gray-600">
                       {pref.count}
                     </td>
-                    <td className="py-3 px-3 text-right text-green-600 font-medium">
+                    <td className="py-3 px-3 text-right font-medium" style={{ color: "#378445" }}>
                       {pref.completed}
                     </td>
                     <td className="py-3 px-3 text-right">
                       <span
-                        className={
-                          pref.critical > 0
-                            ? "text-red-600 font-bold"
-                            : "text-gray-400"
-                        }
+                        style={{
+                          color: pref.critical > 0 ? "#b91c1c" : "#9ca3af",
+                          fontWeight: pref.critical > 0 ? 700 : 400,
+                        }}
                       >
                         {pref.critical}
                       </span>
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${badgeClass}`}
+                        className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold"
+                        style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
                       >
                         {statusLabel}
                       </span>
