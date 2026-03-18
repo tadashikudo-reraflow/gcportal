@@ -41,13 +41,13 @@
 
 /* ========== ベーススタイル ========== */
 html {
-  font-size: 17px;   /* 16→17: text-xs=12.75px, text-sm=14.9px, text-base=17px */
+  font-size: 18px;   /* 18px base: text-xs=13.5px, text-sm=15.75px, text-base=18px */
 }
 body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: 1rem;   /* 17px: 全体を均一に底上げ */
+  font-size: 1rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -104,7 +104,7 @@ body {
   flex: 1;
   background: #d1dff9;          /* Primary系の薄いトラック */
   border-radius: 9999px;
-  height: 1rem;
+  height: 1.5rem;               /* 1rem→1.5rem: バーの太さ3割増し */
   overflow: hidden;
 }
 .bar-fill {
