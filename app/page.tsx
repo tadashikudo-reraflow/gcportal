@@ -183,6 +183,12 @@ export default function DashboardPage() {
           />
           業務別完了率（20業務）
         </h2>
+        <p className="text-xs mb-4 flex items-center gap-1.5" style={{ color: "var(--color-text-muted)" }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 flex-shrink-0">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+          </svg>
+          全国 1,741 自治体の業務ごとの<strong>平均</strong>完了率。平均が高くても個別自治体では遅延が発生しているケースがあります（↓下のリスク表を参照）。
+        </p>
         <div className="space-y-1.5">
           {sortedBusinesses.map((biz) => {
             const pct = biz.avg_rate * 100;
@@ -324,6 +330,24 @@ export default function DashboardPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      {/* 📘 初見者向け読み方ガイド */}
+      <div className="rounded-lg border-l-4 px-5 py-4 flex gap-4" style={{ borderLeftColor: "var(--color-gov-primary)", backgroundColor: "#f0f5ff" }}>
+        <div className="text-2xl leading-none flex-shrink-0 mt-0.5">💡</div>
+        <div>
+          <p className="text-sm font-bold mb-1.5" style={{ color: "var(--color-gov-primary)" }}>
+            「業務グラフは青いのに、なぜリスク自治体が多いの？」
+          </p>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+            上の<strong>業務別グラフ</strong>は全国平均のため、大多数の順調な自治体に引っ張られて高く表示されます。
+            一方、下の<strong>遅延リスク表</strong>は個別の自治体単位で見ており、平均の陰に隠れた「全業務で大幅遅延している自治体」を抽出しています。
+          </p>
+          <p className="text-xs mt-2 flex gap-4 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
+            <span>📊 業務グラフ ＝ 全自治体の平均（マクロ視点）</span>
+            <span>🚨 リスク表 ＝ 個別自治体の実態（ミクロ視点）</span>
+          </p>
         </div>
       </div>
 

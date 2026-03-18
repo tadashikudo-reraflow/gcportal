@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/packages",     label: "パッケージ一覧" },
   { href: "/adoption",     label: "導入実績"       },
   { href: "/costs",        label: "コスト効果"     },
+  { href: "/cloud",        label: "クラウド基盤"   },
 ] as const;
 
 export default function NavBar() {
