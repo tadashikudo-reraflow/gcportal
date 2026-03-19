@@ -47,6 +47,22 @@ export function getAllArticles(): ArticleMeta[] {
   return articles.sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+/** タグに一致する記事を取得（内部リンク用） */
+export function getArticlesByTags(
+  tags: string[],
+  excludeSlug?: string,
+  maxItems = 3
+): ArticleMeta[] {
+  const all = getAllArticles();
+  return all
+    .filter(
+      (a) =>
+        a.slug !== excludeSlug &&
+        a.tags.some((t) => tags.includes(t))
+    )
+    .slice(0, maxItems);
+}
+
 /** slug から記事本文（HTML）を取得 */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const filePath = path.join(ARTICLES_DIR, `${slug}.md`);

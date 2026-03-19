@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import data from "@/public/data/standardization.json";
 import { PrefectureSummary } from "@/lib/types";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
   title: "都道府県別 ガバメントクラウド移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
@@ -153,6 +155,8 @@ export default function PrefecturesPage() {
           </table>
         </div>
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );
 }
