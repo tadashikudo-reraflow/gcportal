@@ -3,7 +3,7 @@ import data from "@/public/data/standardization.json";
 // 完了率に応じた色を返す（指定カラートークン準拠）
 function getRateColor(rate: number): string {
   if (rate >= 0.9) return "#378445"; // FinOps Green: 90%以上
-  if (rate >= 0.7) return "#2864F0"; // Primary Blue: 70-89%
+  if (rate >= 0.7) return "#1D4ED8"; // Primary Blue: 70-89%
   if (rate >= 0.5) return "#FA6414"; // Accent Orange: 50-69%
   return "#b91c1c";                  // Red: 50%未満
 }
@@ -223,7 +223,7 @@ export default function DashboardPage() {
           <span className="text-xs text-gray-500">凡例:</span>
           {[
             { label: "完了(90%+)", color: "#378445" },
-            { label: "順調(70-89%)", color: "#2864F0" },
+            { label: "順調(70-89%)", color: "#1D4ED8" },
             { label: "要注意(50-69%)", color: "#FA6414" },
             { label: "危機(<50%)", color: "#b91c1c" },
           ].map((item) => (

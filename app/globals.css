@@ -1,161 +1,262 @@
 @import "tailwindcss";
 
 /* ==========================================================
-   デザイントークン — gcportal × freee-inspired Palette
-   Primary #2864F0 / Accent #FA6414 / FinOps #378445
+   GCInsight Design System v2.0
+   PJ03 Politech-OS 準拠 — SmartHR / kintone / freee / Sansan
+   Brand: #F5B500 (黄) + #002D72 (深紺)
    ========================================================== */
-:root {
-  /* Primary（freee公式 Primary P5） */
-  --color-gov-primary:   #2864F0;   /* Main Blue: ヘッダー・主要ボタン */
-  --color-gov-nav:       #1a4fd6;   /* やや濃いBlue: ナビ背景 */
-  --color-gov-accent:    #73A5FF;   /* Light Blue: サブアクセント・ホバー */
-
-  /* ステータスカラー */
-  --color-status-complete: #378445; /* FinOps Green: 完了・成功 */
-  --color-status-ok:       #2864F0; /* Primary Blue: 順調 */
-  --color-status-warn:     #b45309; /* 要注意 */
-  --color-status-critical: #b91c1c; /* 危機 */
-  --color-accent-cta:      #FA6414; /* Accent Orange: CTAボタン */
-
-  /* サーフェス */
-  --color-surface:       #EBF3FF;   /* Soft BG: ページ背景（目が疲れにくい） */
-  --color-card:          #ffffff;   /* カード・本文背景 */
-  --color-border:        #d1dff9;   /* Primary系の薄いボーダー */
-  --color-border-subtle: #f0f5ff;
-
-  /* テキスト */
-  --color-text-primary:   #23221F;  /* Dark: 本文 */
-  --color-text-secondary: #4b5563;
-  --color-text-muted:     #9ca3af;
-
-  /* スペーシング */
-  --space-card: 1.25rem;
-}
 
 @theme inline {
-  --color-background: var(--color-surface);
-  --color-foreground: var(--color-text-primary);
-  --font-sans: var(--font-geist-sans);
+  --color-brand-primary: #F5B500;
+  --color-brand-secondary: #002D72;
+  --color-brand-accent: #FFFFFF;
+  --color-brand-pressed: #E5A800;
+
+  --color-card-bg: #FFFFFF;
+  --color-section-bg: #F5F6FA;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-muted: #9CA3AF;
+
+  --color-success: #10B981;
+  --color-info: #1D4ED8;
+  --color-warning: #B8860B;
+  --color-error: #DC2626;
+
+  --color-border: #D1D5DB;
+  --color-border-strong: #9CA3AF;
+
+  --font-sans: 'Noto Sans JP', 'Inter', sans-serif;
   --font-mono: var(--font-geist-mono);
+
+  --color-background: #F5F6FA;
+  --color-foreground: #1F2937;
+}
+
+/* ========== 後方互換エイリアス ========== */
+:root {
+  --color-gov-primary: var(--color-brand-secondary);
+  --color-gov-nav: #003591;
+  --color-gov-accent: var(--color-brand-primary);
+
+  --color-status-complete: #378445;
+  --color-status-ok: #1D4ED8;
+  --color-status-warn: #b45309;
+  --color-status-critical: #b91c1c;
+  --color-accent-cta: var(--color-brand-primary);
+
+  --color-surface: #F5F6FA;
+  --color-card: #FFFFFF;
+
+  font-size: 18px;
 }
 
 /* ========== ベーススタイル ========== */
-html {
-  font-size: 18px;   /* 18px base: text-xs=13.5px, text-sm=15.75px, text-base=18px */
-}
 body {
   background: var(--color-surface);
   color: var(--color-text-primary);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
-  line-height: 1.65;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ========== 共通カードスタイル ========== */
-.card {
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgb(40 100 240 / 0.08);
-}
+/* ==========================================================
+   SmartHR風カードコンポーネント
+   白背景 + 2px太ボーダー + 12px角丸
+   ========================================================== */
 
-/* ========== ステータスバッジ ========== */
-.badge-complete { background: #d1fae5; color: #166534; }
-.badge-ok       { background: #dbeafe; color: #1e40af; }
-.badge-warn     { background: #fef3c7; color: #92400e; }
-.badge-critical { background: #fee2e2; color: #991b1b; }
+@layer utilities {
 
-/* ========== ナビゲーション ========== */
-.nav-link {
-  display: inline-block;
-  padding: 0.75rem 1.25rem;
-  font-size: 0.9375rem;
-  color: #c7d9fd;               /* Primary系の薄色 */
-  border-bottom: 2px solid transparent;
-  transition: background-color 150ms, color 150ms;
-}
-.nav-link:hover {
-  background-color: rgb(115 165 255 / 0.2); /* Light Blue薄め */
-  color: #ffffff;
-}
-.nav-link-active {
-  color: #ffffff;
-  border-bottom-color: #FA6414; /* Accent Orangeのアンダーライン */
-}
+  .card {
+    background: #FFFFFF;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
 
-/* ========== 警告バナー（controlled urgency） ========== */
-.alert-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.375rem;
-  border-left: 4px solid var(--color-status-critical);
-  background: #fff1f2;
-  color: #7f1d1d;
-}
-.alert-banner strong {
-  color: var(--color-status-critical);
-}
+  .card:hover {
+    border-color: var(--color-brand-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
 
-/* ========== バーチャート ========== */
-.bar-track {
-  flex: 1;
-  background: #d1dff9;          /* Primary系の薄いトラック */
-  border-radius: 9999px;
-  height: 1.5rem;               /* 1rem→1.5rem: バーの太さ3割増し */
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 9999px;
-  transition: width 400ms ease;
-}
+  /* セクションヘッダー付きカード */
+  .card-section {
+    background: #FFFFFF;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
 
-/* ========== CTAボタン（Accent Orange） ========== */
-.btn-cta {
-  background: var(--color-accent-cta);
-  color: #ffffff;
-  font-weight: 600;
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.375rem;
-  transition: background-color 150ms;
-}
-.btn-cta:hover {
-  background: #e5530a;
-}
+  .card-section-header {
+    background: var(--color-section-bg);
+    border-bottom: 2px solid var(--color-border);
+    padding: 16px 24px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+  }
 
-/* ========== FinOps Greenバッジ ========== */
-.badge-finops {
-  background: #d1fae5;
-  color: #378445;
-  font-weight: 600;
-}
+  .card-section-body {
+    padding: 24px;
+  }
 
-/* ========== テーブル行ホバー（Server Component対応） ========== */
-.table-row-hover:hover {
-  background-color: #EBF3FF;
-}
-.table-row-hover a {
-  color: var(--color-text-primary);
-}
-.table-row-hover:hover a {
-  color: var(--color-gov-primary);
-}
+  /* ========== ステータスバッジ — freee風 pill + border ========== */
+  .badge-complete {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
+    background: rgba(16, 185, 129, 0.15); color: #065F46; border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .badge-ok {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
+    background: rgba(0, 45, 114, 0.1); color: var(--color-brand-secondary); border: 1px solid rgba(0, 45, 114, 0.2);
+  }
+  .badge-warn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
+    background: rgba(245, 181, 0, 0.15); color: #B8860B; border: 1px solid rgba(245, 181, 0, 0.3);
+  }
+  .badge-critical {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
+    background: rgba(220, 38, 38, 0.12); color: #B91C1C; border: 1px solid rgba(220, 38, 38, 0.3);
+  }
 
-/* ========== ページタイトル（全ページ共通） ========== */
-.page-title {
-  font-size: 1.5rem;    /* text-2xl */
-  font-weight: 700;
-  color: var(--color-gov-primary);
-  padding-left: 1rem;
-  border-left: 4px solid var(--color-gov-primary);
-  line-height: 1.3;
-}
-.page-subtitle {
-  font-size: 0.875rem;  /* text-sm */
-  color: var(--color-text-secondary);
-  margin-top: 0.375rem;
-  padding-left: 1rem;
+  /* ========== ナビゲーション ========== */
+  .nav-link {
+    display: inline-block;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 3px solid transparent;
+    transition: background-color 150ms, color 150ms;
+  }
+  .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .nav-link-active {
+    color: #ffffff;
+    font-weight: 700;
+    border-bottom-color: var(--color-brand-primary);
+  }
+
+  /* ========== 警告バナー ========== */
+  .alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--color-status-critical);
+    background: #fff1f2;
+    color: #7f1d1d;
+  }
+  .alert-banner strong {
+    color: var(--color-status-critical);
+  }
+
+  /* ========== バーチャート ========== */
+  .bar-track {
+    flex: 1;
+    background: #E5E7EB;
+    border-radius: 9999px;
+    height: 1.5rem;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 400ms ease;
+  }
+
+  /* ========== ボタン ========== */
+  .btn-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 10px 24px;
+    background: var(--color-brand-primary);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 2px 4px rgba(245, 181, 0, 0.3);
+  }
+  .btn-cta:hover {
+    background: var(--color-brand-pressed);
+  }
+  .btn-cta:active {
+    transform: scale(0.97);
+  }
+
+  /* ========== テーブル行ホバー ========== */
+  .table-row-hover:hover {
+    background-color: var(--color-section-bg);
+  }
+  .table-row-hover a {
+    color: var(--color-text-primary);
+  }
+  .table-row-hover:hover a {
+    color: var(--color-brand-secondary);
+  }
+
+  /* ========== ページタイトル ========== */
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-brand-secondary);
+    padding-left: 1rem;
+    border-left: 4px solid var(--color-brand-primary);
+    line-height: 1.3;
+  }
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.375rem;
+    padding-left: 1rem;
+  }
+
+  /* ========== Sansan風 情報グリッド ========== */
+  .info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 16px;
+    align-items: baseline;
+  }
+  .info-label {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+  .info-value {
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+  }
+
+  /* ========== スクロールバー非表示 ========== */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ========== モバイル最適化 ========== */
+  @media (max-width: 640px) {
+    .card.p-6 { padding: 1rem !important; }
+    .card.p-5 { padding: 0.9rem !important; }
+    .card-section-header { padding: 12px 16px; font-size: 0.925rem; }
+    .card-section-body { padding: 16px; }
+  }
 }

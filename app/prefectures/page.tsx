@@ -5,7 +5,7 @@ import { PrefectureSummary } from "@/lib/types";
 // ダッシュボードと統一した色分けロジック（指定カラートークン準拠）
 function getRateColor(rate: number): string {
   if (rate >= 0.9) return "#378445"; // FinOps Green
-  if (rate >= 0.7) return "#2864F0"; // Primary Blue
+  if (rate >= 0.7) return "#1D4ED8"; // Primary Blue
   if (rate >= 0.5) return "#FA6414"; // Accent Orange
   return "#b91c1c";                  // Red
 }

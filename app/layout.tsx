@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP, Inter } from "next/font/google";
 import "./globals.css";
 import NavBar from "./NavBar";
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
+  variable: "--font-noto",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "800"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "自治体標準化ダッシュボード",
@@ -13,19 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
-      {/* fontFamilyはglobals.cssのbodyルールに集約。styleプロップを除去。 */}
+    <html lang="ja" className={`${notoSansJP.variable} ${inter.variable}`}>
       <body className="min-h-screen" style={{ backgroundColor: "var(--color-surface)" }}>
 
-        {/* ヘッダー */}
-        <header style={{ backgroundColor: "var(--color-gov-primary)" }}>
+        {/* ヘッダー — 深紺 #002D72 */}
+        <header style={{ backgroundColor: "var(--color-brand-secondary)" }}>
           <div className="max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center gap-3">
+              {/* ロゴ: 黄色アクセント */}
               <div
-                className="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0"
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: "var(--color-brand-primary)" }}
               >
                 <span
-                  style={{ color: "var(--color-gov-primary)", fontSize: "13px", fontWeight: 700 }}
+                  style={{ color: "#FFFFFF", fontSize: "14px", fontWeight: 800 }}
                 >
                   官
                 </span>
@@ -34,13 +50,12 @@ export default function RootLayout({
                 <h1 className="text-white font-bold text-lg leading-tight">
                   自治体標準化ダッシュボード
                 </h1>
-                <p className="text-blue-200 text-xs mt-0.5">
+                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
                   デジタル庁 地方公共団体情報システム標準化 進捗状況
                 </p>
               </div>
             </div>
           </div>
-          {/* pathname連動active — Client Component */}
           <NavBar />
         </header>
 
@@ -52,7 +67,7 @@ export default function RootLayout({
         {/* フッター */}
         <footer
           className="mt-12"
-          style={{ borderTop: "1px solid var(--color-border)", backgroundColor: "var(--color-card)" }}
+          style={{ borderTop: "2px solid var(--color-border)", backgroundColor: "var(--color-card)" }}
         >
           <div className="max-w-7xl mx-auto px-4 py-5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
