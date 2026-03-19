@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import data from "@/public/data/standardization.json";
 import { Municipality, BusinessSummary } from "@/lib/types";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
   title: "自治体標準化20業務 移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
@@ -178,6 +180,8 @@ export default function BusinessesPage() {
           );
         })}
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.business} />
     </div>
   );
 }

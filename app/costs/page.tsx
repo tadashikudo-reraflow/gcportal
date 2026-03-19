@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { CostReport, Vendor } from "@/lib/supabase";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -504,6 +506,8 @@ export default async function CostsPage() {
           </div>
         </div>
       )}
+
+      <RelatedArticles cluster={CLUSTERS.cost} />
     </div>
   );
 }

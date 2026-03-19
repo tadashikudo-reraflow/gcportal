@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Vendor, Package } from "@/lib/supabase";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
   title: "自治体向けガバメントクラウド対応パッケージ一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
@@ -293,6 +295,8 @@ export default async function PackagesPage() {
           </div>
         )}
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.vendor} />
     </div>
   );
 }

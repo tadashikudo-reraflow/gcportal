@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
   title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| 自治体ガバメントクラウド移行進捗ダッシュボード",
@@ -511,6 +513,8 @@ export default async function CloudPage() {
           </p>
         </div>
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.tech} />
     </div>
   );
 }

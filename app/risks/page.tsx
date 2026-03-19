@@ -3,6 +3,8 @@ import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality } from "@/lib/types";
 import RiskFilter from "./RiskFilter";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -209,6 +211,8 @@ export default function RisksPage() {
           </Link>
         </div>
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );
 }

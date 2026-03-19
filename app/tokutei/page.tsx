@@ -3,6 +3,8 @@ import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import standardData from "@/public/data/standardization.json";
 import TokuteiFilter from "./TokuteiFilter";
 import Link from "next/link";
+import RelatedArticles from "@/components/RelatedArticles";
+import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
   title: "特定移行支援システム認定 自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
@@ -173,6 +175,8 @@ export default function TokuteiPage() {
         </div>
         <TokuteiFilter rows={rows} prefectures={prefectures} />
       </div>
+
+      <RelatedArticles cluster={CLUSTERS.tokutei} />
     </div>
   );
 }

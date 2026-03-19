@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { getArticleBySlug, getAllArticles } from "@/lib/articles";
+import { getClusterForTags } from "@/lib/clusters";
+import RelatedArticles from "@/components/RelatedArticles";
+import ArticleCTA from "@/components/ArticleCTA";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
@@ -113,6 +116,17 @@ export default async function ArticlePage({ params }: Props) {
 
       <div className="card p-6 prose-article"
         dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
+
+      {(() => {
+        const cluster = getClusterForTags(article.tags ?? []);
+        if (!cluster) return null;
+        return (
+          <>
+            <ArticleCTA cluster={cluster} />
+            <RelatedArticles cluster={cluster} excludeSlug={slug} />
+          </>
+        );
+      })()}
 
       <div className="flex items-center justify-between pt-2">
         <Link href="/articles" className="text-sm font-semibold hover:underline"
