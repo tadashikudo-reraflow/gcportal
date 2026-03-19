@@ -424,7 +424,7 @@ export default async function CostsPage() {
           デジタル庁先行事業TCO検証・中核市市長会調査（2025）
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          ※ change_ratio は移行前コストを1.0とした比率。1.0未満 = コスト削減、1.0以上 = コスト増。
+          ※ コスト比率は移行前を1.0とした比率。1.0未満 = コスト削減、1.0以上 = コスト増。
           判明分のみ集計のため、実態との乖離がある場合があります。
         </p>
       </div>
@@ -438,8 +438,8 @@ export default async function CostsPage() {
             <span className="text-xs font-normal text-gray-400 ml-1">（上位30件 / 全{muniEstimates.length}件）</span>
           </h2>
           <p className="text-xs text-gray-400 mb-4">
-            municipality_packages × vendors × コスト調査レポートを紐付けた推定値。実際の請求額ではありません。
-            主ベンダー（最多採用パッケージ）のコスト変化レンジを適用。
+            自治体の採用パッケージ・ベンダー情報とコスト調査レポートを紐付けた推定値。実際の請求額ではありません。
+            主ベンダー（最多採用パッケージ）のコスト変化レンジを適用。出典: デジタル庁TCO検証・中核市市長会調査。
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
