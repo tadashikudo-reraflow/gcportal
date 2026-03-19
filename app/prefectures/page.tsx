@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import data from "@/public/data/standardization.json";
 import { PrefectureSummary } from "@/lib/types";
+
+export const metadata: Metadata = {
+  title: "都道府県別 ガバメントクラウド移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "47都道府県別のガバメントクラウド移行進捗状況を一覧表示。各都道府県の自治体数・完了率・遅延リスク数を比較。",
+};
 
 // ダッシュボードと統一した色分けロジック（指定カラートークン準拠）
 function getRateColor(rate: number): string {

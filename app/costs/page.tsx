@@ -45,7 +45,8 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 };
 
 export const metadata: Metadata = {
-  title: "コスト効果分析 | 自治体標準化ダッシュボード",
+  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "ガバメントクラウド移行コストが当初比156%増になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
 };
 
 // change_ratioに応じたバー幅（基準1.0 = 50%、最大3.0 = 100%）

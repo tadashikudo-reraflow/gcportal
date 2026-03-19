@@ -4,9 +4,9 @@ import { getAllArticles } from "@/lib/articles";
 import { createClient } from "@supabase/supabase-js";
 
 export const metadata: Metadata = {
-  title: "コラム・解説記事 | 自治体標準化ダッシュボード",
+  title: "コラム・解説記事 | 自治体ガバメントクラウド移行進捗ダッシュボード",
   description:
-    "ガバメントクラウド・自治体標準化システムに関するコラム・解説記事の一覧。自治体DX推進担当者向けの実務情報を提供します。",
+    "ガバメントクラウド・自治体標準化システムに関するコラム・解説記事の一覧。移行コスト・特定移行認定・遅延リスクなど自治体DX推進担当者向けの実務情報。",
 };
 
 type ArticleItem = {

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Vendor, Package } from "@/lib/supabase";
 
 export const metadata: Metadata = {
-  title: "パッケージ一覧 | 自治体標準化ダッシュボード",
+  title: "自治体向けガバメントクラウド対応パッケージ一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
 };
 
 // ベンダー名からトップボーダーカラーを返す（主要ベンダーのみ対応）

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "クラウド基盤分析 | 自治体標準化ダッシュボード",
+  title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "ガバメントクラウドのインフラシェア（AWS 97%・Azure・GCP・OCI）とコスト指標を分析。自治体が選ぶべきクラウド基盤と認定状況を可視化。",
 };
 
 // ガバクラ インフラシェア実績（デジタル庁 先行事業調査 令和6年9月）
