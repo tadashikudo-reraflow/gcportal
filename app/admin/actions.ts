@@ -85,6 +85,61 @@ export async function deleteArticleAction(id: number) {
   redirect("/admin");
 }
 
+// 自動保存（下書き・リダイレクトなし）
+export async function autoSaveArticleAction(formData: FormData): Promise<{ savedAt: string; id?: number }> {
+  const supabase = getAdminClient();
+
+  const id = formData.get("id") as string | null;
+  const slug = ((formData.get("slug") as string) ?? "").trim();
+  const title = ((formData.get("title") as string) ?? "").trim();
+  const description = ((formData.get("description") as string) ?? "").trim();
+  const content = (formData.get("content") as string) ?? "";
+  const date = (formData.get("date") as string) ?? "";
+  const tagsRaw = (formData.get("tags") as string) ?? "";
+  const tags = tagsRaw.split(/[,、\s]+/).map((t) => t.trim()).filter(Boolean);
+  const author = ((formData.get("author") as string) ?? "").trim();
+  const category = ((formData.get("category") as string) ?? "").trim();
+  const featured_image = ((formData.get("featured_image") as string) ?? "").trim();
+  const content_format = (formData.get("content_format") as string) ?? "html";
+
+  const payload = {
+    slug: slug || `draft-${Date.now()}`,
+    title,
+    description,
+    content,
+    content_format,
+    date,
+    tags,
+    author,
+    category,
+    featured_image,
+    is_published: false,
+  };
+
+  if (id) {
+    await supabase.from("articles").update(payload).eq("id", id);
+    revalidatePath("/admin");
+    return { savedAt: new Date().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }) };
+  } else {
+    const { data } = await supabase.from("articles").insert(payload).select("id").single();
+    revalidatePath("/admin");
+    return {
+      savedAt: new Date().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }),
+      id: data?.id,
+    };
+  }
+}
+
+// クイックドラフト保存（管理ダッシュボードから）
+export async function quickDraftAction(formData: FormData) {
+  const supabase = getAdminClient();
+  const title = ((formData.get("title") as string) ?? "").trim();
+  const content = (formData.get("content") as string) ?? "";
+  const slug = `draft-${Date.now()}`;
+  await supabase.from("articles").insert({ slug, title, content, is_published: false });
+  revalidatePath("/admin");
+}
+
 // 公開/下書き切替
 export async function togglePublishAction(id: number, current: boolean) {
   const supabase = getAdminClient();
