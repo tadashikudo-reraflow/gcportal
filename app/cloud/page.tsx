@@ -68,7 +68,34 @@ type VendorInfo = {
   multitenancy: boolean | null;
   cloud_confirmed: boolean;
   cloud_platform: string | null;
+  notes: string | null;
 };
+
+// notesテキスト内のURLをリンクに変換
+function NotesWithLinks({ notes }: { notes: string }) {
+  const urlRegex = /(https?:\/\/[^\s,、。）)]+)/g;
+  const parts = notes.split(urlRegex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^https?:\/\//.test(part) ? (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline break-all"
+            style={{ color: "#2563eb" }}
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
 
 type PackageRow = {
   package_name: string;
@@ -95,7 +122,7 @@ export default async function CloudPage() {
 
       const { data: pkgRows } = await supabase
         .from("packages")
-        .select("package_name, business, cloud_platform, vendors(id, name, short_name, municipality_count, multitenancy, cloud_confirmed)")
+        .select("package_name, business, cloud_platform, vendors(id, name, short_name, municipality_count, multitenancy, cloud_confirmed, notes)")
         .not("cloud_platform", "is", null)
         .order("business");
 
@@ -266,13 +293,13 @@ export default async function CloudPage() {
                             </div>
                           </summary>
 
-                          {/* パッケージ一覧（展開時） */}
-                          {pkgs.length > 0 && (
-                            <div
-                              className="px-4 pb-4 pt-1"
-                              style={{ backgroundColor: cfg.bgColor + "80" }}
-                            >
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {/* パッケージ一覧 + notes（展開時） */}
+                          <div
+                            className="px-4 pb-4 pt-1"
+                            style={{ backgroundColor: cfg.bgColor + "80" }}
+                          >
+                            {pkgs.length > 0 && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
                                 {pkgs.map((pkg, i) => (
                                   <div
                                     key={i}
@@ -296,8 +323,14 @@ export default async function CloudPage() {
                                   </div>
                                 ))}
                               </div>
-                            </div>
-                          )}
+                            )}
+                            {/* notes / 出典 */}
+                            {vendor.notes && (
+                              <p className="text-xs leading-relaxed px-1" style={{ color: "var(--color-text-muted)" }}>
+                                <NotesWithLinks notes={vendor.notes} />
+                              </p>
+                            )}
+                          </div>
                         </details>
                       );
                     })}
@@ -418,14 +451,24 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* データソース */}
-      <div className="rounded-lg border border-gray-100 px-5 py-3 bg-gray-50">
-        <p className="text-xs text-gray-500">
-          <span className="font-semibold text-gray-600">データソース:</span>{" "}
-          インフラシェア: デジタル庁先行事業調査（令和6年9月）／
-          コスト比較: Oracle TCO白書・Gartner IaaS比較レポート・デジタル庁TCO検証（参考値）／
-          ベンダー・パッケージ: APPLIC準拠製品登録リスト・各社公式発表・デジタル庁先行事業調査をもとに編集
-        </p>
+      {/* 免責 + データソース */}
+      <div className="space-y-2">
+        <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
+            <span className="font-semibold">⚠️ 免責事項:</span>{" "}
+            本ページのクラウド基盤情報は、各社公式発表・プレスリリース・AWSパートナーディレクトリ等の公開情報をもとに調査・編集したものです。
+            <span className="font-semibold">内容の正確性・完全性を保証するものではありません。</span>
+            「移行予定」はGrokによるウェブ調査に基づく情報であり、各社の公式発表と異なる場合があります。最新情報は各社公式サイトをご確認ください。
+          </p>
+        </div>
+        <div className="rounded-lg border border-gray-100 px-5 py-3 bg-gray-50">
+          <p className="text-xs text-gray-500">
+            <span className="font-semibold text-gray-600">データソース:</span>{" "}
+            インフラシェア: デジタル庁先行事業調査（令和6年9月）／
+            コスト比較: Oracle TCO白書・Gartner IaaS比較レポート・デジタル庁TCO検証（参考値）／
+            ベンダー・パッケージ: APPLIC準拠製品登録リスト・各社公式発表・AWSパートナーディレクトリをもとに編集
+          </p>
+        </div>
       </div>
     </div>
   );
