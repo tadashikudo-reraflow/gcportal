@@ -240,10 +240,10 @@ export default async function CloudPage() {
                                 <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
                                   style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
                               )}
-                              {/* 未確認 */}
-                              {!vendor.cloud_confirmed && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full flex-shrink-0"
-                                  style={{ backgroundColor: "#f3f4f6", color: "#6b7280" }}>未確認</span>
+                              {/* 移行予定 / 未確認バッジ */}
+                              {!vendor.cloud_confirmed && vendor.cloud_platform && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                  style={{ backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #d97706" }}>移行予定</span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0 ml-2">
