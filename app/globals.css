@@ -48,7 +48,7 @@
   --color-surface: #F5F6FA;
   --color-card: #FFFFFF;
 
-  font-size: 18px;
+  font-size: 19px;  /* 18→19px: 全体の可読性向上 */
 }
 
 /* ========== ベーススタイル ========== */
@@ -59,6 +59,11 @@ body {
   font-size: 1rem;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+}
+
+/* モバイルではベースフォントをさらに大きく */
+@media (max-width: 640px) {
+  :root { font-size: 17px; }  /* スマホでは17px（小さすぎない程度に） */
 }
 
 /* ==========================================================
@@ -254,9 +259,41 @@ body {
 
   /* ========== モバイル最適化 ========== */
   @media (max-width: 640px) {
+    /* カード密度 */
     .card.p-6 { padding: 1rem !important; }
     .card.p-5 { padding: 0.9rem !important; }
-    .card-section-header { padding: 12px 16px; font-size: 0.925rem; }
+    .card-section-header { padding: 12px 16px; font-size: 1rem; }
     .card-section-body { padding: 16px; }
+
+    /* ページタイトル */
+    .page-title { font-size: 1.25rem; padding-left: 0.75rem; }
+    .page-subtitle { font-size: 0.9rem; padding-left: 0.75rem; }
+
+    /* ナビ: タッチターゲット大きく */
+    .nav-link {
+      padding: 0.875rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* バッジ */
+    .badge-complete, .badge-ok, .badge-warn, .badge-critical {
+      padding: 5px 12px;
+      font-size: 0.8125rem;
+    }
+
+    /* バーチャート: モバイルでは細く */
+    .bar-track { height: 1.25rem; }
+
+    /* テーブル: セル内余白縮小 */
+    table th, table td {
+      padding: 0.5rem 0.375rem !important;
+      font-size: 0.875rem !important;
+    }
+
+    /* 情報グリッド: 1列化 */
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
   }
 }
