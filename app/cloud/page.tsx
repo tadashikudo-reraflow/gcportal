@@ -423,7 +423,7 @@ export default async function CloudPage() {
           <span className="font-semibold text-gray-600">データソース:</span>{" "}
           インフラシェア: デジタル庁先行事業調査（令和6年9月）／
           コスト比較: Oracle TCO白書・Gartner IaaS比較レポート・デジタル庁TCO検証（参考値）／
-          ベンダー基盤: vendors.cloud_platform（本DB）
+          ベンダー・パッケージ: APPLIC準拠製品登録リスト・各社公式発表・デジタル庁先行事業調査をもとに編集
         </p>
       </div>
     </div>
