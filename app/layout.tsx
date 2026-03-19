@@ -18,8 +18,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "自治体標準化ダッシュボード",
-  description: "デジタル庁 地方公共団体情報システム標準化 進捗状況",
+  title: "ガバメントクラウド移行状況ダッシュボード",
+  description: "全国1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化。デジタル庁標準化データに基づくリアルタイムダッシュボード。",
+  verification: {
+    google: "rzkjtVTiTE7yeA1FjPoMBNRmgzbrv-Mc_DN7i1SKvQo",
+  },
 };
 
 export default function RootLayout({
