@@ -230,7 +230,13 @@ export default async function PackagesPage() {
                   </summary>
 
                   <div className="mt-2 overflow-x-auto">
-                    <table className="w-full text-sm">
+                    <table className="w-full text-sm table-fixed">
+                      <colgroup>
+                        <col style={{ width: "auto" }} />
+                        <col style={{ width: "7rem" }} />
+                        <col style={{ width: "6rem" }} />
+                        <col style={{ width: "7rem" }} />
+                      </colgroup>
                       <thead>
                         <tr className="border-b border-gray-200">
                           <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>
