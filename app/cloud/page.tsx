@@ -67,6 +67,7 @@ type VendorInfo = {
   municipality_count: number | null;
   multitenancy: boolean | null;
   cloud_confirmed: boolean;
+  cloud_platform: string | null;
 };
 
 type PackageRow = {
