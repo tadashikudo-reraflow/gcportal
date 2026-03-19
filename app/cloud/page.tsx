@@ -32,6 +32,33 @@ const CLOUD_CONFIG: Record<string, {
 };
 const CLOUD_ORDER = ["AWS", "OCI", "Azure", "GCP", "Sakura"];
 
+// ベンダー公式サイト（vendor.id → URL）
+const VENDOR_WEBSITES: Record<string, string> = {
+  "1":  "https://www.tkc.jp/",
+  "2":  "https://jpn.nec.com/",
+  "3":  "https://www.fujitsu.com/jp/group/fjj/",
+  "4":  "https://www.hitachi-systems.com/",
+  "5":  "https://www.gyosei-system.co.jp/",
+  "7":  "https://www.ines.co.jp/",
+  "8":  "https://www.gcom.co.jp/",
+  "9":  "https://www.rkkcs.co.jp/",
+  "10": "https://www.den-san.co.jp/",
+  "11": "https://www.gcc.co.jp/",
+  "12": "https://www.jip.co.jp/",
+  "13": "https://www.k-js.co.jp/",
+  "14": "https://www.nttdata.com/jp/",
+  "15": "https://www.dsknet.co.jp/",
+  "16": "https://www.iacnet.co.jp/",
+  "17": "https://www.e-sannet.co.jp/",
+  "18": "https://www.ryomo.co.jp/",
+  "19": "https://www.ics.co.jp/",
+  "20": "https://www.intec.co.jp/",
+  "21": "https://www.ryobi.co.jp/",
+  "22": "https://www.sbs-infosys.co.jp/",
+  "23": "https://www.oec.co.jp/",
+  "24": "https://www.n-computer.co.jp/",
+};
+
 // クラウド別コスト比較
 const COST_COMPARE = [
   {
@@ -324,12 +351,25 @@ export default async function CloudPage() {
                                 ))}
                               </div>
                             )}
-                            {/* notes / 出典 */}
-                            {vendor.notes && (
-                              <p className="text-xs leading-relaxed px-1" style={{ color: "var(--color-text-muted)" }}>
-                                <NotesWithLinks notes={vendor.notes} />
-                              </p>
-                            )}
+                            {/* 公式サイト + notes / 出典 */}
+                            <div className="flex flex-wrap items-start gap-3 mt-1">
+                              {VENDOR_WEBSITES[vendor.id] && (
+                                <a
+                                  href={VENDOR_WEBSITES[vendor.id]}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}
+                                >
+                                  公式サイト ↗
+                                </a>
+                              )}
+                              {vendor.notes && (
+                                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
+                                  <NotesWithLinks notes={vendor.notes} />
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </details>
                       );
