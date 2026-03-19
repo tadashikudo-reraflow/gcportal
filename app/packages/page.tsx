@@ -82,6 +82,12 @@ export default async function PackagesPage() {
   }
   const sortedBusinesses = Object.keys(businessGroups).sort();
 
+  // ベンダーを採用団体数順にソート
+  const rankedVendors = [...vendors].sort(
+    (a, b) => (b.municipality_count ?? 0) - (a.municipality_count ?? 0)
+  );
+  const maxCount = rankedVendors[0]?.municipality_count ?? 1;
+
   return (
     <div className="space-y-6">
       {/* ページヘッダー */}
@@ -92,8 +98,8 @@ export default async function PackagesPage() {
         </p>
       </div>
 
-      {/* ベンダーカード */}
-      <div className="card p-6">
+      {/* ベンダー採用団体ランキング */}
+      <div className="card p-5">
         <h2
           className="text-sm font-bold mb-4 flex items-center gap-2"
           style={{ color: "var(--color-text-primary)" }}
@@ -102,76 +108,86 @@ export default async function PackagesPage() {
             className="w-1 h-5 rounded-full inline-block flex-shrink-0"
             style={{ backgroundColor: "var(--color-gov-primary)" }}
           />
-          ベンダー一覧（{vendors.length}社）
+          ベンダー 採用団体ランキング
+          <span className="text-xs font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
+            {vendors.length}社
+          </span>
         </h2>
-        {vendors.length === 0 ? (
+        {rankedVendors.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>データがありません。</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {vendors.map((vendor) => {
+          <div className="space-y-2">
+            {rankedVendors.map((vendor, idx) => {
+              const rank = idx + 1;
               const badgeStyle = getCloudBadgeStyle(vendor.cloud_platform, vendor.cloud_confirmed);
               const borderColor = getVendorBorderColor(vendor.name);
+              const count = vendor.municipality_count ?? 0;
+              const barPct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+              const isTop3 = rank <= 3;
               return (
                 <div
                   key={vendor.id}
-                  className="card p-4 flex flex-col gap-2 hover:shadow-md transition-shadow"
-                  style={{ borderTop: `3px solid ${borderColor}` }}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5"
+                  style={{
+                    backgroundColor: isTop3 ? borderColor + "08" : "transparent",
+                    border: isTop3 ? `1px solid ${borderColor}25` : "1px solid transparent",
+                  }}
                 >
-                  {/* ベンダー名 */}
-                  <div>
-                    <p
-                      className="font-semibold text-sm leading-tight"
-                      style={{ color: "var(--color-text-primary)" }}
-                    >
+                  {/* 順位 */}
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-extrabold"
+                    style={{
+                      backgroundColor: isTop3 ? borderColor : "#e5e7eb",
+                      color: isTop3 ? "white" : "#6b7280",
+                    }}
+                  >
+                    {rank}
+                  </div>
+
+                  {/* ベンダー名＋バッジ */}
+                  <div className="w-28 sm:w-36 flex-shrink-0">
+                    <p className="font-semibold text-sm leading-tight truncate" style={{ color: "var(--color-text-primary)" }}>
                       {vendor.short_name ?? vendor.name}
                     </p>
-                    {vendor.short_name && (
-                      <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                        {vendor.name}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* バッジ群 — cloud_platformがnullの場合はバッジなし */}
-                  <div className="flex flex-wrap gap-1">
-                    {badgeStyle && (
-                      <span
-                        className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold"
-                        style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                      >
-                        {vendor.cloud_platform}
-                        {!vendor.cloud_confirmed && (
-                          <span className="opacity-80 text-xs ml-0.5">未確認</span>
-                        )}
-                      </span>
-                    )}
-                    {vendor.multitenancy && (
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold"
-                        style={{ backgroundColor: "#d1fae5", color: "#166534" }}
-                      >
-                        共同利用
-                      </span>
-                    )}
-                  </div>
-
-                  {/* 採用自治体数 — 数値を大きく表示 */}
-                  {vendor.municipality_count != null && (
-                    <div className="mt-auto pt-1">
-                      <p
-                        className="text-2xl font-extrabold leading-none tabular-nums"
-                        style={{ color: "var(--color-gov-primary)" }}
-                      >
-                        {vendor.municipality_count.toLocaleString()}
+                    <div className="flex gap-1 mt-0.5 flex-wrap">
+                      {badgeStyle && (
                         <span
-                          className="text-xs font-normal ml-1"
-                          style={{ color: "var(--color-text-muted)" }}
+                          className="px-1.5 py-0.5 rounded text-xs font-semibold"
+                          style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
                         >
-                          団体採用
+                          {vendor.cloud_platform}
                         </span>
-                      </p>
+                      )}
+                      {vendor.multitenancy && (
+                        <span className="px-1.5 py-0.5 rounded text-xs font-semibold"
+                          style={{ backgroundColor: "#d1fae5", color: "#166534" }}>共同利用</span>
+                      )}
                     </div>
-                  )}
+                  </div>
+
+                  {/* バー */}
+                  <div className="flex-1 min-w-0">
+                    <div className="bar-track">
+                      <div
+                        className="bar-fill"
+                        style={{ width: `${barPct}%`, backgroundColor: borderColor }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 採用数 */}
+                  <div className="flex-shrink-0 text-right w-20">
+                    {count > 0 ? (
+                      <>
+                        <span className="text-base font-extrabold tabular-nums" style={{ color: borderColor }}>
+                          {count.toLocaleString()}
+                        </span>
+                        <span className="text-xs ml-0.5" style={{ color: "var(--color-text-muted)" }}>団体</span>
+                      </>
+                    ) : (
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>—</span>
+                    )}
+                  </div>
                 </div>
               );
             })}
