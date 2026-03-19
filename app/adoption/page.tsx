@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "導入実績マップ | 自治体標準化ダッシュボード",
+  title: "ガバメントクラウド対応パッケージ 導入実績マップ | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "自治体がどのガバメントクラウド対応パッケージを導入しているかを地域・業務別に可視化。ベンダーシェアと導入年の実績一覧。",
 };
 
 type MunicipalityPackageRow = {

@@ -3,7 +3,8 @@ import data from "@/public/data/standardization.json";
 import { Municipality, BusinessSummary } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "業務別 標準化進捗 | 自治体標準化ダッシュボード",
+  title: "自治体標準化20業務 移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  description: "住民記録・税務・福祉等の標準化20業務ごとのガバメントクラウド移行進捗を可視化。遅延している業務と完了率の全国比較。",
 };
 
 // 完了率に応じた枠線色（インラインスタイル用）

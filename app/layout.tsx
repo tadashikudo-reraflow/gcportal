@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行状況ダッシュボード",
+  title: "自治体ガバメントクラウド移行進捗ダッシュボード",
   description: "全国1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化。デジタル庁標準化データに基づくリアルタイムダッシュボード。",
   verification: {
     google: "rzkjtVTiTE7yeA1FjPoMBNRmgzbrv-Mc_DN7i1SKvQo",
