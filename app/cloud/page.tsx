@@ -60,48 +60,70 @@ const COST_COMPARE = [
   },
 ];
 
-type VendorRow = {
+type VendorInfo = {
   id: string;
   name: string;
   short_name: string | null;
-  cloud_platform: string | null;
-  cloud_confirmed: boolean;
   municipality_count: number | null;
   multitenancy: boolean | null;
-  packages: { package_name: string; business: string | null }[] | null;
+  cloud_confirmed: boolean;
 };
+
+type PackageRow = {
+  package_name: string;
+  business: string | null;
+  cloud_platform: string | null;
+  vendors: VendorInfo | null;
+};
+
+// cloud → vendor_id → { vendor, packages[] } のネスト構造
+type CloudVendorEntry = { vendor: VendorInfo; packages: { package_name: string; business: string | null }[] };
 
 export default async function CloudPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // cloud_platform ごとにグループ化したベンダー一覧
-  const cloudVendors: Record<string, VendorRow[]> = {};
+  // packages.cloud_platform 主軸でグループ化
+  // cloudMap[cloud][vendor_id] = { vendor, packages }
+  const cloudMap: Record<string, Record<string, CloudVendorEntry>> = {};
 
   if (supabaseUrl && supabaseAnonKey) {
     try {
       const { createClient } = await import("@supabase/supabase-js");
       const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-      const { data: vendorRows } = await supabase
-        .from("vendors")
-        .select("id, name, short_name, cloud_platform, cloud_confirmed, municipality_count, multitenancy, packages(package_name, business)")
+      const { data: pkgRows } = await supabase
+        .from("packages")
+        .select("package_name, business, cloud_platform, vendors(id, name, short_name, municipality_count, multitenancy, cloud_confirmed)")
         .not("cloud_platform", "is", null)
-        .order("municipality_count", { ascending: false, nullsFirst: false });
+        .order("business");
 
-      if (vendorRows) {
-        for (const v of vendorRows as VendorRow[]) {
-          const cp = v.cloud_platform ?? "不明";
-          if (!cloudVendors[cp]) cloudVendors[cp] = [];
-          cloudVendors[cp].push(v);
+      if (pkgRows) {
+        for (const row of pkgRows as unknown as PackageRow[]) {
+          const cp = row.cloud_platform ?? "不明";
+          const vendor = row.vendors;
+          if (!vendor) continue;
+          if (!cloudMap[cp]) cloudMap[cp] = {};
+          if (!cloudMap[cp][vendor.id]) cloudMap[cp][vendor.id] = { vendor, packages: [] };
+          cloudMap[cp][vendor.id].packages.push({ package_name: row.package_name, business: row.business });
         }
       }
     } catch { /* fallthrough */ }
   }
 
-  const totalVendors = Object.values(cloudVendors).reduce((s, arr) => s + arr.length, 0);
+  // cloud → sorted vendor entries
+  const cloudVendors: Record<string, CloudVendorEntry[]> = {};
+  for (const [cloud, vendorMap] of Object.entries(cloudMap)) {
+    cloudVendors[cloud] = Object.values(vendorMap).sort(
+      (a, b) => (b.vendor.municipality_count ?? 0) - (a.vendor.municipality_count ?? 0)
+    );
+  }
+
+  const totalVendors = new Set(
+    Object.values(cloudVendors).flatMap((entries) => entries.map((e) => e.vendor.id))
+  ).size;
   const totalPackages = Object.values(cloudVendors).reduce(
-    (s, arr) => s + arr.reduce((ss, v) => ss + (v.packages?.length ?? 0), 0), 0
+    (s, entries) => s + entries.reduce((ss, e) => ss + e.packages.length, 0), 0
   );
 
   return (
@@ -146,8 +168,8 @@ export default async function CloudPage() {
         <div className="space-y-5">
           {CLOUD_ORDER.map((cloudKey) => {
             const cfg = CLOUD_CONFIG[cloudKey];
-            const vendors = cloudVendors[cloudKey] ?? [];
-            const pkgCount = vendors.reduce((s, v) => s + (v.packages?.length ?? 0), 0);
+            const entries = cloudVendors[cloudKey] ?? [];
+            const pkgCount = entries.reduce((s, e) => s + e.packages.length, 0);
 
             return (
               <div
@@ -178,27 +200,26 @@ export default async function CloudPage() {
                   <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
                     <span>{cfg.certYear}年認定</span>
                     <span>インフラ {cfg.infraPct}</span>
-                    {vendors.length > 0 && (
+                    {entries.length > 0 && (
                       <span
                         className="px-2 py-0.5 rounded-full font-semibold"
                         style={{ backgroundColor: cfg.color + "20", color: cfg.color }}
                       >
-                        {vendors.length}社 / {pkgCount}PKG
+                        {entries.length}社 / {pkgCount}PKG
                       </span>
                     )}
                   </div>
                 </div>
 
                 {/* ベンダー一覧 */}
-                {vendors.length === 0 ? (
+                {entries.length === 0 ? (
                   <div className="px-4 py-5 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
                     登録済みデータなし
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100">
-                    {vendors.map((vendor) => {
+                    {entries.map(({ vendor, packages: pkgs }) => {
                       const displayName = vendor.short_name ?? vendor.name;
-                      const pkgs = vendor.packages ?? [];
                       return (
                         <details key={vendor.id} className="group">
                           <summary
