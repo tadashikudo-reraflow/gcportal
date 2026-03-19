@@ -33,24 +33,25 @@ export default function RootLayout({
 
         {/* ヘッダー — 深紺 #002D72 */}
         <header style={{ backgroundColor: "var(--color-brand-secondary)" }}>
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center gap-3">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               {/* ロゴ: 黄色アクセント */}
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: "var(--color-brand-primary)" }}
               >
                 <span
-                  style={{ color: "#FFFFFF", fontSize: "14px", fontWeight: 800 }}
+                  className="text-white text-xs sm:text-sm"
+                  style={{ fontWeight: 800 }}
                 >
                   官
                 </span>
               </div>
               <div>
-                <h1 className="text-white font-bold text-lg leading-tight">
+                <h1 className="text-white font-bold text-base sm:text-lg leading-tight">
                   自治体標準化ダッシュボード
                 </h1>
-                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
+                <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
                   デジタル庁 地方公共団体情報システム標準化 進捗状況
                 </p>
               </div>
@@ -60,7 +61,7 @@ export default function RootLayout({
         </header>
 
         {/* メインコンテンツ */}
-        <main className="max-w-7xl mx-auto px-4 py-6">
+        <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
           {children}
         </main>
 
