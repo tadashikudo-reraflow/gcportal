@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 // ベンダー名からトップボーダーカラーを返す（主要ベンダーのみ対応）
 function getVendorBorderColor(name: string): string {
   const n = name.toLowerCase();
-  if (n.includes("tkc") || n.includes("ティーケーシー")) return "#2864F0";   // TKC = ブルー
+  if (n.includes("tkc") || n.includes("ティーケーシー")) return "#1D4ED8";   // TKC = ブルー
   if (n.includes("アイネス") || n.includes("ines"))        return "#00b4ff";  // アイネス = 水色
   if (n.includes("fujitsu") || n.includes("富士通"))       return "#c00000";  // 富士通 = 赤
   if (n.includes("nec") || n.includes("日本電気"))         return "#0066cc";  // NEC = ネイビーブルー
