@@ -7,12 +7,13 @@ const NAV_ITEMS = [
   { href: "/",             label: "ダッシュボード", short: "TOP"   },
   { href: "/prefectures",  label: "都道府県別",     short: "都道府県" },
   { href: "/businesses",   label: "業務別",         short: "業務"   },
-  { href: "/risks",        label: "遅延リスク一覧", short: "リスク" },
+  { href: "/risks",        label: "遅延リスク",     short: "リスク" },
+  { href: "/tokutei",      label: "特定移行認定",   short: "特定移行" },
   { href: "/packages",     label: "パッケージ一覧", short: "PKG"   },
   { href: "/adoption",     label: "導入実績",       short: "導入"   },
   { href: "/costs",        label: "コスト効果",     short: "コスト" },
   { href: "/cloud",        label: "クラウド基盤",   short: "Cloud"  },
-  { href: "/articles",    label: "コラム・解説",   short: "記事"   },
+  { href: "/articles",     label: "コラム・解説",   short: "記事"   },
 ] as const;
 
 export default function NavBar() {
