@@ -20,7 +20,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const BASE_URL = "https://gcportal-tau.vercel.app";
+const BASE_URL = "https://gcinsight.jp";
 
 export const metadata: Metadata = {
   title: "ガバメントクラウド移行状況ダッシュボード｜全国1,741自治体の進捗をリアルタイム可視化",

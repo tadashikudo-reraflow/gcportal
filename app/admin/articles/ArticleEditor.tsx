@@ -65,7 +65,7 @@ function SeoPreview({
         >
           G
         </span>
-        <span>gcportal-tau.vercel.app</span>
+        <span>gcinsight.jp</span>
         <span style={{ color: "#bbb" }}>›</span>
         <span>articles</span>
         <span style={{ color: "#bbb" }}>›</span>
