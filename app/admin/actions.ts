@@ -60,8 +60,10 @@ export async function saveArticleAction(formData: FormData) {
     .filter(Boolean);
   const author = (formData.get("author") as string).trim();
   const is_published = formData.get("is_published") === "true";
+  const sourcesRaw = formData.get("sources") as string | null;
+  const sources = sourcesRaw ? JSON.parse(sourcesRaw) : [];
 
-  const payload = { slug, title, description, content, date, tags, author, is_published };
+  const payload = { slug, title, description, content, date, tags, author, is_published, sources };
 
   if (id) {
     await supabase.from("articles").update(payload).eq("id", id);
@@ -101,6 +103,8 @@ export async function autoSaveArticleAction(formData: FormData): Promise<{ saved
   const category = ((formData.get("category") as string) ?? "").trim();
   const featured_image = ((formData.get("featured_image") as string) ?? "").trim();
   const content_format = (formData.get("content_format") as string) ?? "html";
+  const sourcesRaw = (formData.get("sources") as string) ?? "[]";
+  const sources = JSON.parse(sourcesRaw);
 
   const payload = {
     slug: slug || `draft-${Date.now()}`,
@@ -113,6 +117,7 @@ export async function autoSaveArticleAction(formData: FormData): Promise<{ saved
     author,
     category,
     featured_image,
+    sources,
     is_published: false,
   };
 

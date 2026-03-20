@@ -1,65 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllArticles } from "@/lib/articles";
-import { createClient } from "@supabase/supabase-js";
 
 export const metadata: Metadata = {
-  title: "コラム・解説記事 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "コラム・解説記事 | ガバメントクラウド移行状況ダッシュボード",
   description:
     "ガバメントクラウド・自治体標準化システムに関するコラム・解説記事の一覧。移行コスト・特定移行認定・遅延リスクなど自治体DX推進担当者向けの実務情報。",
 };
-
-type ArticleItem = {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-  tags: string[];
-  author?: string;
-  source: "db" | "file";
-};
-
-async function getAllArticlesCombined(): Promise<ArticleItem[]> {
-  // Supabase から公開記事を取得
-  const dbArticles: ArticleItem[] = [];
-  try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    const { data } = await supabase
-      .from("articles")
-      .select("slug, title, description, date, tags, author")
-      .eq("is_published", true)
-      .order("date", { ascending: false });
-    if (data) {
-      dbArticles.push(...data.map((a) => ({ ...a, source: "db" as const })));
-    }
-  } catch { /* fallthrough */ }
-
-  // Markdown ファイルからも取得（DBと重複しないもの）
-  const dbSlugs = new Set(dbArticles.map((a) => a.slug));
-  const fileArticles: ArticleItem[] = getAllArticles()
-    .filter((a) => !dbSlugs.has(a.slug))
-    .map((a) => ({ ...a, source: "file" as const }));
-
-  return [...dbArticles, ...fileArticles].sort((a, b) => (a.date < b.date ? 1 : -1));
-}
+export const dynamic = "force-dynamic";
 
 const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   ガバメントクラウド: { bg: "#fff3e0", text: "#e65100" },
-  自治体標準化:       { bg: "#e8f5e9", text: "#2e7d32" },
   コスト:             { bg: "#fce4ec", text: "#c62828" },
-  移行:               { bg: "#e3f2fd", text: "#1565c0" },
-  AWS:                { bg: "#fff8e1", text: "#f57f17" },
-  OCI:                { bg: "#fbe9e7", text: "#bf360c" },
+  FinOps:             { bg: "#fce4ec", text: "#ad1457" },
   ベンダー:           { bg: "#f3e5f5", text: "#6a1b9a" },
-  解説:               { bg: "#e0f7fa", text: "#00695c" },
+  比較:               { bg: "#f3e5f5", text: "#6a1b9a" },
+  特定移行支援:       { bg: "#e8eaf6", text: "#283593" },
+  遅延:               { bg: "#fff8e1", text: "#f57f17" },
+  リスク:             { bg: "#fff8e1", text: "#e65100" },
   "2026年問題":       { bg: "#fce4ec", text: "#c62828" },
+  業務別:             { bg: "#e8f5e9", text: "#2e7d32" },
+  標準化:             { bg: "#e8f5e9", text: "#2e7d32" },
+  クラウド:           { bg: "#e3f2fd", text: "#1565c0" },
+  セキュリティ:       { bg: "#e3f2fd", text: "#0d47a1" },
+  技術:               { bg: "#e3f2fd", text: "#1565c0" },
+  解説:               { bg: "#e0f7fa", text: "#00695c" },
 };
 
 export default async function ArticlesPage() {
-  const articles = await getAllArticlesCombined();
+  const articles = await getAllArticles();
 
   return (
     <div className="space-y-6">
@@ -76,7 +45,14 @@ export default async function ArticlesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {articles.map((article) => (
             <Link key={article.slug} href={`/articles/${article.slug}`}
-              className="card p-5 flex flex-col gap-3 hover:shadow-md transition-shadow group">
+              className="card overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
+              {article.coverImage && (
+                <div className="w-full aspect-[16/9] overflow-hidden bg-gray-100">
+                  <img src={article.coverImage} alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                </div>
+              )}
+              <div className="p-5 flex flex-col gap-3 flex-1">
               {article.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {article.tags.map((tag) => {
@@ -102,6 +78,7 @@ export default async function ArticlesPage() {
                 <span className="text-xs font-semibold" style={{ color: "var(--color-brand-primary)" }}>
                   続きを読む →
                 </span>
+              </div>
               </div>
             </Link>
           ))}

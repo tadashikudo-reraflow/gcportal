@@ -5,6 +5,9 @@ import TokuteiFilter from "./TokuteiFilter";
 import Link from "next/link";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
+import FreshnessBanner from "@/components/FreshnessBanner";
+import SourceAttribution from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
   title: "特定移行支援システム認定 自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
@@ -175,6 +178,9 @@ export default function TokuteiPage() {
         </div>
         <TokuteiFilter rows={rows} prefectures={prefectures} />
       </div>
+
+      <FreshnessBanner dataMonth={(tokuteiData as { updated_at: string }).updated_at.slice(0, 7)} pageLabel="特定移行" />
+      <SourceAttribution sourceIds={PAGE_SOURCES.tokutei} pageId="tokutei" />
 
       <RelatedArticles cluster={CLUSTERS.tokutei} />
     </div>

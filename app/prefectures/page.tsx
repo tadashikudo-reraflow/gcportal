@@ -6,7 +6,7 @@ import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
-  title: "都道府県別 ガバメントクラウド移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "都道府県別 ガバメントクラウド移行進捗一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "47都道府県別のガバメントクラウド移行進捗状況を一覧表示。各都道府県の自治体数・完了率・遅延リスク数を比較。",
 };
 

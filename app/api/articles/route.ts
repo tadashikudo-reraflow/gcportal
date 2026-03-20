@@ -1,0 +1,91 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+/**
+ * POST /api/articles — 記事作成（gc-article Agent / 外部ツール用）
+ *
+ * Headers: Authorization: Bearer <ADMIN_PASSWORD>
+ * Body JSON:
+ *   slug, title, description, content (Markdown本文),
+ *   date, tags[], author, sources[], is_published (default: false)
+ */
+export async function POST(req: NextRequest) {
+  // 認証チェック
+  const auth = req.headers.get("authorization");
+  const expected = process.env.ADMIN_PASSWORD ?? "gcinsight2025";
+  if (auth !== `Bearer ${expected}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+  const {
+    slug,
+    title,
+    description = "",
+    content = "",
+    date = new Date().toISOString().slice(0, 10),
+    tags = [],
+    author = "GCInsight編集部",
+    sources = [],
+    is_published = false,
+  } = body;
+
+  if (!slug || !title) {
+    return NextResponse.json({ error: "slug and title are required" }, { status: 400 });
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // upsert: 同じslugがあれば更新、なければ新規作成
+  const { data, error } = await supabase
+    .from("articles")
+    .upsert(
+      {
+        slug,
+        title,
+        description,
+        content,
+        date,
+        tags,
+        author,
+        sources,
+        is_published,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "slug" }
+    )
+    .select("id, slug, is_published")
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    article: data,
+    message: is_published
+      ? `記事「${title}」を公開しました`
+      : `記事「${title}」を下書き保存しました。CMS (/admin) で公開できます`,
+  });
+}
+
+/**
+ * GET /api/articles — 公開記事一覧（外部連携用）
+ */
+export async function GET() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+  const { data } = await supabase
+    .from("articles")
+    .select("slug, title, description, date, tags, author, is_published")
+    .eq("is_published", true)
+    .order("date", { ascending: false });
+
+  return NextResponse.json({ articles: data ?? [] });
+}

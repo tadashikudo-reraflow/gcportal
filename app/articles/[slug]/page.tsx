@@ -1,84 +1,83 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
 import { getArticleBySlug, getAllArticles } from "@/lib/articles";
 import { getClusterForTags } from "@/lib/clusters";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
-import { remark } from "remark";
-import remarkGfm from "remark-gfm";
-import remarkHtml from "remark-html";
+import MermaidRenderer from "@/components/MermaidRenderer";
 
 type Props = { params: Promise<{ slug: string }> };
 
-async function getArticleFromDb(slug: string) {
-  try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-    const { data } = await supabase
-      .from("articles")
-      .select("*")
-      .eq("slug", slug)
-      .eq("is_published", true)
-      .single();
-    if (!data) return null;
-
-    // markdown → html
-    const processed = await remark()
-      .use(remarkGfm)
-      .use(remarkHtml, { sanitize: false })
-      .process(data.content ?? "");
-
-    return { ...data, contentHtml: processed.toString() };
-  } catch {
-    return null;
-  }
-}
-
 export async function generateStaticParams() {
-  const fileArticles = getAllArticles();
-  return fileArticles.map((a) => ({ slug: a.slug }));
+  const articles = await getAllArticles();
+  return articles.map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = (await getArticleFromDb(slug)) ?? (await getArticleBySlug(slug));
+  const article = await getArticleBySlug(slug);
   if (!article) return { title: "記事が見つかりません" };
+  const ogImages = article.coverImage
+    ? [{ url: article.coverImage, width: 1200, height: 630, alt: article.title }]
+    : undefined;
   return {
-    title: `${article.title} | 自治体標準化ダッシュボード`,
+    title: `${article.title} | ガバメントクラウド移行状況ダッシュボード`,
     description: article.description,
     openGraph: {
       title: article.title,
       description: article.description,
       type: "article",
       publishedTime: article.date,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.description,
+      images: ogImages?.map((img) => img.url),
     },
   };
 }
 
 const TAG_COLORS: Record<string, { bg: string; text: string }> = {
+  // clusters.ts 準拠タグ
   ガバメントクラウド: { bg: "#fff3e0", text: "#e65100" },
-  自治体標準化:       { bg: "#e8f5e9", text: "#2e7d32" },
   コスト:             { bg: "#fce4ec", text: "#c62828" },
-  移行:               { bg: "#e3f2fd", text: "#1565c0" },
-  AWS:                { bg: "#fff8e1", text: "#f57f17" },
-  OCI:                { bg: "#fbe9e7", text: "#bf360c" },
+  FinOps:             { bg: "#fce4ec", text: "#ad1457" },
   ベンダー:           { bg: "#f3e5f5", text: "#6a1b9a" },
-  解説:               { bg: "#e0f7fa", text: "#00695c" },
+  比較:               { bg: "#f3e5f5", text: "#6a1b9a" },
+  特定移行支援:       { bg: "#e8eaf6", text: "#283593" },
+  遅延:               { bg: "#fff8e1", text: "#f57f17" },
+  リスク:             { bg: "#fff8e1", text: "#e65100" },
   "2026年問題":       { bg: "#fce4ec", text: "#c62828" },
+  業務別:             { bg: "#e8f5e9", text: "#2e7d32" },
+  標準化:             { bg: "#e8f5e9", text: "#2e7d32" },
+  クラウド:           { bg: "#e3f2fd", text: "#1565c0" },
+  セキュリティ:       { bg: "#e3f2fd", text: "#0d47a1" },
+  技術:               { bg: "#e3f2fd", text: "#1565c0" },
+  解説:               { bg: "#e0f7fa", text: "#00695c" },
 };
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
-  // DB優先、なければMarkdownファイル
-  const article = (await getArticleFromDb(slug)) ?? (await getArticleBySlug(slug));
+  const article = await getArticleBySlug(slug);
   if (!article) notFound();
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.description,
+    datePublished: article.date,
+    author: { "@type": "Organization", name: article.author ?? "GCInsight編集部" },
+    publisher: { "@type": "Organization", name: "GCInsight" },
+    ...(article.coverImage ? { image: article.coverImage } : {}),
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <nav className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <Link href="/" className="hover:underline">TOP</Link>
         <span>/</span>
@@ -86,6 +85,13 @@ export default async function ArticlePage({ params }: Props) {
         <span>/</span>
         <span className="truncate" style={{ color: "var(--color-text-secondary)" }}>{article.title}</span>
       </nav>
+
+      {article.coverImage && (
+        <div className="card overflow-hidden">
+          <img src={article.coverImage} alt={article.title}
+            className="w-full aspect-[16/9] object-cover" />
+        </div>
+      )}
 
       <div className="card p-6 space-y-4">
         {article.tags?.length > 0 && (
@@ -114,8 +120,55 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </div>
 
-      <div className="card p-6 prose-article"
-        dangerouslySetInnerHTML={{ __html: article.contentHtml }} />
+      <MermaidRenderer
+        html={article.contentHtml}
+        className="card p-6 prose-article"
+      />
+
+      {/* 出典・参考文献 */}
+      {article.sources && Array.isArray(article.sources) && article.sources.length > 0 && (
+        <div className="card p-6 space-y-3">
+          <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+            </svg>
+            参考文献・出典
+          </h2>
+          <ol className="list-decimal list-inside space-y-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+            {(article.sources as { url: string; title: string; org: string; accessed?: string }[]).map(
+              (src, i) => (
+                <li key={i} className="leading-relaxed">
+                  {src.org && (
+                    <span className="font-medium" style={{ color: "var(--color-text-primary)" }}>
+                      {src.org}
+                    </span>
+                  )}
+                  {src.org && src.title && " — "}
+                  {src.url ? (
+                    <a
+                      href={src.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:opacity-70"
+                      style={{ color: "var(--color-brand-secondary)" }}
+                    >
+                      {src.title || src.url}
+                    </a>
+                  ) : (
+                    <span>{src.title}</span>
+                  )}
+                  {src.accessed && (
+                    <span className="text-xs ml-1" style={{ color: "var(--color-text-muted)" }}>
+                      （{src.accessed} アクセス）
+                    </span>
+                  )}
+                </li>
+              )
+            )}
+          </ol>
+        </div>
+      )}
 
       {(() => {
         const cluster = getClusterForTags(article.tags ?? []);
