@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles } from "@/lib/articles";
 
-const BASE_URL = "https://gcportal-tau.vercel.app";
+const BASE_URL = "https://gcinsight.jp";
 
 const PREFECTURES = [
   "北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県",
