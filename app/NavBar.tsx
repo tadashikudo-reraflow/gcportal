@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: "/costs",        label: "コスト効果",     short: "コスト" },
   { href: "/cloud",        label: "クラウド基盤",   short: "Cloud"  },
   { href: "/articles",     label: "コラム・解説",   short: "記事"   },
+  { href: "/sources",      label: "参照サイト",     short: "出典"   },
 ] as const;
 
 export default function NavBar() {

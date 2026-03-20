@@ -6,13 +6,18 @@ import RiskFilter from "./RiskFilter";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 import Link from "next/link";
+import FreshnessBanner from "@/components/FreshnessBanner";
+import SourceAttribution from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行 遅延リスク自治体一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "ガバメントクラウド移行 遅延リスク自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "2026年3月末期限までにガバメントクラウド移行が完了していない遅延リスク自治体の一覧。完了率・都道府県フィルターで検索可能。特定移行認定団体を除く。",
 };
 
 export default function RisksPage() {
+  const { summary } = data;
+
   // 特定移行認定自治体のSetを構築（除外用）
   const tokuteiSet = new Set<string>(
     (tokuteiData.municipalities as { prefecture: string; city: string }[]).map(
@@ -211,6 +216,9 @@ export default function RisksPage() {
           </Link>
         </div>
       </div>
+
+      <FreshnessBanner dataMonth={summary.data_month} pageLabel="遅延リスク" />
+      <SourceAttribution sourceIds={PAGE_SOURCES.risks} pageId="risks" />
 
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>

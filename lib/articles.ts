@@ -1,11 +1,14 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import { createClient } from "@supabase/supabase-js";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
-const ARTICLES_DIR = path.join(process.cwd(), "content", "articles");
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export type ArticleMeta = {
   slug: string;
@@ -19,71 +22,111 @@ export type ArticleMeta = {
 
 export type Article = ArticleMeta & {
   contentHtml: string;
+  sources?: { url: string; title: string; org: string; accessed?: string }[];
 };
 
-/** 全記事のメタ情報を日付降順で取得 */
-export function getAllArticles(): ArticleMeta[] {
-  if (!fs.existsSync(ARTICLES_DIR)) return [];
+/** 全公開記事のメタ情報を日付降順で取得（Supabase） */
+export async function getAllArticles(): Promise<ArticleMeta[]> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from("articles")
+    .select("slug, title, description, date, tags, author")
+    .eq("is_published", true)
+    .order("date", { ascending: false });
 
-  const files = fs.readdirSync(ARTICLES_DIR).filter((f) => f.endsWith(".md"));
+  if (!data) return [];
 
-  const articles = files.map((filename) => {
-    const slug = filename.replace(/\.md$/, "");
-    const filePath = path.join(ARTICLES_DIR, filename);
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const { data } = matter(raw);
-
-    return {
-      slug,
-      title: data.title ?? slug,
-      description: data.description ?? "",
-      date: data.date ?? "",
-      tags: data.tags ?? [],
-      author: data.author,
-      coverImage: data.coverImage,
-    } satisfies ArticleMeta;
-  });
-
-  return articles.sort((a, b) => (a.date < b.date ? 1 : -1));
+  return data.map((a) => ({
+    slug: a.slug,
+    title: a.title ?? a.slug,
+    description: a.description ?? "",
+    date: a.date ?? "",
+    tags: a.tags ?? [],
+    author: a.author,
+    coverImage: undefined,
+  }));
 }
 
-/** タグに一致する記事を取得（内部リンク用） */
-export function getArticlesByTags(
+/** 全記事（下書き含む）を取得（管理用） */
+export async function getAllArticlesAdmin(): Promise<(ArticleMeta & { id: number; is_published: boolean })[]> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from("articles")
+    .select("id, slug, title, description, date, tags, author, is_published")
+    .order("updated_at", { ascending: false });
+
+  if (!data) return [];
+
+  return data.map((a) => ({
+    id: a.id,
+    slug: a.slug,
+    title: a.title ?? a.slug,
+    description: a.description ?? "",
+    date: a.date ?? "",
+    tags: a.tags ?? [],
+    author: a.author,
+    coverImage: undefined,
+    is_published: a.is_published,
+  }));
+}
+
+/** タグに一致する公開記事を取得（内部リンク用） */
+export async function getArticlesByTags(
   tags: string[],
   excludeSlug?: string,
   maxItems = 3
-): ArticleMeta[] {
-  const all = getAllArticles();
-  return all
-    .filter(
-      (a) =>
-        a.slug !== excludeSlug &&
-        a.tags.some((t) => tags.includes(t))
-    )
-    .slice(0, maxItems);
+): Promise<ArticleMeta[]> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from("articles")
+    .select("slug, title, description, date, tags, author")
+    .eq("is_published", true)
+    .overlaps("tags", tags)
+    .order("date", { ascending: false })
+    .limit(maxItems + 1);
+
+  if (!data) return [];
+
+  return data
+    .filter((a) => a.slug !== excludeSlug)
+    .slice(0, maxItems)
+    .map((a) => ({
+      slug: a.slug,
+      title: a.title ?? a.slug,
+      description: a.description ?? "",
+      date: a.date ?? "",
+      tags: a.tags ?? [],
+      author: a.author,
+      coverImage: undefined,
+    }));
 }
 
 /** slug から記事本文（HTML）を取得 */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  const filePath = path.join(ARTICLES_DIR, `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_published", true)
+    .single();
 
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const { data, content } = matter(raw);
+  if (!data) return null;
 
   const processed = await remark()
     .use(remarkGfm)
     .use(remarkHtml, { sanitize: false })
-    .process(content);
+    .process(data.content ?? "");
 
   return {
-    slug,
-    title: data.title ?? slug,
+    slug: data.slug,
+    title: data.title ?? data.slug,
     description: data.description ?? "",
     date: data.date ?? "",
     tags: data.tags ?? [],
     author: data.author,
-    coverImage: data.coverImage,
+    coverImage: data.cover_image,
     contentHtml: processed.toString(),
+    sources: data.sources ?? [],
   };
 }

@@ -5,7 +5,7 @@ import SettingsClient from "./SettingsClient";
 
 // 表示のみ項目（環境変数・固定値）
 const STATIC_SETTINGS = [
-  { label: "サイトタイトル", value: "自治体標準化ダッシュボード" },
+  { label: "サイトタイトル", value: "ガバメントクラウド移行状況ダッシュボード" },
   { label: "サイトURL", value: "gcportal-tau.vercel.app" },
   { label: "パーマリンク構造", value: "/articles/{slug}" },
   { label: "記事一覧URL", value: "/articles" },

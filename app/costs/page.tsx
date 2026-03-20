@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
+import SourceAttribution from "@/components/SourceAttribution";
+import { ConfidenceBadge } from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -47,7 +50,7 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 };
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
   description: "ガバメントクラウド移行コストが当初比156%増になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
 };
 
@@ -281,8 +284,9 @@ export default async function CostsPage() {
           <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
           コスト変化実績
         </h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          移行前コストを0%基準として、増減率で表示。出典: デジタル庁先行事業TCO検証・中核市市長会調査（2025）
+        <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
+          移行前コストを0%基準として、増減率で表示。
+          <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
         </p>
 
         {costs.length === 0 ? (
@@ -422,15 +426,14 @@ export default async function CostsPage() {
 
       {/* 注記 */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
-        <p className="text-xs text-gray-500">
-          <span className="font-semibold text-gray-600">データソース:</span>{" "}
-          デジタル庁先行事業TCO検証・中核市市長会調査（2025）
-        </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-400">
           ※ コスト比率は移行前を1.0とした比率。1.0未満 = コスト削減、1.0以上 = コスト増。
           判明分のみ集計のため、実態との乖離がある場合があります。
         </p>
       </div>
+
+      {/* 出典・データソース */}
+      <SourceAttribution sourceIds={PAGE_SOURCES.costs} pageId="costs" />
 
       {/* 自治体別コスト影響推定 */}
       {muniEstimates.length > 0 && (

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
+import SourceAttribution from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| ガバメントクラウド移行状況ダッシュボード",
   description: "ガバメントクラウドのインフラシェア（AWS 97%・Azure・GCP・OCI）とコスト指標を分析。自治体が選ぶべきクラウド基盤と認定状況を可視化。",
 };
 
@@ -494,25 +496,18 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* 免責 + データソース */}
-      <div className="space-y-2">
-        <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
-          <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
-            <span className="font-semibold">⚠️ 免責事項:</span>{" "}
-            本ページのクラウド基盤情報は、各社公式発表・プレスリリース・AWSパートナーディレクトリ等の公開情報をもとに調査・編集したものです。
-            <span className="font-semibold">内容の正確性・完全性を保証するものではありません。</span>
-            「移行予定」はGrokによるウェブ調査に基づく情報であり、各社の公式発表と異なる場合があります。最新情報は各社公式サイトをご確認ください。
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-100 px-5 py-3 bg-gray-50">
-          <p className="text-xs text-gray-500">
-            <span className="font-semibold text-gray-600">データソース:</span>{" "}
-            インフラシェア: デジタル庁先行事業調査（令和6年9月）／
-            コスト比較: Oracle TCO白書・Gartner IaaS比較レポート・デジタル庁TCO検証（参考値）／
-            ベンダー・パッケージ: APPLIC準拠製品登録リスト・各社公式発表・AWSパートナーディレクトリをもとに編集
-          </p>
-        </div>
+      {/* 免責事項 */}
+      <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
+        <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
+          <span className="font-semibold">⚠️ 免責事項:</span>{" "}
+          本ページのクラウド基盤情報は、各社公式発表・プレスリリース・AWSパートナーディレクトリ等の公開情報をもとに調査・編集したものです。
+          <span className="font-semibold">内容の正確性・完全性を保証するものではありません。</span>
+          最新情報は各社公式サイトをご確認ください。
+        </p>
       </div>
+
+      {/* 出典・データソース */}
+      <SourceAttribution sourceIds={PAGE_SOURCES.cloud} pageId="cloud" />
 
       <RelatedArticles cluster={CLUSTERS.tech} />
     </div>

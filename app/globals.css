@@ -202,6 +202,34 @@ body {
     transform: scale(0.97);
   }
 
+  /* ========== tabular-nums ========== */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* ========== KPIカード (DESIGN.md準拠) ========== */
+  .kpi-card {
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    transition: box-shadow 0.15s;
+  }
+  .kpi-card:hover { box-shadow: 0 4px 12px rgba(0,45,114,0.10); }
+
+  .kpi-card-complete { border-left: 4px solid #378445; background: #f0fdf4; }
+  .kpi-card-ontrack  { border-left: 4px solid #1D4ED8; background: #eff6ff; }
+  .kpi-card-atrisk   { border-left: 4px solid #FA6414; background: #fff7ed; }
+  .kpi-card-critical { border-left: 4px solid #B91C1C; background: #fef2f2; }
+  .kpi-card-tokutei  { border-left: 4px solid #7C3AED; background: #f5f3ff; }
+  .kpi-card-primary  { border-left: 4px solid #002D72; background: #eff6ff; }
+
+  /* ========== scrollbar-none ========== */
+  .scrollbar-none { scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+
   /* ========== テーブル行ホバー ========== */
   .table-row-hover:hover {
     background-color: var(--color-section-bg);
@@ -388,4 +416,44 @@ body {
   background: transparent;
   padding: 0;
   color: inherit;
+}
+/* Mermaid diagram */
+.mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--color-section-bg);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+}
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+.mermaid-error {
+  border-left: 3px solid #ef4444;
+  opacity: 0.7;
+}
+/* 出典セクション（記事末尾） */
+.prose-article .sources-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--color-border);
+}
+.prose-article .sources-section h2 {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+.prose-article .sources-section ol,
+.prose-article .sources-section ul {
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+.prose-article .sources-section a {
+  word-break: break-all;
+  font-size: 0.75rem;
 }

@@ -1,6 +1,9 @@
 import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import Link from "next/link";
+import FreshnessBanner from "@/components/FreshnessBanner";
+import SourceAttribution from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 type StandardMunicipality = {
   prefecture: string;
@@ -115,66 +118,23 @@ export default function DashboardPage() {
         </p>
       </div>
 
+      {/* データ鮮度バナー */}
+      <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
+
       {/* ② 5段階ステータスKPIカード */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {/* 完了 */}
-        <div className="card p-4 text-center" style={{ borderTop: "3px solid #378445" }}>
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#378445" }}>
-            {completeCount}
-          </p>
-          <p className="text-xs font-semibold mt-1" style={{ color: "#378445" }}>完了</p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            ({((completeCount / TOTAL) * 100).toFixed(1)}%)
-          </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>100%完了</p>
-        </div>
-
-        {/* 順調 */}
-        <div className="card p-4 text-center" style={{ borderTop: "3px solid #1D4ED8" }}>
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#1D4ED8" }}>
-            {ontrackCount}
-          </p>
-          <p className="text-xs font-semibold mt-1" style={{ color: "#1D4ED8" }}>順調</p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            ({((ontrackCount / TOTAL) * 100).toFixed(1)}%)
-          </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>75%以上</p>
-        </div>
-
-        {/* 要注意 */}
-        <div className="card p-4 text-center" style={{ borderTop: "3px solid var(--color-status-warn)" }}>
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "var(--color-status-warn)" }}>
-            {atriskCount}
-          </p>
-          <p className="text-xs font-semibold mt-1" style={{ color: "var(--color-status-warn)" }}>要注意</p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            ({((atriskCount / TOTAL) * 100).toFixed(1)}%)
-          </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>50〜75%</p>
-        </div>
-
-        {/* 危機 */}
-        <div className="card p-4 text-center" style={{ borderTop: "3px solid #b91c1c" }}>
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#b91c1c" }}>
-            {criticalCount}
-          </p>
-          <p className="text-xs font-semibold mt-1" style={{ color: "#b91c1c" }}>危機</p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            ({((criticalCount / TOTAL) * 100).toFixed(1)}%)
-          </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>50%未満</p>
-        </div>
-
-        {/* 特定移行 */}
-        <Link href="/tokutei" className="card p-4 text-center hover:shadow-md transition-shadow block" style={{ borderTop: "3px solid #7c3aed" }}>
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
+        <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
+        <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
+        <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#FA6414" cls="kpi-card kpi-card-atrisk"   />
+        <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
+        <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
+          <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", margin: 0, lineHeight: 1 }}>
             {TOKUTEI_COUNT.toLocaleString()}
           </p>
-          <p className="text-xs font-semibold mt-1" style={{ color: "#7c3aed" }}>特定移行</p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-            ({((TOKUTEI_COUNT / TOTAL) * 100).toFixed(1)}%)
+          <p style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginTop: 6 }}>特定移行</p>
+          <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
+            ({((TOKUTEI_COUNT / TOTAL) * 100).toFixed(1)}%) 認定団体 →
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定団体 →</p>
         </Link>
       </div>
 
@@ -432,6 +392,25 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* 出典・データソース */}
+      <SourceAttribution sourceIds={PAGE_SOURCES.dashboard} pageId="dashboard" />
+    </div>
+  );
+}
+
+function StatusKpiCard({ count, total, label, sub, color, cls }: {
+  count: number; total: number; label: string; sub: string; color: string; cls: string;
+}) {
+  return (
+    <div className={cls}>
+      <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color, margin: 0, lineHeight: 1 }}>
+        {count.toLocaleString()}
+      </p>
+      <p style={{ fontSize: 12, fontWeight: 700, color, marginTop: 6 }}>{label}</p>
+      <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
+        ({((count / total) * 100).toFixed(1)}%) {sub}
+      </p>
     </div>
   );
 }

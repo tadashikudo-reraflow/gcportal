@@ -28,12 +28,12 @@ type Props = {
   maxItems?: number;
 };
 
-export default function RelatedArticles({
+export default async function RelatedArticles({
   cluster,
   excludeSlug,
   maxItems = 3,
 }: Props) {
-  const articles = getArticlesByTags(cluster.tags, excludeSlug, maxItems);
+  const articles = await getArticlesByTags(cluster.tags, excludeSlug, maxItems);
 
   if (articles.length === 0) return null;
 

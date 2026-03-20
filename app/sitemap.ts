@@ -13,7 +13,7 @@ const PREFECTURES = [
   "熊本県","大分県","宮崎県","鹿児島県","沖縄県",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -27,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/costs`,         lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/cloud`,         lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/articles`,      lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
+    { url: `${BASE_URL}/sources`,       lastModified: now, changeFrequency: "monthly", priority: 0.5 },
   ];
 
   const prefecturePages: MetadataRoute.Sitemap = PREFECTURES.map((pref) => ({
@@ -36,7 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const articles = getAllArticles();
+  const articles = await getAllArticles();
   const articlePages: MetadataRoute.Sitemap = articles.map((article) => ({
     url: `${BASE_URL}/articles/${article.slug}`,
     lastModified: article.date ? new Date(article.date) : now,

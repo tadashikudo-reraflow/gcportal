@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import SourceAttribution from "@/components/SourceAttribution";
+import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド対応パッケージ 導入実績マップ | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "ガバメントクラウド対応パッケージ 導入実績マップ | ガバメントクラウド移行状況ダッシュボード",
   description: "自治体がどのガバメントクラウド対応パッケージを導入しているかを地域・業務別に可視化。ベンダーシェアと導入年の実績一覧。",
 };
 
@@ -262,6 +264,9 @@ export default async function AdoptionPage() {
           </div>
         </div>
       )}
+
+      {/* 出典・データソース */}
+      <SourceAttribution sourceIds={PAGE_SOURCES.adoption} pageId="adoption" />
 
       {/* 注記 */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

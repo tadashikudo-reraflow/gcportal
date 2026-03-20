@@ -33,10 +33,10 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <h1 className="text-white font-bold text-base sm:text-lg leading-tight">
-                自治体標準化ダッシュボード
+                ガバメントクラウド移行状況ダッシュボード
               </h1>
               <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
-                デジタル庁 地方公共団体情報システム標準化 進捗状況
+                デジタル庁 ガバメントクラウド移行状況インサイト｜全国1,741自治体の進捗を可視化
               </p>
             </div>
           </div>

@@ -5,7 +5,7 @@ import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
-  title: "自治体標準化20業務 移行進捗一覧 | 自治体ガバメントクラウド移行進捗ダッシュボード",
+  title: "自治体標準化20業務 移行進捗一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "住民記録・税務・福祉等の標準化20業務ごとのガバメントクラウド移行進捗を可視化。遅延している業務と完了率の全国比較。",
 };
 
