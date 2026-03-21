@@ -25,9 +25,22 @@ function getRateColor(rate: number | null): string {
   return "#b91c1c";
 }
 
+function getRateBgColor(rate: number | null): string {
+  if (rate === null) return "#f3f4f6";
+  if (rate >= 0.5) return "#fef3c7";
+  return "#fef2f2";
+}
+
+interface PrefGroup {
+  prefecture: string;
+  rows: TokuteiRow[];
+  avgRate: number | null;
+}
+
 export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps) {
   const [selectedPref, setSelectedPref] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [expandedPrefs, setExpandedPrefs] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -36,6 +49,47 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
       return true;
     });
   }, [rows, selectedPref, search]);
+
+  // 都道府県別にグループ化
+  const groups: PrefGroup[] = useMemo(() => {
+    const map = new Map<string, TokuteiRow[]>();
+    for (const r of filtered) {
+      const arr = map.get(r.prefecture) ?? [];
+      arr.push(r);
+      map.set(r.prefecture, arr);
+    }
+    // prefectures の順序を維持
+    return prefectures
+      .filter((p) => map.has(p))
+      .map((p) => {
+        const prefRows = map.get(p)!;
+        const withRate = prefRows.filter((r) => r.overall_rate !== null);
+        const avgRate = withRate.length > 0
+          ? withRate.reduce((s, r) => s + (r.overall_rate ?? 0), 0) / withRate.length
+          : null;
+        return { prefecture: p, rows: prefRows, avgRate };
+      });
+  }, [filtered, prefectures]);
+
+  const togglePref = (pref: string) => {
+    setExpandedPrefs((prev) => {
+      const next = new Set(prev);
+      if (next.has(pref)) {
+        next.delete(pref);
+      } else {
+        next.add(pref);
+      }
+      return next;
+    });
+  };
+
+  const expandAll = () => {
+    setExpandedPrefs(new Set(groups.map((g) => g.prefecture)));
+  };
+
+  const collapseAll = () => {
+    setExpandedPrefs(new Set());
+  };
 
   return (
     <div>
@@ -68,52 +122,119 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
             クリア
           </button>
         )}
-        <span className="text-xs text-gray-400 ml-auto">
-          {filtered.length.toLocaleString()} 件表示
-        </span>
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={expandAll}
+            className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+          >
+            すべて展開
+          </button>
+          <button
+            onClick={collapseAll}
+            className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+          >
+            すべて閉じる
+          </button>
+          <span className="text-xs text-gray-400">
+            {filtered.length.toLocaleString()} 件 / {groups.length} 都道府県
+          </span>
+        </div>
       </div>
 
-      {/* テーブル */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b-2 border-gray-200">
-              <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium w-10">No.</th>
-              <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">都道府県</th>
-              <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">市区町村</th>
-              <th className="text-right py-2.5 px-2 text-xs text-gray-500 font-medium">完了率（参考）</th>
-              <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">ステータス</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((row) => (
-              <tr
-                key={`${row.prefecture}-${row.city}`}
-                className="border-b border-gray-50 hover:bg-purple-50 transition-colors"
+      {/* 都道府県別アコーディオン */}
+      <div className="space-y-1">
+        {groups.map((group) => {
+          const isExpanded = expandedPrefs.has(group.prefecture);
+          return (
+            <div key={group.prefecture} className="border border-gray-200 rounded-lg overflow-hidden">
+              {/* 都道府県ヘッダー（クリックで展開/折りたたみ） */}
+              <button
+                onClick={() => togglePref(group.prefecture)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-purple-50 transition-colors"
+                style={{ backgroundColor: isExpanded ? "#faf5ff" : "#fafafa" }}
               >
-                <td className="py-2.5 px-2 text-xs text-gray-400">{row.no}</td>
-                <td className="py-2.5 px-2 text-gray-600 text-xs">{row.prefecture}</td>
-                <td className="py-2.5 px-2 font-medium text-gray-800">{row.city}</td>
-                <td className="py-2.5 px-2 text-right">
-                  <span className="font-bold text-sm" style={{ color: getRateColor(row.overall_rate) }}>
-                    {formatRate(row.overall_rate)}
+                <div className="flex items-center gap-3">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    className="flex-shrink-0 transition-transform duration-200"
+                    style={{ transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
+                  >
+                    <path d="M4 2L8 6L4 10" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  <span className="text-sm font-bold" style={{ color: "#002D72" }}>
+                    {group.prefecture}
                   </span>
-                </td>
-                <td className="py-2.5 px-2">
                   <span
-                    className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold"
+                    className="inline-flex items-center justify-center min-w-[24px] h-5 px-1.5 rounded-full text-xs font-bold"
                     style={{ backgroundColor: "#f3e8ff", color: "#7c3aed" }}
                   >
-                    特定移行
+                    {group.rows.length}
                   </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="text-gray-500">
+                    {group.rows.length}自治体
+                  </span>
+                  <span style={{ color: getRateColor(group.avgRate) }}>
+                    平均完了率: <span className="font-bold">{formatRate(group.avgRate)}</span>
+                  </span>
+                </div>
+              </button>
+
+              {/* 展開時の自治体リスト */}
+              {isExpanded && (
+                <div className="border-t border-gray-200">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ backgroundColor: "#f9fafb" }}>
+                        <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium w-10">No.</th>
+                        <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium">市区町村</th>
+                        <th className="text-right py-2 px-4 text-xs text-gray-500 font-medium">完了率（参考）</th>
+                        <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium">ステータス</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.rows.map((row) => (
+                        <tr
+                          key={`${row.prefecture}-${row.city}`}
+                          className="border-b border-gray-50 hover:bg-purple-50 transition-colors"
+                        >
+                          <td className="py-2 px-4 text-xs text-gray-400">{row.no}</td>
+                          <td className="py-2 px-4 font-medium text-gray-800">{row.city}</td>
+                          <td className="py-2 px-4 text-right">
+                            <span
+                              className="inline-block px-2 py-0.5 rounded text-xs font-bold"
+                              style={{
+                                color: getRateColor(row.overall_rate),
+                                backgroundColor: getRateBgColor(row.overall_rate),
+                              }}
+                            >
+                              {formatRate(row.overall_rate)}
+                            </span>
+                          </td>
+                          <td className="py-2 px-4">
+                            <span
+                              className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold"
+                              style={{ backgroundColor: "#f3e8ff", color: "#7c3aed" }}
+                            >
+                              特定移行
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {filtered.length === 0 && (
+      {groups.length === 0 && (
         <p className="text-center text-gray-400 py-8 text-sm">
           該当する自治体がありません
         </p>

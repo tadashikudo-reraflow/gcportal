@@ -1,51 +1,53 @@
 @import "tailwindcss";
 
 /* ==========================================================
-   GCInsight Design System v2.0
-   PJ03 Politech-OS 準拠 — SmartHR / kintone / freee / Sansan
-   Brand: #F5B500 (黄) + #002D72 (深紺)
+   GCInsight Design System v3.0
+   Modern Administrative Clarity (Trust & Clean)
+   Brand: #0066FF (ブルー) + #002D72 (深紺ナビ)
+   Stitch by Google DESIGN.md 準拠
    ========================================================== */
 
 @theme inline {
-  --color-brand-primary: #F5B500;
+  --color-brand-primary: #0066FF;
   --color-brand-secondary: #002D72;
-  --color-brand-accent: #FFFFFF;
-  --color-brand-pressed: #E5A800;
+  --color-brand-accent: #F5B500;
+  --color-brand-pressed: #0052CC;
 
   --color-card-bg: #FFFFFF;
-  --color-section-bg: #F5F6FA;
-  --color-text-primary: #1F2937;
-  --color-text-secondary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  --color-section-bg: #F8F9FA;
+  --color-text-primary: #333333;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
 
   --color-success: #10B981;
-  --color-info: #1D4ED8;
-  --color-warning: #B8860B;
-  --color-error: #DC2626;
+  --color-info: #0066FF;
+  --color-warning: #F5B500;
+  --color-error: #FF6B6B;
 
-  --color-border: #D1D5DB;
-  --color-border-strong: #9CA3AF;
+  --color-border: #E2E8F0;
+  --color-border-strong: #94A3B8;
 
-  --font-sans: 'Noto Sans JP', 'Inter', sans-serif;
+  --font-sans: 'Public Sans', 'Noto Sans JP', sans-serif;
   --font-mono: var(--font-geist-mono);
 
-  --color-background: #F5F6FA;
-  --color-foreground: #1F2937;
+  --color-background: #F8F9FA;
+  --color-foreground: #333333;
 }
 
-/* ========== 後方互換エイリアス ========== */
+/* ========== セマンティックエイリアス ========== */
 :root {
   --color-gov-primary: var(--color-brand-secondary);
   --color-gov-nav: #003591;
-  --color-gov-accent: var(--color-brand-primary);
+  --color-gov-accent: var(--color-brand-accent);
 
-  --color-status-complete: #378445;
-  --color-status-ok: #1D4ED8;
-  --color-status-warn: #b45309;
-  --color-status-critical: #b91c1c;
+  --color-status-complete: #10B981;
+  --color-status-ok: #0066FF;
+  --color-status-warn: #F5B500;
+  --color-status-critical: #FF6B6B;
+  --color-status-tokutei: #8B5CF6;
   --color-accent-cta: var(--color-brand-primary);
 
-  --color-surface: #F5F6FA;
+  --color-surface: #F8F9FA;
   --color-card: #FFFFFF;
 
   font-size: 19px;  /* 18→19px: 全体の可読性向上 */
@@ -67,35 +69,35 @@ body {
 }
 
 /* ==========================================================
-   SmartHR風カードコンポーネント
-   白背景 + 2px太ボーダー + 12px角丸
+   Trust & Clean カードコンポーネント
+   白背景 + ボーダーなし + ソフトシャドウ + 12px角丸
    ========================================================== */
 
 @layer utilities {
 
   .card {
     background: #FFFFFF;
-    border: 2px solid var(--color-border);
+    border: none;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .card:hover {
-    border-color: var(--color-brand-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   /* セクションヘッダー付きカード */
   .card-section {
     background: #FFFFFF;
-    border: 2px solid var(--color-border);
+    border: none;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .card-section-header {
     background: var(--color-section-bg);
-    border-bottom: 2px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     padding: 16px 24px;
     font-weight: 700;
     font-size: 1rem;
@@ -106,26 +108,26 @@ body {
     padding: 24px;
   }
 
-  /* ========== ステータスバッジ — freee風 pill + border ========== */
+  /* ========== ステータスバッジ — Trust & Clean ========== */
   .badge-complete {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
-    background: rgba(16, 185, 129, 0.15); color: #065F46; border: 1px solid rgba(16, 185, 129, 0.3);
+    background: #D1FAE5; color: #065F46; border: none;
   }
   .badge-ok {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
-    background: rgba(0, 45, 114, 0.1); color: var(--color-brand-secondary); border: 1px solid rgba(0, 45, 114, 0.2);
+    background: #DBEAFE; color: #1E40AF; border: none;
   }
   .badge-warn {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
-    background: rgba(245, 181, 0, 0.15); color: #B8860B; border: 1px solid rgba(245, 181, 0, 0.3);
+    background: #FEF3C7; color: #92400E; border: none;
   }
   .badge-critical {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: 0.875rem;
-    background: rgba(220, 38, 38, 0.12); color: #B91C1C; border: 1px solid rgba(220, 38, 38, 0.3);
+    background: #FEE2E2; color: #991B1B; border: none;
   }
 
   /* ========== ナビゲーション ========== */
@@ -145,7 +147,7 @@ body {
   .nav-link-active {
     color: #ffffff;
     font-weight: 700;
-    border-bottom-color: var(--color-brand-primary);
+    border-bottom-color: var(--color-brand-accent);
   }
 
   /* ========== 警告バナー ========== */
@@ -154,9 +156,9 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1rem;
-    border-radius: 12px;
+    border-radius: 8px;
     border-left: 4px solid var(--color-status-critical);
-    background: #fff1f2;
+    background: #FEF2F2;
     color: #7f1d1d;
   }
   .alert-banner strong {
@@ -193,7 +195,7 @@ body {
     border: none;
     cursor: pointer;
     transition: background 0.15s, transform 0.1s;
-    box-shadow: 0 2px 4px rgba(245, 181, 0, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 102, 255, 0.25);
   }
   .btn-cta:hover {
     background: var(--color-brand-pressed);
@@ -208,22 +210,22 @@ body {
     font-feature-settings: "tnum";
   }
 
-  /* ========== KPIカード (DESIGN.md準拠) ========== */
+  /* ========== KPIカード (Trust & Clean) ========== */
   .kpi-card {
     background: #FFFFFF;
-    border: 1px solid var(--color-border);
+    border: none;
     border-radius: 12px;
     padding: 20px 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     transition: box-shadow 0.15s;
   }
-  .kpi-card:hover { box-shadow: 0 4px 12px rgba(0,45,114,0.10); }
+  .kpi-card:hover { box-shadow: 0 4px 12px rgba(0,102,255,0.10); }
 
-  .kpi-card-complete { border-left: 4px solid #378445; background: #f0fdf4; }
-  .kpi-card-ontrack  { border-left: 4px solid #1D4ED8; background: #eff6ff; }
-  .kpi-card-atrisk   { border-left: 4px solid #FA6414; background: #fff7ed; }
-  .kpi-card-critical { border-left: 4px solid #B91C1C; background: #fef2f2; }
-  .kpi-card-tokutei  { border-left: 4px solid #7C3AED; background: #f5f3ff; }
+  .kpi-card-complete { border-left: 4px solid #10B981; background: #f0fdf4; }
+  .kpi-card-ontrack  { border-left: 4px solid #0066FF; background: #eff6ff; }
+  .kpi-card-atrisk   { border-left: 4px solid #F5B500; background: #fffbeb; }
+  .kpi-card-critical { border-left: 4px solid #FF6B6B; background: #fef2f2; }
+  .kpi-card-tokutei  { border-left: 4px solid #8B5CF6; background: #f5f3ff; }
   .kpi-card-primary  { border-left: 4px solid #002D72; background: #eff6ff; }
 
   /* ========== scrollbar-none ========== */
@@ -327,6 +329,24 @@ body {
 }
 
 /* ==========================================================
+   記事カード — VisasQ風（ボーダーなし + ホバー影 + 白背景）
+   ========================================================== */
+.article-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: none;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.article-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================
    記事本文スタイル（prose-article）
    ========================================================== */
 .prose-article {
@@ -339,8 +359,8 @@ body {
   font-weight: 800;
   margin: 2rem 0 0.75rem;
   padding-left: 0.75rem;
-  border-left: 4px solid var(--color-brand-primary);
-  color: var(--color-brand-secondary);
+  border-left: 4px solid var(--color-brand-accent);
+  color: var(--color-text-primary);
 }
 .prose-article h3 {
   font-size: 1.05rem;
@@ -363,7 +383,7 @@ body {
   color: var(--color-text-primary);
 }
 .prose-article a {
-  color: #2563eb;
+  color: #0066FF;
   text-decoration: underline;
 }
 .prose-article a:hover {
@@ -417,20 +437,23 @@ body {
   padding: 0;
   color: inherit;
 }
-/* Mermaid diagram */
+/* Mermaid diagram — カード幅を突破して大きく表示 */
 .mermaid-diagram {
   display: flex;
   justify-content: center;
-  margin: 1.5rem 0;
-  padding: 1rem;
+  margin: 2rem -1.5rem; /* card の p-6 を打ち消し */
+  padding: 2rem 0.5rem;
   background: var(--color-section-bg);
   border-radius: 8px;
   border: 1px solid var(--color-border);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .mermaid-diagram svg {
-  max-width: 100%;
+  min-width: 700px;
+  max-width: none;
   height: auto;
+  font-size: 16px;
 }
 .mermaid-error {
   border-left: 3px solid #ef4444;

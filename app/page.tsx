@@ -89,7 +89,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* ① 緊急アラートバナー */}
-      <div className="alert-banner">
+      <div className="alert-banner flex-wrap gap-y-2">
         <svg
           width="18" height="18" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -113,9 +113,15 @@ export default function DashboardPage() {
             特定移行認定 {TOKUTEI_COUNT.toLocaleString()} 自治体を含む
           </p>
         </div>
-        <p className="text-xs flex-shrink-0" style={{ color: "#991b1b" }}>
-          基準: {summary.data_month}
-        </p>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <p className="text-xs" style={{ color: "#991b1b" }}>基準: {summary.data_month}</p>
+          <span
+            className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide text-white"
+            style={{ backgroundColor: "#b91c1c", letterSpacing: "0.04em" }}
+          >
+            緊急対応必要
+          </span>
+        </div>
       </div>
 
       {/* データ鮮度バナー */}
@@ -182,33 +188,37 @@ export default function DashboardPage() {
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 flex-shrink-0">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
           </svg>
-          全国 {TOTAL.toLocaleString()} 自治体（特定移行含む）の業務ごとの<strong>平均</strong>完了率。
+          全国 {TOTAL.toLocaleString()} 自治体（特定移行含む）の業務ごとの<strong>平均</strong>完了率。完了率降順。
         </p>
-        <div className="space-y-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
           {sortedBusinesses.map((biz) => {
             const pct = biz.avg_rate * 100;
             const barColor = getRateColor(biz.avg_rate);
             return (
-              <div key={biz.business} className="flex items-center gap-3">
-                <span
-                  className="text-sm w-36 flex-shrink-0 text-right truncate"
-                  style={{ color: "var(--color-text-secondary)" }}
+              <div
+                key={biz.business}
+                className="bg-white rounded-xl p-3 flex flex-col gap-2"
+                style={{ border: "1px solid #E5E7EB", borderTop: `3px solid ${barColor}` }}
+              >
+                <p
+                  className="text-xs leading-snug"
+                  style={{ color: "var(--color-text-secondary)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
                   title={biz.business}
                 >
                   {biz.business}
-                </span>
-                <div className="bar-track">
+                </p>
+                <p
+                  className="tabular-nums font-black leading-none"
+                  style={{ fontSize: 20, color: barColor }}
+                >
+                  {pct.toFixed(1)}%
+                </p>
+                <div className="rounded-full overflow-hidden" style={{ height: 8, backgroundColor: "#e5e7eb" }}>
                   <div
-                    className="bar-fill"
+                    className="h-full rounded-full"
                     style={{ width: `${pct}%`, backgroundColor: barColor }}
                   />
                 </div>
-                <span
-                  className="text-sm font-bold w-14 flex-shrink-0 text-right tabular-nums"
-                  style={{ color: barColor }}
-                >
-                  {pct.toFixed(1)}%
-                </span>
               </div>
             );
           })}

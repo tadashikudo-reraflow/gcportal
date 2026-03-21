@@ -41,11 +41,22 @@ export default function TokuteiPage() {
   }));
 
   // 都道府県一覧
-  const prefectures = [...new Set(tokuteiList.map((m) => m.prefecture))].sort();
+  // JIS X 0401 都道府県コード順
+  const PREF_ORDER = [
+    "北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県",
+    "茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県",
+    "新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県",
+    "静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県",
+    "奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県",
+    "徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県",
+    "熊本県","大分県","宮崎県","鹿児島県","沖縄県",
+  ];
+  const prefSet = new Set(tokuteiList.map((m) => m.prefecture));
+  const prefectures = PREF_ORDER.filter((p) => prefSet.has(p));
 
-  // 統計
+  // 統計（total_countフィールドではなく実データ件数を使用）
   const TOTAL_MUNICIPALITIES = 1741;
-  const tokuteiCount = tokuteiData.total_count as number;
+  const tokuteiCount = rows.length;
   const systemCount = tokuteiData.system_count as number;
   const tokuteiRatio = (tokuteiCount / TOTAL_MUNICIPALITIES) * 100;
 
@@ -148,12 +159,12 @@ export default function TokuteiPage() {
         <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           都道府県別 認定自治体数
         </h2>
-        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-8 gap-2">
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
           {prefectures.map((pref) => {
             const count = tokuteiList.filter((m) => m.prefecture === pref).length;
             return (
               <div key={pref} className="text-center p-2 rounded-lg" style={{ backgroundColor: "#f3e8ff" }}>
-                <p className="text-xs font-medium" style={{ color: "#6d28d9" }}>{pref.replace("都","").replace("道","").replace("府","").replace("県","")}</p>
+                <p className="text-xs font-medium whitespace-nowrap" style={{ color: "#6d28d9" }}>{pref}</p>
                 <p className="text-lg font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>{count}</p>
               </div>
             );
@@ -161,7 +172,7 @@ export default function TokuteiPage() {
         </div>
       </div>
 
-      {/* 自治体一覧テーブル */}
+      {/* 自治体一覧（都道府県別アコーディオン） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>

@@ -76,7 +76,7 @@ export default async function ArticlePage({ params }: Props) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <nav className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <Link href="/" className="hover:underline">TOP</Link>
