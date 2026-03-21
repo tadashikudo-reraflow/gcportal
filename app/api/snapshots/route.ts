@@ -5,11 +5,31 @@ import { getSnapshots, createSnapshotFromJson } from "@/lib/snapshot";
 import { readFile } from "fs/promises";
 import { join } from "path";
 
-/** GET /api/snapshots — 時系列スナップショット一覧（公開） */
-export async function GET() {
+/**
+ * GET /api/snapshots
+ * - 通常: 時系列スナップショット一覧を返す（公開）
+ * - Vercel Cron 呼び出し時: Authorization: Bearer <CRON_SECRET> ヘッダーを検知し、
+ *   standardization.json から月次スナップショットを保存してから一覧を返す。
+ */
+export async function GET(req: NextRequest) {
   try {
+    // Vercel Cron は GET + Authorization: Bearer <CRON_SECRET> を送る
+    const authHeader = req.headers.get("authorization");
+    const expectedCron = process.env.CRON_SECRET;
+    const isCron =
+      expectedCron &&
+      authHeader === `Bearer ${expectedCron}`;
+
+    if (isCron) {
+      // Cron 起動: 現在の standardization.json をスナップショットとして保存
+      const filePath = join(process.cwd(), "public/data/standardization.json");
+      const raw = await readFile(filePath, "utf-8");
+      const json = JSON.parse(raw);
+      await createSnapshotFromJson(json);
+    }
+
     const snapshots = await getSnapshots();
-    return NextResponse.json({ snapshots });
+    return NextResponse.json({ snapshots, savedByCron: isCron ? true : undefined });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });

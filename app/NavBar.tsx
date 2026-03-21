@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/compare",     label: "自治体比較",     short: "比較2"  },
   { href: "/report",      label: "無料レポート",   short: "PDF"    },
   { href: "/articles",     label: "コラム・解説",   short: "記事"   },
+  { href: "/tracker",      label: "移行トラッカー", short: "Tracker" },
   { href: "/sources",      label: "参照サイト",     short: "出典"   },
 ] as const;
 

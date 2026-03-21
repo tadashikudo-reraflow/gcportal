@@ -7,6 +7,7 @@ import MigrationResultBanner from "@/components/MigrationResultBanner";
 import PrefectureHeatmap from "@/components/PrefectureHeatmap";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import { COST_CONSTANTS } from "@/lib/constants";
 
 const avgRate = (data.summary.avg_rate * 100).toFixed(1);
 
@@ -115,13 +116,15 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* 最終移行結果バナー */}
       <MigrationResultBanner
-        completionRate={0.384}
+        completionRate={summary.avg_rate}
+        // totalSystems: standardization.json に total_systems キーなし。要データソース
         totalSystems={34592}
+        // completedSystems: standardization.json に completed_systems キーなし。要データソース
         completedSystems={13283}
-        delayedSystems={8956}
-        delayedMunicipalities={935}
+        delayedSystems={tokuteiData.system_count}
+        delayedMunicipalities={TOKUTEI_COUNT}
         totalMunicipalities={TOTAL}
-        costMultiplier={2.3}
+        costMultiplier={COST_CONSTANTS.avgCostIncrease}
         dataMonth={summary.data_month}
       />
 

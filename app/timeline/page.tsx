@@ -89,6 +89,82 @@ function generateMockHistory(
   return { snapshots, prefectureTimeline };
 }
 
+/**
+ * DBスナップショット1件 + standardization.json の現在値を合成してグラフ用データを生成。
+ * DBが完全に空の場合は null を返す（呼び出し元でモックにフォールバック）。
+ */
+function buildFromDbAndCurrent(
+  dbSnapshots: {
+    data_month: string;
+    avg_rate: number;
+    completed_count: number;
+    critical_count: number;
+    municipality_count: number;
+    snapshot_data: Record<string, unknown>;
+  }[],
+  typedData: StandardizationData
+): { snapshots: SnapshotPoint[]; prefectureTimeline: PrefectureTimelinePoint[] } | null {
+  if (dbSnapshots.length === 0) return null;
+
+  const { summary, prefectures } = typedData;
+
+  // DBスナップショットを時系列順でマッピング
+  const snapshotMap = new Map(dbSnapshots.map((s) => [s.data_month, s]));
+
+  // standardization.json の現在月がDBにまだ無ければ末尾に追加（現在値で補完）
+  if (!snapshotMap.has(summary.data_month)) {
+    snapshotMap.set(summary.data_month, {
+      data_month: summary.data_month,
+      avg_rate: summary.avg_rate,
+      completed_count: summary.completed_count,
+      critical_count: summary.critical_count,
+      municipality_count: summary.total,
+      snapshot_data: {
+        at_risk_count: summary.at_risk_count,
+        on_track_count: summary.on_track_count,
+        prefecture_summary: prefectures.map((p) => ({
+          prefecture: p.prefecture,
+          avg_rate: p.avg_rate,
+          count: p.count,
+          completed: p.completed,
+          critical: p.critical,
+        })),
+      },
+    });
+  }
+
+  // data_month 昇順でソート
+  const sorted = Array.from(snapshotMap.values()).sort((a, b) =>
+    a.data_month.localeCompare(b.data_month)
+  );
+
+  const snapshots: SnapshotPoint[] = sorted.map((s) => ({
+    data_month: s.data_month,
+    avg_rate: s.avg_rate,
+    completed_count: s.completed_count,
+    critical_count: s.critical_count,
+    municipality_count: s.municipality_count,
+  }));
+
+  const prefectureTimeline: PrefectureTimelinePoint[] = [];
+  for (const s of sorted) {
+    const prefSummary = (
+      s.snapshot_data as { prefecture_summary?: { prefecture: string; avg_rate: number }[] }
+    )?.prefecture_summary;
+    if (prefSummary) {
+      for (const p of prefSummary) {
+        prefectureTimeline.push({
+          data_month: s.data_month,
+          prefecture: p.prefecture,
+          avg_rate: p.avg_rate,
+        });
+      }
+    }
+  }
+
+  return { snapshots, prefectureTimeline };
+}
+
 export default async function TimelinePage() {
   const typedData = data as StandardizationData;
 
@@ -98,38 +174,26 @@ export default async function TimelinePage() {
   let isMockData = false;
 
   try {
-    const { getSnapshots } = await import("@/lib/snapshot");
-    const dbSnapshots = await getSnapshots();
+    const { getSnapshots, seedInitialSnapshot } = await import("@/lib/snapshot");
 
-    if (dbSnapshots.length >= 2) {
-      snapshots = dbSnapshots.map((s) => ({
-        data_month: s.data_month,
-        avg_rate: s.avg_rate,
-        completed_count: s.completed_count,
-        critical_count: s.critical_count,
-        municipality_count: s.municipality_count,
-      }));
-      // Extract prefecture data from snapshot_data if available
-      prefectureTimeline = [];
-      for (const s of dbSnapshots) {
-        const prefSummary = (
-          s.snapshot_data as { prefecture_summary?: { prefecture: string; avg_rate: number }[] }
-        )?.prefecture_summary;
-        if (prefSummary) {
-          for (const p of prefSummary) {
-            prefectureTimeline.push({
-              data_month: s.data_month,
-              prefecture: p.prefecture,
-              avg_rate: p.avg_rate,
-            });
-          }
-        }
-      }
+    // テーブルが空なら初期シーディングを試みる
+    await seedInitialSnapshot().catch(() => {
+      // シーディング失敗は致命的ではない（後続でモックにフォールバック）
+    });
+
+    const dbSnapshots = await getSnapshots();
+    const built = buildFromDbAndCurrent(dbSnapshots, typedData);
+
+    if (built) {
+      snapshots = built.snapshots;
+      prefectureTimeline = built.prefectureTimeline;
+      // DBが1件のみ（初期シード直後）でも実データとして扱う
+      isMockData = false;
     } else {
-      throw new Error("Not enough snapshots");
+      throw new Error("DB is empty");
     }
   } catch {
-    // Fall back to mock data
+    // Fall back to mock data（DBが完全に空 or 接続エラーの場合のみ）
     const mock = generateMockHistory(typedData);
     snapshots = mock.snapshots;
     prefectureTimeline = mock.prefectureTimeline;
