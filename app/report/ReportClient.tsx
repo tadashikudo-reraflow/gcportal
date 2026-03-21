@@ -2,31 +2,6 @@
 
 import { useState } from "react";
 
-type ReportData = {
-  generatedAt: string;
-  title: string;
-  dataMonth: string;
-  executive_summary: {
-    total_municipalities: number;
-    avg_rate: number;
-    completed_count: number;
-    critical_count: number;
-    at_risk_count: number;
-    on_track_count: number;
-    deadline: string;
-  };
-  prefecture_ranking: {
-    top10: Array<{ prefecture: string; avg_rate: number; count: number }>;
-    bottom10: Array<{ prefecture: string; avg_rate: number; count: number }>;
-  };
-  cost: {
-    avgCostIncrease: number;
-    maxCostIncrease: number;
-    costFactors: string[];
-  };
-  sections: Array<{ title: string; content: string }>;
-};
-
 const ORG_OPTIONS = [
   { value: "municipality", label: "自治体職員" },
   { value: "it_vendor", label: "IT企業・SIer" },
@@ -41,7 +16,6 @@ export default function ReportClient() {
   const [orgType, setOrgType] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [report, setReport] = useState<ReportData | null>(null);
   const [showReport, setShowReport] = useState(false);
   const [error, setError] = useState("");
 
@@ -70,20 +44,12 @@ export default function ReportClient() {
         return;
       }
 
-      // 2. レポート取得
-      const res = await fetch("/api/report");
-      const data = await res.json();
-      setReport(data);
       setShowReport(true);
     } catch {
-      setError("レポートの取得に失敗しました。もう一度お試しください。");
+      setError("登録に失敗しました。もう一度お試しください。");
     } finally {
       setLoading(false);
     }
-  }
-
-  function handlePrint() {
-    window.print();
   }
 
   return (
@@ -212,220 +178,42 @@ export default function ReportClient() {
         </div>
       )}
 
-      {/* レポート表示 + サンクス */}
-      {showReport && report && (
-        <div>
-          {/* サンクスバナー */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6 print:hidden">
-            <h2 className="text-lg font-bold text-green-800 mb-2">
-              レポートをご覧いただけます
+      {/* サンクス画面 */}
+      {showReport && (
+        <div className="text-center max-w-lg mx-auto">
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-8 md:p-12">
+            <div className="text-5xl mb-4">&#9993;</div>
+            <h2 className="text-2xl font-bold text-green-800 mb-3">
+              登録ありがとうございます
             </h2>
-            <p className="text-green-700 text-sm mb-4">
-              下記のボタンからPDF保存できます。週次「ガバクラ週報」を{email}宛にお届けします。
+            <p className="text-green-700 mb-6">
+              <strong>{email}</strong> 宛にレポートのダウンロードリンクをお送りしました。
+              メールをご確認ください。
             </p>
-            <div className="flex flex-wrap gap-3">
-              <a
-                href="https://note.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
-              >
-                note で有料レポートを見る →
-              </a>
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center mb-6 print:hidden">
-            <button
-              onClick={() => setShowReport(false)}
-              className="text-blue-600 hover:text-blue-800"
-            >
-              ← 戻る
-            </button>
-            <button
-              onClick={handlePrint}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              PDF保存 (印刷)
-            </button>
-          </div>
-
-          {/* 印刷用レポート本体 */}
-          <div className="print:p-0" id="report-content">
-            <div className="bg-gradient-to-br from-[#002D72] to-[#001440] text-white rounded-xl p-8 mb-8 print:rounded-none print:mb-4">
-              <h1 className="text-2xl md:text-3xl font-bold">{report.title}</h1>
-              <p className="text-blue-200 mt-2">
-                データ月: {report.dataMonth} | 生成日:{" "}
-                {new Date(report.generatedAt).toLocaleDateString("ja-JP")}
-              </p>
-            </div>
-
-            {/* エグゼクティブサマリー */}
-            <div className="bg-white border rounded-xl p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">
-                {report.sections[0]?.title}
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-800">
-                    {(report.executive_summary.avg_rate * 100).toFixed(1)}%
-                  </div>
-                  <div className="text-sm text-gray-600">平均移行進捗率</div>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-green-800">
-                    {report.executive_summary.completed_count}
-                  </div>
-                  <div className="text-sm text-gray-600">完了自治体</div>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-red-800">
-                    {report.executive_summary.critical_count}
-                  </div>
-                  <div className="text-sm text-gray-600">深刻な遅延</div>
-                </div>
-                <div className="bg-orange-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-800">
-                    {report.executive_summary.at_risk_count}
-                  </div>
-                  <div className="text-sm text-gray-600">リスクあり</div>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-800">
-                    {report.executive_summary.total_municipalities}
-                  </div>
-                  <div className="text-sm text-gray-600">対象自治体数</div>
-                </div>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-800">
-                    {report.executive_summary.deadline}
-                  </div>
-                  <div className="text-sm text-gray-600">移行期限</div>
-                </div>
-              </div>
-              <p className="text-gray-700">{report.sections[0]?.content}</p>
-            </div>
-
-            {/* 都道府県ランキング */}
-            <div className="bg-white border rounded-xl p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">
-                {report.sections[1]?.title}
-              </h2>
-              <p className="text-gray-700 mb-4">
-                {report.sections[1]?.content}
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-bold text-green-700 mb-2">
-                    進捗率 上位10
-                  </h3>
-                  <div className="space-y-2">
-                    {report.prefecture_ranking.top10.map((p, i) => (
-                      <div key={p.prefecture} className="flex items-center gap-2">
-                        <span className="w-6 text-sm text-gray-500 text-right">
-                          {i + 1}.
-                        </span>
-                        <span className="w-20 text-sm font-medium">
-                          {p.prefecture}
-                        </span>
-                        <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                          <div
-                            className="bg-green-500 h-full rounded-full"
-                            style={{ width: `${p.avg_rate * 100}%` }}
-                          />
-                        </div>
-                        <span className="w-14 text-sm text-right">
-                          {(p.avg_rate * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-bold text-red-700 mb-2">
-                    進捗率 下位10
-                  </h3>
-                  <div className="space-y-2">
-                    {report.prefecture_ranking.bottom10.map((p, i) => (
-                      <div key={p.prefecture} className="flex items-center gap-2">
-                        <span className="w-6 text-sm text-gray-500 text-right">
-                          {i + 1}.
-                        </span>
-                        <span className="w-20 text-sm font-medium">
-                          {p.prefecture}
-                        </span>
-                        <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                          <div
-                            className="bg-red-400 h-full rounded-full"
-                            style={{ width: `${p.avg_rate * 100}%` }}
-                          />
-                        </div>
-                        <span className="w-14 text-sm text-right">
-                          {(p.avg_rate * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* コスト分析 */}
-            <div className="bg-white border rounded-xl p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">
-                {report.sections[2]?.title}
-              </h2>
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="bg-orange-50 p-4 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-orange-700">
-                    {report.cost.avgCostIncrease}x
-                  </div>
-                  <div className="text-sm text-gray-600">平均コスト増加</div>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-red-700">
-                    {report.cost.maxCostIncrease}x
-                  </div>
-                  <div className="text-sm text-gray-600">最大コスト増加</div>
-                </div>
-                <div className="bg-blue-50 p-4 rounded-lg text-center">
-                  <div className="text-3xl font-bold text-blue-700">
-                    {report.cost.costFactors.length}
-                  </div>
-                  <div className="text-sm text-gray-600">主要因</div>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-3">
-                {report.sections[2]?.content}
-              </p>
-              <ul className="space-y-1">
-                {report.cost.costFactors.map((f) => (
-                  <li key={f} className="text-sm text-gray-600 flex items-start gap-2">
-                    <span className="text-orange-500">&#9679;</span>
-                    {f}
-                  </li>
-                ))}
+            <div className="bg-white rounded-xl p-5 mb-6 text-left">
+              <h3 className="font-bold text-gray-800 mb-3">今後のお届け内容</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-500 font-bold">1.</span>
+                  <span>無料レポート「ガバメントクラウド移行 最終結果レポート 2026」</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-500 font-bold">2.</span>
+                  <span>週次「ガバクラ週報」— 最新動向と編集部の見解</span>
+                </li>
               </ul>
             </div>
-
-            {/* 推奨事項 */}
-            <div className="bg-white border rounded-xl p-6 mb-6">
-              <h2 className="text-xl font-bold mb-4">
-                {report.sections[3]?.title}
-              </h2>
-              <p className="text-gray-700">{report.sections[3]?.content}</p>
-            </div>
-
-            {/* フッター */}
-            <div className="text-center text-sm text-gray-500 border-t pt-4">
-              <p>
-                本レポートはGCInsight（gcinsight.jp）が公開データを基に作成したものです。
-              </p>
-              <p>
-                データソース: 総務省、デジタル庁、内閣官房
-              </p>
-            </div>
+            <button
+              onClick={() => setShowReport(false)}
+              className="text-blue-600 hover:text-blue-800 text-sm"
+            >
+              ← トップに戻る
+            </button>
           </div>
+          <p className="text-xs text-gray-400 mt-4">
+            メールが届かない場合は迷惑メールフォルダをご確認ください。
+            配信はいつでも解除できます。
+          </p>
         </div>
       )}
     </div>
