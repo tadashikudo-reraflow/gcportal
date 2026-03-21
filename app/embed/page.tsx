@@ -1,4 +1,6 @@
 import data from "@/public/data/standardization.json";
+import tokuteiData from "@/public/data/tokutei_municipalities.json";
+import { COST_CONSTANTS } from "@/lib/constants";
 
 type WidgetType = "progress" | "prefecture" | "cost" | undefined;
 
@@ -163,6 +165,9 @@ function PrefectureWidget() {
 }
 
 function CostWidget() {
+  // TODO: コストデータAPIから取得（avgCostIncrease / initialIncreaseRate は現在 COST_CONSTANTS 定数）
+  const delayedCount = tokuteiData.total_count; // tokutei_municipalities.json から動的取得
+
   return (
     <div className="p-5 space-y-4">
       <h3 className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
@@ -175,21 +180,23 @@ function CostWidget() {
 
       <div className="grid grid-cols-3 gap-3 text-center">
         <div className="bg-red-50 rounded-lg p-3">
-          <p className="text-xl font-extrabold text-red-700">2.3x</p>
+          {/* TODO: コストデータAPIから取得 */}
+          <p className="text-xl font-extrabold text-red-700">{COST_CONSTANTS.avgCostIncrease}x</p>
           <p className="text-[10px] text-red-500 mt-1">平均コスト増</p>
         </div>
         <div className="bg-orange-50 rounded-lg p-3">
-          <p className="text-xl font-extrabold text-orange-700">156%</p>
+          {/* TODO: コストデータAPIから取得 */}
+          <p className="text-xl font-extrabold text-orange-700">{COST_CONSTANTS.initialIncreaseRate}%</p>
           <p className="text-[10px] text-orange-500 mt-1">当初比増加率</p>
         </div>
         <div className="bg-blue-50 rounded-lg p-3">
-          <p className="text-xl font-extrabold text-blue-700">935</p>
+          <p className="text-xl font-extrabold text-blue-700">{delayedCount.toLocaleString()}</p>
           <p className="text-[10px] text-blue-500 mt-1">遅延自治体数</p>
         </div>
       </div>
 
       <div className="text-[10px] text-gray-400 flex items-center justify-between pt-2 border-t border-gray-100">
-        <span>出典: デジタル庁先行事業TCO検証</span>
+        <span>出典: {COST_CONSTANTS.source}</span>
         <a
           href="https://gcinsight.jp/costs"
           target="_blank"

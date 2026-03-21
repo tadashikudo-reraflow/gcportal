@@ -310,7 +310,7 @@ export default function TimelineClient({
             color: "var(--color-rate-atrisk, #FA6414)",
           }}
         >
-          ※ 推定データを表示中 — DBスナップショットが蓄積されると実測値に切り替わります
+          ※ このデータは推定値です。実データは次回のスナップショット保存後に表示されます
         </div>
       )}
 

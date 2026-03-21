@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import { join } from "path";
+import { COST_CONSTANTS } from "@/lib/constants";
 
 /**
  * GET /api/report — 無料PDFレポート用データ生成
@@ -28,11 +29,12 @@ export async function GET() {
     const top10 = sorted.slice(0, 10);
     const bottom10 = sorted.slice(-10).reverse();
 
-    // コスト関連データ
+    // コスト関連データ（COST_CONSTANTS から参照。出典: デジタル庁先行事業TCO検証）
     const costHighlights = {
-      avgCostIncrease: 2.3,
-      maxCostIncrease: 5.7,
-      minCostIncrease: 1.6,
+      avgCostIncrease: COST_CONSTANTS.avgCostIncrease,
+      maxCostIncrease: COST_CONSTANTS.maxCostIncrease,
+      minCostIncrease: COST_CONSTANTS.minCostIncrease,
+      source: COST_CONSTANTS.source,
       costFactors: [
         "クラウドサービス利用料の想定超過",
         "データ移行・変換の複雑さ",

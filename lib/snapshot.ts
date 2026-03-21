@@ -65,6 +65,43 @@ export async function getSnapshots(): Promise<
   return data ?? [];
 }
 
+/**
+ * 初期スナップショットをシーディング
+ * progress_snapshots が空の場合のみ、standardization.json の現在値を1件保存する。
+ * 既に同 data_month のレコードがある場合はスキップ（UPSERT で安全）。
+ */
+export async function seedInitialSnapshot(): Promise<{
+  seeded: boolean;
+  dataMonth?: string;
+  reason?: string;
+}> {
+  const supabase = getServiceClient();
+
+  // 既存レコード数を確認
+  const { count, error: countError } = await supabase
+    .from("progress_snapshots")
+    .select("*", { count: "exact", head: true });
+
+  if (countError) {
+    throw new Error(`Failed to count snapshots: ${countError.message}`);
+  }
+
+  if ((count ?? 0) > 0) {
+    return { seeded: false, reason: "snapshots already exist" };
+  }
+
+  // テーブルが空 → standardization.json から初期レコードを作成
+  const { readFile } = await import("fs/promises");
+  const { join } = await import("path");
+  const filePath = join(process.cwd(), "public/data/standardization.json");
+  const raw = await readFile(filePath, "utf-8");
+  const json = JSON.parse(raw);
+
+  await createSnapshotFromJson(json);
+
+  return { seeded: true, dataMonth: json.summary.data_month };
+}
+
 /** standardization.json からスナップショットを自動生成 */
 export async function createSnapshotFromJson(
   json: {
