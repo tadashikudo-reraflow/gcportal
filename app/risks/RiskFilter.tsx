@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import FilterBar, { FilterValues } from "@/components/FilterBar";
+import { REGIONS, STATUS_OPTIONS, POPULATION_BANDS } from "@/lib/regions";
 
 interface MunicipalityRow {
   rank: number;
@@ -9,6 +11,7 @@ interface MunicipalityRow {
   overall_rate: number;
   worst_business: string;
   worst_rate: number;
+  population?: number;
 }
 
 interface RiskFilterProps {
@@ -23,58 +26,73 @@ function getRateTextColor(rate: number): string {
   return "#c8102e";
 }
 
-function getStatusBadge(rate: number): { label: string; className: string } {
-  if (rate >= 1.0) return { label: "完了", className: "bg-green-100 text-green-800" };
-  if (rate >= 0.8) return { label: "順調", className: "bg-blue-100 text-blue-800" };
-  if (rate >= 0.5) return { label: "要注意", className: "bg-yellow-100 text-yellow-800" };
-  return { label: "危機", className: "bg-red-100 text-red-800" };
+function getStatusBadge(rate: number): { label: string; className: string; key: string } {
+  if (rate >= 1.0) return { label: "完了", className: "bg-green-100 text-green-800", key: "completed" };
+  if (rate >= 0.8) return { label: "順調", className: "bg-blue-100 text-blue-800", key: "on_track" };
+  if (rate >= 0.5) return { label: "要注意", className: "bg-yellow-100 text-yellow-800", key: "warning" };
+  return { label: "危機", className: "bg-red-100 text-red-800", key: "critical" };
 }
 
 function formatRate(rate: number): string {
   return (rate * 100).toFixed(1) + "%";
 }
 
-export default function RiskFilter({ rows, prefectures }: RiskFilterProps) {
-  const [selectedPref, setSelectedPref] = useState<string>("");
+/** 都道府県から地域を逆引き */
+function prefToRegion(pref: string): string | undefined {
+  for (const [region, prefs] of Object.entries(REGIONS)) {
+    if (prefs.includes(pref)) return region;
+  }
+  return undefined;
+}
+
+export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilterProps) {
+  const [filterValues, setFilterValues] = useState<FilterValues>({});
 
   const filtered = useMemo(() => {
-    if (!selectedPref) return rows;
-    return rows.filter((r) => r.prefecture === selectedPref);
-  }, [rows, selectedPref]);
+    let result = rows;
+
+    // 地域フィルター
+    if (filterValues.region) {
+      const regionPrefs = REGIONS[filterValues.region];
+      if (regionPrefs) {
+        result = result.filter((r) => regionPrefs.includes(r.prefecture));
+      }
+    }
+
+    // ステータスフィルター
+    if (filterValues.status) {
+      const statusKey = filterValues.status;
+      result = result.filter((r) => {
+        const badge = getStatusBadge(r.overall_rate);
+        return badge.key === statusKey;
+      });
+    }
+
+    // 人口帯フィルター（人口データがある場合のみ）
+    if (filterValues.population) {
+      const band = POPULATION_BANDS.find((b) => b.key === filterValues.population);
+      if (band && rows.some((r) => r.population != null)) {
+        result = result.filter((r) => {
+          if (r.population == null) return true;
+          return r.population >= band.min && r.population <= band.max;
+        });
+      }
+    }
+
+    return result;
+  }, [rows, filterValues]);
 
   return (
     <div>
-      {/* フィルター UI */}
-      <div className="flex items-center gap-3 mb-4">
-        <label
-          htmlFor="pref-filter"
-          className="text-sm font-medium text-gray-700 whitespace-nowrap"
-        >
-          都道府県で絞り込み:
-        </label>
-        <select
-          id="pref-filter"
-          value={selectedPref}
-          onChange={(e) => setSelectedPref(e.target.value)}
-          className="text-sm border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">全都道府県</option>
-          {prefectures.map((p) => (
-            <option key={p} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
-        {selectedPref && (
-          <button
-            onClick={() => setSelectedPref("")}
-            className="text-xs text-gray-500 hover:text-gray-700 underline"
-          >
-            クリア
-          </button>
-        )}
-        <span className="text-xs text-gray-400 ml-auto">
-          {filtered.length} 件表示
+      <FilterBar
+        filters={{ population: false, region: true, status: true }}
+        values={filterValues}
+        onChange={setFilterValues}
+      />
+
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs text-gray-400">
+          {filtered.length} 件表示{filtered.length !== rows.length ? ` / ${rows.length}件中` : ""}
         </span>
       </div>
 
@@ -88,6 +106,9 @@ export default function RiskFilter({ rows, prefectures }: RiskFilterProps) {
               </th>
               <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">
                 都道府県
+              </th>
+              <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">
+                地域
               </th>
               <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">
                 市区町村
@@ -106,6 +127,7 @@ export default function RiskFilter({ rows, prefectures }: RiskFilterProps) {
           <tbody>
             {filtered.map((row) => {
               const badge = getStatusBadge(row.overall_rate);
+              const region = prefToRegion(row.prefecture);
               return (
                 <tr
                   key={`${row.prefecture}-${row.city}`}
@@ -116,6 +138,9 @@ export default function RiskFilter({ rows, prefectures }: RiskFilterProps) {
                   </td>
                   <td className="py-2.5 px-2 text-gray-600 text-xs">
                     {row.prefecture}
+                  </td>
+                  <td className="py-2.5 px-2 text-gray-400 text-xs">
+                    {region ?? ""}
                   </td>
                   <td className="py-2.5 px-2 font-medium text-gray-800">
                     {row.city}

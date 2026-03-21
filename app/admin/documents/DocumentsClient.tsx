@@ -141,23 +141,21 @@ export default function DocumentsClient() {
     }
   }
 
-  // ドキュメント削除
+  // ドキュメント削除（API経由・管理者認証付き）
   async function handleDelete(id: number) {
     if (!confirm("このドキュメントとすべてのチャンクを削除しますか？")) return;
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rag_documents?id=eq.${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""}`,
-          },
-        }
-      );
+      const res = await fetch(`/api/rag/documents/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(`削除に失敗しました: ${data.error ?? res.statusText}`);
+        return;
+      }
       fetchDocuments();
     } catch {
-      // silent
+      alert("削除リクエストに失敗しました");
     }
   }
 

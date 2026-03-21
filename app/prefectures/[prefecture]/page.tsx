@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import data from "@/public/data/standardization.json";
@@ -34,6 +35,34 @@ function formatRate(rate: number | null): string {
 
 interface PageProps {
   params: Promise<{ prefecture: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { prefecture: encoded } = await params;
+  const name = decodeURIComponent(encoded);
+  const prefSummary = data.prefectures.find((p) => p.prefecture === name);
+  const rate = prefSummary ? (prefSummary.avg_rate * 100).toFixed(1) : null;
+
+  return {
+    title: `${name}のガバメントクラウド移行進捗 | GCInsight`,
+    description: `${name}の全市区町村のガバメントクラウド移行進捗状況。${rate ? `平均完了率${rate}%。` : ""}業務別の詳細データ付き。`,
+    openGraph: {
+      title: `${name} — ガバメントクラウド移行進捗`,
+      description: rate
+        ? `${name}の平均完了率は${rate}%`
+        : `${name}の移行進捗を可視化`,
+      images: [
+        {
+          url: `/og?title=${encodeURIComponent(name)}&subtitle=${encodeURIComponent(rate ? `平均完了率 ${rate}%` : "ガバメントクラウド移行進捗")}${prefSummary ? `&rate=${prefSummary.avg_rate}` : ""}&type=prefecture`,
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+    twitter: { card: "summary_large_image" },
+  };
 }
 
 export default async function PrefectureDetailPage({ params }: PageProps) {

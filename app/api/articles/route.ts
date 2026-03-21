@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     tags = [],
     author = "GCInsight編集部",
     sources = [],
+    cover_image,
     is_published = false,
   } = body;
 
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
         tags,
         author,
         sources,
+        cover_image: cover_image ?? `/images/articles/${slug}.png`,
         is_published,
         updated_at: new Date().toISOString(),
       },

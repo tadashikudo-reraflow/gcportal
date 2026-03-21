@@ -6,9 +6,10 @@ import NavBar from "./NavBar";
 export default function RootShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isEmbed = pathname.startsWith("/embed");
 
-  if (isAdmin) {
-    // admin 配下は admin/layout.tsx に完全に委譲するため、
+  if (isAdmin || isEmbed) {
+    // admin / embed 配下はそれぞれの layout.tsx に完全に委譲するため、
     // ヘッダー・フッター・max-w ラッパーをすべてスキップ
     return <>{children}</>;
   }
@@ -19,17 +20,12 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
       <header style={{ backgroundColor: "var(--color-brand-secondary)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* ロゴ: 黄色アクセント */}
-            <div
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: "var(--color-brand-primary)" }}
-            >
-              <span
-                className="text-white text-xs sm:text-sm"
-                style={{ fontWeight: 800 }}
-              >
-                官
-              </span>
+            {/* ロゴ: クラウド+GC */}
+            <div className="flex-shrink-0" style={{ width: 36, height: 32 }}>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="36" height="32">
+                <path d="M155 128H48C25 128 8 110 8 88C8 68 22 52 42 48C42 47 42 46 42 44C42 22 60 4 82 4C100 4 114 15 122 30C128 26 135 24 143 24C164 24 182 42 182 64C182 66 182 68 181 70C192 76 198 87 198 100C198 116 184 128 166 128" stroke="white" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <text x="56" y="108" fontFamily="Helvetica Neue,Arial,sans-serif" fontSize="60" fontWeight="800" fill="white" letterSpacing="-2">GC</text>
+              </svg>
             </div>
             <div>
               <h1 className="text-white font-bold text-base sm:text-lg leading-tight">

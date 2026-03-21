@@ -1,15 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // /api/scrape/* を保護（CRON_SECRET or JWT）
+  if (pathname.startsWith("/api/scrape")) {
+    const token = request.cookies.get(COOKIE_NAME)?.value;
+    const cronSecret = request.headers.get("x-cron-secret");
+    const expectedCron = process.env.CRON_SECRET;
+
+    const isAuthed = token && (await verifyAdminToken(token));
+    const isCron = cronSecret && expectedCron && cronSecret === expectedCron;
+
+    if (!isAuthed && !isCron) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    return NextResponse.next();
+  }
 
   // /admin/* を保護（/admin/login は除外）
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const token = request.cookies.get("admin_token")?.value;
-    const expected = process.env.ADMIN_PASSWORD ?? "gcinsight2025";
+    const token = request.cookies.get(COOKIE_NAME)?.value;
 
-    if (token !== expected) {
+    if (!token || !(await verifyAdminToken(token))) {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
@@ -20,5 +35,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/api/scrape/:path*"],
 };
