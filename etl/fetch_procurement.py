@@ -59,5 +59,7 @@ def fetch_all(data_dir: Path) -> dict[int, Path]:
 
 if __name__ == "__main__":
     import sys
-    data_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("../../60_data")
+    import os
+    _default = os.path.join(os.environ["GDRIVE_WORKSPACE"], "datasets", "PJ12-govinsight") if "GDRIVE_WORKSPACE" in os.environ else "../../60_data"
+    data_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(_default)
     fetch_all(data_dir)

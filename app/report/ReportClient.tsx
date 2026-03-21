@@ -27,21 +27,56 @@ type ReportData = {
   sections: Array<{ title: string; content: string }>;
 };
 
+const ORG_OPTIONS = [
+  { value: "municipality", label: "自治体職員" },
+  { value: "it_vendor", label: "IT企業・SIer" },
+  { value: "consultant", label: "コンサル・シンクタンク" },
+  { value: "politician", label: "議員・議員事務所" },
+  { value: "media", label: "メディア・研究者" },
+  { value: "other", label: "その他" },
+];
+
 export default function ReportClient() {
   const [email, setEmail] = useState("");
+  const [orgType, setOrgType] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<ReportData | null>(null);
   const [showReport, setShowReport] = useState(false);
+  const [error, setError] = useState("");
+
+  const canSubmit = email.includes("@") && orgType && agreed && !loading;
 
   async function handleDownload() {
+    if (!canSubmit) return;
     setLoading(true);
+    setError("");
+
     try {
+      // 1. リード保存
+      const leadRes = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          organization_type: orgType,
+          source: "report",
+        }),
+      });
+
+      if (!leadRes.ok) {
+        const err = await leadRes.json();
+        setError(err.error || "登録に失敗しました");
+        return;
+      }
+
+      // 2. レポート取得
       const res = await fetch("/api/report");
       const data = await res.json();
       setReport(data);
       setShowReport(true);
     } catch {
-      alert("レポートの取得に失敗しました");
+      setError("レポートの取得に失敗しました。もう一度お試しください。");
     } finally {
       setLoading(false);
     }
@@ -120,37 +155,86 @@ export default function ReportClient() {
             </ul>
           </div>
 
-          {/* CTA */}
+          {/* CTA フォーム */}
           <div className="bg-gray-50 border rounded-xl p-6">
             <h3 className="text-lg font-bold mb-4">
               無料でレポートをダウンロード
             </h3>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <div className="max-w-md mx-auto space-y-4">
               <input
                 type="email"
-                placeholder="メールアドレス（任意）"
+                placeholder="メールアドレス"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                required
               />
+              <select
+                value={orgType}
+                onChange={(e) => setOrgType(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-700"
+                required
+              >
+                <option value="">ご所属を選択してください</option>
+                {ORG_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <label className="flex items-start gap-2 text-sm text-gray-600 text-left cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <span>
+                  レポートのダウンロードおよび更新情報のメール配信に同意します。
+                  配信はいつでも解除できます。
+                </span>
+              </label>
+              {error && (
+                <p className="text-red-600 text-sm">{error}</p>
+              )}
               <button
                 onClick={handleDownload}
-                disabled={loading}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
+                disabled={!canSubmit}
+                className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? "読み込み中..." : "無料ダウンロード"}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
-              ※メールアドレスの入力は任意です。入力された場合、更新情報をお届けします。
+            <p className="text-xs text-gray-400 mt-3">
+              ※ご入力いただいた情報はレポート配信のみに使用します。第三者への提供はいたしません。
             </p>
           </div>
         </div>
       )}
 
-      {/* レポート表示 */}
+      {/* レポート表示 + サンクス */}
       {showReport && report && (
         <div>
+          {/* サンクスバナー */}
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6 print:hidden">
+            <h2 className="text-lg font-bold text-green-800 mb-2">
+              レポートをご覧いただけます
+            </h2>
+            <p className="text-green-700 text-sm mb-4">
+              下記のボタンからPDF保存できます。週次「ガバクラ週報」を{email}宛にお届けします。
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://note.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
+              >
+                note で有料レポートを見る →
+              </a>
+            </div>
+          </div>
+
           <div className="flex justify-between items-center mb-6 print:hidden">
             <button
               onClick={() => setShowReport(false)}
