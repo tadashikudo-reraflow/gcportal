@@ -102,72 +102,86 @@ export default function TrackerPage() {
   );
 
   return (
-    <div className="max-w-md mx-auto space-y-6 sm:max-w-2xl">
-      {/* ── Page Header ── */}
-      <header className="text-center">
-        <h1 className="text-xl font-bold text-gray-800">
+    <div className="max-w-lg mx-auto space-y-6 sm:max-w-3xl">
+      {/* ── ページヘッダー ── */}
+      <header>
+        <h1 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
           ガバメントクラウド移行状況
         </h1>
       </header>
 
-      {/* ── Alert Banner (Stitch: red bg, white text, rounded-xl) ── */}
+      {/* ── カウントダウンバナー ── */}
       <section>
-        <div className="bg-red-600 text-white p-3 rounded-xl shadow-sm text-center">
-          <p className="text-sm font-medium">
+        <div
+          className="p-4 rounded-xl shadow-sm text-center"
+          style={{ backgroundColor: "var(--color-error)" }}
+        >
+          <p className="text-sm font-medium text-white">
             移行完了期限まで残り{" "}
             <span className="text-2xl font-bold tabular-nums">
               {remainingDays.toLocaleString()}
             </span>{" "}
             日
           </p>
-          <p className="text-xs opacity-90">（{deadlineFormatted}）</p>
+          <p className="text-xs text-white/80">（{deadlineFormatted}）</p>
         </div>
       </section>
 
-      {/* ── Global Status (Stitch: white card, progress bar) ── */}
+      {/* ── 全体ステータス ── */}
       <section>
-        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
-          Global Status
+        <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--color-text-secondary)" }}>
+          全体ステータス
         </h2>
-        <div className="bg-white p-4 rounded-xl shadow-sm space-y-4">
-          {/* Completion Rate with progress bar */}
+        <div className="card p-4 space-y-4">
+          {/* 完了率 + プログレスバー */}
           <div>
             <div className="flex justify-between items-end mb-1">
-              <span className="text-sm text-gray-600">完了率</span>
-              <span className="text-2xl font-bold text-gray-800 tabular-nums">
+              <span className="text-sm" style={{ color: "var(--color-text-secondary)" }}>完了率</span>
+              <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
                 {completionPct}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="w-full rounded-full h-2.5"
+              style={{ backgroundColor: "var(--color-border)" }}
+              role="progressbar"
+              aria-valuenow={parseFloat(completionPct)}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`完了率 ${completionPct}%`}
+            >
               <div
-                className="bg-blue-600 h-2.5 rounded-full"
-                style={{ width: `${completionPct}%` }}
+                className="h-2.5 rounded-full"
+                style={{
+                  width: `${completionPct}%`,
+                  backgroundColor: "var(--color-brand-primary)",
+                }}
               />
             </div>
-            <p className="text-[10px] text-gray-400 mt-1 tabular-nums">
+            <p className="text-xs mt-1 tabular-nums" style={{ color: "var(--color-text-muted)" }}>
               {completeCount.toLocaleString()} / {TOTAL.toLocaleString()}
             </p>
           </div>
 
-          {/* Target / Migrated grid */}
-          <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+          {/* 対象 / 遷移 グリッド */}
+          <div className="grid grid-cols-2 gap-4 pt-3" style={{ borderTop: "1px solid var(--color-border)" }}>
             <div>
-              <p className="text-xs text-gray-500">対象団体</p>
-              <p className="text-lg font-bold tabular-nums">
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>対象団体</p>
+              <p className="text-lg font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
                 {TOTAL.toLocaleString()}
-                <span className="text-xs font-normal ml-1">件</span>
+                <span className="text-xs font-normal ml-1" style={{ color: "var(--color-text-secondary)" }}>件</span>
               </p>
-              <p className="text-[10px] text-gray-400 tabular-nums">
+              <p className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
                 (全体の {completedPct}%)
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">遷移自治体</p>
-              <p className="text-lg font-bold tabular-nums">
+              <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>遷移自治体</p>
+              <p className="text-lg font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
                 {completeCount.toLocaleString()}
-                <span className="text-xs font-normal ml-1">団体</span>
+                <span className="text-xs font-normal ml-1" style={{ color: "var(--color-text-secondary)" }}>団体</span>
               </p>
-              <p className="text-[10px] text-gray-400 tabular-nums">
+              <p className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
                 (全体の {completedPct}%)
               </p>
             </div>
@@ -175,7 +189,7 @@ export default function TrackerPage() {
         </div>
       </section>
 
-      {/* ── Quick Filters (Stitch: pill buttons) ── */}
+      {/* ── クイックフィルター ── */}
       <section className="flex gap-2 overflow-x-auto pb-1">
         {[
           { href: "/businesses", label: "業務別" },
@@ -186,90 +200,91 @@ export default function TrackerPage() {
           <Link
             key={href}
             href={href}
-            className="flex-shrink-0 px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-300 transition-colors"
+            className="flex-shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: "var(--color-border)",
+              color: "var(--color-text-primary)",
+            }}
           >
             {label} ▸
           </Link>
         ))}
       </section>
 
-      {/* ── Status Breakdown (Stitch: solid color cards, 2x2 grid) ── */}
+      {/* ── ステータス内訳 ── */}
       <section>
-        <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-3">
-          Status Breakdown
+        <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--color-text-secondary)" }}>
+          ステータス内訳
         </h2>
         <div className="grid grid-cols-2 gap-3">
           <StatusCard
             label="完了"
             count={completeCount}
-            bgClass="bg-emerald-500"
-            icon="✓"
+            color="var(--color-status-complete)"
           />
           <StatusCard
             label="順調"
             count={ontrackCount}
-            bgClass="bg-blue-500"
-            icon="↑"
+            color="var(--color-status-ok)"
           />
           <StatusCard
             label="要注意"
             count={atriskCount}
-            bgClass="bg-yellow-500"
-            icon="!"
+            color="var(--color-status-warn)"
+            darkText
           />
           <StatusCard
             label="危険"
             count={criticalCount}
-            bgClass="bg-red-500"
-            icon="✕"
+            color="var(--color-status-critical)"
           />
         </div>
-        {/* Tokutei separate row */}
+        {/* 特定移行認定 — フル幅 */}
         <div className="mt-3">
-          <div className="bg-violet-500 p-3 rounded-xl text-white flex justify-between items-start shadow-sm">
-            <div>
-              <p className="text-xs font-bold opacity-90">特定移行認定</p>
-              <p className="text-2xl font-bold tabular-nums">{TOKUTEI_COUNT}</p>
-            </div>
-            <div className="w-6 h-6 rounded-full border-2 border-white/50 flex items-center justify-center text-xs">
-              ★
-            </div>
-          </div>
+          <StatusCard
+            label="特定移行認定"
+            count={TOKUTEI_COUNT}
+            color="var(--color-status-tokutei)"
+          />
         </div>
       </section>
 
-      {/* ── Regional Data (Stitch: progress bars per prefecture) ── */}
+      {/* ── 都道府県別データ ── */}
       <RegionalDataSection prefectures={sortedPrefectures} />
 
-      {/* ── Critical Risk List (Stitch: red border + red bg section) ── */}
-      <section className="border-2 border-red-500 rounded-xl overflow-hidden">
-        <div className="bg-white p-4">
-          <h2 className="text-sm font-bold text-red-600 mb-3">
-            Critical Risk List
-          </h2>
-          <div className="bg-red-50 p-3 rounded-lg border border-red-100">
-            <h3 className="text-xs font-bold text-gray-800 mb-3">
-              遅延リスク自治体 TOP 5（{summary.data_month}）
-            </h3>
-            <ol className="text-xs space-y-2 text-gray-700">
-              {top5Risk.map((m, i) => (
-                <li
-                  key={`${m.prefecture}-${m.city}`}
-                  className="flex justify-between"
-                >
-                  <span>
-                    {i + 1}. {m.prefecture} {m.city}{" "}
-                    {((m.overall_rate ?? 0) * 100).toFixed(1)}%
-                  </span>
-                  <span className="text-red-600 font-bold">（危険）</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="mt-3 text-center">
+      {/* ── 遅延リスク一覧 ── */}
+      <section>
+        <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--color-text-secondary)" }}>
+          遅延リスク
+        </h2>
+        <div
+          className="card p-4 rounded-xl"
+          style={{ border: "2px solid var(--color-status-critical)" }}
+        >
+          <p className="text-sm font-bold mb-3" style={{ color: "var(--color-status-critical)" }}>
+            遅延リスク自治体 TOP 5（{summary.data_month}）
+          </p>
+          <ol className="text-sm space-y-2" style={{ color: "var(--color-text-primary)" }}>
+            {top5Risk.map((m, i) => (
+              <li
+                key={`${m.prefecture}-${m.city}`}
+                className="flex justify-between"
+              >
+                <span className="tabular-nums">
+                  {i + 1}. {m.prefecture} {m.city}{" "}
+                  {((m.overall_rate ?? 0) * 100).toFixed(1)}%
+                </span>
+                <span className="font-bold" style={{ color: "var(--color-status-critical)" }}>
+                  （危険）
+                </span>
+              </li>
+            ))}
+          </ol>
+          <div className="mt-3 pt-3 text-center" style={{ borderTop: "1px solid var(--color-border)" }}>
             <Link
               href="/risks"
-              className="text-xs font-medium text-blue-600 hover:underline"
+              className="text-sm font-medium hover:underline"
+              style={{ color: "var(--color-brand-primary)" }}
             >
               全リスク自治体を見る →
             </Link>
@@ -277,7 +292,7 @@ export default function TrackerPage() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
+      {/* ── 出典 ── */}
       <SourceAttribution sourceIds={PAGE_SOURCES.dashboard} />
     </div>
   );
@@ -288,26 +303,32 @@ export default function TrackerPage() {
 function StatusCard({
   label,
   count,
-  bgClass,
-  icon,
+  color,
+  darkText = false,
 }: {
   label: string;
   count: number;
-  bgClass: string;
-  icon: string;
+  color: string;
+  darkText?: boolean;
 }) {
   return (
     <div
-      className={`${bgClass} p-3 rounded-xl text-white flex justify-between items-start shadow-sm`}
+      className="p-3 rounded-xl shadow-sm flex justify-between items-start"
+      style={{ backgroundColor: color }}
     >
       <div>
-        <p className="text-xs font-bold opacity-90">{label}</p>
-        <p className="text-2xl font-bold tabular-nums">
+        <p
+          className="text-xs font-bold"
+          style={{ color: darkText ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.9)" }}
+        >
+          {label}
+        </p>
+        <p
+          className="text-2xl font-bold tabular-nums"
+          style={{ color: darkText ? "rgba(0,0,0,0.9)" : "#fff" }}
+        >
           {count.toLocaleString()}
         </p>
-      </div>
-      <div className="w-6 h-6 rounded-full border-2 border-white/50 flex items-center justify-center text-xs">
-        {icon}
       </div>
     </div>
   );
