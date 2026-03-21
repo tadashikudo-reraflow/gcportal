@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   alternates: { canonical: "/" },
   verification: {
-    google: "rzkjtVTiTE7yeA1FjPoMBNRmgzbrv-Mc_DN7i1SKvQo",
+    google: "hk66ltVdyRloBqdOteNRmxzjMNnd2U_EPz0zR0zRz8g",
   },
   openGraph: {
     title: "GCInsight — ガバメントクラウド移行ダッシュボード",
