@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Noto_Sans_JP, Inter } from "next/font/google";
+import { Noto_Sans_JP, Public_Sans } from "next/font/google";
 import "./globals.css";
 import RootShell from "./RootShell";
 
@@ -13,10 +13,10 @@ const notoSansJP = Noto_Sans_JP({
   display: "swap",
 });
 
-const inter = Inter({
+const publicSans = Public_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "700", "800"],
-  variable: "--font-inter",
+  variable: "--font-public-sans",
   display: "swap",
 });
 
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${notoSansJP.variable} ${inter.variable}`}>
+    <html lang="ja" className={`${notoSansJP.variable} ${publicSans.variable}`}>
       {GA_ID && (
         <head>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />

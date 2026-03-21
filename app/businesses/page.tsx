@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import data from "@/public/data/standardization.json";
+import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality, BusinessSummary } from "@/lib/types";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
+
+// 特定移行自治体のSetを構築
+const tokuteiSet = new Set(
+  tokuteiData.municipalities.map((m: { prefecture: string; city: string }) => `${m.prefecture}_${m.city}`)
+);
 
 export const metadata: Metadata = {
   title: "自治体標準化20業務 移行進捗一覧 | ガバメントクラウド移行状況ダッシュボード",
@@ -48,8 +55,13 @@ export default function BusinessesPage() {
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">業務別 標準化進捗</h1>
         <p className="page-subtitle">
-          全20業務の完了率を低い順に表示。各業務で遅れている自治体を確認できます。
+          全20業務の完了率を低い順に表示（特定移行認定自治体を含む全{data.summary.total.toLocaleString()}団体）。各業務で遅れている自治体を確認できます。
         </p>
+        <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 10, fontWeight: 700 }}>特定移行</span>
+          <span>= デジタル庁認定 特定移行支援システム対象自治体（{tokuteiData.municipalities.length}団体）。期限延長が認められており「遅延」とは異なります。</span>
+          <Link href="/tokutei" className="underline" style={{ color: "#7C3AED" }}>詳細 →</Link>
+        </div>
       </div>
 
       {/* 業務カード グリッド */}
@@ -155,17 +167,24 @@ export default function BusinessesPage() {
                   <tbody>
                     {bottom10.map((muni, i) => {
                       const r = muni.business_rates[biz.business] as number;
+                      const isTokutei = tokuteiSet.has(`${muni.prefecture}_${muni.city}`);
                       return (
                         <tr
                           key={`${muni.prefecture}-${muni.city}`}
                           className="border-b border-gray-50"
+                          style={isTokutei ? { backgroundColor: "#F5F3FF" } : undefined}
                         >
                           <td className="py-1 text-gray-400">{i + 1}</td>
                           <td className="py-1 text-gray-500">
                             {muni.prefecture}
                           </td>
                           <td className="py-1 text-gray-800 font-medium">
-                            {muni.city}
+                            <span className="flex items-center gap-1">
+                              {muni.city}
+                              {isTokutei && (
+                                <span className="inline-block px-1 py-0 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 9, fontWeight: 700, lineHeight: "14px" }}>特定移行</span>
+                              )}
+                            </span>
                           </td>
                           <td className="py-1 text-right font-bold" style={{ color: getTextColor(r) }}>
                             {formatRate(r)}

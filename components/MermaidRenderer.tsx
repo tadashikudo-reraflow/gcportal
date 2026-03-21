@@ -7,7 +7,14 @@ mermaid.initialize({
   startOnLoad: false,
   theme: "neutral",
   fontFamily: "system-ui, sans-serif",
+  fontSize: 18,
   securityLevel: "loose",
+  flowchart: {
+    padding: 20,
+    nodeSpacing: 40,
+    rankSpacing: 60,
+    useMaxWidth: false,
+  },
 });
 
 /**

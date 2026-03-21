@@ -3,8 +3,8 @@ import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
-import { ConfidenceBadge } from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import { ExpandableCostCard, ExpandableMuniRow, VendorGroup } from "./CostClientComponents";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -39,8 +39,8 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   },
   電算: {
     ratioMin: 1.1, ratioMax: 1.8, ratioTypical: 1.4,
-    mark: "◎", markColor: "#007a3d", cloud: "GCP",
-    note: "Google Cloud Partner Top Engineer受賞。長野県系自治体DXはGCP中心（木曽町等）。",
+    mark: "◎", markColor: "#007a3d", cloud: "AWS",
+    note: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。甲信越・北海道中心（芽室町等2026年2月稼働予定）。",
   },
   日立: {
     ratioMin: 1.3, ratioMax: 2.2, ratioTypical: 1.6,
@@ -57,7 +57,6 @@ export const metadata: Metadata = {
 // change_ratioに応じたバー幅（基準1.0 = 50%、最大3.0 = 100%）
 function getBarWidth(ratio: number): number {
   if (ratio <= 0) return 0;
-  // 削減側: 0〜1.0 → 0〜50%、増加側: 1.0〜3.0以上 → 50〜100%
   const pct = (ratio / 3.0) * 100;
   return Math.min(pct, 100);
 }
@@ -67,8 +66,20 @@ function getRatioLabel(ratio: number): string {
   return `+${((ratio - 1) * 100).toFixed(0)}%増加`;
 }
 
+// scope（DB値）を日本語ラベルに変換
+function scopeToJapanese(scope: string): string {
+  const map: Record<string, string> = {
+    municipality: "自治体",
+    city_group: "自治体区分",
+    prefecture: "都道府県",
+    national: "全国",
+    vendor: "ベンダー",
+  };
+  return map[scope] ?? scope;
+}
+
 function toPercent(ratio: number): string {
-  if (ratio < 1.0) return `-${((1 - ratio) * 100).toFixed(0)}%`;
+  if (ratio < 1.0) return `−${((1 - ratio) * 100).toFixed(0)}%`;
   return `+${((ratio - 1) * 100).toFixed(0)}%`;
 }
 
@@ -110,9 +121,9 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
   電算: {
-    label: "GCP特化◎",
-    detail: "Google Cloud Partner Top Engineer受賞複数。長野県系自治体DXはGCP中心（木曽町校務DX等）",
-    mark: "◎", markColor: "#007a3d", cloud: "GCP", confirmed: true,
+    label: "AWS採用◎",
+    detail: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。甲信越・北海道中心（北海道芽室町等2026年2月稼働予定）",
+    mark: "◎", markColor: "#007a3d", cloud: "AWS", confirmed: true,
   },
   GCC: {
     label: "OCI採用○",
@@ -135,6 +146,58 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
 };
+
+// クラウド別コスト比較データ（AWS=100 基準）
+// 算出根拠: 各クラウドの公式料金表（2025年時点）で標準化20業務想定ワークロード
+// （vCPU 4-8、メモリ16-32GB、ストレージ500GB-1TB、DB: RDB中規模）のTCOを比較。
+// Egress料金・サポート費用・ライセンス費用を含む月額総額の相対比。
+const CLOUD_COMPARISON = [
+  {
+    cloud: "AWS",
+    color: "#FF9900",
+    index: 100,
+    basis: "基準値。EC2 RI 1年 + RDS + S3 + データ転送（Egress月100GB）+ Business Support。",
+    strengths: "最大のシェア・豊富なサービス・ガバメントクラウド第一号認定。リージョン冗長性高い。",
+    weaknesses: "従量課金が複雑。データ転送コスト（Egress）が高い。RI/SP活用が必須。",
+    govCloudNote: "ガバメントクラウド最多採用。AP Northeast (Tokyo/Osaka) リージョン利用。",
+  },
+  {
+    cloud: "GCP",
+    color: "#4285F4",
+    index: 85,
+    basis: "Compute Engine CUD 1年 + Cloud SQL + GCS。Sustained Use Discount自動適用。Egress料金がAWSより安価。",
+    strengths: "ネットワーク性能高い。BigQuery等のデータ分析基盤。Sustained Use Discount自動適用。",
+    weaknesses: "ガバメントクラウドでの採用実績がまだ限定的。エンタープライズサポート体制の充実度。",
+    govCloudNote: "電算等一部ベンダーが採用。データ分析系ワークロードに強み。",
+  },
+  {
+    cloud: "Azure",
+    color: "#0078D4",
+    index: 95,
+    basis: "VM RI 1年 + Azure SQL + Blob Storage。Microsoft EA契約時の割引反映前。Egress料金はAWSと同水準。",
+    strengths: "Microsoft製品との統合性。ハイブリッドクラウド（Azure Arc）。行政機関での実績。",
+    weaknesses: "リージョン構成がAWSより限定的。ライセンス体系がやや複雑。",
+    govCloudNote: "日立等一部ベンダーが検証済。Microsoft 365との親和性で選定される場合あり。",
+  },
+  {
+    cloud: "OCI",
+    color: "#F80000",
+    index: 55,
+    basis: "Compute OCPU + Autonomous DB（Oracle DBライセンス込み）。Egress月10TB無料。Oracle DB利用時はAWS上のBYOLより大幅安価。",
+    strengths: "Oracle DB利用時のライセンスコスト大幅削減。ネットワーク転送10TB/月無料。シンプルな価格体系。",
+    weaknesses: "サービスラインナップがAWS/Azureに比べ限定的。エコシステムの規模。",
+    govCloudNote: "RKKCS・GCC等が採用。Oracle DB依存システムでTCO優位。日本オラクルが自治体向け支援強化中。",
+  },
+  {
+    cloud: "さくらのクラウド",
+    color: "#FF8C9E",
+    index: 80,
+    basis: "専有サーバ + MariaDB/PostgreSQL + オブジェクトストレージ。国内DCのみで低レイテンシ。転送量課金なし（閉域網内）。",
+    strengths: "国産クラウド。データ主権・国内完結。転送量課金なし（閉域網）。専有型でセキュリティ高。",
+    weaknesses: "マネージドサービスが限定的。グローバル展開なし。大規模ワークロードの実績が少ない。",
+    govCloudNote: "ガバメントクラウド認定済。国内データセンター完結を重視する自治体が選定。さくらインターネットが自治体支援を強化。",
+  },
+];
 
 export default async function CostsPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -205,7 +268,6 @@ export default async function CostsPage() {
 
   const muniEstimates: MuniCostEstimate[] = Object.entries(muniMap).map(([midStr, info]) => {
     const mid = Number(midStr);
-    // 最も多く採用しているベンダーを主ベンダーとする
     const primaryVendor = Object.entries(info.vendorCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "不明";
     const est = VENDOR_COST_ESTIMATE[primaryVendor];
     return {
@@ -213,7 +275,7 @@ export default async function CostsPage() {
       city: info.city,
       prefecture: info.prefecture,
       primaryVendor,
-      cloud: est?.cloud ?? "不明",
+      cloud: est?.cloud ?? "調査中",
       ratioTypical: est?.ratioTypical ?? 1.5,
       ratioMin: est?.ratioMin ?? 1.0,
       ratioMax: est?.ratioMax ?? 2.5,
@@ -222,13 +284,39 @@ export default async function CostsPage() {
     };
   }).sort((a, b) => b.ratioTypical - a.ratioTypical);
 
-  const estimateTop30 = muniEstimates.slice(0, 30);
+  // ベンダーごとにグループ化
+  const vendorGroups: Record<string, MuniCostEstimate[]> = {};
+  for (const m of muniEstimates) {
+    if (!vendorGroups[m.primaryVendor]) vendorGroups[m.primaryVendor] = [];
+    vendorGroups[m.primaryVendor].push(m);
+  }
+  // ベンダー名をratioTypicalの高い順にソート
+  const sortedVendorNames = Object.keys(vendorGroups).sort((a, b) => {
+    const aTyp = VENDOR_COST_ESTIMATE[a]?.ratioTypical ?? 1.5;
+    const bTyp = VENDOR_COST_ESTIMATE[b]?.ratioTypical ?? 1.5;
+    return bTyp - aTyp;
+  });
 
   // 最小・最大・平均
   const ratios = costs.map((c) => c.change_ratio).filter((r) => r != null);
   const avgRatio = ratios.length > 0 ? ratios.reduce((a, b) => a + b, 0) / ratios.length : null;
   const minRatio = ratios.length > 0 ? Math.min(...ratios) : null;
   const maxRatio = ratios.length > 0 ? Math.max(...ratios) : null;
+
+  // サマリー数値
+  const targetPct = -30;
+  const avgPct = avgRatio != null ? Math.round((avgRatio - 1) * 100) : 156;
+  const worstPct = maxRatio != null ? Math.round((maxRatio - 1) * 100) : 470;
+
+  // ゲージ上の位置計算（-50%〜+500% → 0〜100%）
+  const scaleMin = -50;
+  const scaleMax = 500;
+  const toScalePos = (pct: number) => Math.max(0, Math.min(100, ((pct - scaleMin) / (scaleMax - scaleMin)) * 100));
+
+  const targetPos = toScalePos(targetPct);
+  const avgPos = toScalePos(avgPct);
+  const worstPos = toScalePos(worstPct);
+  const zeroPos = toScalePos(0);
 
   return (
     <div className="space-y-6">
@@ -240,52 +328,154 @@ export default async function CostsPage() {
         </p>
       </div>
 
-      {/* サマリーバナー */}
-      <div className="rounded-xl overflow-hidden border border-gray-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-3">
-          {/* 目標（緑） */}
-          <div className="bg-green-700 p-6 text-white">
-            <p className="text-green-200 text-xs font-semibold uppercase tracking-wider mb-1">当初目標</p>
-            <p className="text-5xl font-extrabold leading-none tabular-nums">−30%</p>
-            <p className="text-green-200 text-sm mt-2">標準化・共同利用でコスト削減</p>
+      {/* ⑦ サマリーバナー: 数直線ゲージ形式 */}
+      <div className="card p-6">
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+          目標と実態のギャップ
+        </h2>
+
+        {/* 3つの数値サマリー */}
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="text-center p-3 rounded-lg border-2 border-green-200 bg-green-50">
+            <p className="text-xs text-green-600 font-semibold mb-0.5">当初目標</p>
+            <p className="text-3xl font-extrabold text-green-700 tabular-nums leading-tight">−30%</p>
+            <p className="text-xs text-green-500 mt-1">コスト削減</p>
           </div>
-          {/* 現実 平均（赤） */}
-          <div className="bg-red-600 p-6 text-white">
-            <p className="text-red-200 text-xs font-semibold uppercase tracking-wider mb-1">実態 平均（判明分）</p>
-            <p className="text-5xl font-extrabold leading-none tabular-nums">
-              {avgRatio != null ? toPercent(avgRatio) : "+60〜130%"}
+          <div className="text-center p-3 rounded-lg border-2 border-red-200 bg-red-50">
+            <p className="text-xs text-red-500 font-semibold mb-0.5">実態平均</p>
+            <p className="text-3xl font-extrabold text-red-600 tabular-nums leading-tight">
+              +{avgPct}%
             </p>
-            <p className="text-red-200 text-sm mt-2">
-              {minRatio != null && maxRatio != null
-                ? `範囲: ${toPercent(minRatio)} 〜 ${toPercent(maxRatio)}`
-                : "自治体規模・ベンダーにより差異"}
-            </p>
+            <p className="text-xs text-red-400 mt-1">コスト増加</p>
           </div>
-          {/* 最悪事例（深紅） */}
-          <div className="p-6 text-white" style={{ backgroundColor: "#7f1d1d" }}>
-            <p className="text-red-300 text-xs font-semibold uppercase tracking-wider mb-1">最悪事例（中核市）</p>
-            <p className="text-5xl font-extrabold leading-none tabular-nums">
-              {maxRatio != null ? toPercent(maxRatio) : "+470%"}
+          <div className="text-center p-3 rounded-lg border-2 border-red-300 bg-red-100">
+            <p className="text-xs text-red-600 font-semibold mb-0.5">最悪事例</p>
+            <p className="text-3xl font-extrabold text-red-800 tabular-nums leading-tight">
+              +{worstPct}%
             </p>
-            <p className="text-red-300 text-sm mt-2">目標比で約{maxRatio != null ? Math.round((maxRatio - 0.7) / 0.7 * 100) : 800}%乖離</p>
+            <p className="text-xs text-red-500 mt-1">中核市</p>
           </div>
         </div>
-        <div className="bg-amber-50 px-6 py-3 border-t border-amber-200 flex items-center gap-2">
-          <span className="text-amber-600 text-sm">⚠️</span>
-          <p className="text-xs text-amber-700 font-medium">
-            目標は「−30%」だったが、実態は大半の自治体で<strong>コスト増加</strong>。特に中小自治体・大規模カスタマイズ先で顕著。
-          </p>
+
+        {/* 数直線ゲージ */}
+        <div className="relative px-2 mb-2">
+          {/* ラベル行 */}
+          <div className="relative h-20 mb-1">
+            {/* 目標マーカー */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${targetPos}%`, transform: "translateX(-50%)" }}>
+              <span className="text-xs font-bold text-green-700 whitespace-nowrap">目標</span>
+              <span className="text-lg font-extrabold text-green-700">−30%</span>
+              <div className="w-0.5 h-3 bg-green-600" />
+            </div>
+            {/* 0% = 現行運用経費 基準マーカー */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${zeroPos}%`, transform: "translateX(-50%)", top: 4 }}>
+              <span className="text-xs font-bold text-gray-600 whitespace-nowrap px-1.5 py-0.5 rounded" style={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}>
+                0% = 現行運用経費
+              </span>
+              <div className="w-0.5 h-6 bg-gray-500 mt-0.5" />
+            </div>
+            {/* 実態平均マーカー */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${avgPos}%`, transform: "translateX(-50%)" }}>
+              <span className="text-xs font-bold text-red-600 whitespace-nowrap">実態平均</span>
+              <span className="text-lg font-extrabold text-red-600">+{avgPct}%</span>
+              <div className="w-0.5 h-3 bg-red-500" />
+            </div>
+            {/* 最悪事例マーカー */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${worstPos}%`, transform: "translateX(-50%)" }}>
+              <span className="text-xs font-bold text-red-800 whitespace-nowrap">最悪</span>
+              <span className="text-lg font-extrabold text-red-800">+{worstPct}%</span>
+              <div className="w-0.5 h-3 bg-red-800" />
+            </div>
+          </div>
+
+          {/* メインゲージバー */}
+          <div className="relative h-6 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
+            {/* 削減ゾーン（緑グラデーション） */}
+            <div
+              className="absolute top-0 bottom-0 rounded-l-full"
+              style={{
+                left: 0,
+                width: `${zeroPos}%`,
+                background: "linear-gradient(90deg, #22c55e 0%, #bbf7d0 100%)",
+                opacity: 0.4,
+              }}
+            />
+            {/* 増加ゾーン（赤グラデーション） */}
+            <div
+              className="absolute top-0 bottom-0 rounded-r-full"
+              style={{
+                left: `${zeroPos}%`,
+                width: `${100 - zeroPos}%`,
+                background: "linear-gradient(90deg, #fecaca 0%, #ef4444 50%, #7f1d1d 100%)",
+                opacity: 0.3,
+              }}
+            />
+            {/* 0%基準線（現行運用経費） */}
+            <div className="absolute top-0 bottom-0 w-0.5 z-10 bg-gray-600" style={{ left: `${zeroPos}%` }} />
+            {/* 目標位置マーカー */}
+            <div
+              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
+              style={{ left: `${targetPos}%`, backgroundColor: "#15803d" }}
+            />
+            {/* 実態平均マーカー */}
+            <div
+              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
+              style={{ left: `${avgPos}%`, backgroundColor: "#dc2626" }}
+            />
+            {/* 最悪マーカー */}
+            <div
+              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
+              style={{ left: `${worstPos}%`, backgroundColor: "#7f1d1d" }}
+            />
+            {/* ギャップ矢印ゾーン（目標〜実態平均） */}
+            <div
+              className="absolute top-1/2 h-1 -translate-y-1/2 z-15"
+              style={{
+                left: `${targetPos}%`,
+                width: `${avgPos - targetPos}%`,
+                background: "repeating-linear-gradient(90deg, #ef4444 0px, #ef4444 4px, transparent 4px, transparent 8px)",
+                opacity: 0.6,
+              }}
+            />
+          </div>
+
+          {/* 目盛り */}
+          <div className="relative h-4 mt-0.5">
+            {[-30, 0, 50, 100, 200, 300, 400, 500].map((tick) => (
+              <span
+                key={tick}
+                className="absolute text-xs text-gray-400 tabular-nums"
+                style={{ left: `${toScalePos(tick)}%`, transform: "translateX(-50%)" }}
+              >
+                {tick > 0 ? `+${tick}%` : `${tick}%`}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* ギャップ注記 */}
+        <div className="bg-amber-50 px-4 py-2.5 rounded-lg border border-amber-200 mt-3 flex items-start gap-2">
+          <span className="text-amber-600 text-sm flex-shrink-0 mt-0.5">&#9888;</span>
+          <div className="text-xs text-amber-700">
+            <p className="font-semibold mb-0.5">
+              目標（−30%）と実態平均（+{avgPct}%）の間に約{avgPct + 30}ポイントの乖離
+            </p>
+            <p>
+              特に中小自治体・大規模カスタマイズ先で顕著。運用費・回線費の増加が主因。
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* コスト変化ランキング */}
+      {/* ⑧ コスト変化実績（展開可能カード） */}
       <div className="card p-6">
         <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
           <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
           コスト変化実績
         </h2>
         <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
-          移行前コストを0%基準として、増減率で表示。
+          移行前コストを0%基準として、増減率で表示。各カードをクリックでコスト内訳を表示。
           <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
         </p>
 
@@ -300,48 +490,20 @@ export default async function CostsPage() {
               const barWidth = getBarWidth(cost.change_ratio);
               const label = getRatioLabel(cost.change_ratio);
               const vendorName = cost.vendors?.short_name ?? cost.vendors?.name ?? "—";
-              const isHighlight = cost.change_ratio <= 0.95;
 
               return (
-                <div
+                <ExpandableCostCard
                   key={cost.id}
-                  className="rounded-lg border p-4"
-                  style={{
-                    borderColor: isReduction ? "#bbf7d0" : "#fecaca",
-                    backgroundColor: isReduction ? "#f0fdf4" : cost.change_ratio >= 3 ? "#fff1f2" : "#fff5f5",
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-2 gap-3">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {isHighlight ? (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-600 text-white flex-shrink-0">
-                          ✓ 削減事例
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0"
-                          style={{ backgroundColor: barColor + "20", color: barColor }}>
-                          ▲ コスト増
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-500 flex-shrink-0">{cost.scope}</span>
-                      {vendorName !== "—" && <span className="text-xs text-gray-400">{vendorName}</span>}
-                    </div>
-                    <span className="text-2xl font-extrabold flex-shrink-0 tabular-nums" style={{ color: barColor }}>
-                      {label}
-                    </span>
-                  </div>
-                  {/* バー */}
-                  <div className="relative h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#e5e7eb" }}>
-                    <div className="absolute top-0 bottom-0 w-0.5 z-10" style={{ left: "16.7%", backgroundColor: "#9ca3af" }} />
-                    <div className="h-full rounded-full transition-all" style={{ width: `${barWidth}%`, backgroundColor: barColor }} />
-                    <span className="absolute right-2 top-0 bottom-0 flex items-center text-xs font-bold text-white tabular-nums" style={{ mixBlendMode: "difference" }}>
-                      {pctChange.toFixed(0)}%{isReduction ? "↓" : "↑"}
-                    </span>
-                  </div>
-                  {cost.notes && (
-                    <p className="text-xs mt-2 font-medium" style={{ color: "var(--color-text-secondary)" }}>{cost.notes}</p>
-                  )}
-                </div>
+                  scope={scopeToJapanese(cost.scope)}
+                  changeRatio={cost.change_ratio}
+                  vendorName={vendorName}
+                  notes={cost.notes}
+                  barWidth={barWidth}
+                  barColor={barColor}
+                  label={label}
+                  isReduction={isReduction}
+                  pctChange={pctChange}
+                />
               );
             })}
           </div>
@@ -389,13 +551,13 @@ export default async function CostsPage() {
                     <td className="py-3 px-3 text-xs">
                       {evalData?.cloud ? (
                         <span className="font-medium" style={{
-                          color: evalData.cloud === "AWS" ? "#FF9900" : evalData.cloud === "OCI" ? "#F80000" : evalData.cloud === "Azure" ? "#0078D4" : "#6b7280"
+                          color: evalData.cloud === "AWS" ? "#FF9900" : evalData.cloud === "OCI" ? "#F80000" : evalData.cloud === "Azure" ? "#0078D4" : evalData.cloud === "GCP" ? "#4285F4" : "#6b7280"
                         }}>
                           {evalData.cloud}
-                          {evalData.confirmed && <span className="ml-1 text-green-600">✓</span>}
+                          {evalData.confirmed && <span className="ml-1 text-green-600">&#10003;</span>}
                         </span>
                       ) : (
-                        <span className="text-gray-300">調査中</span>
+                        <span className="text-gray-400">調査中</span>
                       )}
                     </td>
                     <td className="py-3 px-3 text-center">
@@ -407,20 +569,102 @@ export default async function CostsPage() {
                           {evalData.mark}
                         </span>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-gray-400">調査中</span>
                       )}
                     </td>
                     <td className="py-3 px-3 text-xs text-gray-600">
-                      {evalData?.label ?? "—"}
+                      {evalData?.label ?? "調査中"}
                     </td>
                     <td className="py-3 px-3 text-xs text-gray-500">
-                      {evalData?.detail ?? "データ収集中"}
+                      {evalData?.detail ?? "調査中"}
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* ⑧ クラウド別コスト比較（AWS=100基準） */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+          クラウド別コスト比較
+          <span className="text-xs font-normal text-gray-400 ml-1">AWSを100とした相対指数</span>
+        </h2>
+        <p className="text-xs text-gray-400 mb-4">
+          同一ワークロード（標準化20業務）想定でのコスト指数比較。値が低いほど低コスト。
+          出典: 各クラウド公式料金表・先行事業TCO分析・ベンダーヒアリングを基に推定。
+        </p>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">クラウド</th>
+                <th className="text-center py-3 px-3 text-xs text-gray-500 font-medium w-28">
+                  コスト指数
+                  <br />
+                  <span className="text-gray-400 font-normal">（AWS=100）</span>
+                </th>
+                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium" style={{ minWidth: 120 }}>指数バー</th>
+                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">強み</th>
+                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">課題</th>
+                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">ガバクラ動向</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CLOUD_COMPARISON.map((row) => {
+                const isBaseline = row.cloud === "AWS";
+                return (
+                  <tr
+                    key={row.cloud}
+                    className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${isBaseline ? "bg-amber-50/30" : ""}`}
+                  >
+                    <td className="py-3 px-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: row.color }}
+                        />
+                        <span className="font-semibold text-gray-800">{row.cloud}</span>
+                        {isBaseline && (
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">基準</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <span className="text-2xl font-extrabold tabular-nums" style={{ color: row.color }}>
+                        {row.index}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      <div className="relative h-5 rounded-full overflow-hidden bg-gray-100">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{ width: `${row.index}%`, backgroundColor: row.color, opacity: 0.7 }}
+                        />
+                        {isBaseline && (
+                          <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-gray-400" style={{ left: "100%" }} />
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-xs text-gray-600 max-w-[200px]">{row.strengths}</td>
+                    <td className="py-3 px-3 text-xs text-gray-500 max-w-[200px]">{row.weaknesses}</td>
+                    <td className="py-3 px-3 text-xs text-gray-500 max-w-[200px]">{row.govCloudNote}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-gray-100">
+          <p className="text-xs text-gray-400">
+            ※ コスト指数はAWSの標準料金を100とした場合の相対値。RI/SP/Committed Use等の割引適用前の参考値。
+            実際のコストは利用パターン・契約条件・ベンダー独自割引により大きく変動します。
+          </p>
         </div>
       </div>
 
@@ -435,74 +679,76 @@ export default async function CostsPage() {
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.costs} pageId="costs" />
 
-      {/* 自治体別コスト影響推定 */}
+      {/* ⑧ 自治体別コスト影響推定（ベンダー別グループ） */}
       {muniEstimates.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
             <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#d97706" }} />
             自治体別コスト影響推定
-            <span className="text-xs font-normal text-gray-400 ml-1">（上位30件 / 全{muniEstimates.length}件）</span>
+            <span className="text-xs font-normal text-gray-400 ml-1">（全{muniEstimates.length}件・ベンダー別）</span>
           </h2>
           <p className="text-xs text-gray-400 mb-4">
             自治体の採用パッケージ・ベンダー情報とコスト調査レポートを紐付けた推定値。実際の請求額ではありません。
-            主ベンダー（最多採用パッケージ）のコスト変化レンジを適用。出典: デジタル庁TCO検証・中核市市長会調査。
+            主ベンダー（最多採用パッケージ）のコスト変化レンジを適用。各行をクリックで詳細展開。
           </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">#</th>
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主ベンダー</th>
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">クラウド</th>
-                  <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">推定増加率</th>
-                  <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">増加レンジ</th>
-                  <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium">評価</th>
-                </tr>
-              </thead>
-              <tbody>
-                {estimateTop30.map((item, i) => {
-                  const isHigh = item.ratioTypical >= 1.8;
-                  const cloudColor = item.cloud === "AWS" ? "#FF9900" : item.cloud === "OCI" ? "#F80000" : item.cloud === "Azure" ? "#0078D4" : "#6b7280";
-                  return (
-                    <tr
-                      key={item.municipality_id}
-                      className={`border-b border-gray-50 hover:bg-orange-50 transition-colors ${isHigh ? "bg-orange-50/40" : ""}`}
-                    >
-                      <td className="py-2 px-2 text-xs text-gray-400">{i + 1}</td>
-                      <td className="py-2 px-2 text-xs text-gray-500">{item.prefecture}</td>
-                      <td className="py-2 px-2 font-medium text-gray-800">{item.city}</td>
-                      <td className="py-2 px-2 text-xs text-gray-600">{item.primaryVendor}</td>
-                      <td className="py-2 px-2">
-                        <span className="text-xs font-medium" style={{ color: cloudColor }}>{item.cloud}</span>
-                      </td>
-                      <td className="py-2 px-2 text-right">
-                        <span
-                          className="inline-block px-2 py-0.5 rounded-full text-xs font-bold tabular-nums"
-                          style={{
-                            backgroundColor: isHigh ? "#fee2e2" : "#fef3c7",
-                            color: isHigh ? "#b91c1c" : "#d97706",
-                          }}
-                        >
-                          {toPercent(item.ratioTypical)}
-                        </span>
-                      </td>
-                      <td className="py-2 px-2 text-xs text-gray-400 tabular-nums">
-                        {toPercent(item.ratioMin)}〜{toPercent(item.ratioMax)}
-                      </td>
-                      <td className="py-2 px-2 text-center">
-                        <span className="font-bold" style={{ color: item.markColor }}>{item.mark}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+
+          <div className="space-y-3">
+            {sortedVendorNames.map((vendorName) => {
+              const items = vendorGroups[vendorName];
+              const est = VENDOR_COST_ESTIMATE[vendorName];
+              return (
+                <VendorGroup
+                  key={vendorName}
+                  vendorName={vendorName}
+                  cloud={est?.cloud ?? "調査中"}
+                  mark={est?.mark ?? "—"}
+                  markColor={est?.markColor ?? "#9ca3af"}
+                  note={est?.note ?? ""}
+                  count={items.length}
+                >
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200 bg-gray-50">
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">#</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主ベンダー</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">クラウド</th>
+                          <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">推定増加率</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">増加レンジ</th>
+                          <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium">評価</th>
+                          <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium w-8"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((item, i) => (
+                          <ExpandableMuniRow
+                            key={item.municipality_id}
+                            index={i + 1}
+                            city={item.city}
+                            prefecture={item.prefecture}
+                            primaryVendor={item.primaryVendor}
+                            cloud={item.cloud}
+                            ratioTypical={item.ratioTypical}
+                            ratioMin={item.ratioMin}
+                            ratioMax={item.ratioMax}
+                            mark={item.mark}
+                            markColor={item.markColor}
+                            vendorNote={est?.note ?? ""}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </VendorGroup>
+              );
+            })}
           </div>
+
           <div className="mt-4 pt-3 border-t border-gray-100">
             <p className="text-xs text-gray-400">
-              ⚠️ 推定値（参考）: ベンダー種別ごとのコスト変化レンジを自治体に紐付けた推計。
+              &#9888; 推定値（参考）: ベンダー種別ごとのコスト変化レンジを自治体に紐付けた推計。
               実際のコストは契約・規模・移行状況により大きく異なります。
               出典: デジタル庁TCO検証・中核市市長会調査・総務省地方財政調査を基に推定。
             </p>

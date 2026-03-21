@@ -27,6 +27,18 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   解説:               { bg: "#e0f7fa", text: "#00695c" },
 };
 
+/** coverImage がない場合のプレースホルダー */
+function ArticlePlaceholder({ title }: { title: string }) {
+  return (
+    <div className="w-full aspect-[16/9] flex items-center justify-center"
+      style={{ background: "linear-gradient(135deg, #002D72 0%, #0066FF 100%)" }}>
+      <span className="text-white text-sm font-bold px-6 text-center leading-snug opacity-80">
+        {title.length > 30 ? title.slice(0, 30) + "…" : title}
+      </span>
+    </div>
+  );
+}
+
 export default async function ArticlesPage() {
   const articles = await getAllArticles();
 
@@ -42,43 +54,48 @@ export default async function ArticlesPage() {
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>記事準備中です</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {articles.map((article) => (
             <Link key={article.slug} href={`/articles/${article.slug}`}
-              className="card overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
-              {article.coverImage && (
-                <div className="w-full aspect-[16/9] overflow-hidden bg-gray-100">
+              className="article-card group">
+              {article.coverImage ? (
+                <div className="w-full aspect-[16/9] overflow-hidden">
                   <img src={article.coverImage} alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
+              ) : (
+                <ArticlePlaceholder title={article.title} />
               )}
               <div className="p-5 flex flex-col gap-3 flex-1">
-              {article.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {article.tags.map((tag) => {
-                    const c = TAG_COLORS[tag] ?? { bg: "#f1f5f9", text: "#475569" };
-                    return (
-                      <span key={tag} className="text-xs px-2 py-0.5 rounded-full font-medium"
-                        style={{ backgroundColor: c.bg, color: c.text }}>{tag}</span>
-                    );
-                  })}
-                </div>
-              )}
-              <h2 className="text-base font-bold leading-snug group-hover:underline"
-                style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
-              {article.description && (
-                <p className="text-sm leading-relaxed line-clamp-3"
-                  style={{ color: "var(--color-text-secondary)" }}>{article.description}</p>
-              )}
-              <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-                <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{article.date}</span>
-                {article.author && (
-                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{article.author}</span>
+                <h2 className="text-base font-bold leading-snug group-hover:underline"
+                  style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
+                {article.description && (
+                  <p className="text-sm leading-relaxed line-clamp-3"
+                    style={{ color: "var(--color-text-secondary)" }}>{article.description}</p>
                 )}
-                <span className="text-xs font-semibold" style={{ color: "var(--color-brand-primary)" }}>
-                  続きを読む →
-                </span>
-              </div>
+                <div className="mt-auto pt-3 space-y-3">
+                  {article.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {article.tags.map((tag) => {
+                        const c = TAG_COLORS[tag] ?? { bg: "#f1f5f9", text: "#475569" };
+                        return (
+                          <span key={tag} className="text-xs px-2 py-0.5 rounded-full font-medium"
+                            style={{ backgroundColor: c.bg, color: c.text }}>{tag}</span>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-2 border-t"
+                    style={{ borderColor: "var(--color-border)" }}>
+                    <span className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>{article.date}</span>
+                    {article.author && (
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{article.author}</span>
+                    )}
+                    <span className="text-xs font-semibold" style={{ color: "var(--color-brand-primary)" }}>
+                      続きを読む →
+                    </span>
+                  </div>
+                </div>
               </div>
             </Link>
           ))}
