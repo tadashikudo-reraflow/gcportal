@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 170" fill="none">
+  <!-- Cloud outline -->
+  <path d="M160 130H50C28 130 10 112 10 90C10 70 24 53 43 49C43 48 43 47 43 46C43 24 61 6 83 6C100 6 115 16 122 31C128 27 135 25 143 25C165 25 183 43 183 65C183 67 183 69 182 71C192 77 199 88 199 100C199 117 185 131 168 131" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- G letter -->
+  <text x="62" y="112" font-family="'Helvetica Neue', Arial, sans-serif" font-size="62" font-weight="800" fill="white" letter-spacing="-2">G</text>
+  <!-- C letter -->
+  <text x="110" y="112" font-family="'Helvetica Neue', Arial, sans-serif" font-size="62" font-weight="800" fill="white" letter-spacing="-2">C</text>
+</svg>
