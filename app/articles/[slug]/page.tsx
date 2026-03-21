@@ -20,7 +20,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return { title: "記事が見つかりません" };
   const ogImages = article.coverImage
     ? [{ url: article.coverImage, width: 1200, height: 630, alt: article.title }]
-    : undefined;
+    : [
+        {
+          url: `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent(article.description || "GCInsight 記事")}&type=article`,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ];
   return {
     title: `${article.title} | ガバメントクラウド移行状況ダッシュボード`,
     description: article.description,
@@ -35,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: article.title,
       description: article.description,
-      images: ogImages?.map((img) => img.url),
+      images: ogImages.map((img) => img.url),
     },
   };
 }

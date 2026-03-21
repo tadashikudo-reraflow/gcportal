@@ -11,8 +11,23 @@ import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行 遅延リスク自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
-  description: "2026年3月末期限までにガバメントクラウド移行が完了していない遅延リスク自治体の一覧。完了率・都道府県フィルターで検索可能。特定移行認定団体を除く。",
+  title:
+    "ガバメントクラウド移行 遅延リスク自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
+  description:
+    "2026年3月末期限までにガバメントクラウド移行が完了していない遅延リスク自治体の一覧。完了率・都道府県フィルターで検索可能。特定移行認定団体を除く。",
+  openGraph: {
+    title: "遅延リスク自治体一覧 — GCInsight",
+    description:
+      "2026年3月末期限に間に合わない遅延リスク自治体を完了率順に一覧表示。",
+    images: [
+      {
+        url: `/og?title=${encodeURIComponent("遅延リスク自治体一覧")}&subtitle=${encodeURIComponent("2026年3月末期限の移行遅延リスクを可視化")}&type=risk`,
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RisksPage() {

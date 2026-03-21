@@ -30,6 +30,29 @@ export const metadata: Metadata = {
   verification: {
     google: "rzkjtVTiTE7yeA1FjPoMBNRmgzbrv-Mc_DN7i1SKvQo",
   },
+  openGraph: {
+    title: "GCInsight — ガバメントクラウド移行ダッシュボード",
+    description:
+      "全国1,741自治体のガバメントクラウド移行進捗・コスト・リスクをリアルタイム可視化。デジタル庁標準化データに基づく公式ダッシュボード。",
+    images: [
+      {
+        url: "/og?title=GCInsight&subtitle=ガバメントクラウド移行ダッシュボード",
+        width: 1200,
+        height: 630,
+        alt: "GCInsight — ガバメントクラウド移行ダッシュボード",
+      },
+    ],
+    type: "website",
+    siteName: "GCInsight",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GCInsight — ガバメントクラウド移行ダッシュボード",
+    description:
+      "全国1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化",
+    images: ["/og?title=GCInsight&subtitle=ガバメントクラウド移行ダッシュボード"],
+  },
 };
 
 export default function RootLayout({

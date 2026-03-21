@@ -50,6 +50,17 @@ export type SearchResult = {
   doc_source_url: string | null;
 };
 
+export type SearchResultV2 = SearchResult & {
+  doc_category: string | null;
+  doc_created_at: string | null;
+};
+
+export type DocumentStats = {
+  category: string | null;
+  organization: string | null;
+  count: number;
+};
+
 export type VerifyResult = {
   claim: string;
   status: "supported" | "contradicted" | "unverified";
@@ -324,6 +335,66 @@ export async function searchChunks(
   }
 
   return results;
+}
+
+/**
+ * セマンティック検索 V2: カテゴリ・組織フィルタ + ドキュメントメタデータ付き
+ */
+export async function searchChunksV2(
+  query: string,
+  opts?: {
+    threshold?: number;
+    limit?: number;
+    category?: string;
+    organization?: string;
+  }
+): Promise<SearchResultV2[]> {
+  const supabase = getServiceClient();
+  const embedding = await getEmbedding(query);
+
+  const { data, error } = await supabase.rpc("match_chunks_v2", {
+    query_embedding: JSON.stringify(embedding),
+    match_threshold: opts?.threshold ?? 0.5,
+    match_count: opts?.limit ?? 5,
+    filter_category: opts?.category ?? null,
+    filter_organization: opts?.organization ?? null,
+  });
+
+  if (error) throw new Error(`Search V2 error: ${error.message}`);
+
+  return (data ?? []) as SearchResultV2[];
+}
+
+/**
+ * ドキュメント統計: カテゴリ・組織別のドキュメント数を取得
+ */
+export async function getDocumentStats(): Promise<DocumentStats[]> {
+  const supabase = getServiceClient();
+
+  const { data, error } = await supabase
+    .from("rag_documents")
+    .select("category, organization")
+    .eq("status", "indexed");
+
+  if (error) throw new Error(`Failed to get document stats: ${error.message}`);
+
+  // カテゴリ×組織でグルーピング
+  const counts = new Map<string, DocumentStats>();
+  for (const row of data ?? []) {
+    const key = `${row.category ?? "null"}::${row.organization ?? "null"}`;
+    const existing = counts.get(key);
+    if (existing) {
+      existing.count++;
+    } else {
+      counts.set(key, {
+        category: row.category ?? null,
+        organization: row.organization ?? null,
+        count: 1,
+      });
+    }
+  }
+
+  return Array.from(counts.values()).sort((a, b) => b.count - a.count);
 }
 
 // ---------------------------------------------------------------------------

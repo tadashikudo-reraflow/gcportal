@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 import { ingestDocument, type DocumentCategory } from "@/lib/rag";
 
-/** POST /api/rag/ingest — ドキュメントをインジェスト（管理者認証必須） */
+/** POST /api/rag/ingest — ドキュメントをインジェスト（管理者認証 or CRON_SECRET） */
 export async function POST(req: NextRequest) {
-  // 管理者認証チェック
+  // JWT認証 or CRON_SECRET（自動パイプライン用）
   const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
-  const expected = process.env.ADMIN_PASSWORD ?? "gcinsight2025";
-  if (token !== expected) {
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const cronSecret = req.headers.get("x-cron-secret");
+  const expectedCron = process.env.CRON_SECRET;
+
+  const isAuthed = token && (await verifyAdminToken(token));
+  const isCron = cronSecret && expectedCron && cronSecret === expectedCron;
+
+  if (!isAuthed && !isCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -30,7 +30,7 @@ export async function getAllArticles(): Promise<ArticleMeta[]> {
   const supabase = getSupabase();
   const { data } = await supabase
     .from("articles")
-    .select("slug, title, description, date, tags, author")
+    .select("slug, title, description, date, tags, author, cover_image")
     .eq("is_published", true)
     .order("date", { ascending: false });
 
@@ -43,7 +43,7 @@ export async function getAllArticles(): Promise<ArticleMeta[]> {
     date: a.date ?? "",
     tags: a.tags ?? [],
     author: a.author,
-    coverImage: undefined,
+    coverImage: a.cover_image ?? undefined,
   }));
 }
 
@@ -52,7 +52,7 @@ export async function getAllArticlesAdmin(): Promise<(ArticleMeta & { id: number
   const supabase = getSupabase();
   const { data } = await supabase
     .from("articles")
-    .select("id, slug, title, description, date, tags, author, is_published")
+    .select("id, slug, title, description, date, tags, author, cover_image, is_published")
     .order("updated_at", { ascending: false });
 
   if (!data) return [];
@@ -65,7 +65,7 @@ export async function getAllArticlesAdmin(): Promise<(ArticleMeta & { id: number
     date: a.date ?? "",
     tags: a.tags ?? [],
     author: a.author,
-    coverImage: undefined,
+    coverImage: a.cover_image ?? undefined,
     is_published: a.is_published,
   }));
 }
@@ -79,7 +79,7 @@ export async function getArticlesByTags(
   const supabase = getSupabase();
   const { data } = await supabase
     .from("articles")
-    .select("slug, title, description, date, tags, author")
+    .select("slug, title, description, date, tags, author, cover_image")
     .eq("is_published", true)
     .overlaps("tags", tags)
     .order("date", { ascending: false })
@@ -97,7 +97,7 @@ export async function getArticlesByTags(
       date: a.date ?? "",
       tags: a.tags ?? [],
       author: a.author,
-      coverImage: undefined,
+      coverImage: a.cover_image ?? undefined,
     }));
 }
 

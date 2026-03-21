@@ -5,6 +5,7 @@ import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { ExpandableCostCard, ExpandableMuniRow, VendorGroup } from "./CostClientComponents";
+import CostSimulator from "./CostSimulator";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -51,7 +52,21 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 
 export const metadata: Metadata = {
   title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
-  description: "ガバメントクラウド移行コストが当初比156%増になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
+  description:
+    "ガバメントクラウド移行コストが当初比156%増になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
+  openGraph: {
+    title: "ガバメントクラウド移行コスト分析",
+    description:
+      "移行コストが当初比156%増。ベンダー別コスト比較と費用対効果を可視化。",
+    images: [
+      {
+        url: `/og?title=${encodeURIComponent("コスト分析")}&subtitle=${encodeURIComponent("ガバメントクラウド移行コスト増減を可視化")}&type=cost`,
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // change_ratioに応じたバー幅（基準1.0 = 50%、最大3.0 = 100%）
@@ -467,6 +482,144 @@ export default async function CostsPage() {
           </div>
         </div>
       </div>
+
+      {/* 数値ハイライトバナー */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="card p-5 text-center" style={{ borderTop: "4px solid #c8102e" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>中核市 平均</p>
+          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#c8102e" }}>2.3<span className="text-lg">倍</span></p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>移行前コスト比</p>
+        </div>
+        <div className="card p-5 text-center" style={{ borderTop: "4px solid #7f1d1d" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>最大事例</p>
+          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#7f1d1d" }}>5.7<span className="text-lg">倍</span></p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>一部中核市で確認</p>
+        </div>
+        <div className="card p-5 text-center" style={{ borderTop: "4px solid #d97706" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>東京都</p>
+          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>1.6<span className="text-lg">倍</span></p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>特別区の平均増加率</p>
+        </div>
+      </div>
+
+      {/* コスト増の構造的原因 */}
+      <div className="card p-6">
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "#c8102e" }} />
+          コスト増の構造的原因
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* ガバメントクラウド利用料 */}
+          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#fef3c7" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800 mb-1">ガバメントクラウド利用料</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  AWS/Azure/GCP/OCI等のIaaS利用料が新規発生。
+                  オンプレミスでは不要だったクラウド基盤料・データ転送料が年間コストを押し上げる。
+                  特に小規模自治体ではスケールメリットが効かず割高に。
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                    影響大
+                  </span>
+                  <span className="text-xs text-gray-400">全自治体共通</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ソフトウェア借料 */}
+          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#ede9fe" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800 mb-1">ソフトウェア借料</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  標準準拠システムのSaaS/ライセンス料が移行前比で増加。
+                  カスタマイズ不可の標準化仕様により、別途アドオン費用が発生するケースも。
+                  ベンダーロックインによる価格交渉力の低下が一因。
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+                    影響中〜大
+                  </span>
+                  <span className="text-xs text-gray-400">ベンダー依存</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ネットワーク費用 */}
+          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#dbeafe" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="2" y1="12" x2="22" y2="12" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800 mb-1">ネットワーク費用</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  LGWAN-ASP接続からクラウド直接接続（Direct Connect等）への切り替えコスト。
+                  閉域網接続・VPN費用・帯域増強が必要。
+                  複数クラウドを利用する場合は接続ポイントごとに費用が発生。
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                    影響中
+                  </span>
+                  <span className="text-xs text-gray-400">インフラ依存</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SE単価高騰 */}
+          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#fce7f3" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#db2777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-800 mb-1">SE単価高騰</p>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  全国1,741自治体の同時移行需要によりSE・PMのリソースが逼迫。
+                  クラウド移行スキルを持つ技術者の単価が上昇。
+                  移行期限が迫るほど「急ぎ対応」プレミアムが加算される傾向。
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">
+                    影響中〜大
+                  </span>
+                  <span className="text-xs text-gray-400">市場構造</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* コストシミュレーター */}
+      <CostSimulator />
 
       {/* ⑧ コスト変化実績（展開可能カード） */}
       <div className="card p-6">

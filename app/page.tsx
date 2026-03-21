@@ -1,9 +1,34 @@
+import type { Metadata } from "next";
 import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
+import MigrationResultBanner from "@/components/MigrationResultBanner";
+import PrefectureHeatmap from "@/components/PrefectureHeatmap";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+
+const avgRate = (data.summary.avg_rate * 100).toFixed(1);
+
+export const metadata: Metadata = {
+  title:
+    "ガバメントクラウド移行状況ダッシュボード｜全国1,741自治体の進捗をリアルタイム可視化",
+  description: `全国平均完了率${avgRate}%。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
+  openGraph: {
+    title: "GCInsight — 全国ガバメントクラウド移行ダッシュボード",
+    description: `全国平均完了率${avgRate}%。1,741自治体の移行進捗をリアルタイム可視化。`,
+    images: [
+      {
+        url: `/og?title=${encodeURIComponent("全国ガバメントクラウド移行ダッシュボード")}&subtitle=${encodeURIComponent(`全国平均完了率 ${avgRate}%`)}&rate=${data.summary.avg_rate}`,
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
 
 type StandardMunicipality = {
   prefecture: string;
@@ -88,6 +113,18 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* 最終移行結果バナー */}
+      <MigrationResultBanner
+        completionRate={0.384}
+        totalSystems={34592}
+        completedSystems={13283}
+        delayedSystems={8956}
+        delayedMunicipalities={935}
+        totalMunicipalities={TOTAL}
+        costMultiplier={2.3}
+        dataMonth={summary.data_month}
+      />
+
       {/* ① 緊急アラートバナー */}
       <div className="alert-banner flex-wrap gap-y-2">
         <svg
@@ -126,6 +163,45 @@ export default function DashboardPage() {
 
       {/* データ鮮度バナー */}
       <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
+
+      {/* データ最終更新・出典リンク */}
+      <div
+        className="rounded-lg px-5 py-3 flex flex-wrap items-center justify-between gap-3"
+        style={{ backgroundColor: "#f0f5ff", border: "1px solid #bfdbfe" }}
+      >
+        <div className="flex items-center gap-2">
+          <svg
+            width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <p className="text-xs font-semibold" style={{ color: "#1e40af" }}>
+            データ最終更新: {summary.data_month.replace("-", "年")}月
+          </p>
+        </div>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://www.digital.go.jp/policies/local_governments"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium underline"
+            style={{ color: "#0066FF" }}
+          >
+            デジタル庁公式
+          </a>
+          <a
+            href="https://www.soumu.go.jp/denshijiti/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium underline"
+            style={{ color: "#0066FF" }}
+          >
+            総務省
+          </a>
+        </div>
+      </div>
 
       {/* ② 5段階ステータスKPIカード */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -241,6 +317,9 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* 都道府県ヒートマップ */}
+      <PrefectureHeatmap prefectures={prefectures} />
 
       {/* ④ 都道府県別ランキングテーブル */}
       <div className="card p-6">

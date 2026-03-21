@@ -3,6 +3,7 @@ title: "ガバメントクラウド移行が遅延する自治体急増——202
 description: "ガバメントクラウド移行の遅延が深刻化。全国1,741自治体のうち743団体で5,009システムが期限超過。遅延の原因・リスク・対策を自治体DX担当者向けに解説。"
 date: "2025-03-19"
 tags: ["ガバメントクラウド", "遅延", "リスク", "2026年問題"]
+coverImage: "/images/articles/govcloud-delay-risk.png"
 author: "GCInsight編集部"
 ---
 

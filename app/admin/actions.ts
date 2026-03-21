@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { verifyPassword, createAdminToken, COOKIE_NAME } from "@/lib/auth";
 
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -18,18 +19,18 @@ function getAdminClient() {
 export async function loginAction(formData: FormData): Promise<void> {
   const password = formData.get("password") as string;
   const next = (formData.get("next") as string) || "/admin";
-  const expected = process.env.ADMIN_PASSWORD ?? "gcinsight2025";
 
-  if (password !== expected) {
+  if (!verifyPassword(password)) {
     redirect(`/admin/login?error=${encodeURIComponent("パスワードが違います")}&next=${encodeURIComponent(next)}`);
   }
 
+  const token = await createAdminToken();
   const cookieStore = await cookies();
-  cookieStore.set("admin_token", expected, {
+  cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7日
+    maxAge: 60 * 60 * 24, // 24時間
     path: "/",
   });
 
@@ -39,7 +40,7 @@ export async function loginAction(formData: FormData): Promise<void> {
 // ログアウト
 export async function logoutAction() {
   const cookieStore = await cookies();
-  cookieStore.delete("admin_token");
+  cookieStore.delete(COOKIE_NAME);
   redirect("/admin/login");
 }
 

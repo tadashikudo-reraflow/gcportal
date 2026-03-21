@@ -3,6 +3,7 @@ title: "ガバメントクラウドとは？自治体標準化システムとの
 description: "デジタル庁が推進するガバメントクラウドの概要、認定クラウド5種類、自治体標準化20業務との関係、2026年3月の移行期限まで何をすべきかを解説します。"
 date: "2025-03-15"
 tags: ["ガバメントクラウド", "解説", "標準化"]
+coverImage: "/images/articles/govcloud-basics.png"
 author: "GCInsight編集部"
 ---
 
