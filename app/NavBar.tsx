@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
   { href: "/",             label: "ダッシュボード", short: "TOP"   },
-  { href: "/prefectures",  label: "都道府県別",     short: "都道府県" },
   { href: "/businesses",   label: "業務別",         short: "業務"   },
   { href: "/risks",        label: "遅延リスク",     short: "リスク" },
   { href: "/tokutei",      label: "特定移行認定",   short: "特定移行" },

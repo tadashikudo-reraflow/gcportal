@@ -5,6 +5,11 @@
       "source": "/tracker",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/prefectures",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "crons": [

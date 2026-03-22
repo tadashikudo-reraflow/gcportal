@@ -5,8 +5,8 @@ import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import MigrationResultBanner from "@/components/MigrationResultBanner";
-import PrefectureHeatmap from "@/components/PrefectureHeatmap";
 import JapanMap from "@/components/JapanMap";
+import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
@@ -78,6 +78,12 @@ export default function DashboardPage() {
     )
   );
   const TOKUTEI_OFFICIAL = tokuteiData.total_count as number; // 公式総数935（都道府県含む）
+
+  // 特定移行の都道府県別カウント（PrefectureRanking用）
+  const tokuteiByPref: Record<string, number> = {};
+  for (const m of tokuteiData.municipalities as { prefecture: string; city: string }[]) {
+    tokuteiByPref[m.prefecture] = (tokuteiByPref[m.prefecture] ?? 0) + 1;
+  }
   const TOKUTEI_MUNI_COUNT = tokuteiSet.size; // 市区町村のみ898（standardization.jsonとマッチする実数）
   const TOTAL = summary.total; // 1741
 
@@ -110,10 +116,7 @@ export default function DashboardPage() {
   // 業務別: 完了率降順
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
 
-  // 都道府県別: 完了率降順
-  const sortedPrefectures = [...prefectures].sort((a, b) => b.avg_rate - a.avg_rate);
-  const topPrefectures = sortedPrefectures.slice(0, 10);
-  const bottomPrefectures = sortedPrefectures.slice(-5).reverse();
+  // 都道府県別（PrefectureRanking コンポーネントで表示）
 
   return (
     <div className="space-y-6">
@@ -325,85 +328,14 @@ export default function DashboardPage() {
       {/* 日本地図ヒートマップ */}
       <JapanMap prefectures={prefectures} />
 
-      {/* ④ 都道府県別ランキングテーブル */}
-      <div className="card p-6">
-        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span
-            className="w-1 h-5 rounded-full inline-block"
-            style={{ backgroundColor: "#003087" }}
-          />
-          都道府県別ランキング
+      {/* ④ 都道府県別一覧テーブル */}
+      <div className="card p-4 sm:p-6">
+        <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+          都道府県別 標準化進捗
+          <span className="text-xs font-normal text-gray-400 ml-1">完了率の低い順</span>
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 上位10 */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2">上位 10 都道府県</p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 text-xs text-gray-500 font-medium">順位</th>
-                  <th className="text-left py-2 text-xs text-gray-500 font-medium">都道府県</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">完了率</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">完了</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">危機</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topPrefectures.map((pref, i) => (
-                  <tr key={pref.prefecture} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="py-2 text-xs text-gray-400">{i + 1}</td>
-                    <td className="py-2 font-medium text-gray-800">{pref.prefecture}</td>
-                    <td className="py-2 text-right">
-                      <span className="font-bold" style={{ color: getRateColor(pref.avg_rate) }}>
-                        {formatRate(pref.avg_rate)}
-                      </span>
-                    </td>
-                    <td className="py-2 text-right" style={{ color: "#007a3d" }}>{pref.completed}</td>
-                    <td className="py-2 text-right" style={{ color: pref.critical > 0 ? "#c8102e" : "#9ca3af" }}>
-                      {pref.critical}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 下位5 */}
-          <div>
-            <p className="text-xs font-semibold text-gray-500 mb-2">
-              下位 5 都道府県{" "}
-              <span className="text-red-400 font-normal">（要重点対応）</span>
-            </p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 text-xs text-gray-500 font-medium">順位</th>
-                  <th className="text-left py-2 text-xs text-gray-500 font-medium">都道府県</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">完了率</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">完了</th>
-                  <th className="text-right py-2 text-xs text-gray-500 font-medium">危機</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bottomPrefectures.map((pref, i) => (
-                  <tr key={pref.prefecture} className="border-b border-gray-50 hover:bg-gray-50">
-                    <td className="py-2 text-xs text-gray-400">{47 - i}</td>
-                    <td className="py-2 font-medium text-gray-800">{pref.prefecture}</td>
-                    <td className="py-2 text-right">
-                      <span className="font-bold" style={{ color: getRateColor(pref.avg_rate) }}>
-                        {formatRate(pref.avg_rate)}
-                      </span>
-                    </td>
-                    <td className="py-2 text-right" style={{ color: "#007a3d" }}>{pref.completed}</td>
-                    <td className="py-2 text-right" style={{ color: pref.critical > 0 ? "#c8102e" : "#9ca3af" }}>
-                      {pref.critical}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <PrefectureRanking prefectures={prefectures} tokuteiByPref={tokuteiByPref} />
       </div>
 
       {/* 📘 初見者向け読み方ガイド */}

@@ -5,8 +5,8 @@ import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // /tracker → / リダイレクト（ダッシュボードと統合済み）
-  if (pathname === "/tracker") {
+  // 統合済みページ → ダッシュボードへリダイレクト
+  if (pathname === "/tracker" || pathname === "/prefectures") {
     return NextResponse.redirect(new URL("/", request.url), 301);
   }
 
@@ -41,5 +41,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/tracker", "/admin/:path*", "/api/scrape/:path*", "/api/schedule/:path*"],
+  matcher: ["/tracker", "/prefectures", "/admin/:path*", "/api/scrape/:path*", "/api/schedule/:path*"],
 };
