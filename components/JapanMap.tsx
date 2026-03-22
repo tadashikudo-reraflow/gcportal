@@ -88,15 +88,15 @@ const PREFECTURE_GRID: { name: string; col: number; row: number }[] = [
 
 // --- Constants ---
 
-const CELL_SIZE = 36;
-const GAP = 3;
+const CELL_SIZE = 52;
+const GAP = 4;
 const STEP = CELL_SIZE + GAP;
 const PADDING = 8;
 const COLS = 10;
 const ROWS = 12;
 const SVG_WIDTH = PADDING * 2 + COLS * STEP - GAP;
 const SVG_HEIGHT = PADDING * 2 + ROWS * STEP - GAP;
-const CORNER_RADIUS = 4;
+const CORNER_RADIUS = 5;
 
 const LEGEND_ITEMS = [
   { label: "90%+", color: "#166534" },
@@ -161,7 +161,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         色は標準化完了率を示します。クリックで都道府県詳細へ。
       </p>
 
-      <div className="relative w-full mx-auto" style={{ maxWidth: 500 }}>
+      <div className="relative w-full mx-auto" style={{ maxWidth: 700 }}>
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           width="100%"
@@ -219,11 +219,11 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                 {/* Prefecture name */}
                 <text
                   x={cx}
-                  y={cy - 3}
+                  y={cy - 5}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={textColor}
-                  fontSize={shortName.length > 3 ? 7 : shortName.length > 2 ? 8 : 9}
+                  fontSize={shortName.length > 3 ? 10 : shortName.length > 2 ? 11 : 12}
                   fontWeight={700}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
@@ -233,11 +233,11 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                 {rate >= 0 && (
                   <text
                     x={cx}
-                    y={cy + 9}
+                    y={cy + 13}
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill={textColor}
-                    fontSize={7}
+                    fontSize={10}
                     fontWeight={500}
                     opacity={0.9}
                     style={{ pointerEvents: "none", userSelect: "none" }}
