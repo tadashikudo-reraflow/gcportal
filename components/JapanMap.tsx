@@ -88,15 +88,15 @@ const PREFECTURE_GRID: { name: string; col: number; row: number }[] = [
 
 // --- Constants ---
 
-const CELL_SIZE = 52;
-const GAP = 4;
+const CELL_SIZE = 64;
+const GAP = 3;
 const STEP = CELL_SIZE + GAP;
-const PADDING = 8;
+const PADDING = 6;
 const COLS = 10;
 const ROWS = 12;
 const SVG_WIDTH = PADDING * 2 + COLS * STEP - GAP;
 const SVG_HEIGHT = PADDING * 2 + ROWS * STEP - GAP;
-const CORNER_RADIUS = 5;
+const CORNER_RADIUS = 6;
 
 const LEGEND_ITEMS = [
   { label: "90%+", color: "#166534" },
@@ -161,7 +161,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         色は標準化完了率を示します。クリックで都道府県詳細へ。
       </p>
 
-      <div className="relative w-full mx-auto" style={{ maxWidth: 700 }}>
+      <div className="relative w-full mx-auto">
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           width="100%"
@@ -210,21 +210,22 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                   rx={CORNER_RADIUS}
                   ry={CORNER_RADIUS}
                   fill={fill}
-                  stroke={tooltip?.data.prefecture === name ? "#1e293b" : "rgba(255,255,255,0.3)"}
-                  strokeWidth={tooltip?.data.prefecture === name ? 2 : 0.5}
+                  stroke={tooltip?.data.prefecture === name ? "#1e293b" : "rgba(0,0,0,0.12)"}
+                  strokeWidth={tooltip?.data.prefecture === name ? 2.5 : 1}
                   style={{
                     transition: "stroke-width 0.15s, stroke 0.15s",
+                    filter: tooltip?.data.prefecture === name ? "brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
                   }}
                 />
                 {/* Prefecture name */}
                 <text
                   x={cx}
-                  y={cy - 5}
+                  y={cy - 7}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={textColor}
-                  fontSize={shortName.length > 3 ? 10 : shortName.length > 2 ? 11 : 12}
-                  fontWeight={700}
+                  fontSize={shortName.length > 3 ? 11 : shortName.length > 2 ? 13 : 14}
+                  fontWeight={800}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
                   {shortName}
@@ -233,12 +234,12 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                 {rate >= 0 && (
                   <text
                     x={cx}
-                    y={cy + 13}
+                    y={cy + 16}
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill={textColor}
-                    fontSize={10}
-                    fontWeight={500}
+                    fontSize={13}
+                    fontWeight={800}
                     opacity={0.9}
                     style={{ pointerEvents: "none", userSelect: "none" }}
                   >
