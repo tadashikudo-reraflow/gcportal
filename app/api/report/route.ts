@@ -46,7 +46,7 @@ export async function GET() {
     // 特定移行支援システム（あれば）
     const tokuteiSummary = tokutei
       ? {
-          totalSystems: tokutei.summary?.total_systems ?? 0,
+          totalSystems: tokutei.summary?.total_applicable_systems ?? 0,
           totalMunicipalities: tokutei.summary?.total_municipalities ?? 0,
           avgSystemsPerMunicipality:
             tokutei.summary?.avg_systems_per_municipality ?? 0,

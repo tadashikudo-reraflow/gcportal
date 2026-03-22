@@ -212,6 +212,38 @@ def run():
     )
     print(f"Output: {out_path}")
 
+    # --- Generate tokutei_municipalities.json (市区町村のみ) ---
+    muni_only = [m for m in municipalities if m["category"] != "都道府県"]
+    muni_list = []
+    for m in muni_only:
+        muni_list.append({
+            "prefecture": m["prefecture"],
+            "city": m["city"],
+        })
+    # Sort by prefecture order then city name
+    pref_idx = {p: i for i, p in enumerate(PREFECTURES)}
+    muni_list.sort(key=lambda m: (pref_idx.get(m["prefecture"], 99), m["city"]))
+
+    muni_out = {
+        "updated_at": out["updated_at"],
+        "source": out["source"],
+        "source_url": out["source_url"],
+        "total_count": len(municipalities),  # 都道府県含む公式総数
+        "municipality_count": len(muni_list),  # 市区町村のみ
+        "system_count": total_systems,
+        "municipalities": muni_list,
+    }
+
+    muni_path = OUT_DIR / "tokutei_municipalities.json"
+    with open(muni_path, "w", encoding="utf-8") as f:
+        json.dump(muni_out, f, ensure_ascii=False, indent=2)
+
+    print(
+        f"Municipalities JSON: {len(muni_list)} entries "
+        f"(total_count={len(municipalities)}, municipality_count={len(muni_list)})"
+    )
+    print(f"Output: {muni_path}")
+
 
 if __name__ == "__main__":
     run()

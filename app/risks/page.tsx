@@ -81,7 +81,7 @@ export default function RisksPage() {
 
   // 全自治体数（特定移行含む1,741全体）
   const TOTAL_MUNICIPALITIES = 1741;
-  const TOKUTEI_COUNT = tokuteiData.total_count as number;
+  const TOKUTEI_OFFICIAL = tokuteiData.total_count as number; // 公式総数935（都道府県含む）
   const riskRatio = (riskMunicipalities.length / TOTAL_MUNICIPALITIES) * 100;
 
   // 完了率分布
@@ -218,7 +218,7 @@ export default function RisksPage() {
             特定移行支援システム認定とは
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-            デジタル庁が認定した特定移行支援システムの対象となった自治体（{TOKUTEI_COUNT.toLocaleString()}団体）は、
+            デジタル庁が認定した特定移行支援システムの対象となった自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は、
             2026年3月末の期限延長が認められ、別途移行計画が策定されます。
             これらは遅延とは異なる扱いのため、本リストからは除外されています。
           </p>

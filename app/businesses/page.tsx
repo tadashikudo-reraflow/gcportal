@@ -59,7 +59,7 @@ export default function BusinessesPage() {
         </p>
         <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 10, fontWeight: 700 }}>特定移行</span>
-          <span>= デジタル庁認定 特定移行支援システム対象自治体（{tokuteiData.municipalities.length}団体）。期限延長が認められており「遅延」とは異なります。</span>
+          <span>= デジタル庁認定 特定移行支援システム対象自治体（{tokuteiData.municipalities.length}市区町村）。期限延長が認められており「遅延」とは異なります。</span>
           <Link href="/tokutei" className="underline" style={{ color: "#7C3AED" }}>詳細 →</Link>
         </div>
       </div>

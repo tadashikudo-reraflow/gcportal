@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
+import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import MigrationResultBanner from "@/components/MigrationResultBanner";
@@ -75,7 +76,8 @@ export default function DashboardPage() {
       (m) => `${m.prefecture}/${m.city}`
     )
   );
-  const TOKUTEI_COUNT = tokuteiData.total_count as number;
+  const TOKUTEI_OFFICIAL = tokuteiData.total_count as number; // 公式総数935（都道府県含む）
+  const TOKUTEI_MUNI_COUNT = tokuteiSet.size; // 市区町村のみ898（standardization.jsonとマッチする実数）
   const TOTAL = summary.total; // 1741
 
   // 全自治体を5段階で分類
@@ -117,12 +119,10 @@ export default function DashboardPage() {
       {/* 最終移行結果バナー */}
       <MigrationResultBanner
         completionRate={summary.avg_rate}
-        // totalSystems: standardization.json に total_systems キーなし。要データソース
-        totalSystems={34592}
-        // completedSystems: standardization.json に completed_systems キーなし。要データソース
-        completedSystems={13283}
+        totalSystems={migrationStats.total_systems}
+        completedSystems={migrationStats.completed_systems}
         delayedSystems={tokuteiData.system_count}
-        delayedMunicipalities={TOKUTEI_COUNT}
+        delayedMunicipalities={TOKUTEI_OFFICIAL}
         totalMunicipalities={TOTAL}
         costMultiplier={COST_CONSTANTS.avgCostIncrease}
         dataMonth={summary.data_month}
@@ -150,7 +150,7 @@ export default function DashboardPage() {
           <p className="text-xs mt-0.5" style={{ color: "#991b1b" }}>
             全国 {TOTAL.toLocaleString()} 自治体のうち完了は{" "}
             {completeCount} 自治体（{completedPct}%）、
-            特定移行認定 {TOKUTEI_COUNT.toLocaleString()} 自治体を含む
+            特定移行認定 {TOKUTEI_OFFICIAL.toLocaleString()} 団体を含む
           </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -214,11 +214,11 @@ export default function DashboardPage() {
         <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
         <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
           <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", margin: 0, lineHeight: 1 }}>
-            {TOKUTEI_COUNT.toLocaleString()}
+            {TOKUTEI_OFFICIAL.toLocaleString()}
           </p>
           <p style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginTop: 6 }}>特定移行</p>
           <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
-            ({((TOKUTEI_COUNT / TOTAL) * 100).toFixed(1)}%) 認定団体 →
+            認定団体（うち市区町村{TOKUTEI_MUNI_COUNT}） →
           </p>
         </Link>
       </div>
@@ -233,7 +233,7 @@ export default function DashboardPage() {
           <div style={{ width: `${(ontrackCount / TOTAL) * 100}%`, backgroundColor: "#1D4ED8" }} title={`順調: ${ontrackCount}`} />
           <div style={{ width: `${(atriskCount / TOTAL) * 100}%`, backgroundColor: "#FA6414" }} title={`要注意: ${atriskCount}`} />
           <div style={{ width: `${(criticalCount / TOTAL) * 100}%`, backgroundColor: "#b91c1c" }} title={`危機: ${criticalCount}`} />
-          <div style={{ width: `${(TOKUTEI_COUNT / TOTAL) * 100}%`, backgroundColor: "#7c3aed" }} title={`特定移行: ${TOKUTEI_COUNT}`} />
+          <div style={{ width: `${(TOKUTEI_MUNI_COUNT / TOTAL) * 100}%`, backgroundColor: "#7c3aed" }} title={`特定移行: ${TOKUTEI_MUNI_COUNT}`} />
         </div>
         <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           {[
@@ -241,7 +241,7 @@ export default function DashboardPage() {
             { label: "順調", color: "#1D4ED8", count: ontrackCount },
             { label: "要注意", color: "#FA6414", count: atriskCount },
             { label: "危機", color: "#b91c1c", count: criticalCount },
-            { label: "特定移行", color: "#7c3aed", count: TOKUTEI_COUNT },
+            { label: "特定移行", color: "#7c3aed", count: TOKUTEI_MUNI_COUNT },
           ].map((s) => (
             <span key={s.label} className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: s.color }} />
@@ -413,7 +413,7 @@ export default function DashboardPage() {
             「特定移行」ってなに？
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-            デジタル庁が認定した<strong>特定移行支援システム</strong>の対象自治体（{TOKUTEI_COUNT.toLocaleString()}団体）は、
+            デジタル庁が認定した<strong>特定移行支援システム</strong>の対象自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は、
             2026年3月末の期限が適用されない別途スケジュールが設定されます。
             「遅延」や「危機」とは異なる扱いです。
           </p>

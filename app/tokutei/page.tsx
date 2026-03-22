@@ -11,8 +11,7 @@ import { PAGE_SOURCES } from "@/lib/sources";
 
 export const metadata: Metadata = {
   title: "特定移行支援システム認定 自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
-  description:
-    "デジタル庁が認定した特定移行支援システムの対象となった935自治体の一覧。ガバメントクラウド移行の2026年3月末期限延長対象。",
+  description: `デジタル庁が認定した特定移行支援システムの対象となった${tokuteiData.total_count}団体（うち市区町村${(tokuteiData as Record<string, unknown>).municipality_count ?? tokuteiData.municipalities.length}）の一覧。ガバメントクラウド移行の2026年3月末期限延長対象。`,
 };
 
 type TokuteiMunicipality = { prefecture: string; city: string };
@@ -54,11 +53,12 @@ export default function TokuteiPage() {
   const prefSet = new Set(tokuteiList.map((m) => m.prefecture));
   const prefectures = PREF_ORDER.filter((p) => prefSet.has(p));
 
-  // 統計（total_countフィールドではなく実データ件数を使用）
+  // 統計
   const TOTAL_MUNICIPALITIES = 1741;
-  const tokuteiCount = rows.length;
+  const tokuteiCount = rows.length; // 市区町村のみ（898件）
+  const tokuteiTotalCount = tokuteiData.total_count as number; // 都道府県含む公式総数（935団体）
   const systemCount = tokuteiData.system_count as number;
-  const tokuteiRatio = (tokuteiCount / TOTAL_MUNICIPALITIES) * 100;
+  const tokuteiRatio = (tokuteiTotalCount / TOTAL_MUNICIPALITIES) * 100;
 
   // 完了率の分布（参考）
   const withRate = rows.filter((r) => r.overall_rate !== null);
@@ -105,11 +105,11 @@ export default function TokuteiPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="card p-5 text-center" style={{ borderTop: "3px solid #7c3aed" }}>
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
-            {tokuteiCount.toLocaleString()}
+            {tokuteiTotalCount.toLocaleString()}
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定自治体数</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定団体数</p>
           <p className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-            全体の {tokuteiRatio.toFixed(1)}%
+            全体の {tokuteiRatio.toFixed(1)}%（うち市区町村{tokuteiCount.toLocaleString()}）
           </p>
         </div>
         <div className="card p-5 text-center" style={{ borderTop: "3px solid #7c3aed" }}>
@@ -177,7 +177,7 @@ export default function TokuteiPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
             認定自治体 一覧
-            <span className="ml-2 text-xs font-normal text-gray-400">（令和7年12月末時点・{tokuteiCount.toLocaleString()}団体）</span>
+            <span className="ml-2 text-xs font-normal text-gray-400">（令和7年12月末時点・市区町村{tokuteiCount.toLocaleString()}団体）</span>
           </h2>
           <Link
             href="/risks"

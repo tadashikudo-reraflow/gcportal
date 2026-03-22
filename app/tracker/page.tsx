@@ -65,7 +65,7 @@ export default function TrackerPage() {
       tokuteiData.municipalities as { prefecture: string; city: string }[]
     ).map((m) => `${m.prefecture}/${m.city}`)
   );
-  const TOKUTEI_COUNT = tokuteiData.total_count as number;
+  const TOKUTEI_OFFICIAL = tokuteiData.total_count as number; // 公式総数935（都道府県含む）
   const TOTAL = summary.total;
 
   let completeCount = 0;
@@ -243,7 +243,7 @@ export default function TrackerPage() {
         <div className="mt-3">
           <StatusCard
             label="特定移行認定"
-            count={TOKUTEI_COUNT}
+            count={TOKUTEI_OFFICIAL}
             color="var(--color-status-tokutei)"
           />
         </div>

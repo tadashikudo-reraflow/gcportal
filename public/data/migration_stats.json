@@ -1,0 +1,13 @@
+{
+  "data_month": "2026-01",
+  "source": "総務省PMOツール集計",
+  "total_systems": 34592,
+  "completed_systems": 13283,
+  "completion_rate": 0.384,
+  "total_municipalities": 1741,
+  "cost_multiplier_avg": 2.3,
+  "cost_multiplier_max": 5.7,
+  "cost_source": "中核市市長会調査（2025年1月）",
+  "updated_at": "2026-03-22",
+  "notes": "total_systemsとcompleted_systemsは総務省PMOツール集計値。standardization.jsonのステップ完了率とは異なる指標"
+}

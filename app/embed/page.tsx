@@ -166,7 +166,7 @@ function PrefectureWidget() {
 
 function CostWidget() {
   // TODO: コストデータAPIから取得（avgCostIncrease / initialIncreaseRate は現在 COST_CONSTANTS 定数）
-  const delayedCount = tokuteiData.total_count; // tokutei_municipalities.json から動的取得
+  const delayedCount = tokuteiData.total_count; // 特定移行認定団体数（都道府県含む公式総数935）
 
   return (
     <div className="p-5 space-y-4">
@@ -191,7 +191,7 @@ function CostWidget() {
         </div>
         <div className="bg-blue-50 rounded-lg p-3">
           <p className="text-xl font-extrabold text-blue-700">{delayedCount.toLocaleString()}</p>
-          <p className="text-[10px] text-blue-500 mt-1">遅延自治体数</p>
+          <p className="text-[10px] text-blue-500 mt-1">特定移行認定団体</p>
         </div>
       </div>
 
