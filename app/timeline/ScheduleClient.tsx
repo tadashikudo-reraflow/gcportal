@@ -17,8 +17,8 @@ function formatDate(dateStr: string): string {
 }
 
 function formatMonth(dateStr: string): string {
-  const [, m] = dateStr.split("-");
-  return `${parseInt(m)}月`;
+  const [y, m] = dateStr.split("-");
+  return `${y}年${parseInt(m)}月`;
 }
 
 /** Group events by month (e.g. "2026-03") */
@@ -181,7 +181,7 @@ export default function ScheduleClient({ data }: Props) {
           className="text-lg font-bold mb-4"
           style={{ color: "var(--color-gov-primary, #002D72)" }}
         >
-          年度スケジュール（R8年度の主なイベント）
+          年度スケジュール（2026年度の主なイベント）
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {data.annual_schedule.map((q) => (
