@@ -7,6 +7,7 @@ export const metadata: Metadata = {
     "ガバクラ関連スケジュール｜年度計画と直近の動き | ガバメントクラウド移行状況ダッシュボード",
   description:
     "ガバメントクラウド・自治体標準化に関する年間スケジュールと直近の重要イベントを一覧。デジタル庁・総務省・厚労省等の最新動向を時系列で確認。",
+  alternates: { canonical: "/timeline" },
 };
 
 export interface ScheduleEvent {

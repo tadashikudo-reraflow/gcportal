@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: "データソース・方法論 | ガバメントクラウド移行状況ダッシュボード",
   description:
     "GCInsightが参照・引用するデジタル庁・総務省・内閣官房等の公式データソース一覧。データ収集方法論・信頼度レベル・鮮度ステータスを公開。",
+  alternates: { canonical: "/sources" },
 };
 
 export default function SourcesPage() {

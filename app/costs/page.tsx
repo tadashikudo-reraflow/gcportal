@@ -67,6 +67,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: { card: "summary_large_image" },
+  alternates: { canonical: "/costs" },
 };
 
 // change_ratioに応じたバー幅（基準1.0 = 50%、最大3.0 = 100%）

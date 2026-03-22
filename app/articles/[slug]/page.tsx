@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} | ガバメントクラウド移行状況ダッシュボード`,
     description: article.description,
+    alternates: { canonical: `/articles/${slug}` },
     openGraph: {
       title: article.title,
       description: article.description,

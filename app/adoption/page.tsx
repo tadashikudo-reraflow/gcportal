@@ -7,6 +7,7 @@ import type { MunicipalityPackageRow, VendorRow } from "@/components/AdoptionExp
 export const metadata: Metadata = {
   title: "ガバメントクラウド対応パッケージ 導入実績マップ | ガバメントクラウド移行状況ダッシュボード",
   description: "自治体がどのガバメントクラウド対応パッケージを導入しているかを地域・業務別に可視化。ベンダーシェアと導入年の実績一覧。",
+  alternates: { canonical: "/adoption" },
 };
 
 export default async function AdoptionPage() {

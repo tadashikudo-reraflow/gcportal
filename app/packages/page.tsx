@@ -10,6 +10,7 @@ import BusinessPackageList from "@/components/BusinessPackageList";
 export const metadata: Metadata = {
   title: "自治体向けガバメントクラウド対応パッケージ一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
+  alternates: { canonical: "/packages" },
 };
 
 export default async function PackagesPage() {

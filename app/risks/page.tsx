@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: { card: "summary_large_image" },
+  alternates: { canonical: "/risks" },
 };
 
 export default function RisksPage() {
@@ -208,6 +209,87 @@ export default function RisksPage() {
       {/* テーブル（フィルター付き Client Component） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <RiskFilter rows={rows} prefectures={prefectures} />
+      </div>
+
+      {/* 期限超過のデメリット */}
+      <div className="card p-5">
+        <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+          移行期限に間に合わない場合のデメリット
+        </h2>
+        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+          2026年3月31日の移行期限を超過した場合、以下のリスクが想定されます。
+          標準化法に罰則規定はありませんが、財政・運用・政策面で実質的な不利益が生じます。
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            {
+              icon: "💰",
+              title: "補助金・財政支援の喪失",
+              desc: "デジタル基盤改革支援補助金の対象外となり、移行費用が全額自治体負担になる可能性。期限内完了を前提とした補助スキームが適用されなくなる。",
+              severity: "高",
+            },
+            {
+              icon: "⚖️",
+              title: "法的・行政的リスク",
+              desc: "標準化法上の「努力義務」違反として、総務省・デジタル庁からの是正勧告や個別ヒアリングの対象に。移行計画の再提出を求められる。",
+              severity: "中",
+            },
+            {
+              icon: "🔒",
+              title: "旧システムの保守リスク",
+              desc: "ベンダーが標準準拠システムへリソースを集中し、旧システムのサポート縮小・終了が加速。セキュリティパッチ停止で住民データ漏洩リスクが増大。",
+              severity: "高",
+            },
+            {
+              icon: "🔗",
+              title: "自治体間連携からの孤立",
+              desc: "引越しワンストップ・マイナンバー連携など、標準化を前提とした自治体間情報連携サービスに参加できず、住民サービスに格差が生じる。",
+              severity: "中",
+            },
+            {
+              icon: "📊",
+              title: "コスト増大の悪循環",
+              desc: "旧システムの保守費用は据え置き、ガバメントクラウド利用料との二重負担が発生。移行が遅れるほどベンダー側の対応要員も減少し、移行コストがさらに膨らむ。",
+              severity: "高",
+            },
+            {
+              icon: "📰",
+              title: "説明責任・評判リスク",
+              desc: "議会・住民への説明責任が発生。「デジタル化の遅れた自治体」として報道対象になり、移住・企業誘致の際の評判にも影響する。",
+              severity: "低",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-lg p-3 flex items-start gap-3"
+              style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
+            >
+              <span className="text-lg leading-none flex-shrink-0">{item.icon}</span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
+                    {item.title}
+                  </p>
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0"
+                    style={{
+                      backgroundColor: item.severity === "高" ? "#dc2626" : item.severity === "中" ? "#d97706" : "#6b7280",
+                      color: "#fff",
+                    }}
+                  >
+                    影響度: {item.severity}
+                  </span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "#7f1d1d" }}>
+                  {item.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+          ※ 標準化法は「努力義務」であり、直接的な罰則規定はありません。ただし特定移行支援システム認定を受けずに期限を超過した場合、上記のリスクが現実化する可能性が高まります。
+        </p>
       </div>
 
       {/* 特定移行案内 */}

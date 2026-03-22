@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     "自治体比較｜複数団体のサイドバイサイド比較 | ガバメントクラウド移行状況ダッシュボード",
   description:
     "最大4つの自治体を選択し、進捗率・業務別完了状況・基本情報を一覧比較。レーダーチャートで多角的な分析が可能。",
+  alternates: { canonical: "/compare" },
 };
 
 export default function ComparePage() {

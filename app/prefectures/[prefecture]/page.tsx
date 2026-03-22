@@ -48,6 +48,7 @@ export async function generateMetadata({
   return {
     title: `${name}のガバメントクラウド移行進捗 | GCInsight`,
     description: `${name}の全市区町村のガバメントクラウド移行進捗状況。${rate ? `平均完了率${rate}%。` : ""}業務別の詳細データ付き。`,
+    alternates: { canonical: `/prefectures/${encodeURIComponent(name)}` },
     openGraph: {
       title: `${name} — ガバメントクラウド移行進捗`,
       description: rate

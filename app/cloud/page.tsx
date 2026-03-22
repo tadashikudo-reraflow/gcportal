@@ -7,6 +7,7 @@ import { PAGE_SOURCES } from "@/lib/sources";
 export const metadata: Metadata = {
   title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| ガバメントクラウド移行状況ダッシュボード",
   description: "ガバメントクラウドのインフラシェア（AWS 97%・Azure・GCP・OCI）とコスト指標を分析。自治体が選ぶべきクラウド基盤と認定状況を可視化。",
+  alternates: { canonical: "/cloud" },
 };
 
 // ガバクラ インフラシェア実績（デジタル庁 先行事業調査 令和6年9月）

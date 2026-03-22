@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title:
     "ガバメントクラウド移行状況ダッシュボード｜全国1,741自治体の進捗をリアルタイム可視化",
   description: `全国平均完了率${avgRate}%。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
+  alternates: { canonical: "/" },
   openGraph: {
     title: "GCInsight — 全国ガバメントクラウド移行ダッシュボード",
     description: `全国平均完了率${avgRate}%。1,741自治体の移行進捗をリアルタイム可視化。`,
