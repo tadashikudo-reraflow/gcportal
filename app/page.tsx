@@ -6,6 +6,7 @@ import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import MigrationResultBanner from "@/components/MigrationResultBanner";
 import PrefectureHeatmap from "@/components/PrefectureHeatmap";
+import JapanMap from "@/components/JapanMap";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
@@ -321,8 +322,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 都道府県ヒートマップ */}
-      <PrefectureHeatmap prefectures={prefectures} />
+      {/* 日本地図ヒートマップ */}
+      <JapanMap prefectures={prefectures} />
 
       {/* ④ 都道府県別ランキングテーブル */}
       <div className="card p-6">
