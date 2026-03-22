@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import data from "@/public/data/standardization.json";
+import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { PrefectureSummary } from "@/lib/types";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
@@ -37,6 +38,12 @@ function formatRate(rate: number): string {
 }
 
 export default function PrefecturesPage() {
+  // 特定移行認定の都道府県別カウント
+  const tokuteiByPref = new Map<string, number>();
+  for (const m of tokuteiData.municipalities as { prefecture: string; city: string }[]) {
+    tokuteiByPref.set(m.prefecture, (tokuteiByPref.get(m.prefecture) ?? 0) + 1);
+  }
+
   // 完了率の低い順に並べる（昇順）
   const sortedPrefectures: PrefectureSummary[] = [...data.prefectures].sort(
     (a, b) => a.avg_rate - b.avg_rate
@@ -73,6 +80,9 @@ export default function PrefecturesPage() {
                 </th>
                 <th className="text-right py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   危機数
+                </th>
+                <th className="text-right py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
+                  特定移行
                 </th>
                 <th className="text-center py-3 px-3 text-xs font-medium" style={{ color: "#ffffff" }}>
                   ステータス
@@ -139,6 +149,21 @@ export default function PrefecturesPage() {
                       >
                         {pref.critical}
                       </span>
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      {(() => {
+                        const tokuteiCount = tokuteiByPref.get(pref.prefecture) ?? 0;
+                        return (
+                          <span
+                            style={{
+                              color: tokuteiCount > 0 ? "#7c3aed" : "#9ca3af",
+                              fontWeight: tokuteiCount > 0 ? 700 : 400,
+                            }}
+                          >
+                            {tokuteiCount}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="py-3 px-3 text-center">
                       <span

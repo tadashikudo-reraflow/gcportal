@@ -362,6 +362,7 @@ export const PAGE_SOURCES: Record<string, string[]> = {
   tokutei:   ["digital-cho-tokutei"],
   businesses: ["soumu-progress-excel"],
   prefectures: ["soumu-progress-excel"],
+  timeline:  ["digital-cho-standardization", "digital-cho-govcloud", "soumu-dx", "cas-digital-gyozai"],
   sources:   [],
 };
 

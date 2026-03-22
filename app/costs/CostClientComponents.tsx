@@ -91,31 +91,34 @@ export function ExpandableMuniRow({
           <td colSpan={9} className="px-4 py-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
-                <p className="font-semibold text-gray-600 mb-1">コスト内訳（推定）</p>
+                <p className="font-semibold text-gray-600 mb-1">コスト内訳（典型構成比）</p>
                 <table className="w-full">
                   <tbody>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">運用費（IaaS利用料）</td>
-                      <td className="py-1 text-right font-medium text-gray-700">調査中</td>
+                      <td className="py-1 text-gray-500">クラウド利用料（IaaS）</td>
+                      <td className="py-1 text-right font-medium text-gray-700">約25〜35%</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">回線費（接続・ネットワーク）</td>
-                      <td className="py-1 text-right font-medium text-gray-700">調査中</td>
+                      <td className="py-1 text-gray-500">ソフトウェア借料（SaaS/ライセンス）</td>
+                      <td className="py-1 text-right font-medium text-gray-700">約30〜40%</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">移行費（データ移行・設定）</td>
-                      <td className="py-1 text-right font-medium text-gray-700">調査中</td>
+                      <td className="py-1 text-gray-500">回線費（閉域網・VPN）</td>
+                      <td className="py-1 text-right font-medium text-gray-700">約10〜15%</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">カスタマイズ費</td>
-                      <td className="py-1 text-right font-medium text-gray-700">調査中</td>
+                      <td className="py-1 text-gray-500">移行・構築費（初年度）</td>
+                      <td className="py-1 text-right font-medium text-gray-700">約10〜20%</td>
                     </tr>
                     <tr>
                       <td className="py-1 text-gray-500">保守・運用支援費</td>
-                      <td className="py-1 text-right font-medium text-gray-700">調査中</td>
+                      <td className="py-1 text-right font-medium text-gray-700">約10〜15%</td>
                     </tr>
                   </tbody>
                 </table>
+                <p className="text-gray-400 mt-1" style={{ fontSize: "9px" }}>
+                  出典: デジタル庁先行事業TCO検証・中核市市長会調査より典型構成
+                </p>
               </div>
               <div>
                 <p className="font-semibold text-gray-600 mb-1">ベンダー情報</p>
@@ -282,25 +285,32 @@ export function ExpandableCostCard({
       )}
       {open && (
         <div className="mt-3 pt-3 border-t border-gray-200/60">
-          <p className="text-xs font-semibold text-gray-600 mb-2">コスト内訳</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <p className="text-xs font-semibold text-gray-600 mb-2">コスト構成（典型比率）</p>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
             <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">運用費</p>
-              <p className="font-medium text-gray-600">調査中</p>
+              <p className="text-gray-400">クラウド利用料</p>
+              <p className="font-medium text-gray-600">25〜35%</p>
+            </div>
+            <div className="bg-white/80 rounded p-2 border border-gray-100">
+              <p className="text-gray-400">SW借料</p>
+              <p className="font-medium text-gray-600">30〜40%</p>
             </div>
             <div className="bg-white/80 rounded p-2 border border-gray-100">
               <p className="text-gray-400">回線費</p>
-              <p className="font-medium text-gray-600">調査中</p>
+              <p className="font-medium text-gray-600">10〜15%</p>
             </div>
             <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">移行費</p>
-              <p className="font-medium text-gray-600">調査中</p>
+              <p className="text-gray-400">移行・構築費</p>
+              <p className="font-medium text-gray-600">10〜20%</p>
             </div>
             <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">カスタマイズ費</p>
-              <p className="font-medium text-gray-600">調査中</p>
+              <p className="text-gray-400">保守・運用</p>
+              <p className="font-medium text-gray-600">10〜15%</p>
             </div>
           </div>
+          <p className="text-gray-400 mt-1" style={{ fontSize: "9px" }}>
+            出典: デジタル庁先行事業TCO検証・中核市市長会調査より典型構成比
+          </p>
         </div>
       )}
     </div>

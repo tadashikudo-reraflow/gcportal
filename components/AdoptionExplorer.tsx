@@ -81,6 +81,14 @@ const SIZE_ORDER: SizeCategory[] = [
   "その他の市区町村",
 ];
 
+// 標準化対象20業務（デジタル庁定義）
+const STANDARD_20_BUSINESSES = [
+  "住民記録", "選挙人名簿管理", "固定資産税", "個人住民税", "法人住民税",
+  "軽自動車税", "就学", "国民年金", "国民健康保険", "後期高齢者医療",
+  "介護保険", "障害者福祉", "生活保護", "健康管理", "児童手当",
+  "児童扶養手当", "子ども・子育て支援", "戸籍", "戸籍附票", "印鑑登録",
+] as const;
+
 const CLOUD_COLORS: Record<string, { bg: string; text: string }> = {
   AWS:    { bg: "#ff9900", text: "#fff" },
   GCP:    { bg: "#1a73e8", text: "#fff" },
@@ -283,6 +291,22 @@ export default function AdoptionExplorer({
       .sort((a, b) => a.business.localeCompare(b.business));
   }, [filteredRows]);
 
+  // 20業務カバレッジ分析
+  const businessCoverage = useMemo(() => {
+    const bizMuniMap = new Map<string, Set<string>>();
+    for (const row of filteredRows) {
+      const biz = row.business ?? "";
+      const city = row.municipalities?.city ?? "";
+      if (!biz || !city) continue;
+      if (!bizMuniMap.has(biz)) bizMuniMap.set(biz, new Set());
+      bizMuniMap.get(biz)!.add(city);
+    }
+    return STANDARD_20_BUSINESSES.map((biz) => {
+      const munis = bizMuniMap.get(biz);
+      return { business: biz, count: munis?.size ?? 0 };
+    });
+  }, [filteredRows]);
+
   // Toggle helpers
   const toggleCategory = (cat: string) => {
     setExpandedCategories((prev) => {
@@ -390,6 +414,59 @@ export default function AdoptionExplorer({
           <p className="text-3xl font-bold text-gray-800">{uniqueVendorCount}</p>
           <p className="text-xs text-gray-500 mt-1">対応ベンダー</p>
         </div>
+      </div>
+
+      {/* データカバレッジ */}
+      <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+        <h3 className="text-sm font-bold text-gray-800 mb-1">データカバレッジ</h3>
+        <p className="text-xs text-gray-400 mb-3">
+          全国1,741自治体のうち {uniqueMuniCount} 自治体の導入情報を収集済み（{((uniqueMuniCount / 1741) * 100).toFixed(1)}%）
+        </p>
+        {/* 全体カバレッジバー */}
+        <div className="relative h-4 rounded-full overflow-hidden bg-gray-100 mb-4">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{
+              width: `${Math.min((uniqueMuniCount / 1741) * 100, 100)}%`,
+              backgroundColor: "#002D72",
+            }}
+          />
+          <span className="absolute right-2 top-0 bottom-0 flex items-center text-[10px] font-bold text-gray-500">
+            {uniqueMuniCount} / 1,741
+          </span>
+        </div>
+
+        {/* 20業務別カバレッジ */}
+        <h4 className="text-xs font-semibold text-gray-600 mb-2">標準化対象20業務 カバー率</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {businessCoverage.map((biz) => {
+            const pct = uniqueMuniCount > 0 ? (biz.count / uniqueMuniCount) * 100 : 0;
+            return (
+              <div key={biz.business} className="border border-gray-100 rounded-lg p-2">
+                <p className="text-[11px] font-medium text-gray-700 truncate" title={biz.business}>
+                  {biz.business}
+                </p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${Math.min(pct, 100)}%`,
+                        backgroundColor: biz.count > 0 ? "#002D72" : "#d1d5db",
+                      }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-gray-500 tabular-nums w-8 text-right">
+                    {biz.count > 0 ? `${biz.count}件` : "—"}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-[10px] text-gray-400 mt-2">
+          ※ 上記は調査済み自治体における各業務の導入情報件数。未調査自治体は含みません。
+        </p>
       </div>
 
       {filteredRows.length === 0 && (

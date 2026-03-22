@@ -14,12 +14,11 @@ const NAV_ITEMS = [
   { href: "/costs",        label: "コスト効果",     short: "コスト" },
   { href: "/cloud",        label: "クラウド基盤",   short: "Cloud"  },
   { href: "/benchmark",   label: "ベンチマーク",   short: "比較"   },
-  { href: "/timeline",    label: "タイムライン",   short: "推移"   },
+  { href: "/timeline",    label: "スケジュール",   short: "日程"   },
   { href: "/compare",     label: "自治体比較",     short: "比較2"  },
   { href: "/report",      label: "無料レポート",   short: "PDF"    },
   { href: "/articles",     label: "コラム・解説",   short: "記事"   },
-  { href: "/tracker",      label: "移行トラッカー", short: "Tracker" },
-  { href: "/sources",      label: "参照サイト",     short: "出典"   },
+{ href: "/sources",      label: "参照サイト",     short: "出典"   },
 ] as const;
 
 export default function NavBar() {

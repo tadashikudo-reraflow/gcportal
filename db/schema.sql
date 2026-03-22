@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS packages (
   vendor_id INTEGER REFERENCES vendors(id),
   package_name TEXT NOT NULL,
   business TEXT NOT NULL,
+  cloud_platform TEXT,
   exemption_number TEXT,
   confirmed_date DATE,
   notes TEXT
@@ -70,5 +71,6 @@ CREATE TABLE IF NOT EXISTS municipality_packages (
 CREATE INDEX IF NOT EXISTS idx_muni_pref ON municipalities(prefecture);
 CREATE INDEX IF NOT EXISTS idx_pkg_vendor ON packages(vendor_id);
 CREATE INDEX IF NOT EXISTS idx_pkg_business ON packages(business);
+CREATE INDEX IF NOT EXISTS idx_pkg_cloud ON packages(cloud_platform);
 CREATE INDEX IF NOT EXISTS idx_progress_muni ON municipality_progress(municipality_id);
 CREATE INDEX IF NOT EXISTS idx_cost_muni ON cost_reports(municipality_id);

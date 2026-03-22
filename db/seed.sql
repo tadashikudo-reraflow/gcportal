@@ -1,8 +1,8 @@
 -- ベンダーマスタ初期データ
 INSERT INTO vendors (name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count, notes) VALUES
 ('株式会社ＴＫＣ',        'TKC',   'AWS',   true,  true,  170, '164自治体が2026/2時点で移行完了。マルチテナント方式'),
-('日本電気株式会社',       'NEC',   'OCI',   true,  false, null, 'GPRIME=OCI（2024/10 PR確認）。COKAS-Rのクラウドは要確認'),
-('富士通Japan株式会社',    '富士通', 'Azure', false, false, 300, '約300自治体担当。移行遅延で期限内完了不可を通知。AzureはGC外の可能性あり'),
+('日本電気株式会社',       'NEC',   'AWS',   true,  false, null, 'COKAS系=AWS、GPRIME行政経営=OCI（2024/10 NEC×Oracle発表）。パッケージ単位でcloud_platform管理'),
+('富士通Japan株式会社',    '富士通', 'AWS',   true,  false, 300, '約300自治体担当。移行遅延で期限内完了不可を通知。MICJET/MCWEL全パッケージAWS稼働'),
 ('株式会社日立システムズ', '日立',  null,    false, false, null, 'ADWORLD等。クラウド基盤未確認'),
 ('行政システム株式会社',   '行政S', null,    false, false, null, null),
 ('京都府自治体情報化推進協議会', '京都GIS', null, false, true, null, '共同利用型'),

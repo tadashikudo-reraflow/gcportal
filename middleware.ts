@@ -5,8 +5,9 @@ import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // /api/scrape/* を保護（CRON_SECRET or JWT）
-  if (pathname.startsWith("/api/scrape")) {
+  // /api/scrape/* と /api/schedule/*（POST系）を保護（CRON_SECRET or JWT）
+  if (pathname.startsWith("/api/scrape") ||
+      (pathname.startsWith("/api/schedule") && request.method !== "GET")) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
     const cronSecret = request.headers.get("x-cron-secret");
     const expectedCron = process.env.CRON_SECRET;
@@ -35,5 +36,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/scrape/:path*"],
+  matcher: ["/admin/:path*", "/api/scrape/:path*", "/api/schedule/:path*"],
 };

@@ -231,3 +231,19 @@ INSERT INTO packages (vendor_id, package_name, business, exemption_number, confi
   ((SELECT id FROM vendors WHERE name='株式会社ＴＫＣ' LIMIT 1), 'ＴＡＳＫクラウドシステム', '統合滞納管理', '037_5060001002844_1', '2025-10-29'),
   ((SELECT id FROM vendors WHERE name='行政システム株式会社' LIMIT 1), 'Probono住民情報', '統合収納管理', '036_1012801000382_1', '2025-10-29')
 ON CONFLICT DO NOTHING;
+
+-- vendors.cloud_platform をデフォルトとして packages に継承
+UPDATE packages
+SET cloud_platform = v.cloud_platform
+FROM vendors v
+WHERE packages.vendor_id = v.id
+  AND v.cloud_platform IS NOT NULL
+  AND packages.cloud_platform IS NULL;
+
+-- NEC GPRIME系のみ OCI に上書き（COKAS系はAWSのまま）
+UPDATE packages
+SET cloud_platform = 'OCI'
+FROM vendors v
+WHERE packages.vendor_id = v.id
+  AND v.short_name = 'NEC'
+  AND packages.package_name LIKE 'GPRIME%';

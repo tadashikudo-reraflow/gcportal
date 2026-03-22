@@ -21,7 +21,7 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   RKKCS: {
     ratioMin: 1.0, ratioMax: 1.5, ratioTypical: 1.2,
     mark: "◎", markColor: "#007a3d", cloud: "OCI",
-    note: "OCI基盤。Oracle DB親和性でライセンスコスト削減可能。比較的低コスト。",
+    note: "OCI基盤。シンプルな価格体系・Egress 10TB/月無料・OCPU課金で利用料自体が安価。Oracle DB利用時はライセンス込みでさらに有利。",
   },
   富士通: {
     ratioMin: 1.5, ratioMax: 3.0, ratioTypical: 2.0,
@@ -116,9 +116,9 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
     mark: "△", markColor: "#d97706", cloud: "AWS", confirmed: true,
   },
   RKKCS: {
-    label: "コスト低○",
-    detail: "OCI採用。Oracle DB親和性でライセンスコスト削減可能（RKKCS公式）",
-    mark: "○", markColor: "#1d6fa4", cloud: "OCI", confirmed: true,
+    label: "コスト効率◎",
+    detail: "OCI採用。シンプルな価格体系・Egress無料枠大・OCPU課金で利用料自体が安価。Oracle DB利用時はライセンス込みでさらに有利（RKKCS公式）",
+    mark: "◎", markColor: "#007a3d", cloud: "OCI", confirmed: true,
   },
   日立: {
     label: "AWS全業務対応○",
@@ -198,10 +198,10 @@ const CLOUD_COMPARISON = [
     cloud: "OCI",
     color: "#F80000",
     index: 55,
-    basis: "Compute OCPU + Autonomous DB（Oracle DBライセンス込み）。Egress月10TB無料。Oracle DB利用時はAWS上のBYOLより大幅安価。",
-    strengths: "Oracle DB利用時のライセンスコスト大幅削減。ネットワーク転送10TB/月無料。シンプルな価格体系。",
-    weaknesses: "サービスラインナップがAWS/Azureに比べ限定的。エコシステムの規模。",
-    govCloudNote: "RKKCS・GCC等が採用。Oracle DB依存システムでTCO優位。日本オラクルが自治体向け支援強化中。",
+    basis: "Compute OCPU + Autonomous DB。Egress月10TB無料（AWSは100GBで課金開始）。OCPU課金はvCPU換算で安価。Oracle DB利用時はライセンス込みでさらに有利。",
+    strengths: "シンプルな価格体系で利用料自体が安価。Egress 10TB/月無料。OCPU課金がvCPU比で低コスト。Oracle DB利用時はライセンス込みでTCO大幅削減。",
+    weaknesses: "サービスラインナップがAWS/Azureに比べ限定的。エコシステムの規模。非Oracle DBワークロードでの優位性は限定的。",
+    govCloudNote: "RKKCS・GCC等が採用。Oracle DB依存に限らず、シンプルな料金体系を評価して選定する自治体も。日本オラクルが自治体向け支援強化中。",
   },
   {
     cloud: "さくらのクラウド",
@@ -375,32 +375,32 @@ export default async function CostsPage() {
 
         {/* 数直線ゲージ */}
         <div className="relative px-2 mb-2">
-          {/* ラベル行 */}
-          <div className="relative h-20 mb-1">
-            {/* 目標マーカー */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${targetPos}%`, transform: "translateX(-50%)" }}>
-              <span className="text-xs font-bold text-green-700 whitespace-nowrap">目標</span>
-              <span className="text-lg font-extrabold text-green-700">−30%</span>
-              <div className="w-0.5 h-3 bg-green-600" />
+          {/* ラベル行 — 上段と下段に分散して文字被りを回避 */}
+          <div className="relative h-24 mb-1">
+            {/* 目標マーカー（上段） */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${targetPos}%`, transform: "translateX(-50%)", top: 0 }}>
+              <span className="text-[10px] font-bold text-green-700 whitespace-nowrap">目標</span>
+              <span className="text-sm font-extrabold text-green-700">−30%</span>
+              <div className="w-0.5 h-6 bg-green-600" />
             </div>
-            {/* 0% = 現行運用経費 基準マーカー */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${zeroPos}%`, transform: "translateX(-50%)", top: 4 }}>
-              <span className="text-xs font-bold text-gray-600 whitespace-nowrap px-1.5 py-0.5 rounded" style={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}>
-                0% = 現行運用経費
+            {/* 0% = 現行運用経費 基準マーカー（下段） */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${zeroPos}%`, transform: "translateX(-50%)", top: 28 }}>
+              <span className="text-[10px] font-bold text-gray-600 whitespace-nowrap px-1 py-0.5 rounded" style={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}>
+                0%基準
               </span>
-              <div className="w-0.5 h-6 bg-gray-500 mt-0.5" />
+              <div className="w-0.5 h-5 bg-gray-500 mt-0.5" />
             </div>
-            {/* 実態平均マーカー */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${avgPos}%`, transform: "translateX(-50%)" }}>
-              <span className="text-xs font-bold text-red-600 whitespace-nowrap">実態平均</span>
-              <span className="text-lg font-extrabold text-red-600">+{avgPct}%</span>
-              <div className="w-0.5 h-3 bg-red-500" />
+            {/* 実態平均マーカー（上段） */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${avgPos}%`, transform: "translateX(-50%)", top: 0 }}>
+              <span className="text-[10px] font-bold text-red-600 whitespace-nowrap">実態平均</span>
+              <span className="text-sm font-extrabold text-red-600">+{avgPct}%</span>
+              <div className="w-0.5 h-6 bg-red-500" />
             </div>
-            {/* 最悪事例マーカー */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${worstPos}%`, transform: "translateX(-50%)" }}>
-              <span className="text-xs font-bold text-red-800 whitespace-nowrap">最悪</span>
-              <span className="text-lg font-extrabold text-red-800">+{worstPct}%</span>
-              <div className="w-0.5 h-3 bg-red-800" />
+            {/* 最悪事例マーカー（下段） */}
+            <div className="absolute flex flex-col items-center" style={{ left: `${worstPos}%`, transform: "translateX(-50%)", top: 28 }}>
+              <span className="text-[10px] font-bold text-red-800 whitespace-nowrap">最悪</span>
+              <span className="text-sm font-extrabold text-red-800">+{worstPct}%</span>
+              <div className="w-0.5 h-5 bg-red-800" />
             </div>
           </div>
 

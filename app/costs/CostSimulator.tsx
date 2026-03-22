@@ -89,9 +89,19 @@ export default function CostSimulator() {
         <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-brand-accent)" }} />
         コストシミュレーター
       </h2>
-      <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+      <p className="text-xs mb-2" style={{ color: "var(--color-text-muted)" }}>
         自治体の人口規模とベンダーを選択して、ガバメントクラウド移行後の推定コストレンジを確認できます。
       </p>
+      <div className="text-[10px] leading-relaxed mb-4 p-2.5 rounded-md" style={{ backgroundColor: "#f8fafc", color: "var(--color-text-muted)" }}>
+        <p className="font-semibold mb-1">算出根拠：</p>
+        <ul className="list-disc pl-4 space-y-0.5">
+          <li>デジタル庁「先行事業TCO検証」（令和5年度報告）のベンダー別コスト比率</li>
+          <li>中核市市長会「ガバメントクラウド移行に伴うコスト調査」（令和6年度）</li>
+          <li>総務省「地方財政状況調査」の情報システム経費データ</li>
+          <li>各ベンダーの公開料金体系から人口帯別にレンジを推定</li>
+        </ul>
+        <p className="mt-1">※ 実際のコストは契約条件・既存システム構成・移行方式により大きく異なります。参考値としてご利用ください。</p>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
         <div>

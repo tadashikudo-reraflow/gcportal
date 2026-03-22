@@ -1,0 +1,305 @@
+{
+  "last_updated": "2026-03-22",
+  "annual_schedule": [
+    {
+      "quarter": "Q1（4-6月）",
+      "events": [
+        "ガバクラ継続利用割引込タイミング（AWS）",
+        "標準化基準令施行",
+        "介護情報基盤データ連携開始（先行自治体）",
+        "ガバメントクラウド利用権付与兼債務引受契約",
+        "R8年度ガバクラ運用開始",
+        "PMOツール上期中間報告"
+      ]
+    },
+    {
+      "quarter": "Q2（7-9月）",
+      "events": [
+        "標準化対応状況フォローアップ調査（総務省）",
+        "デジタル庁予算概算要求",
+        "ガバクラ利用料中間精算",
+        "自治体DX推進計画改定期限"
+      ]
+    },
+    {
+      "quarter": "Q3（10-12月）",
+      "events": [
+        "PMOツールダッシュボード更新（9月末時点）",
+        "ガバクラ次期契約に向けた事業者協議",
+        "標準仕様書改定（秋期リリース）",
+        "デジタル田園都市国家構想交付金申請"
+      ]
+    },
+    {
+      "quarter": "Q4（1-3月）",
+      "events": [
+        "PMOツールダッシュボード更新（12月末時点）",
+        "標準仕様書改定（春期リリース）",
+        "データ要件・連携要件標準仕様書改定",
+        "デジタル基盤改革支援補助金交付決定",
+        "R9年度ガバクラ契約先決定",
+        "GCASダッシュボード更新",
+        "次年度予算成立"
+      ]
+    }
+  ],
+  "recent_schedule": [
+    {
+      "date": "2026-03-04",
+      "status": "done",
+      "title": "事業者協議会（行政事務標準文字への文字追加等）",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-03-09",
+      "status": "done",
+      "title": "ガバクラのSP/RI予約解放",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-10",
+      "status": "done",
+      "title": "自治体向け行政事務標準文字への文字追加に係る説明会",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-03-11",
+      "status": "done",
+      "title": "PMOツールダッシュボード更新（2月末時点）【40.9%→52.3%】",
+      "org": "総務省",
+      "url": "https://www.soumu.go.jp/denshijiti/index_00001.html"
+    },
+    {
+      "date": "2026-03-11",
+      "status": "done",
+      "title": "標準化基準のパブコメ",
+      "org": "厚労省",
+      "url": "https://www.mhlw.go.jp/"
+    },
+    {
+      "date": "2026-03-12",
+      "status": "done",
+      "title": "給付付き税額控除等に関する実務者会議（第１回）",
+      "org": "政府"
+    },
+    {
+      "date": "2026-03-13",
+      "status": "done",
+      "title": "衆議院予算通過",
+      "org": "国会"
+    },
+    {
+      "date": "2026-03-17",
+      "status": "done",
+      "title": "標準仕様書改定（介護保険）",
+      "org": "厚生労働省",
+      "important": true,
+      "url": "https://www.mhlw.go.jp/"
+    },
+    {
+      "date": "2026-03-18",
+      "status": "done",
+      "title": "データ要件・連携要件標準仕様書改定 全体バージョン10.1",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-03-18",
+      "status": "done",
+      "title": "ガバメントクラウドの利用等に関する説明会",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-19",
+      "status": "done",
+      "title": "運用最適化及び活用に係る検討・検証事業 第一回公募締め切り",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-23",
+      "status": "upcoming",
+      "title": "医療保険者等向け中間サーバーのオン資黒丸表示問題対応",
+      "org": "厚生労働省",
+      "url": "https://www.mhlw.go.jp/"
+    },
+    {
+      "date": "2026-03-24",
+      "status": "upcoming",
+      "title": "第16次地方分権一括法案（閣議決定）",
+      "org": "閣議",
+      "note": "日程未確定"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "R8ガバクラ契約先決定",
+      "org": "デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "インフラモダン化実践ガイドの公開",
+      "org": "デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "アプリケーションモダン化実践ガイドの公開",
+      "org": "デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "Gビズポータル版リリース",
+      "org": "デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "R8ガバクラ契約",
+      "org": "デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "標準化基準令公布",
+      "org": "制度所管省庁・デジタル庁",
+      "note": "3月下旬予定",
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-03-25",
+      "status": "upcoming",
+      "title": "暫定予算成立",
+      "org": "国会",
+      "note": "3月下旬予定"
+    },
+    {
+      "date": "2026-03-27",
+      "status": "upcoming",
+      "title": "地方公共団体情報セキュリティポリシーに関するガイドライン改定",
+      "org": "総務省",
+      "url": "https://www.soumu.go.jp/main_sosiki/jichi_gyousei/c-gyousei/lg-cloud/"
+    },
+    {
+      "date": "2026-03-27",
+      "status": "upcoming",
+      "title": "デジタル基盤改革支援補助金交付の決定",
+      "org": "J-LIS",
+      "url": "https://www.j-lis.go.jp/"
+    },
+    {
+      "date": "2026-03-31",
+      "status": "upcoming",
+      "title": "GCASコストダッシュボード正式版",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-31",
+      "status": "upcoming",
+      "title": "GCASセキュリティダッシュボード",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-31",
+      "status": "upcoming",
+      "title": "ガバメントクラウドにおける開発環境提供",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-31",
+      "status": "upcoming",
+      "title": "行政標準文字への登記統一文字統合",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-04-01",
+      "status": "upcoming",
+      "title": "ガバクラ継続利用割引込タイミング（AWS）9:00-10:00",
+      "org": "AWS",
+      "important": true,
+      "url": "https://aws.amazon.com/jp/government-education/worldwide/japan/gov-cloud-advisory-site/"
+    },
+    {
+      "date": "2026-04-01",
+      "status": "upcoming",
+      "title": "標準化基準令施行",
+      "org": "制度所管省庁・デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/local_governments"
+    },
+    {
+      "date": "2026-04-01",
+      "status": "upcoming",
+      "title": "介護情報基盤データ連携開始（先行自治体）",
+      "org": "厚生労働省",
+      "url": "https://www.mhlw.go.jp/"
+    },
+    {
+      "date": "2026-04-01",
+      "status": "upcoming",
+      "title": "ガバメントクラウド利用権付与兼債務引受契約（自治体or共同利用ベンダ）",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    }
+  ],
+  "source_pages": [
+    {
+      "id": "digital-cho-news",
+      "name": "デジタル庁 新着情報",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/news",
+      "description": "デジタル庁の最新ニュース・お知らせ。会議・説明会・仕様書公開等のスケジュール情報源。"
+    },
+    {
+      "id": "digital-cho-standardization",
+      "name": "地方公共団体の基幹業務システムの統一・標準化",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/local_governments",
+      "description": "標準仕様書改定・事業者協議会・データ要件等の公式スケジュール掲載元。"
+    },
+    {
+      "id": "digital-cho-govcloud",
+      "name": "ガバメントクラウド",
+      "org": "デジタル庁",
+      "url": "https://www.digital.go.jp/policies/gov_cloud",
+      "description": "ガバクラ契約・GCAS・クラウド基盤関連の説明会・公募情報。"
+    },
+    {
+      "id": "soumu-dx",
+      "name": "自治体DX推進",
+      "org": "総務省",
+      "url": "https://www.soumu.go.jp/denshijiti/index_00001.html",
+      "description": "PMOツール更新・補助金交付・進捗調査等のスケジュール情報源。"
+    },
+    {
+      "id": "cas-digital-gyozai",
+      "name": "デジタル行財政改革",
+      "org": "内閣官房",
+      "url": "https://www.cas.go.jp/jp/seisaku/digital_gyozaikaikaku/",
+      "description": "共通WT資料・コスト分析等の会議日程。"
+    }
+  ]
+}

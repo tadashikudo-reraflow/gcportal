@@ -15,6 +15,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "新規追加", href: "/admin/articles/new", icon: "&#9999;&#65039;" },
   { label: "カテゴリー", href: "/admin/categories", icon: "&#128193;" },
   { label: "ドキュメント", href: "/admin/documents", icon: "&#128218;" },
+  { label: "スケジュール", href: "/admin/schedule", icon: "&#128197;" },
   { label: "データ収集", href: "/admin/scrape", icon: "&#128269;" },
   { label: "ジョブ管理", href: "/admin/scrape/jobs", icon: "&#9881;" },
   { label: "設定", href: "/admin/settings", icon: "&#128295;" },

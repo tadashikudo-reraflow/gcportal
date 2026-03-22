@@ -59,11 +59,20 @@ export default async function AdoptionPage() {
       <SourceAttribution sourceIds={PAGE_SOURCES.adoption} pageId="adoption" />
 
       {/* 注記 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
         <p className="text-xs text-blue-700">
-          <strong>データについて：</strong>
-          このページのデータは、各ベンダーのプレスリリース・各自治体の公開資料・議会議事録等を独自調査したものです。
-          順次精度向上・件数拡充を行っています。情報の訂正・追加はGitHubのIssueでご報告ください。
+          <strong>対象業務：</strong>
+          地方公共団体情報システムの標準化に関する法律で定める20業務（住民記録・戸籍・税務・福祉・国保・介護等）が対象です。
+        </p>
+        <p className="text-xs text-blue-700">
+          <strong>データソース：</strong>
+          各ベンダーのプレスリリース・各自治体の公開資料・議会議事録・予算書・調達情報等を独自調査したものです。
+          全1,741自治体の網羅を目指し順次拡充中です。
+        </p>
+        <p className="text-xs text-blue-700">
+          <strong>情報提供のお願い：</strong>
+          自治体職員・ベンダー関係者の方からの情報提供を歓迎します。
+          訂正・追加は <a href="https://github.com" className="underline font-semibold">GitHubのIssue</a> でご報告ください。
         </p>
       </div>
     </div>

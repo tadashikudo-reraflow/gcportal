@@ -1,5 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/tracker",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "crons": [
     {
       "path": "/api/scrape/process",
@@ -8,6 +15,10 @@
     {
       "path": "/api/snapshots",
       "schedule": "0 4 1 * *"
+    },
+    {
+      "path": "/api/schedule",
+      "schedule": "0 5 * * *"
     }
   ]
 }

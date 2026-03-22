@@ -62,8 +62,8 @@ def run():
             "completed":sum(1 for x in v if x>=1.0),"critical":sum(1 for x in v if x<0.5)}
             for p,v in sorted(pref_map.items())],
         "businesses": biz_summary,
-        "risk_municipalities": sorted([m for m in municipalities if m["overall_rate"] is not None and m["overall_rate"]<1.0],
-            key=lambda m:m["overall_rate"])[:100],
+        "risk_municipalities": sorted([m for m in municipalities if m["overall_rate"] is not None and m["overall_rate"]<0.5],
+            key=lambda m:m["overall_rate"]),
         "municipalities": municipalities,
     }
     with open(OUT_DIR/"standardization.json","w",encoding="utf-8") as f:
