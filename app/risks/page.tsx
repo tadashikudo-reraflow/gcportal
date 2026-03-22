@@ -117,10 +117,10 @@ export default function RisksPage() {
             <circle cx="12" cy="12" r="10"/>
           </svg>
           <span style={{ color: "#6d28d9" }}>
-            このリストからデジタル庁の<strong>特定移行支援システム認定 {tokuteiOverlapCount}自治体</strong>は除外しています。
-            特定移行団体は別途{" "}
+            完了率50%未満の自治体のうち<strong>{tokuteiOverlapCount}自治体</strong>は、デジタル庁の「特定移行支援システム」認定を受けており、移行期限の延長が認められています。
+            これらは通常の遅延とは異なるため本リストから除外し、{" "}
             <Link href="/tokutei" className="underline font-semibold">特定移行認定ページ</Link>
-            でご確認いただけます。
+            に掲載しています。
           </span>
         </div>
       )}
