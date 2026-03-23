@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import data from "@/public/data/standardization.json";
+import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality } from "@/lib/types";
 
 // SSG: 47都道府県分の静的パラメータを生成
@@ -94,6 +95,16 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
     (p) => p.prefecture === prefectureName
   );
 
+  // 特定移行認定自治体のSet
+  const tokuteiSet = new Set<string>(
+    (tokuteiData.municipalities as { prefecture: string; city: string }[]).map(
+      (m) => `${m.prefecture}/${m.city}`
+    )
+  );
+  const tokuteiCount = sortedMunicipalities.filter(
+    (m) => tokuteiSet.has(`${m.prefecture}/${m.city}`)
+  ).length;
+
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
@@ -123,7 +134,7 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
               {formatRate(prefSummary.avg_rate)}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              完了 {prefSummary.completed} / 危機 {prefSummary.critical}
+              完了 {prefSummary.completed} / 危機 {prefSummary.critical} / 特定移行 {tokuteiCount}
             </p>
           </div>
         )}
@@ -140,6 +151,9 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
                 </th>
                 <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium min-w-[160px]">
                   完了率
+                </th>
+                <th className="text-center py-3 px-2 text-xs text-gray-500 font-medium min-w-[40px]" title="特定移行認定">
+                  特定
                 </th>
                 {businessNames.map((biz) => (
                   <th
@@ -190,6 +204,17 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
                           {formatRate(rate)}
                         </span>
                       </div>
+                    </td>
+
+                    {/* 特定移行認定 */}
+                    <td className="py-2.5 px-2 text-center">
+                      {tokuteiSet.has(`${muni.prefecture}/${muni.city}`) ? (
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-purple-100 text-purple-700" title="特定移行認定済み">
+                          認定
+                        </span>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
                     </td>
 
                     {/* 業務別ミニバー */}
