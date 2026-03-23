@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { remark } from "remark";
+import remarkGfm from "remark-gfm";
+import remarkHtml from "remark-html";
 
 /**
  * POST /api/articles — 記事作成（gc-article Agent / 外部ツール用）
@@ -47,6 +50,13 @@ export async function POST(req: NextRequest) {
     serviceKey
   );
 
+  // Markdown → HTML 変換（API経由は常にMDを受け取りHTMLで保存）
+  const processed = await remark()
+    .use(remarkGfm)
+    .use(remarkHtml, { sanitize: false })
+    .process(content);
+  const contentHtml = processed.toString();
+
   // upsert: 同じslugがあれば更新、なければ新規作成
   const { data, error } = await supabase
     .from("articles")
@@ -55,7 +65,8 @@ export async function POST(req: NextRequest) {
         slug,
         title,
         description,
-        content,
+        content: contentHtml,
+        content_format: "html",
         date,
         tags,
         author,

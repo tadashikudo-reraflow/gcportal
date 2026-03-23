@@ -27,12 +27,15 @@ import { createClient } from "@supabase/supabase-js";
 
 /**
  * 記事MDの読み込み元:
- *   1. 環境変数 ARTICLES_DIR が設定されていればそちらを優先（Drive等の外部パス）
- *   2. 未設定なら従来通り content/articles/ をフォールバック
+ *   1. 環境変数 ARTICLES_DIR が設定されていればそちらを優先
+ *   2. 環境変数 GDRIVE_WORKSPACE があれば contents/PJ19/articles/ を使用
+ *   3. いずれも未設定なら content/articles/ をフォールバック
  */
 const ARTICLES_DIR =
   process.env.ARTICLES_DIR ??
-  path.join(process.cwd(), "content", "articles");
+  (process.env.GDRIVE_WORKSPACE
+    ? path.join(process.env.GDRIVE_WORKSPACE, "contents", "PJ19", "articles")
+    : path.join(process.cwd(), "content", "articles"));
 
 function parseArgs() {
   const args = process.argv.slice(2);

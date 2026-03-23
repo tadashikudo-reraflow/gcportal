@@ -64,7 +64,7 @@ export async function saveArticleAction(formData: FormData) {
   const sourcesRaw = formData.get("sources") as string | null;
   const sources = sourcesRaw ? JSON.parse(sourcesRaw) : [];
 
-  const payload = { slug, title, description, content, date, tags, author, is_published, sources };
+  const payload = { slug, title, description, content, content_format: "html", date, tags, author, is_published, sources };
 
   if (id) {
     await supabase.from("articles").update(payload).eq("id", id);

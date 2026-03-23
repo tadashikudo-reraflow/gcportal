@@ -1,7 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { remark } from "remark";
-import remarkGfm from "remark-gfm";
-import remarkHtml from "remark-html";
 
 /** 公開データ読み取り用（anon key = RLS適用） */
 function getSupabase() {
@@ -122,11 +119,6 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 
   if (!data) return null;
 
-  const processed = await remark()
-    .use(remarkGfm)
-    .use(remarkHtml, { sanitize: true })
-    .process(data.content ?? "");
-
   return {
     slug: data.slug,
     title: data.title ?? data.slug,
@@ -135,7 +127,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     tags: data.tags ?? [],
     author: data.author,
     coverImage: data.cover_image,
-    contentHtml: processed.toString(),
+    contentHtml: data.content ?? "",
     sources: data.sources ?? [],
   };
 }

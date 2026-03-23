@@ -184,9 +184,9 @@ coverImage: "/images/articles/{slug}.webp"
 
 80点未満の場合は不足項目を自動修正してから次へ。
 
-### Step 7: Markdown保存
+### Step 7: Markdown保存（Drive格納）
 
-`content/articles/{slug}.md` に frontmatter 付きで保存:
+`$GDRIVE_WORKSPACE/contents/PJ19/articles/{slug}.md` に frontmatter 付きで保存:
 
 ```yaml
 ---
@@ -197,6 +197,40 @@ tags: ["タグ1", "タグ2", "タグ3"]
 author: "GovCloud Insight編集部"
 coverImage: "/images/articles/{slug}.webp"
 ---
+```
+
+### Step 7.5: DB投入（API経由）
+
+Markdown保存後、APIでSupabase DBに投入する。APIがMD→HTML変換を自動実行する。
+
+```bash
+curl -s -X POST https://gcinsight.jp/api/articles \
+  -H "Authorization: Bearer $ADMIN_PASSWORD" \
+  -H "Content-Type: application/json" \
+  -d @- <<EOF
+{
+  "slug": "{slug}",
+  "title": "{frontmatter.title}",
+  "description": "{frontmatter.description}",
+  "content": "{Markdown本文（frontmatter除く）}",
+  "date": "{frontmatter.date}",
+  "tags": {frontmatter.tags},
+  "author": "{frontmatter.author}",
+  "cover_image": "{frontmatter.coverImage}",
+  "sources": [],
+  "is_published": false
+}
+EOF
+```
+
+- `is_published: false` で下書き投入。公開は管理画面 or Gate確認後に切替
+- APIが `content` をMarkdown→HTML変換してDB保存する（手動バッチ不要）
+- 環境変数 `ADMIN_PASSWORD` が必要
+
+**代替手段**: APIが使えない場合はバッチスクリプトでも可:
+```bash
+cd ~/workspace/pj/PJ19_GCInsight/gcportal
+ARTICLES_DIR="$GDRIVE_WORKSPACE/contents/PJ19/articles" npx tsx scripts/migrate-articles-to-db.ts --slug {slug} --update
 ```
 
 ### Step 8: Gate確認
@@ -239,7 +273,7 @@ RAG出典: 〇件（最低3件）
 
 ### パス情報
 - プロジェクト: /Users/tadashikudo/workspace/pj/PJ19_GCInsight/gcportal
-- 記事保存先: content/articles/
+- 記事保存先: $GDRIVE_WORKSPACE/contents/PJ19/articles/
 - 画像保存先: public/images/articles/
 - RAG: ~/workspace/pj/digital-go-jp-rag/ (source .venv/bin/activate && python 04_search.py "クエリ")
 - クラスター定義: lib/clusters.ts
