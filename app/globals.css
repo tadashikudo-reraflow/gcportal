@@ -10,7 +10,7 @@
 @theme inline {
   --color-brand-primary: #0066FF;
   --color-brand-secondary: #002D72;
-  --color-brand-accent: #F5B500;
+  --color-brand-accent: #F59E0B;
   --color-brand-pressed: #0052CC;
 
   --color-card-bg: #FFFFFF;
@@ -21,8 +21,8 @@
 
   --color-success: #10B981;
   --color-info: #0066FF;
-  --color-warning: #F5B500;
-  --color-error: #FF6B6B;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
 
   --color-border: #E2E8F0;
   --color-border-strong: #94A3B8;
@@ -42,9 +42,9 @@
 
   --color-status-complete: #10B981;
   --color-status-ok: #0066FF;
-  --color-status-warn: #F5B500;
-  --color-status-critical: #FF6B6B;
-  --color-status-tokutei: #8B5CF6;
+  --color-status-warn: #F59E0B;
+  --color-status-critical: #EF4444;
+  --color-status-tokutei: #64748B;
   --color-accent-cta: var(--color-brand-primary);
 
   --color-surface: #F8F9FA;
@@ -609,14 +609,14 @@ body {
 .hero-countdown-number {
   font-size: 3rem;
   font-weight: 900;
-  color: #FF6B6B;
+  color: #EF4444;
   line-height: 1;
   font-variant-numeric: tabular-nums;
   margin: 0.25rem 0;
 }
 .hero-countdown-unit {
   font-size: 0.875rem;
-  color: #FF6B6B;
+  color: #EF4444;
   font-weight: 700;
 }
 .hero-countdown-deadline {

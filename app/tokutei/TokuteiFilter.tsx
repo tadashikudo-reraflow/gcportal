@@ -99,7 +99,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
           value={selectedPref}
           onChange={(e) => setSelectedPref(e.target.value)}
           className="text-sm border border-gray-300 rounded-md px-3 py-1.5 bg-white text-gray-800 focus:outline-none focus:ring-2"
-          style={{ "--tw-ring-color": "#7c3aed" } as React.CSSProperties}
+          style={{ "--tw-ring-color": "#475569" } as React.CSSProperties}
         >
           <option value="">全都道府県</option>
           {prefectures.map((p) => (
@@ -112,7 +112,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 w-48"
-          style={{ "--tw-ring-color": "#7c3aed" } as React.CSSProperties}
+          style={{ "--tw-ring-color": "#475569" } as React.CSSProperties}
         />
         {(selectedPref || search) && (
           <button
@@ -150,8 +150,8 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
               {/* 都道府県ヘッダー（クリックで展開/折りたたみ） */}
               <button
                 onClick={() => togglePref(group.prefecture)}
-                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-purple-50 transition-colors"
-                style={{ backgroundColor: isExpanded ? "#faf5ff" : "#fafafa" }}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-slate-50 transition-colors"
+                style={{ backgroundColor: isExpanded ? "#f8fafc" : "#fafafa" }}
               >
                 <div className="flex items-center gap-3">
                   <svg
@@ -162,14 +162,14 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                     className="flex-shrink-0 transition-transform duration-200"
                     style={{ transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)" }}
                   >
-                    <path d="M4 2L8 6L4 10" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M4 2L8 6L4 10" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   <span className="text-sm font-bold" style={{ color: "#002D72" }}>
                     {group.prefecture}
                   </span>
                   <span
                     className="inline-flex items-center justify-center min-w-[24px] h-5 px-1.5 rounded-full text-xs font-bold"
-                    style={{ backgroundColor: "#f3e8ff", color: "#7c3aed" }}
+                    style={{ backgroundColor: "#f1f5f9", color: "#475569" }}
                   >
                     {group.rows.length}
                   </span>
@@ -200,7 +200,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                       {group.rows.map((row) => (
                         <tr
                           key={`${row.prefecture}-${row.city}`}
-                          className="border-b border-gray-50 hover:bg-purple-50 transition-colors"
+                          className="border-b border-gray-50 hover:bg-slate-50 transition-colors"
                         >
                           <td className="py-2 px-4 text-xs text-gray-400">{row.no}</td>
                           <td className="py-2 px-4 font-medium text-gray-800 truncate max-w-[160px]">{row.city}</td>
@@ -218,7 +218,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                           <td className="py-2 px-4">
                             <span
                               className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold"
-                              style={{ backgroundColor: "#f3e8ff", color: "#7c3aed" }}
+                              style={{ backgroundColor: "#f1f5f9", color: "#475569" }}
                             >
                               特定移行
                             </span>

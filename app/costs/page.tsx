@@ -488,7 +488,7 @@ export default async function CostsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card p-5 text-center">
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>中核市 平均</p>
-          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#c8102e" }}>2.3<span className="text-lg">倍</span></p>
+          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#EF4444" }}>2.3<span className="text-lg">倍</span></p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>移行前コスト比</p>
         </div>
         <div className="card p-5 text-center">
@@ -535,8 +535,8 @@ export default async function CostsPage() {
           {/* ソフトウェア借料 */}
           <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#ede9fe" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#f1f5f9" }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
                   <line x1="8" y1="21" x2="16" y2="21" />
                   <line x1="12" y1="17" x2="12" y2="21" />
@@ -630,7 +630,7 @@ export default async function CostsPage() {
             {costs.map((cost) => {
               const isReduction = cost.change_ratio < 1.0;
               const pctChange = Math.abs((cost.change_ratio - 1) * 100);
-              const barColor = isReduction ? "#007a3d" : cost.change_ratio >= 3.0 ? "#7f1d1d" : cost.change_ratio >= 1.5 ? "#c8102e" : "#d97706";
+              const barColor = isReduction ? "#007a3d" : cost.change_ratio >= 3.0 ? "#7f1d1d" : cost.change_ratio >= 1.5 ? "#EF4444" : "#d97706";
               const barWidth = getBarWidth(cost.change_ratio);
               const label = getRatioLabel(cost.change_ratio);
               const vendorName = cost.vendors?.short_name ?? cost.vendors?.name ?? "—";

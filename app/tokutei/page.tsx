@@ -122,7 +122,7 @@ export default function TokuteiPage() {
       {/* KPIカード */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="card p-5 text-center">
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
+          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#475569" }}>
             {tokuteiTotalCount.toLocaleString()}
           </p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定団体数</p>
@@ -131,7 +131,7 @@ export default function TokuteiPage() {
           </p>
         </div>
         <div className="card p-5 text-center">
-          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
+          <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#475569" }}>
             {systemCount.toLocaleString()}
           </p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定システム数</p>
@@ -152,7 +152,7 @@ export default function TokuteiPage() {
 
       {/* 特定移行とは */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-2" style={{ color: "#6d28d9" }}>
+        <h2 className="text-sm font-bold mb-2" style={{ color: "#475569" }}>
           特定移行支援システム認定とは
         </h2>
         <div className="text-sm leading-relaxed space-y-2" style={{ color: "var(--color-text-secondary)" }}>
@@ -162,10 +162,10 @@ export default function TokuteiPage() {
           </p>
           <div
             className="rounded-md px-4 py-3 mt-3"
-            style={{ backgroundColor: "#faf5ff", border: "1px solid #c4b5fd" }}
+            style={{ backgroundColor: "#f8fafc", border: "1px solid #cbd5e1" }}
           >
-            <p className="text-xs font-semibold mb-1" style={{ color: "#6d28d9" }}>移行継続スケジュール</p>
-            <p className="text-xs leading-relaxed" style={{ color: "#5b21b6" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "#475569" }}>移行継続スケジュール</p>
+            <p className="text-xs leading-relaxed" style={{ color: "#334155" }}>
               特定移行支援システム対象の<strong>{tokuteiTotalCount.toLocaleString()}団体</strong>は2026年度以降も移行を継続します。
               <strong>概ね5年以内（〜2030年度目安）</strong>の完了を目指す方針が示されており、
               2026〜2030年度にかけて段階的に移行が進む見込みです。
@@ -186,9 +186,9 @@ export default function TokuteiPage() {
           {prefectures.map((pref) => {
             const count = tokuteiList.filter((m) => m.prefecture === pref).length;
             return (
-              <div key={pref} className="text-center p-2 rounded-lg" style={{ backgroundColor: "#f3e8ff" }}>
-                <p className="text-xs font-medium whitespace-nowrap" style={{ color: "#6d28d9" }}>{pref}</p>
-                <p className="text-lg font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>{count}</p>
+              <div key={pref} className="text-center p-2 rounded-lg" style={{ backgroundColor: "#f1f5f9" }}>
+                <p className="text-xs font-medium whitespace-nowrap" style={{ color: "#475569" }}>{pref}</p>
+                <p className="text-lg font-extrabold tabular-nums" style={{ color: "#475569" }}>{count}</p>
               </div>
             );
           })}

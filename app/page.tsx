@@ -54,7 +54,7 @@ function getStatus(rate: number, isTokutei: boolean): "tokutei" | "complete" | "
 function getRateColor(rate: number): string {
   if (rate >= 0.9) return "#378445";
   if (rate >= 0.7) return "#1D4ED8";
-  if (rate >= 0.5) return "#FA6414";
+  if (rate >= 0.5) return "#F59E0B";
   return "#b91c1c";
 }
 
@@ -145,13 +145,13 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
           <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
-          <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#FA6414" cls="kpi-card kpi-card-atrisk"   />
+          <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#F59E0B" cls="kpi-card kpi-card-atrisk"   />
           <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
           <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
-            <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", margin: 0, lineHeight: 1 }}>
+            <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#475569", margin: 0, lineHeight: 1 }}>
               {TOKUTEI_OFFICIAL.toLocaleString()}
             </p>
-            <p style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginTop: 6 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginTop: 6 }}>
               <GlossaryTooltip term="特定移行認定">特定移行</GlossaryTooltip>
             </p>
             <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
@@ -169,17 +169,17 @@ export default function DashboardPage() {
         <div className="flex rounded-full overflow-hidden h-6">
           <div style={{ width: `${(completeCount / TOTAL) * 100}%`, backgroundColor: "#378445" }} title={`完了: ${completeCount}`} />
           <div style={{ width: `${(ontrackCount / TOTAL) * 100}%`, backgroundColor: "#1D4ED8" }} title={`順調: ${ontrackCount}`} />
-          <div style={{ width: `${(atriskCount / TOTAL) * 100}%`, backgroundColor: "#FA6414" }} title={`要注意: ${atriskCount}`} />
+          <div style={{ width: `${(atriskCount / TOTAL) * 100}%`, backgroundColor: "#F59E0B" }} title={`要注意: ${atriskCount}`} />
           <div style={{ width: `${(criticalCount / TOTAL) * 100}%`, backgroundColor: "#b91c1c" }} title={`危機: ${criticalCount}`} />
-          <div style={{ width: `${(TOKUTEI_MUNI_COUNT / TOTAL) * 100}%`, backgroundColor: "#7c3aed" }} title={`特定移行: ${TOKUTEI_MUNI_COUNT}`} />
+          <div style={{ width: `${(TOKUTEI_MUNI_COUNT / TOTAL) * 100}%`, backgroundColor: "#64748B" }} title={`特定移行: ${TOKUTEI_MUNI_COUNT}`} />
         </div>
         <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           {[
             { label: "完了", color: "#378445", count: completeCount },
             { label: "順調", color: "#1D4ED8", count: ontrackCount },
-            { label: "要注意", color: "#FA6414", count: atriskCount },
+            { label: "要注意", color: "#F59E0B", count: atriskCount },
             { label: "危機", color: "#b91c1c", count: criticalCount },
-            { label: "特定移行", color: "#7c3aed", count: TOKUTEI_MUNI_COUNT },
+            { label: "特定移行", color: "#64748B", count: TOKUTEI_MUNI_COUNT },
           ].map((s) => (
             <span key={s.label} className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: s.color }} />
@@ -236,7 +236,7 @@ export default function DashboardPage() {
           {[
             { label: "完了(90%+)", color: "#378445" },
             { label: "順調(70-89%)", color: "#1D4ED8" },
-            { label: "要注意(50-69%)", color: "#FA6414" },
+            { label: "要注意(50-69%)", color: "#F59E0B" },
             { label: "危機(<50%)", color: "#b91c1c" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1">

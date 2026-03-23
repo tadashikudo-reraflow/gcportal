@@ -111,13 +111,13 @@ export default function RisksPage() {
       {tokuteiOverlapCount > 0 && (
         <div
           className="flex items-start gap-3 rounded-lg px-4 py-3 text-sm"
-          style={{ backgroundColor: "#f3e8ff", border: "1px solid #d8b4fe" }}
+          style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1" }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" className="flex-shrink-0 mt-0.5">
             <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
             <circle cx="12" cy="12" r="10"/>
           </svg>
-          <span style={{ color: "#6d28d9" }}>
+          <span style={{ color: "#475569" }}>
             50%未満のうち<strong>{tokuteiOverlapCount}自治体</strong>は特定移行認定済み（期限延長対象）のため本リストから除外。{" "}
             <Link href="/tokutei" className="underline font-semibold">特定移行ページ →</Link>
           </span>
@@ -290,13 +290,13 @@ export default function RisksPage() {
       </div>
 
       {/* 特定移行案内 */}
-      <div className="card p-5 flex items-start gap-3" style={{ backgroundColor: "#f5f3ff" }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+      <div className="card p-5 flex items-start gap-3" style={{ backgroundColor: "#f1f5f9" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
           <circle cx="12" cy="12" r="10"/>
           <path d="M12 16v-4M12 8h.01"/>
         </svg>
         <div>
-          <p className="text-sm font-bold mb-1" style={{ color: "#6d28d9" }}>
+          <p className="text-sm font-bold mb-1" style={{ color: "#475569" }}>
             特定移行支援システム認定とは
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
@@ -305,7 +305,7 @@ export default function RisksPage() {
           <Link
             href="/tokutei"
             className="inline-flex items-center gap-1 mt-2 text-xs font-semibold underline"
-            style={{ color: "#7c3aed" }}
+            style={{ color: "#475569" }}
           >
             特定移行認定自治体を確認する →
           </Link>

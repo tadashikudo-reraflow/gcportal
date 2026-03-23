@@ -15,7 +15,7 @@ function formatRate(rate: number): string {
 function getRateColor(rate: number): string {
   if (rate >= 0.9) return "#378445";
   if (rate >= 0.7) return "#1D4ED8";
-  if (rate >= 0.5) return "#FA6414";
+  if (rate >= 0.5) return "#F59E0B";
   return "#b91c1c";
 }
 
@@ -39,7 +39,7 @@ const ALL_BANDS: PopBand[] = ["1万未満", "1-5万", "5-10万", "10-30万", "30
 /* ============================================================
    Compare tab – colors for up to 4 selected municipalities
    ============================================================ */
-const SLOT_COLORS = ["#1D4ED8", "#378445", "#FA6414", "#7C3AED"];
+const SLOT_COLORS = ["#1D4ED8", "#378445", "#F59E0B", "#64748B"];
 
 /* ============================================================
    Compare tab – Autocomplete Input

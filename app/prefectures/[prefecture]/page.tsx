@@ -209,7 +209,7 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
                     {/* 特定移行認定 */}
                     <td className="py-2.5 px-2 text-center">
                       {tokuteiSet.has(`${muni.prefecture}/${muni.city}`) ? (
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-purple-100 text-purple-700" title="特定移行認定済み">
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-700" title="特定移行認定済み">
                           認定
                         </span>
                       ) : (

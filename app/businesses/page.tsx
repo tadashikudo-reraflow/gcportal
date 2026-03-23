@@ -22,21 +22,21 @@ function getBorderColor(rate: number): string {
   if (rate >= 1.0) return "#007a3d";
   if (rate >= 0.8) return "#1d6fa4";
   if (rate >= 0.5) return "#d97706";
-  return "#c8102e";
+  return "#EF4444";
 }
 
 function getBarColor(rate: number): string {
   if (rate >= 1.0) return "#007a3d";
   if (rate >= 0.8) return "#1d6fa4";
   if (rate >= 0.5) return "#d97706";
-  return "#c8102e";
+  return "#EF4444";
 }
 
 function getTextColor(rate: number): string {
   if (rate >= 1.0) return "#007a3d";
   if (rate >= 0.8) return "#1d6fa4";
   if (rate >= 0.5) return "#d97706";
-  return "#c8102e";
+  return "#EF4444";
 }
 
 function formatRate(rate: number): string {
@@ -59,9 +59,9 @@ export default function BusinessesPage() {
           全20業務の完了率を低い順に表示（全{data.summary.total.toLocaleString()}団体対象）
         </p>
         <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
-          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 10, fontWeight: 700 }}>特定移行</span>
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#64748B", fontSize: 10, fontWeight: 700 }}>特定移行</span>
           <span>= 特定移行支援システム対象（{tokuteiData.municipalities.length}市区町村）。期限延長あり。</span>
-          <Link href="/tokutei" className="underline" style={{ color: "#7C3AED" }}>詳細 →</Link>
+          <Link href="/tokutei" className="underline" style={{ color: "#475569" }}>詳細 →</Link>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ export default function BusinessesPage() {
                         <tr
                           key={`${muni.prefecture}-${muni.city}`}
                           className="border-b border-gray-50"
-                          style={isTokutei ? { backgroundColor: "#F5F3FF" } : undefined}
+                          style={isTokutei ? { backgroundColor: "#f1f5f9" } : undefined}
                         >
                           <td className="py-1 text-gray-400">{i + 1}</td>
                           <td className="py-1 text-gray-500">
@@ -183,7 +183,7 @@ export default function BusinessesPage() {
                             <span className="flex items-center gap-1">
                               {muni.city}
                               {isTokutei && (
-                                <span className="inline-block px-1 py-0 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 9, fontWeight: 700, lineHeight: "14px" }}>特定移行</span>
+                                <span className="inline-block px-1 py-0 rounded text-white" style={{ backgroundColor: "#64748B", fontSize: 9, fontWeight: 700, lineHeight: "14px" }}>特定移行</span>
                               )}
                             </span>
                           </td>

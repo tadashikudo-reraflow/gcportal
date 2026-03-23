@@ -95,7 +95,7 @@ export default function PrefectureRanking({ prefectures, tokuteiByPref }: Props)
                   <td className="py-2 px-2 text-right text-xs" style={{ color: pref.critical > 0 ? "#b91c1c" : "#9ca3af", fontWeight: pref.critical > 0 ? 700 : 400 }}>
                     {pref.critical}
                   </td>
-                  <td className="py-2 px-2 text-right text-xs" style={{ color: tokutei > 0 ? "#7c3aed" : "#9ca3af", fontWeight: tokutei > 0 ? 700 : 400 }}>
+                  <td className="py-2 px-2 text-right text-xs" style={{ color: tokutei > 0 ? "#475569" : "#9ca3af", fontWeight: tokutei > 0 ? 700 : 400 }}>
                     {tokutei}
                   </td>
                   <td className="py-2 px-2 text-center">

@@ -197,7 +197,7 @@ export default function HeroSection({
               <circle
                 cx="64" cy="64" r={radius}
                 fill="none"
-                stroke={completionRate >= 0.75 ? "#10B981" : completionRate >= 0.5 ? "#F5B500" : "#FF6B6B"}
+                stroke={completionRate >= 0.75 ? "#10B981" : completionRate >= 0.5 ? "#F59E0B" : "#EF4444"}
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={circumference}
@@ -220,7 +220,7 @@ export default function HeroSection({
             </div>
             <div className="hero-mini-kpi-divider" />
             <div className="hero-mini-kpi">
-              <span className="hero-mini-value" style={{ color: "#8B5CF6" }}>{tokuteiCount.toLocaleString()}</span>
+              <span className="hero-mini-value" style={{ color: "#64748B" }}>{tokuteiCount.toLocaleString()}</span>
               <span className="hero-mini-label">特定移行認定</span>
             </div>
           </div>
