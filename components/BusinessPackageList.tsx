@@ -95,7 +95,13 @@ function BusinessGroup({
       <div className="mt-2">
         {/* デスクトップ: テーブル表示 */}
         <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-fixed">
+            <colgroup>
+              <col className="w-[40%]" />
+              <col className="w-[20%]" />
+              <col className="w-[15%]" />
+              <col className="w-[25%]" />
+            </colgroup>
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>

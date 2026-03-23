@@ -37,8 +37,10 @@ export default function HeroSection({
       {/* カウントダウン */}
       <div className="hero-countdown">
         <p className="hero-countdown-label">移行期限まで</p>
-        <p className="hero-countdown-number">{remainingDays}</p>
-        <p className="hero-countdown-unit">日</p>
+        <div className="hero-countdown-value-row" aria-label={`あと${remainingDays}日`}>
+          <span className="hero-countdown-number">{remainingDays}</span>
+          <span className="hero-countdown-unit">日</span>
+        </div>
         <p className="hero-countdown-deadline">{deadline}</p>
       </div>
 
@@ -64,21 +66,34 @@ export default function HeroSection({
         <div className="hero-ring-text">
           <span className="hero-ring-pct">{pct}%</span>
           <span className="hero-ring-label">全国平均完了率</span>
+          <span className="hero-ring-sublabel">各自治体の平均</span>
         </div>
       </div>
 
-      {/* ミニ KPI */}
+      {/* ミニ KPI（％リングとは別指標の件数） */}
       <div className="hero-mini-kpis">
         <div className="hero-mini-kpi">
-          <span className="hero-mini-value" style={{ color: "#10B981" }}>{completeCount.toLocaleString()}</span>
-          <span className="hero-mini-label">完了自治体</span>
+          <span className="hero-mini-value-row">
+            <span className="hero-mini-value" style={{ color: "#10B981" }}>{completeCount.toLocaleString()}</span>
+            <span className="hero-mini-suffix">件</span>
+          </span>
+          <span className="hero-mini-label">100%達成の自治体</span>
+          <span className="hero-mini-hint">特定移行は除く</span>
         </div>
-        <div className="hero-mini-kpi-divider" />
+        <div className="hero-mini-kpi-divider" aria-hidden />
         <div className="hero-mini-kpi">
-          <span className="hero-mini-value" style={{ color: "#64748B" }}>{tokuteiCount.toLocaleString()}</span>
+          <span className="hero-mini-value-row">
+            <span className="hero-mini-value" style={{ color: "#64748B" }}>{tokuteiCount.toLocaleString()}</span>
+            <span className="hero-mini-suffix">件</span>
+          </span>
           <span className="hero-mini-label">特定移行認定</span>
+          <span className="hero-mini-hint">認定団体数（公式）</span>
         </div>
       </div>
+
+      <p className="hero-stats-footnote">
+        中央の％は、対象となる全自治体の業務完了率を単純平均した値です（特定移行の自治体も平均の母集団に含みます）。左の件数は特定移行以外で100%達成の自治体数、右は特定移行の認定団体数（公式集計）で、いずれも％とは別指標です。
+      </p>
     </>
   );
 

@@ -610,6 +610,7 @@ body {
 /* Countdown */
 .hero-countdown {
   text-align: center;
+  min-width: 0;
 }
 .hero-countdown-label {
   font-size: 0.6875rem;
@@ -618,18 +619,27 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
+.hero-countdown-value-row {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.125rem;
+  margin: 0.25rem 0;
+  flex-wrap: nowrap;
+}
 .hero-countdown-number {
   font-size: 3.5rem;
   font-weight: 900;
   color: #EF4444;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  margin: 0.25rem 0;
 }
 .hero-countdown-unit {
-  font-size: 0.875rem;
+  font-size: 1.25rem;
   color: #EF4444;
   font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
 }
 .hero-countdown-deadline {
   font-size: 0.6875rem;
@@ -655,6 +665,8 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  padding: 0 2px;
+  text-align: center;
 }
 .hero-ring-pct {
   font-size: 1.625rem;
@@ -662,71 +674,156 @@ body {
   color: #ffffff;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  line-height: 1.1;
 }
 .hero-ring-label {
   font-size: 0.625rem;
   color: #cbd5e1;
   font-weight: 500;
+  line-height: 1.35;
+  max-width: 100%;
+  margin-top: 0.125rem;
+}
+.hero-ring-sublabel {
+  font-size: 0.5625rem;
+  color: #94a3b8;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 0.125rem;
 }
 
 /* Mini KPIs */
 .hero-mini-kpis {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 1rem;
 }
 .hero-mini-kpi {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
+  max-width: 9rem;
+}
+.hero-mini-value-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.125rem;
 }
 .hero-mini-value {
   font-size: 1.5rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.hero-mini-suffix {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  line-height: 1;
 }
 .hero-mini-label {
   font-size: 0.6875rem;
   color: #cbd5e1;
   font-weight: 500;
+  margin-top: 0.25rem;
+  line-height: 1.35;
+  text-align: center;
+  text-wrap: balance;
+}
+.hero-mini-hint {
+  font-size: 0.5625rem;
+  color: #94a3b8;
+  font-weight: 500;
+  line-height: 1.3;
   margin-top: 0.125rem;
+  text-align: center;
+  max-width: 11rem;
 }
 .hero-mini-kpi-divider {
   width: 1px;
-  height: 2rem;
+  min-height: 3rem;
+  align-self: center;
   background: rgba(255, 255, 255, 0.15);
+}
+.hero-stats-footnote {
+  margin: 0;
+  font-size: 0.625rem;
+  line-height: 1.45;
+  color: #94a3b8;
+  text-align: center;
+  max-width: 17.5rem;
 }
 
 @media (max-width: 900px) {
   .hero-stats {
+    display: grid;
     width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-    flex-wrap: nowrap;
-    gap: 0.75rem;
+    max-width: 100%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "countdown ring"
+      "kpis kpis"
+      "note note";
+    align-items: center;
+    justify-items: center;
+    column-gap: 0.75rem;
+    row-gap: 1rem;
+  }
+  .hero-countdown {
+    grid-area: countdown;
+    justify-self: center;
+    width: 100%;
+    max-width: 11rem;
+  }
+  .hero-ring-container {
+    grid-area: ring;
+    width: 110px;
+    height: 110px;
+    flex-shrink: 0;
+  }
+  .hero-mini-kpis {
+    grid-area: kpis;
+    width: 100%;
+    max-width: 22rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+  .hero-stats-footnote {
+    grid-area: note;
+    max-width: 100%;
+    padding: 0 0.25rem;
   }
   .hero-stats-desktop {
     display: none !important;
   }
-  .hero-ring-container {
-    width: 110px;
-    height: 110px;
-  }
   .hero-ring-text {
-    inset: 20px;
+    inset: 18px;
   }
   .hero-ring-pct {
     font-size: 1.125rem;
   }
   .hero-ring-label {
     font-size: 0.5625rem;
-    line-height: 1.2;
+    line-height: 1.25;
+  }
+  .hero-ring-sublabel {
+    font-size: 0.5rem;
   }
   .hero-countdown-number {
     font-size: 1.75rem;
   }
+  .hero-countdown-unit {
+    font-size: 0.875rem;
+  }
   .hero-countdown-label {
     font-size: 0.5625rem;
+  }
+  .hero-mini-kpi {
+    max-width: none;
+    flex: 1 1 auto;
+    min-width: 6.5rem;
   }
   .hero-mini-value {
     font-size: 1rem;
@@ -734,33 +831,56 @@ body {
   .hero-mini-label {
     font-size: 0.5625rem;
   }
+  .hero-mini-hint {
+    font-size: 0.5rem;
+    max-width: 100%;
+  }
+  .hero-mini-suffix {
+    font-size: 0.75rem;
+  }
+  .hero-stats-footnote {
+    font-size: 0.5625rem;
+    text-align: left;
+  }
 }
 @media (max-width: 420px) {
   .hero-stats {
-    gap: 0.25rem;
+    column-gap: 0.5rem;
+    row-gap: 0.875rem;
   }
   .hero-ring-container {
     width: 96px;
     height: 96px;
   }
   .hero-ring-text {
-    inset: 16px;
+    inset: 14px;
   }
   .hero-ring-pct {
     font-size: 1rem;
   }
   .hero-ring-label {
     font-size: 0.5rem;
-    line-height: 1.1;
+    line-height: 1.2;
+  }
+  .hero-ring-sublabel {
+    font-size: 0.46875rem;
   }
   .hero-countdown {
-    min-width: 48px;
+    max-width: 100%;
   }
   .hero-countdown-number {
     font-size: 1.5rem;
   }
+  .hero-countdown-unit {
+    font-size: 0.8125rem;
+  }
   .hero-mini-kpis {
-    gap: 0.5rem;
+    gap: 0.5rem 0.75rem;
+  }
+  .hero-mini-kpi {
+    min-width: 0;
+    flex: 1 1 45%;
+    max-width: 48%;
   }
   .hero-mini-value {
     font-size: 0.875rem;

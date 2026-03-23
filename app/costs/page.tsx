@@ -640,7 +640,57 @@ export default async function CostsPage() {
           標準化20業務想定でのコスト指数比較。値が低いほど低コスト。
         </p>
 
-        <div className="overflow-x-auto">
+        {/* モバイル: カード型レイアウト */}
+        <div className="md:hidden space-y-3">
+          {CLOUD_COMPARISON.map((row) => {
+            const isBaseline = row.cloud === "AWS";
+            return (
+              <div
+                key={row.cloud}
+                className={`rounded-lg border p-4 ${isBaseline ? "border-amber-200 bg-amber-50/30" : "border-gray-200"}`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: row.color }}
+                    />
+                    <span className="font-semibold text-gray-800">{row.cloud}</span>
+                    {isBaseline && (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">基準</span>
+                    )}
+                  </div>
+                  <span className="text-2xl font-extrabold tabular-nums" style={{ color: row.color }}>
+                    {row.index}
+                  </span>
+                </div>
+                <div className="relative h-4 rounded-full overflow-hidden bg-gray-100 mb-3">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${row.index}%`, backgroundColor: row.color, opacity: 0.7 }}
+                  />
+                </div>
+                <dl className="space-y-1.5 text-xs">
+                  <div>
+                    <dt className="font-medium text-gray-500">強み</dt>
+                    <dd className="text-gray-700 mt-0.5">{row.strengths}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-gray-500">課題</dt>
+                    <dd className="text-gray-600 mt-0.5">{row.weaknesses}</dd>
+                  </div>
+                  <div>
+                    <dt className="font-medium text-gray-500">ガバクラ動向</dt>
+                    <dd className="text-gray-600 mt-0.5">{row.govCloudNote}</dd>
+                  </div>
+                </dl>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* デスクトップ: テーブルレイアウト */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b-2 border-gray-200">
