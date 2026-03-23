@@ -12,19 +12,17 @@ import GlossaryTooltip from "@/components/GlossaryTooltip";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
 
-const avgRate = (data.summary.avg_rate * 100).toFixed(1);
-
 export const metadata: Metadata = {
   title:
     "GC Insight｜全国1,741自治体の「現在地」と「遅延リスク」を可視化",
-  description: `全国平均完了率${avgRate}%。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
+  description: `移行完了はわずか${data.summary.completed_count}自治体。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
     title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
-    description: `全国平均完了率${avgRate}%。1,741自治体の移行進捗をリアルタイム可視化。`,
+    description: `移行完了はわずか${data.summary.completed_count}自治体。残り期限内の現在地を可視化。`,
     images: [
       {
-        url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`全国平均完了率 ${avgRate}%`)}&rate=${data.summary.avg_rate}`,
+        url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`移行完了 ${data.summary.completed_count} / 1,741自治体`)}&rate=${data.summary.completed_count / data.summary.total}`,
         width: 1200,
         height: 630,
       },
@@ -121,7 +119,6 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* ========== Hero セクション ========== */}
       <HeroSection
-        completionRate={summary.avg_rate}
         remainingDays={remainingDays}
         deadline={summary.deadline}
         totalMunicipalities={TOTAL}

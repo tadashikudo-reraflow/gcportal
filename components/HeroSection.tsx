@@ -3,17 +3,15 @@
 import Link from "next/link";
 
 type HeroProps = {
-  completionRate: number; // 0-1
   remainingDays: number;
   deadline: string; // "2026-03-31"
   totalMunicipalities: number;
-  completeCount: number;
-  tokuteiCount: number;
+  completeCount: number; // 全20業務移行完了の自治体数（特定移行除く）
+  tokuteiCount: number; // 特定移行認定団体数（公式）
   dataMonth: string; // "2026-01"
 };
 
 export default function HeroSection({
-  completionRate,
   remainingDays,
   deadline,
   totalMunicipalities,
@@ -21,16 +19,18 @@ export default function HeroSection({
   tokuteiCount,
   dataMonth,
 }: HeroProps) {
-  const pct = (completionRate * 100).toFixed(1);
-
   // Format dataMonth
   const [year, month] = dataMonth.split("-");
   const formattedMonth = `${year}年${parseInt(month)}月`;
 
-  // SVG プログレスリング
+  // 移行完了率（自治体数ベース）
+  const completePct = ((completeCount / totalMunicipalities) * 100).toFixed(1);
+
+  // SVG プログレスリング — 移行完了自治体の割合で描画
+  const completeRate = completeCount / totalMunicipalities;
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference * (1 - completionRate);
+  const strokeDashoffset = circumference * (1 - completeRate);
 
   const statsContent = (
     <>
@@ -44,7 +44,7 @@ export default function HeroSection({
         <p className="hero-countdown-deadline">{deadline}</p>
       </div>
 
-      {/* プログレスリング */}
+      {/* メイン指標: 移行完了自治体数リング */}
       <div className="hero-ring-container">
         <svg viewBox="0 0 128 128" className="hero-ring-svg">
           <circle
@@ -54,7 +54,7 @@ export default function HeroSection({
           <circle
             cx="64" cy="64" r={radius}
             fill="none"
-            stroke={completionRate >= 0.75 ? "#10B981" : completionRate >= 0.5 ? "#F59E0B" : "#EF4444"}
+            stroke="#EF4444"
             strokeWidth="7"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -64,21 +64,23 @@ export default function HeroSection({
           />
         </svg>
         <div className="hero-ring-text">
-          <span className="hero-ring-pct">{pct}%</span>
-          <span className="hero-ring-label">全国平均完了率</span>
-          <span className="hero-ring-sublabel">各自治体の平均</span>
+          <span className="hero-ring-pct">{completeCount}</span>
+          <span className="hero-ring-label">
+            / {totalMunicipalities.toLocaleString()}
+          </span>
+          <span className="hero-ring-sublabel">移行完了（{completePct}%）</span>
         </div>
       </div>
 
-      {/* ミニ KPI（％リングとは別指標の件数） */}
+      {/* サブ KPI */}
       <div className="hero-mini-kpis">
         <div className="hero-mini-kpi">
           <span className="hero-mini-value-row">
-            <span className="hero-mini-value" style={{ color: "#10B981" }}>{completeCount.toLocaleString()}</span>
+            <span className="hero-mini-value" style={{ color: "#F59E0B" }}>{(totalMunicipalities - completeCount - tokuteiCount).toLocaleString()}</span>
             <span className="hero-mini-suffix">件</span>
           </span>
-          <span className="hero-mini-label">100%達成の自治体</span>
-          <span className="hero-mini-hint">特定移行は除く</span>
+          <span className="hero-mini-label">移行中</span>
+          <span className="hero-mini-hint">期限内だが未完了</span>
         </div>
         <div className="hero-mini-kpi-divider" aria-hidden />
         <div className="hero-mini-kpi">
@@ -87,12 +89,12 @@ export default function HeroSection({
             <span className="hero-mini-suffix">件</span>
           </span>
           <span className="hero-mini-label">特定移行認定</span>
-          <span className="hero-mini-hint">認定団体数（公式）</span>
+          <span className="hero-mini-hint">期限延長（最大5年）</span>
         </div>
       </div>
 
       <p className="hero-stats-footnote">
-        中央の％は、対象となる全自治体の業務完了率を単純平均した値です（特定移行の自治体も平均の母集団に含みます）。左の件数は特定移行以外で100%達成の自治体数、右は特定移行の認定団体数（公式集計）で、いずれも％とは別指標です。
+        「移行完了」は全20業務の移行ステップが完了した自治体数（特定移行認定団体を除く）。出典: 総務省進捗管理データ（{formattedMonth}末時点）
       </p>
     </>
   );
