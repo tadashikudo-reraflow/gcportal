@@ -1078,16 +1078,16 @@ export default function BenchmarkClient({
             )}
           </section>
 
-          {/* SECTION 4: 予算要求テンプレート出力 */}
+          {/* SECTION 4: 比較データ出力 */}
           <section className="card p-5 sm:p-6">
             <h2
               className="text-lg font-bold mb-1"
               style={{ color: "var(--color-gov-primary)" }}
             >
-              予算要求テンプレート出力
+              比較データをコピー
             </h2>
             <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-              選択した自治体のベンチマークデータを議会説明資料形式でクリップボードにコピー
+              選択した自治体のベンチマークデータをテーブル形式でクリップボードにコピー
             </p>
 
             {!selectedMuni ? (
