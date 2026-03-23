@@ -12,7 +12,10 @@ import { createClient } from "@supabase/supabase-js";
 export async function POST(req: NextRequest) {
   // 認証チェック
   const auth = req.headers.get("authorization");
-  const expected = process.env.ADMIN_PASSWORD ?? "gcinsight2025";
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected) {
+    return NextResponse.json({ error: "ADMIN_PASSWORD not configured" }, { status: 500 });
+  }
   if (auth !== `Bearer ${expected}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -35,9 +38,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "slug and title are required" }, { status: 400 });
   }
 
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) {
+    return NextResponse.json({ error: "Service role key not configured" }, { status: 500 });
+  }
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    serviceKey
   );
 
   // upsert: 同じslugがあれば更新、なければ新規作成

@@ -8,7 +8,7 @@ mermaid.initialize({
   theme: "neutral",
   fontFamily: "system-ui, sans-serif",
   fontSize: 18,
-  securityLevel: "loose",
+  securityLevel: "strict",
   flowchart: {
     padding: 20,
     nodeSpacing: 40,
