@@ -391,11 +391,13 @@ export default function ScheduleClient({ data }: Props) {
         </div>
 
         {filteredEvents.length === 0 && (
-          <div
-            className="text-center py-12 text-sm"
-            style={{ color: "var(--color-text-secondary, #64748b)" }}
-          >
-            該当するイベントはありません
+          <div className="py-16 text-center">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" className="mx-auto mb-3" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>該当するイベントはありません</p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>フィルター条件を変更してください</p>
           </div>
         )}
       </div>

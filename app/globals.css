@@ -171,7 +171,7 @@ body {
     align-items: center;
   }
 
-  /* ナビ: ドロップダウンメニュー */
+  /* ナビ: ドロップダウンメニュー（overflow-x-autoコンテナの外に配置） */
   .nav-dropdown {
     position: absolute;
     top: 100%;
@@ -180,14 +180,12 @@ body {
     background: #ffffff;
     border-radius: 0 0 12px 12px;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-    z-index: 40;
+    z-index: 50;
     overflow: hidden;
   }
   @media (max-width: 640px) {
     .nav-dropdown {
-      position: fixed;
-      top: auto;
-      left: 0;
+      left: 0 !important;
       right: 0;
       min-width: 0;
       border-radius: 0 0 12px 12px;
@@ -596,40 +594,6 @@ body {
   flex-shrink: 0;
   width: 220px;
 }
-@media (max-width: 900px) {
-  .hero-stats {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-  }
-  .hero-ring-container {
-    width: 90px;
-    height: 90px;
-  }
-  .hero-ring-text {
-    inset: 18px;
-  }
-  .hero-ring-pct {
-    font-size: 1rem;
-  }
-  .hero-ring-label {
-    font-size: 0.5rem;
-  }
-  .hero-countdown-number {
-    font-size: 1.75rem;
-  }
-  .hero-countdown-label {
-    font-size: 0.5625rem;
-  }
-  .hero-mini-value {
-    font-size: 0.875rem;
-  }
-  .hero-mini-label {
-    font-size: 0.5rem;
-  }
-}
 
 /* Countdown */
 .hero-countdown {
@@ -719,6 +683,76 @@ body {
   width: 1px;
   height: 2rem;
   background: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 900px) {
+  .hero-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    gap: 0.75rem;
+  }
+  .hero-ring-container {
+    width: 110px;
+    height: 110px;
+  }
+  .hero-ring-text {
+    inset: 20px;
+  }
+  .hero-ring-pct {
+    font-size: 1.125rem;
+  }
+  .hero-ring-label {
+    font-size: 0.5625rem;
+    line-height: 1.2;
+  }
+  .hero-countdown-number {
+    font-size: 1.75rem;
+  }
+  .hero-countdown-label {
+    font-size: 0.5625rem;
+  }
+  .hero-mini-value {
+    font-size: 1rem;
+  }
+  .hero-mini-label {
+    font-size: 0.5625rem;
+  }
+}
+@media (max-width: 420px) {
+  .hero-stats {
+    gap: 0.25rem;
+  }
+  .hero-ring-container {
+    width: 96px;
+    height: 96px;
+  }
+  .hero-ring-text {
+    inset: 16px;
+  }
+  .hero-ring-pct {
+    font-size: 1rem;
+  }
+  .hero-ring-label {
+    font-size: 0.5rem;
+    line-height: 1.1;
+  }
+  .hero-countdown {
+    min-width: 48px;
+  }
+  .hero-countdown-number {
+    font-size: 1.5rem;
+  }
+  .hero-mini-kpis {
+    gap: 0.5rem;
+  }
+  .hero-mini-value {
+    font-size: 0.875rem;
+  }
+  .hero-mini-label {
+    font-size: 0.5rem;
+  }
 }
 
 /* ==========================================================

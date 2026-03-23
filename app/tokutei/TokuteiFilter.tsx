@@ -203,7 +203,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                           className="border-b border-gray-50 hover:bg-purple-50 transition-colors"
                         >
                           <td className="py-2 px-4 text-xs text-gray-400">{row.no}</td>
-                          <td className="py-2 px-4 font-medium text-gray-800">{row.city}</td>
+                          <td className="py-2 px-4 font-medium text-gray-800 truncate max-w-[160px]">{row.city}</td>
                           <td className="py-2 px-4 text-right">
                             <span
                               className="inline-block px-2 py-0.5 rounded text-xs font-bold"
