@@ -347,13 +347,12 @@ export default async function CostsPage() {
 
       {/* ⑦ サマリーバナー: 数直線ゲージ形式 */}
       <div className="card p-6">
-        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
           目標と実態のギャップ
         </h2>
 
         {/* 3つの数値サマリー */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
           <div className="text-center p-3 rounded-lg border-2 border-green-200 bg-green-50">
             <p className="text-xs text-green-600 font-semibold mb-0.5">当初目標</p>
             <p className="text-3xl font-extrabold text-green-700 tabular-nums leading-tight">−30%</p>
@@ -487,17 +486,17 @@ export default async function CostsPage() {
 
       {/* 数値ハイライトバナー */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="card p-5 text-center" style={{ borderTop: "4px solid #c8102e" }}>
+        <div className="card p-5 text-center">
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>中核市 平均</p>
           <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#c8102e" }}>2.3<span className="text-lg">倍</span></p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>移行前コスト比</p>
         </div>
-        <div className="card p-5 text-center" style={{ borderTop: "4px solid #7f1d1d" }}>
+        <div className="card p-5 text-center">
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>最大事例</p>
           <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#7f1d1d" }}>5.7<span className="text-lg">倍</span></p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>一部中核市で確認</p>
         </div>
-        <div className="card p-5 text-center" style={{ borderTop: "4px solid #d97706" }}>
+        <div className="card p-5 text-center">
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>東京都</p>
           <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>1.6<span className="text-lg">倍</span></p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>+178億円/年（2025年6月発表）</p>
@@ -506,8 +505,7 @@ export default async function CostsPage() {
 
       {/* コスト増の構造的原因 */}
       <div className="card p-6">
-        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "#c8102e" }} />
+        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
           コスト増の構造的原因
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -625,8 +623,7 @@ export default async function CostsPage() {
 
       {/* ⑧ コスト変化実績（展開可能カード） */}
       <div className="card p-6">
-        <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
           コスト変化実績
         </h2>
         <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
@@ -673,8 +670,7 @@ export default async function CostsPage() {
 
       {/* ベンダー別評価テーブル */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+        <h2 className="text-base font-bold text-gray-800 mb-4">
           ベンダー別コスト評価
         </h2>
         <div className="overflow-x-auto">
@@ -743,8 +739,7 @@ export default async function CostsPage() {
 
       {/* ⑧ クラウド別コスト比較（AWS=100基準） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
+        <h2 className="text-base font-bold text-gray-800 mb-1">
           クラウド別コスト比較
           <span className="text-xs font-normal text-gray-400 ml-1">AWSを100とした相対指数</span>
         </h2>
@@ -850,8 +845,7 @@ export default async function CostsPage() {
 
       {/* コスト内訳（増加・減少項目） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#6366f1" }} />
+        <h2 className="text-base font-bold text-gray-800 mb-1">
           コスト内訳（増加・減少項目）
         </h2>
         <p className="text-xs text-gray-400 mb-4">
@@ -980,8 +974,7 @@ export default async function CostsPage() {
       {/* ⑧ 自治体別コスト影響推定（ベンダー別グループ） */}
       {muniEstimates.length > 0 && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
-            <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#d97706" }} />
+          <h2 className="text-base font-bold text-gray-800 mb-1">
             自治体別コスト影響推定
             <span className="text-xs font-normal text-gray-400 ml-1">（全{muniEstimates.length}件・ベンダー別）</span>
           </h2>

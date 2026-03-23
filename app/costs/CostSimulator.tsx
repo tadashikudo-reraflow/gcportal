@@ -86,7 +86,6 @@ export default function CostSimulator() {
   return (
     <div className="card p-6">
       <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-        <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-brand-accent)" }} />
         コストシミュレーター
       </h2>
       <p className="text-xs mb-2" style={{ color: "var(--color-text-muted)" }}>

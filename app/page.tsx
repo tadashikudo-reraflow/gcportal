@@ -212,7 +212,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ② 5段階ステータスKPIカード */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
         <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
         <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#FA6414" cls="kpi-card kpi-card-atrisk"   />
@@ -262,10 +262,6 @@ export default function DashboardPage() {
           className="text-sm font-bold mb-4 flex items-center gap-2"
           style={{ color: "var(--color-text-primary)" }}
         >
-          <span
-            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
-            style={{ backgroundColor: "var(--color-gov-primary)" }}
-          />
           業務別完了率（20業務）
         </h2>
         <p className="text-xs mb-4 flex items-center gap-1.5" style={{ color: "var(--color-text-muted)" }}>
@@ -282,7 +278,7 @@ export default function DashboardPage() {
               <div
                 key={biz.business}
                 className="bg-white rounded-xl p-3 flex flex-col gap-2"
-                style={{ border: "1px solid #E5E7EB", borderTop: `3px solid ${barColor}` }}
+                style={{ border: "1px solid #E5E7EB" }}
               >
                 <p
                   className="text-xs leading-snug"
@@ -332,7 +328,6 @@ export default function DashboardPage() {
       {/* ④ 都道府県別一覧テーブル */}
       <div className="card p-4 sm:p-6">
         <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
           都道府県別 標準化進捗
           <span className="text-xs font-normal text-gray-400 ml-1">完了率の低い順</span>
         </h2>
@@ -340,8 +335,11 @@ export default function DashboardPage() {
       </div>
 
       {/* 📘 初見者向け読み方ガイド */}
-      <div className="rounded-lg border-l-4 px-5 py-4 flex gap-4" style={{ borderLeftColor: "var(--color-gov-primary)", backgroundColor: "#f0f5ff" }}>
-        <div className="text-2xl leading-none flex-shrink-0 mt-0.5">💡</div>
+      <div className="rounded-xl px-5 py-4 flex gap-3" style={{ backgroundColor: "#f0f5ff" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
         <div>
           <p className="text-sm font-bold mb-1.5" style={{ color: "var(--color-gov-primary)" }}>
             「特定移行」ってなに？
@@ -360,7 +358,6 @@ export default function DashboardPage() {
       {/* ⑤ 遅延リスク自治体TOP20テーブル（特定移行除外） */}
       <div className="card p-6">
         <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#c8102e" }} />
           遅延リスク自治体 TOP20
           <span className="ml-1 text-xs text-gray-400 font-normal">※特定移行認定団体を除く</span>
         </h2>
@@ -387,8 +384,8 @@ export default function DashboardPage() {
                     className="border-b border-gray-50 hover:bg-red-50 transition-colors"
                   >
                     <td className="py-2.5 px-2 text-xs text-gray-400">{i + 1}</td>
-                    <td className="py-2.5 px-2 text-gray-600 text-xs">{muni.prefecture}</td>
-                    <td className="py-2.5 px-2 font-medium text-gray-800">{muni.city}</td>
+                    <td className="py-2.5 px-2 text-gray-600 text-xs whitespace-nowrap">{muni.prefecture}</td>
+                    <td className="py-2.5 px-2 font-medium text-gray-800 truncate max-w-[120px]">{muni.city}</td>
                     <td className="py-2.5 px-2 text-right">
                       <span className="font-bold text-sm" style={{ color: getRateColor(rate) }}>
                         {formatRate(rate)}

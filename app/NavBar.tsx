@@ -22,8 +22,10 @@ export default function NavBar() {
 
   return (
     <nav style={{ backgroundColor: "var(--color-gov-nav)" }}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4">
-        <div className="flex items-center gap-0 overflow-x-auto scrollbar-none">
+      {/* 外枠: フェードグラデーション用の relative コンテナ */}
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 relative">
+        {/* スクロール領域: scroll-snap で快適スワイプ */}
+        <div className="flex items-center gap-0 overflow-x-auto scrollbar-none nav-scroll-snap">
           {NAV_ITEMS.map(({ href, label, short }) => {
             const isActive =
               href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -31,7 +33,7 @@ export default function NavBar() {
               <Link
                 key={href}
                 href={href}
-                className={`nav-link whitespace-nowrap flex-shrink-0 ${isActive ? "nav-link-active" : ""}`}
+                className={`nav-link nav-touch-target whitespace-nowrap flex-shrink-0 ${isActive ? "nav-link-active" : ""}`}
               >
                 {/* デスクトップ: フルラベル / モバイル: 短縮ラベル */}
                 <span className="hidden sm:inline">{label}</span>
@@ -40,6 +42,8 @@ export default function NavBar() {
             );
           })}
         </div>
+        {/* モバイル右端フェード: 続きがあることを示す */}
+        <div className="nav-fade-hint sm:hidden" aria-hidden="true" />
       </div>
     </nav>
   );

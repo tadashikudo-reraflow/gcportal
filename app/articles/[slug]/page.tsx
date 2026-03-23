@@ -126,8 +126,8 @@ export default async function ArticlePage({ params }: Props) {
         )}
         <div className="flex items-center gap-4 text-xs pt-2 border-t border-gray-100"
           style={{ color: "var(--color-text-muted)" }}>
-          {article.date && <span>📅 {article.date}</span>}
-          {article.author && <span>✍️ {article.author}</span>}
+          {article.date && <span>{article.date}</span>}
+          {article.author && <span>{article.author}</span>}
         </div>
       </div>
 

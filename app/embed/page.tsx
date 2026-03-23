@@ -113,10 +113,6 @@ function PrefectureWidget() {
   return (
     <div className="p-4 space-y-3">
       <h3 className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-        <span
-          className="w-1 h-4 rounded-full inline-block"
-          style={{ backgroundColor: "#003087" }}
-        />
         都道府県別完了率 TOP10
       </h3>
       <div className="space-y-1.5">
@@ -171,10 +167,6 @@ function CostWidget() {
   return (
     <div className="p-5 space-y-4">
       <h3 className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-        <span
-          className="w-1 h-4 rounded-full inline-block"
-          style={{ backgroundColor: "#b91c1c" }}
-        />
         ガバメントクラウド移行コスト
       </h3>
 

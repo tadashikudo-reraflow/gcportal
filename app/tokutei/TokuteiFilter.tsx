@@ -235,9 +235,14 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
       </div>
 
       {groups.length === 0 && (
-        <p className="text-center text-gray-400 py-8 text-sm">
-          該当する自治体がありません
-        </p>
+        <div className="py-16 text-center">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" className="mx-auto mb-3" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>該当する自治体がありません</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>フィルター条件を変更してください</p>
+        </div>
       )}
     </div>
   );

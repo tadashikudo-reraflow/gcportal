@@ -218,37 +218,37 @@ export default function RisksPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             {
-              icon: "💰",
+              label: "財政",
               title: "補助金・財政支援の喪失",
               desc: "デジタル基盤改革支援補助金の対象外となり、移行費用が全額自治体負担になる可能性。期限内完了を前提とした補助スキームが適用されなくなる。",
               severity: "高",
             },
             {
-              icon: "⚖️",
+              label: "法務",
               title: "法的・行政的リスク",
               desc: "標準化法上の「努力義務」違反として、総務省・デジタル庁からの是正勧告や個別ヒアリングの対象に。移行計画の再提出を求められる。",
               severity: "中",
             },
             {
-              icon: "🔒",
+              label: "保守",
               title: "旧システムの保守リスク",
               desc: "ベンダーが標準準拠システムへリソースを集中し、旧システムのサポート縮小・終了が加速。セキュリティパッチ停止で住民データ漏洩リスクが増大。",
               severity: "高",
             },
             {
-              icon: "🔗",
+              label: "連携",
               title: "自治体間連携からの孤立",
               desc: "引越しワンストップ・マイナンバー連携など、標準化を前提とした自治体間情報連携サービスに参加できず、住民サービスに格差が生じる。",
               severity: "中",
             },
             {
-              icon: "📊",
+              label: "費用",
               title: "コスト増大の悪循環",
               desc: "旧システムの保守費用は据え置き、ガバメントクラウド利用料との二重負担が発生。移行が遅れるほどベンダー側の対応要員も減少し、移行コストがさらに膨らむ。",
               severity: "高",
             },
             {
-              icon: "📰",
+              label: "評判",
               title: "説明責任・評判リスク",
               desc: "議会・住民への説明責任が発生。「デジタル化の遅れた自治体」として報道対象になり、移住・企業誘致の際の評判にも影響する。",
               severity: "低",
@@ -259,7 +259,7 @@ export default function RisksPage() {
               className="rounded-lg p-3 flex items-start gap-3"
               style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
             >
-              <span className="text-lg leading-none flex-shrink-0">{item.icon}</span>
+              <span className="text-xs font-bold px-2 py-1 rounded-md flex-shrink-0" style={{ backgroundColor: "#fecaca", color: "#991b1b" }}>{item.label}</span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
@@ -293,8 +293,11 @@ export default function RisksPage() {
       </div>
 
       {/* 特定移行案内 */}
-      <div className="card p-5 flex items-start gap-4" style={{ borderLeft: "4px solid #7c3aed" }}>
-        <div className="text-2xl leading-none flex-shrink-0">🏛️</div>
+      <div className="card p-5 flex items-start gap-3" style={{ backgroundColor: "#f5f3ff" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
         <div>
           <p className="text-sm font-bold mb-1" style={{ color: "#6d28d9" }}>
             特定移行支援システム認定とは

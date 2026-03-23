@@ -198,7 +198,7 @@ export default async function CloudPage() {
       </div>
 
       {/* サマリーバー */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="card p-4 text-center">
           <p className="text-2xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-primary)" }}>
             {Object.keys(CLOUD_CONFIG).length}
@@ -221,8 +221,7 @@ export default async function CloudPage() {
 
       {/* ① クラウド別ベンダー・パッケージ一覧（メイン） */}
       <div>
-        <h2 className="text-base font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-brand-secondary)" }} />
+        <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
           クラウド別 対応ベンダー一覧
         </h2>
 
@@ -390,8 +389,7 @@ export default async function CloudPage() {
 
       {/* ② ガバクラ インフラシェア実態（コンパクト） */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "#FF9900" }} />
+        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           インフラシェア実態
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
             本番稼働システム数（2024年10月・デジタル庁調査）
@@ -421,8 +419,7 @@ export default async function CloudPage() {
 
       {/* ③ クラウド別コスト比較 */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "#F80000" }} />
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
           クラウド別コスト比較
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ典型ワークロード</span>
         </h2>
@@ -520,7 +517,7 @@ export default async function CloudPage() {
       {/* 免責事項 */}
       <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
         <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
-          <span className="font-semibold">⚠️ 免責事項:</span>{" "}
+          <span className="font-semibold">免責事項:</span>{" "}
           本ページのクラウド基盤情報は、各社公式発表・プレスリリース・AWSパートナーディレクトリ等の公開情報をもとに調査・編集したものです。
           <span className="font-semibold">内容の正確性・完全性を保証するものではありません。</span>
           最新情報は各社公式サイトをご確認ください。

@@ -81,7 +81,7 @@ export default function TokuteiPage() {
       {/* 重要注記: 標準化とガバクラ移行は別工程 */}
       <div
         className="flex items-start gap-3 rounded-lg px-5 py-4"
-        style={{ backgroundColor: "#eff6ff", border: "1px solid #93c5fd", borderLeft: "4px solid #1d4ed8" }}
+        style={{ backgroundColor: "#eff6ff", border: "1px solid #93c5fd" }}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" className="flex-shrink-0 mt-0.5">
           <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
@@ -124,7 +124,7 @@ export default function TokuteiPage() {
 
       {/* KPIカード */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="card p-5 text-center" style={{ borderTop: "3px solid #7c3aed" }}>
+        <div className="card p-5 text-center">
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
             {tokuteiTotalCount.toLocaleString()}
           </p>
@@ -133,19 +133,19 @@ export default function TokuteiPage() {
             全体の {tokuteiRatio.toFixed(1)}%（うち市区町村{tokuteiCount.toLocaleString()}）
           </p>
         </div>
-        <div className="card p-5 text-center" style={{ borderTop: "3px solid #7c3aed" }}>
+        <div className="card p-5 text-center">
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#7c3aed" }}>
             {systemCount.toLocaleString()}
           </p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>認定システム数</p>
         </div>
-        <div className="card p-5 text-center" style={{ borderTop: "3px solid #d97706" }}>
+        <div className="card p-5 text-center">
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>
             {(avgRate * 100).toFixed(1)}%
           </p>
           <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>平均完了率（参考）</p>
         </div>
-        <div className="card p-5 text-center" style={{ borderTop: "3px solid #b91c1c" }}>
+        <div className="card p-5 text-center">
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#b91c1c" }}>
             {below50}
           </p>
@@ -154,7 +154,7 @@ export default function TokuteiPage() {
       </div>
 
       {/* 特定移行とは */}
-      <div className="card p-5" style={{ borderLeft: "4px solid #7c3aed" }}>
+      <div className="card p-5">
         <h2 className="text-sm font-bold mb-2" style={{ color: "#6d28d9" }}>
           特定移行支援システム認定とは
         </h2>

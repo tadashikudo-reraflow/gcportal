@@ -136,13 +136,13 @@ export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilt
                   <td className="py-2.5 px-2 text-xs text-gray-400">
                     {row.rank}
                   </td>
-                  <td className="py-2.5 px-2 text-gray-600 text-xs">
+                  <td className="py-2.5 px-2 text-gray-600 text-xs whitespace-nowrap">
                     {row.prefecture}
                   </td>
-                  <td className="py-2.5 px-2 text-gray-400 text-xs">
+                  <td className="py-2.5 px-2 text-gray-400 text-xs whitespace-nowrap">
                     {region ?? ""}
                   </td>
-                  <td className="py-2.5 px-2 font-medium text-gray-800">
+                  <td className="py-2.5 px-2 font-medium text-gray-800 truncate max-w-[120px]">
                     {row.city}
                   </td>
                   <td className="py-2.5 px-2 text-right">
@@ -179,9 +179,14 @@ export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilt
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-center text-gray-400 py-8 text-sm">
-          該当する自治体がありません
-        </p>
+        <div className="py-16 text-center">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" className="mx-auto mb-3" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+          </svg>
+          <p className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>該当する自治体がありません</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>フィルター条件を変更してください</p>
+        </div>
       )}
     </div>
   );

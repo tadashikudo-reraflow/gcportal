@@ -101,7 +101,6 @@ export default function SourcesPage() {
       {/* データ方法論 */}
       <div className="card p-5 space-y-4">
         <h2 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "var(--color-gov-primary)" }} />
           データ収集方法論
         </h2>
         <div className="text-sm leading-relaxed space-y-3" style={{ color: "var(--color-text-secondary)" }}>
@@ -140,7 +139,6 @@ export default function SourcesPage() {
       {/* データ鮮度ステータス */}
       <div className="card p-5 space-y-3">
         <h2 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#d97706" }} />
           データ鮮度ステータス
         </h2>
         <div className="overflow-x-auto">
@@ -198,7 +196,6 @@ export default function SourcesPage() {
       {/* ページ別データソースマッピング */}
       <div className="card p-5 space-y-3">
         <h2 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#003087" }} />
           ページ別データソース
         </h2>
         <div className="space-y-2">
