@@ -13,7 +13,7 @@ const tokuteiSet = new Set(
 
 export const metadata: Metadata = {
   title: "自治体標準化20業務 移行進捗一覧 | ガバメントクラウド移行状況ダッシュボード",
-  description: "住民記録・税務・福祉等の標準化20業務ごとのガバメントクラウド移行進捗を可視化。遅延している業務と完了率の全国比較。",
+  description: "住民記録・税務・福祉等の標準化20業務ごとのガバメントクラウド移行進捗を可視化。遅延している業務と手続き進捗率の全国比較。",
   alternates: { canonical: "/businesses" },
 };
 
@@ -63,6 +63,15 @@ export default function BusinessesPage() {
           <span>= 特定移行支援システム対象（{tokuteiData.municipalities.length}市区町村）。期限延長あり。</span>
           <Link href="/tokutei" className="underline" style={{ color: "#475569" }}>詳細 →</Link>
         </div>
+      </div>
+
+      {/* 進捗率の注釈バナー */}
+      <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
+        <span style={{ color: "#dc2626", fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠</span>
+        <p className="text-xs leading-relaxed" style={{ color: "#991b1b" }}>
+          <strong>手続き進捗率は移行完了を意味しません。</strong>
+          予算要求・ベンダー選定などの準備ステップ（全40段階）が含まれます。全20業務の移行が完了した自治体は <strong>{data.summary.completed_count} / {data.summary.total.toLocaleString()}（{((data.summary.completed_count / data.summary.total) * 100).toFixed(1)}%）</strong> です。
+        </p>
       </div>
 
       {/* 業務カード グリッド */}
@@ -123,22 +132,27 @@ export default function BusinessesPage() {
                 </div>
               </div>
 
-              {/* 完了 / 危機 カウント */}
-              <div className="flex items-center gap-4 mb-4 text-sm">
+              {/* 完了 / 未完了 / 危機 カウント */}
+              <div className="flex items-center gap-3 mb-4 text-sm flex-wrap">
                 <div className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
                   <span className="text-gray-600">
                     完了:{" "}
-                    <strong className="text-green-600">{biz.completed}</strong>{" "}
-                    自治体
+                    <strong className="text-green-600">{biz.completed}</strong>
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
+                  <span className="text-gray-600">
+                    未完了:{" "}
+                    <strong style={{ color: "#ef4444" }}>{data.summary.total - biz.completed}</strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                   <span className="text-gray-600">
                     危機:{" "}
-                    <strong className="text-red-600">{biz.critical}</strong>{" "}
-                    自治体
+                    <strong className="text-red-600">{biz.critical}</strong>
                   </span>
                 </div>
               </div>

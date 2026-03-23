@@ -33,6 +33,21 @@ function formatRate(rate: number | null): string {
   return (rate * 100).toFixed(1) + "%";
 }
 
+/** 業務ヘルスステータス判定 */
+type HealthStatus = "stable" | "volatile" | "alert";
+
+function getBusinessHealth(avgRate: number): HealthStatus {
+  if (avgRate >= 0.8) return "stable";
+  if (avgRate >= 0.5) return "volatile";
+  return "alert";
+}
+
+const HEALTH_CONFIG: Record<HealthStatus, { dot: string; border: string; label: string }> = {
+  stable:   { dot: "bg-emerald-500", border: "border-gray-200",  label: "安定" },
+  volatile: { dot: "bg-amber-600",   border: "border-amber-400", label: "注意" },
+  alert:    { dot: "bg-red-500",     border: "border-red-400",   label: "危機" },
+};
+
 interface PageProps {
   params: Promise<{ prefecture: string }>;
 }
@@ -47,16 +62,16 @@ export async function generateMetadata({
 
   return {
     title: `${name}のガバメントクラウド移行進捗 | GCInsight`,
-    description: `${name}の全市区町村のガバメントクラウド移行進捗状況。${rate ? `平均完了率${rate}%。` : ""}業務別の詳細データ付き。`,
+    description: `${name}の全市区町村のガバメントクラウド移行進捗状況。${rate ? `手続き進捗率（都道府県平均）${rate}%。` : ""}業務別の詳細データ付き。`,
     alternates: { canonical: `/prefectures/${name}` },
     openGraph: {
       title: `${name} — ガバメントクラウド移行進捗`,
       description: rate
-        ? `${name}の平均完了率は${rate}%`
+        ? `${name}の手続き進捗率（都道府県平均）は${rate}%`
         : `${name}の移行進捗を可視化`,
       images: [
         {
-          url: `/og?title=${encodeURIComponent(name)}&subtitle=${encodeURIComponent(rate ? `平均完了率 ${rate}%` : "ガバメントクラウド移行進捗")}${prefSummary ? `&rate=${prefSummary.avg_rate}` : ""}&type=prefecture`,
+          url: `/og?title=${encodeURIComponent(name)}&subtitle=${encodeURIComponent(rate ? `手続き進捗率（平均） ${rate}%` : "ガバメントクラウド移行進捗")}${prefSummary ? `&rate=${prefSummary.avg_rate}` : ""}&type=prefecture`,
           width: 1200,
           height: 630,
         },
@@ -144,140 +159,105 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
         )}
       </div>
 
-      {/* 市区町村テーブル */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b-2 border-gray-200">
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium sticky left-0 bg-gray-50 z-10 min-w-[120px]">
-                  市区町村
-                </th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium min-w-[160px]">
-                  進捗率
-                </th>
-                <th className="text-center py-3 px-2 text-xs text-gray-500 font-medium min-w-[40px]" title="特定移行認定">
-                  特定
-                </th>
-                {businessNames.map((biz) => (
-                  <th
-                    key={biz}
-                    className="text-center py-3 px-1 text-xs text-gray-400 font-medium min-w-[36px]"
-                    title={biz}
-                  >
-                    <span className="truncate block max-w-[32px] mx-auto" title={biz}>
-                      {/* 業務名は hover の title で確認できるため省略表示 */}
-                      <span className="sr-only">{biz}</span>
-                      <span className="not-sr-only text-[10px] writing-mode-vertical" aria-hidden="true">
-                        {biz.slice(0, 2)}
-                      </span>
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedMunicipalities.map((muni) => {
-                const rate = muni.overall_rate;
-                const textColor = getRateColor(rate);
-                const barColor = getRateBarColor(rate);
-                const pct = rate !== null ? rate * 100 : 0;
-
+      {/* 業務ヘルス概観 */}
+      {(() => {
+        // 業務ごとの都道府県内平均完了率を算出
+        const bizHealthMap = businessNames.map((biz, i) => {
+          const rates = municipalities
+            .map((m) => m.business_rates[biz])
+            .filter((r): r is number => r !== null && r !== undefined);
+          const avg = rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
+          const status = getBusinessHealth(avg);
+          return { biz, index: i + 1, avg, status };
+        });
+        const cfg = HEALTH_CONFIG;
+        return (
+          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-gray-800">業務別ヘルス</h2>
+              <div className="flex items-center gap-4 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />安定</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-600" />注意</span>
+                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />危機</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-3">
+              {bizHealthMap.map((item) => {
+                const c = cfg[item.status];
                 return (
-                  <tr
-                    key={`${muni.prefecture}-${muni.city}`}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  <div
+                    key={item.biz}
+                    className={`rounded-xl border-2 ${c.border} bg-gray-50 p-3 flex flex-col items-center gap-1.5 text-center`}
+                    title={`${item.biz}: ${formatRate(item.avg)}（${c.label}）`}
                   >
-                    {/* 市区町村名 */}
-                    <td className="py-2.5 px-3 font-medium text-gray-800 sticky left-0 bg-white z-10">
-                      {muni.city}
-                    </td>
-
-                    {/* 全体完了率 + プログレスバー */}
-                    <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden min-w-[80px]">
-                          <div
-                            className={`h-full rounded-full ${barColor}`}
-                            style={{ width: `${Math.min(pct, 100)}%` }}
-                          />
-                        </div>
-                        <span
-                          className={`text-xs font-bold w-12 flex-shrink-0 ${textColor}`}
-                        >
-                          {formatRate(rate)}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* 特定移行認定 */}
-                    <td className="py-2.5 px-2 text-center">
-                      {tokuteiSet.has(`${muni.prefecture}/${muni.city}`) ? (
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-700" title="特定移行認定済み">
-                          認定
-                        </span>
-                      ) : (
-                        <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-
-                    {/* 業務別ミニバー */}
-                    {businessNames.map((biz) => {
-                      const bizRate = muni.business_rates[biz];
-                      const bizPct =
-                        bizRate !== null && bizRate !== undefined
-                          ? bizRate * 100
-                          : null;
-                      const miniBarColor = getRateBarColor(
-                        bizRate !== undefined ? bizRate : null
-                      );
-
-                      return (
-                        <td
-                          key={biz}
-                          className="py-2.5 px-1 text-center"
-                          title={`${biz}: ${formatRate(bizRate !== undefined ? bizRate : null)}`}
-                        >
-                          <div
-                            className="mx-auto bg-gray-100 rounded-sm overflow-hidden"
-                            style={{ width: 28, height: 28 }}
-                            title={`${biz}: ${formatRate(bizRate !== undefined ? bizRate : null)}`}
-                          >
-                            {bizPct !== null ? (
-                              <div
-                                className={`w-full rounded-sm ${miniBarColor}`}
-                                style={{
-                                  height: `${Math.min(bizPct, 100)}%`,
-                                  marginTop: `${100 - Math.min(bizPct, 100)}%`,
-                                }}
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gray-200" />
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
+                    <span className="text-[10px] text-gray-400 font-medium">{item.index}</span>
+                    <span className={`inline-block w-3 h-3 rounded-full ${c.dot}`} />
+                    <span className="text-[11px] text-gray-700 font-medium leading-tight">{item.biz.length > 5 ? item.biz.slice(0, 4) + "…" : item.biz}</span>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* 業務名凡例 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-        <p className="text-xs font-semibold text-gray-500 mb-3">業務名一覧（ミニバー列の対応）</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-          {businessNames.map((biz, i) => (
-            <div key={biz} className="flex items-center gap-1.5">
-              <span className="text-xs text-gray-400 font-mono w-5 flex-shrink-0">
-                {i + 1}.
-              </span>
-              <span className="text-xs text-gray-700">{biz}</span>
             </div>
-          ))}
+          </div>
+        );
+      })()}
+
+      {/* 市区町村一覧 */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center gap-4">
+          <span className="text-xs font-semibold text-gray-500">市区町村</span>
+          <span className="text-xs text-gray-400">クリックで業務別詳細を表示</span>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {sortedMunicipalities.map((muni) => {
+            const rate = muni.overall_rate;
+            const textColor = getRateColor(rate);
+            const barColor = getRateBarColor(rate);
+            const pct = rate !== null ? rate * 100 : 0;
+            const isTokutei = tokuteiSet.has(`${muni.prefecture}/${muni.city}`);
+
+            return (
+              <details key={`${muni.prefecture}-${muni.city}`} className="group">
+                <summary className="flex items-center gap-3 py-2.5 px-4 cursor-pointer hover:bg-gray-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
+                  <span className="text-xs text-gray-400 group-open:rotate-90 transition-transform">▶</span>
+                  <span className="font-medium text-gray-800 text-sm min-w-[80px]">{muni.city}</span>
+                  {isTokutei && (
+                    <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-700">認定</span>
+                  )}
+                  <div className="flex-1 flex items-center gap-2 max-w-[240px]">
+                    <div className="flex-1 bg-gray-100 rounded-full h-3.5 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${barColor}`}
+                        style={{ width: `${Math.min(pct, 100)}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs font-bold w-12 flex-shrink-0 ${textColor}`}>
+                      {formatRate(rate)}
+                    </span>
+                  </div>
+                </summary>
+                <div className="px-4 pb-3 pt-1">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-2">
+                    {businessNames.map((biz, i) => {
+                      const bizRate = muni.business_rates[biz];
+                      const bizPct = bizRate !== null && bizRate !== undefined ? bizRate * 100 : null;
+                      const dotColor = bizRate !== null && bizRate !== undefined
+                        ? bizRate >= 1.0 ? "bg-emerald-500" : bizRate >= 0.8 ? "bg-blue-400" : bizRate >= 0.5 ? "bg-amber-500" : "bg-red-500"
+                        : "bg-gray-300";
+                      return (
+                        <div key={biz} className="flex flex-col items-center gap-0.5 text-center py-1.5">
+                          <span className={`inline-block w-2.5 h-2.5 rounded-full ${dotColor}`} />
+                          <span className="text-[10px] text-gray-500 leading-tight">{biz.length > 4 ? biz.slice(0, 3) + "…" : biz}</span>
+                          <span className={`text-[10px] font-bold ${bizRate !== null && bizRate !== undefined ? (bizRate >= 1.0 ? "text-emerald-600" : bizRate >= 0.5 ? "text-gray-600" : "text-red-600") : "text-gray-400"}`}>
+                            {bizPct !== null ? `${bizPct.toFixed(0)}%` : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </details>
+            );
+          })}
         </div>
       </div>
     </div>

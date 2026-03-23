@@ -33,7 +33,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
                 GC Insight
               </h1>
               <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
-                全国1,741自治体の「現在地」と「遅延リスク」を可視化する
+                ガバメントクラウド移行状況ダッシュボード
               </p>
             </div>
           </Link>
