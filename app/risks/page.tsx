@@ -103,7 +103,7 @@ export default function RisksPage() {
       <div className="pb-2">
         <h1 className="page-title">遅延リスク 自治体一覧</h1>
         <p className="page-subtitle">
-          2026年3月31日の移行期限に向け、完了率50%未満かつ特定移行認定を受けていない自治体
+          完了率50%未満かつ特定移行認定なしの自治体（2026年3月末期限）
         </p>
       </div>
 
@@ -118,10 +118,8 @@ export default function RisksPage() {
             <circle cx="12" cy="12" r="10"/>
           </svg>
           <span style={{ color: "#6d28d9" }}>
-            完了率50%未満の自治体のうち<strong>{tokuteiOverlapCount}自治体</strong>は、デジタル庁の「特定移行支援システム」認定を受けており、移行期限の延長が認められています。
-            これらは通常の遅延とは異なるため本リストから除外し、{" "}
-            <Link href="/tokutei" className="underline font-semibold">特定移行認定ページ</Link>
-            に掲載しています。
+            50%未満のうち<strong>{tokuteiOverlapCount}自治体</strong>は特定移行認定済み（期限延長対象）のため本リストから除外。{" "}
+            <Link href="/tokutei" className="underline font-semibold">特定移行ページ →</Link>
           </span>
         </div>
       )}
@@ -212,8 +210,7 @@ export default function RisksPage() {
           移行期限に間に合わない場合のデメリット
         </h2>
         <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          2026年3月31日の移行期限を超過した場合、以下のリスクが想定されます。
-          標準化法に罰則規定はありませんが、財政・運用・政策面で実質的な不利益が生じます。
+          期限超過時に想定されるリスク。罰則規定はないが実質的な不利益あり。<Link href="/articles" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
@@ -283,7 +280,7 @@ export default function RisksPage() {
           ))}
         </div>
         <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-          ※ 標準化法は「努力義務」であり、直接的な罰則規定はありません。ただし特定移行支援システム認定を受けずに期限を超過した場合、上記のリスクが現実化する可能性が高まります。
+          ※ 標準化法は「努力義務」。特定移行認定なしで超過した場合、上記リスクが現実化する可能性あり。
         </p>
       </div>
 
@@ -303,9 +300,7 @@ export default function RisksPage() {
             特定移行支援システム認定とは
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-            デジタル庁が認定した特定移行支援システムの対象となった自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は、
-            2026年3月末の期限延長が認められ、別途移行計画が策定されます。
-            これらは遅延とは異なる扱いのため、本リストからは除外されています。
+            特定移行認定自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長対象。遅延とは異なるため本リストから除外。
           </p>
           <Link
             href="/tokutei"

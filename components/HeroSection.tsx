@@ -77,8 +77,7 @@ export default function HeroSection({
             <span className="hero-headline-accent">「現在地」と「遅延リスク」</span>を可視化
           </h2>
           <p className="hero-sub">
-            標準化法に基づくガバメントクラウド移行の進捗を、
-            業務別・自治体別にリアルタイムで追跡できるダッシュボードです。
+            業務別・自治体別にガバメントクラウド移行の進捗を追跡。
           </p>
 
           {/* 巨大検索バー */}

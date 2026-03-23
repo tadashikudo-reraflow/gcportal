@@ -224,7 +224,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={textColor}
-                  fontSize={shortName.length > 3 ? 10 : shortName.length > 2 ? 12 : 13}
+                  fontSize={shortName.length > 3 ? 11 : shortName.length > 2 ? 12 : 13}
                   fontWeight={700}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >

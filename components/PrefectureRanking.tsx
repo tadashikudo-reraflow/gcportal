@@ -47,7 +47,7 @@ export default function PrefectureRanking({ prefectures, tokuteiByPref }: Props)
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
               <th className="text-center py-2.5 px-2 text-xs font-medium w-10" style={{ color: "#fff" }}>#</th>
@@ -69,7 +69,7 @@ export default function PrefectureRanking({ prefectures, tokuteiByPref }: Props)
               return (
                 <tr key={pref.prefecture} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                   <td className="py-2 px-2 text-center text-xs text-gray-400">{i + 1}</td>
-                  <td className="py-2 px-2 truncate max-w-[100px]">
+                  <td className="py-2 px-2 whitespace-nowrap">
                     <Link
                       href={`/prefectures/${encodeURIComponent(pref.prefecture)}`}
                       className="font-medium text-gray-800 hover:underline"

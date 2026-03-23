@@ -520,9 +520,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ガバメントクラウド利用料</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  AWS/Azure/GCP/OCI等のIaaS利用料が新規発生。
-                  オンプレミスでは不要だったクラウド基盤料・データ転送料が年間コストを押し上げる。
-                  特に小規模自治体ではスケールメリットが効かず割高に。
+                  IaaS利用料が新規発生。小規模自治体ほどスケールメリットが効かず割高に。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
@@ -547,9 +545,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ソフトウェア借料</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  標準準拠システムのSaaS/ライセンス料が移行前比で増加。
-                  カスタマイズ不可の標準化仕様により、別途アドオン費用が発生するケースも。
-                  ベンダーロックインによる価格交渉力の低下が一因。
+                  SaaS/ライセンス料が増加。標準化仕様でアドオン費用が発生するケースも。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
@@ -574,9 +570,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ネットワーク費用</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  LGWAN-ASP接続からクラウド直接接続（Direct Connect等）への切り替えコスト。
-                  閉域網接続・VPN費用・帯域増強が必要。
-                  複数クラウドを利用する場合は接続ポイントごとに費用が発生。
+                  クラウド直接接続（Direct Connect等）への切替。閉域網・VPN費用が新規発生。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
@@ -602,9 +596,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">SE単価高騰</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  全国1,741自治体の同時移行需要によりSE・PMのリソースが逼迫。
-                  クラウド移行スキルを持つ技術者の単価が上昇。
-                  移行期限が迫るほど「急ぎ対応」プレミアムが加算される傾向。
+                  全国同時移行でSE逼迫。期限が迫るほど単価上昇の傾向。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">
@@ -744,8 +736,7 @@ export default async function CostsPage() {
           <span className="text-xs font-normal text-gray-400 ml-1">AWSを100とした相対指数</span>
         </h2>
         <p className="text-xs text-gray-400 mb-4">
-          同一ワークロード（標準化20業務）想定でのコスト指数比較。値が低いほど低コスト。
-          出典: 各クラウド公式料金表・先行事業TCO分析・ベンダーヒアリングを基に推定。
+          標準化20業務想定でのコスト指数比較。値が低いほど低コスト。
         </p>
 
         <div className="overflow-x-auto">
@@ -812,9 +803,7 @@ export default async function CostsPage() {
 
         <div className="mt-4 pt-3 border-t border-gray-100">
           <p className="text-xs text-gray-400">
-            ※ コスト指数はAWSの標準料金を100とした場合の相対値。RI/SP/Committed Use等の割引適用前の参考値。
-            各クラウドの公式料金表（2025年時点）を基に独自試算したもので、実際のコストは利用パターン・契約条件・ベンダー独自割引により大きく変動します。
-            公式の見積もりは各クラウドの料金計算ツールをご利用ください。
+            ※ AWS=100の相対値。割引適用前の参考値。実際のコストは契約条件により変動。
           </p>
         </div>
       </div>
@@ -830,15 +819,15 @@ export default async function CostsPage() {
         <ul className="space-y-1.5 text-xs text-blue-700">
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">運用経費見積チェックリスト</span>: デジタル庁が移行費用の過小見積もりを防ぐため公開。クラウド利用料・回線費・SE費用の漏れ防止項目を整備。</span>
+            <span><span className="font-semibold">運用経費見積チェックリスト</span>: デジタル庁が公開。費用漏れ防止項目を整備。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">FinOpsガイド策定中</span>: 自治体向けクラウドコスト最適化（FinOps）ガイドラインをデジタル庁が策定中。RI/Savings Plans活用・タグ管理・コスト可視化の標準手法を整備予定。</span>
+            <span><span className="font-semibold">FinOpsガイド策定中</span>: デジタル庁がクラウドコスト最適化ガイドラインを策定中。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">東京都+178億円/年</span>: 2025年6月発表。都内自治体の標準化移行に伴うシステム経費増が確認され、コスト超過問題が全国規模の政策課題として浮上。</span>
+            <span><span className="font-semibold">東京都+178億円/年</span>: 2025年6月発表。コスト超過が全国規模の政策課題に。</span>
           </li>
         </ul>
       </div>
@@ -963,8 +952,7 @@ export default async function CostsPage() {
       {/* 注記 */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
         <p className="text-xs text-gray-400">
-          ※ コスト比率は移行前を1.0とした比率。1.0未満 = コスト削減、1.0以上 = コスト増。
-          判明分のみ集計のため、実態との乖離がある場合があります。
+          ※ コスト比率は移行前=1.0基準。判明分のみ集計。
         </p>
       </div>
 
@@ -979,8 +967,7 @@ export default async function CostsPage() {
             <span className="text-xs font-normal text-gray-400 ml-1">（全{muniEstimates.length}件・ベンダー別）</span>
           </h2>
           <p className="text-xs text-gray-400 mb-4">
-            自治体の採用パッケージ・ベンダー情報とコスト調査レポートを紐付けた推定値。実際の請求額ではありません。
-            主ベンダー（最多採用パッケージ）のコスト変化レンジを適用。各行をクリックで詳細展開。
+            採用ベンダー別のコスト変化レンジを適用した推定値（実際の請求額ではありません）。各行クリックで詳細展開。
           </p>
 
           <div className="space-y-3">
@@ -1039,9 +1026,7 @@ export default async function CostsPage() {
 
           <div className="mt-4 pt-3 border-t border-gray-100">
             <p className="text-xs text-gray-400">
-              &#9888; 推定値（参考）: ベンダー種別ごとのコスト変化レンジを自治体に紐付けた推計。
-              実際のコストは契約・規模・移行状況により大きく異なります。
-              出典: デジタル庁TCO検証・中核市市長会調査・総務省地方財政調査を基に推定。
+              &#9888; 推定値（参考）。実際のコストは契約・規模により異なります。出典: デジタル庁TCO検証・中核市市長会調査等。
             </p>
           </div>
         </div>

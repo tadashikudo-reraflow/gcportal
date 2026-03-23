@@ -40,10 +40,10 @@ export default function FreshnessBanner({
         </svg>
         <div>
           <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
-            {pageLabel ? `${pageLabel}の` : ""}データが古くなっています
+            {label}時点のデータです（{daysOld}日前）
           </p>
           <p className="text-xs mt-0.5" style={{ color: "#b91c1c" }}>
-            {label}のデータです（{daysOld}日前）。最新情報は
+            最新情報は
             <a
               href="https://www.digital.go.jp/policies/local_governments"
               target="_blank"
@@ -75,8 +75,7 @@ export default function FreshnessBanner({
         <line x1="12" y1="17" x2="12.01" y2="17" />
       </svg>
       <p className="text-xs" style={{ color: "#92400e" }}>
-        {pageLabel ? `${pageLabel}: ` : ""}
-        <span className="font-semibold">{label}</span>のデータです（{daysOld}日前）
+        <span className="font-semibold">{label}</span>時点（{daysOld}日前）
       </p>
     </div>
   );

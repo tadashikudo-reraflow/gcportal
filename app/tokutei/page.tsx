@@ -74,7 +74,7 @@ export default function TokuteiPage() {
       <div className="pb-2">
         <h1 className="page-title">特定移行支援システム認定 自治体一覧</h1>
         <p className="page-subtitle">
-          デジタル庁が認定した特定移行支援システムの対象自治体。2026年3月末の標準期限とは別途移行計画が策定されます。
+          デジタル庁認定の特定移行支援システム対象自治体一覧（期限延長対象）
         </p>
       </div>
 
@@ -90,10 +90,7 @@ export default function TokuteiPage() {
         <div style={{ color: "#1e40af" }}>
           <p className="font-bold text-sm mb-1">標準化とガバクラ移行は別の工程です</p>
           <p className="text-xs leading-relaxed">
-            完了率は「標準準拠システムのガバメントクラウドへの移行進捗」を示します（令和8年1月時点の推計値）。
-            <strong>標準化（標準仕様への準拠）</strong>と<strong>ガバクラ移行（クラウド基盤への載せ替え）</strong>は別の工程であり、
-            認定は業務システム単位のため、自治体全体の完了率とは必ずしも連動しません。
-            特定移行認定を受けた自治体でも「標準化済み・ガバクラ未移行」のケースが多く存在します。
+            完了率は「ガバクラへの移行進捗」（令和8年1月推計）。標準化とガバクラ移行は別工程のため、認定は業務システム単位で自治体全体の完了率とは連動しません。
           </p>
         </div>
       </div>
@@ -118,7 +115,7 @@ export default function TokuteiPage() {
             {tokuteiData.source as string}
           </a>
           {" "}（令和7年12月末時点）。
-          本データは公開情報に基づく調査情報であり、最新の認定状況は公式資料をご確認ください。
+          最新の認定状況は公式資料をご確認ください。
         </span>
       </div>
 
@@ -160,19 +157,8 @@ export default function TokuteiPage() {
         </h2>
         <div className="text-sm leading-relaxed space-y-2" style={{ color: "var(--color-text-secondary)" }}>
           <p>
-            デジタル庁は、自治体が利用するシステムのうち、標準仕様への移行が技術的・運用的に困難なものを
-            「特定移行支援システム」として認定しています。
-          </p>
-          <p>
-            認定を受けた自治体は<strong>2026年3月末の標準的な移行期限の延長</strong>が認められ、
-            デジタル庁との協議のうえで別途移行計画を策定します。
-            このため「遅延」とは本質的に異なるステータスです。
-          </p>
-          <p>
-            認定の背景には、既存システムの技術的移行困難性に加え、
-            <strong>共同利用型の地域クラウド基盤</strong>（北海道HARP等）を運用している自治体群も含まれます。
-            これらは標準準拠システムへの移行とガバメントクラウドへの移行を段階的に進める必要があり、
-            一律の期限適用が困難なケースです。
+            技術的・運用的に移行困難なシステムをデジタル庁が認定。認定自治体は<strong>期限延長</strong>のうえ別途移行計画を策定するため「遅延」とは異なるステータスです。
+            共同利用型クラウド基盤（北海道HARP等）の自治体群も含まれます。<a href="/articles" className="underline" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</a>
           </p>
           <div
             className="rounded-md px-4 py-3 mt-3"
@@ -186,8 +172,7 @@ export default function TokuteiPage() {
             </p>
           </div>
           <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-            ※ 完了率は「標準準拠システムのガバメントクラウドへの移行進捗」を示します（令和8年1月時点の推計値）。
-            認定は業務システム単位のため、自治体全体の完了率とは必ずしも連動しません。
+            ※ 完了率はガバクラ移行進捗の推計値（令和8年1月時点）。認定は業務単位のため自治体全体の完了率と連動しない場合あり。
           </p>
         </div>
       </div>

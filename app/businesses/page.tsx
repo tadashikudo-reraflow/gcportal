@@ -56,11 +56,11 @@ export default function BusinessesPage() {
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">業務別 標準化進捗</h1>
         <p className="page-subtitle">
-          全20業務の完了率を低い順に表示（特定移行認定自治体を含む全{data.summary.total.toLocaleString()}団体）。各業務で遅れている自治体を確認できます。
+          全20業務の完了率を低い順に表示（全{data.summary.total.toLocaleString()}団体対象）
         </p>
         <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#7C3AED", fontSize: 10, fontWeight: 700 }}>特定移行</span>
-          <span>= デジタル庁認定 特定移行支援システム対象自治体（{tokuteiData.municipalities.length}市区町村）。期限延長が認められており「遅延」とは異なります。</span>
+          <span>= 特定移行支援システム対象（{tokuteiData.municipalities.length}市区町村）。期限延長あり。</span>
           <Link href="/tokutei" className="underline" style={{ color: "#7C3AED" }}>詳細 →</Link>
         </div>
       </div>
