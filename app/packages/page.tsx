@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
-import { Vendor, Package } from "@/lib/supabase";
+import { Vendor, Package, Municipality, MunicipalityPackageRow } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import VendorRanking from "@/components/VendorRanking";
 import BusinessPackageList from "@/components/BusinessPackageList";
+import MunicipalitySearch from "@/components/MunicipalitySearch";
 
 export const metadata: Metadata = {
   title: "自治体向けガバメントクラウド対応パッケージ一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
   alternates: { canonical: "/packages" },
+};
+
+type MunicipalityPackageWithPackage = MunicipalityPackageRow & {
+  packages?: Package & { vendors?: Vendor };
 };
 
 export default async function PackagesPage() {
@@ -19,6 +24,8 @@ export default async function PackagesPage() {
 
   let vendors: Vendor[] = [];
   let packages: (Package & { vendors?: Vendor })[] = [];
+  let municipalities: Municipality[] = [];
+  let packagesByMunicipality: Record<number, MunicipalityPackageWithPackage[]> = {};
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return (
@@ -33,19 +40,42 @@ export default async function PackagesPage() {
     const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    const [vendorRes, packageRes] = await Promise.all([
+    const [vendorRes, packageRes, municipalityRes, mpRes] = await Promise.all([
       supabase.from("vendors").select("*").order("name"),
       supabase
         .from("packages")
         .select("*, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count)")
         .order("business"),
+      supabase
+        .from("municipalities")
+        .select("id, prefecture, city, pref_city_code, size_category")
+        .order("prefecture")
+        .order("city"),
+      supabase
+        .from("municipality_packages")
+        .select(
+          "id, municipality_id, package_id, business, adoption_year, source, confidence, packages(id, package_name, business, vendor_id, confirmed_date, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count))"
+        ),
     ]);
 
     vendors = vendorRes.data ?? [];
     packages = packageRes.data ?? [];
+    municipalities = municipalityRes.data ?? [];
+
+    // municipality_id をキーにした Map を構築
+    // Supabase の JOIN 結果はネスト型が配列になるため unknown 経由でキャスト
+    const mpRows: MunicipalityPackageWithPackage[] = (mpRes.data ?? []) as unknown as MunicipalityPackageWithPackage[];
+    for (const row of mpRows) {
+      if (!packagesByMunicipality[row.municipality_id]) {
+        packagesByMunicipality[row.municipality_id] = [];
+      }
+      packagesByMunicipality[row.municipality_id].push(row);
+    }
   } catch {
     vendors = [];
     packages = [];
+    municipalities = [];
+    packagesByMunicipality = {};
   }
 
   return (
@@ -57,6 +87,12 @@ export default async function PackagesPage() {
           標準化対応パッケージを提供するベンダーと業務別パッケージの一覧。
         </p>
       </div>
+
+      {/* 自治体名検索 */}
+      <MunicipalitySearch
+        municipalities={municipalities}
+        packagesByMunicipality={packagesByMunicipality}
+      />
 
       {/* ベンダー採用団体ランキング */}
       <VendorRanking vendors={vendors} />

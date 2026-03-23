@@ -26,6 +26,25 @@ export type Package = {
   vendors?: Vendor;
 };
 
+export type Municipality = {
+  id: number;
+  prefecture: string;
+  city: string;
+  pref_city_code: string | null;
+  size_category: string | null;
+};
+
+export type MunicipalityPackageRow = {
+  id: number;
+  municipality_id: number;
+  package_id: number;
+  business: string | null;
+  adoption_year: number | null;
+  source: string | null;
+  confidence: string | null;
+  packages?: Package & { vendors?: Vendor };
+};
+
 export type CostReport = {
   id: number;
   municipality_id: number | null;
