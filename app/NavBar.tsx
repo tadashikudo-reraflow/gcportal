@@ -12,7 +12,7 @@ const NAV_GROUPS = [
     href: "/",
   },
   {
-    label: "自治体を調べる",
+    label: "調べる",
     short: "調べる",
     children: [
       { href: "/businesses", label: "業務別の進捗を見る", desc: "20業務ごとの完了率" },
@@ -21,7 +21,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "リスクを把握する",
+    label: "リスク",
     short: "リスク",
     children: [
       { href: "/risks",   label: "遅延リスク自治体一覧", desc: "完了率50%未満の自治体" },
@@ -29,7 +29,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "コスト・ベンダー",
+    label: "コスト",
     short: "コスト",
     children: [
       { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
@@ -131,8 +131,7 @@ export default function NavBar() {
                   href={group.href}
                   className={`nav-link nav-touch-target whitespace-nowrap flex-shrink-0 ${active ? "nav-link-active" : ""}`}
                 >
-                  <span className="hidden sm:inline">{group.label}</span>
-                  <span className="sm:hidden">{group.short}</span>
+                  {group.label}
                 </Link>
               );
             }
@@ -156,8 +155,7 @@ export default function NavBar() {
                   className={`nav-link nav-touch-target whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${active ? "nav-link-active" : ""}`}
                   style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }}
                 >
-                  <span className="hidden sm:inline">{group.label}</span>
-                  <span className="sm:hidden">{group.short}</span>
+                  {group.label}
                   <svg
                     width="10" height="10" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
