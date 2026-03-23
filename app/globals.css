@@ -605,20 +605,29 @@ body {
     gap: 0.5rem;
   }
   .hero-ring-container {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
+  }
+  .hero-ring-text {
+    inset: 18px;
   }
   .hero-ring-pct {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
   .hero-ring-label {
-    font-size: 0.5625rem;
+    font-size: 0.5rem;
   }
   .hero-countdown-number {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+  .hero-countdown-label {
+    font-size: 0.5625rem;
   }
   .hero-mini-value {
-    font-size: 1rem;
+    font-size: 0.875rem;
+  }
+  .hero-mini-label {
+    font-size: 0.5rem;
   }
 }
 

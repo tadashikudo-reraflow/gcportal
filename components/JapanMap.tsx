@@ -88,7 +88,7 @@ const PREFECTURE_GRID: { name: string; col: number; row: number }[] = [
 
 // --- Constants ---
 
-const CELL_SIZE = 56;
+const CELL_SIZE = 68;
 const GAP = 3;
 const STEP = CELL_SIZE + GAP;
 const PADDING = 8;
@@ -224,7 +224,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={textColor}
-                  fontSize={shortName.length > 3 ? 11 : shortName.length > 2 ? 12 : 13}
+                  fontSize={shortName.length > 3 ? 13 : shortName.length > 2 ? 14 : 15}
                   fontWeight={700}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
@@ -234,11 +234,11 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                 {rate >= 0 && (
                   <text
                     x={cx}
-                    y={cy + 16}
+                    y={cy + 18}
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill={textColor}
-                    fontSize={11}
+                    fontSize={13}
                     fontWeight={700}
                     opacity={0.9}
                     style={{ pointerEvents: "none", userSelect: "none" }}
