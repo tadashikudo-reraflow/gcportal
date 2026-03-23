@@ -321,19 +321,8 @@ export default async function CostsPage() {
   const maxRatio = ratios.length > 0 ? Math.max(...ratios) : null;
 
   // サマリー数値
-  const targetPct = -30;
   const avgPct = avgRatio != null ? Math.round((avgRatio - 1) * 100) : 156;
   const worstPct = maxRatio != null ? Math.round((maxRatio - 1) * 100) : 470;
-
-  // ゲージ上の位置計算（-50%〜+500% → 0〜100%）
-  const scaleMin = -50;
-  const scaleMax = 500;
-  const toScalePos = (pct: number) => Math.max(0, Math.min(100, ((pct - scaleMin) / (scaleMax - scaleMin)) * 100));
-
-  const targetPos = toScalePos(targetPct);
-  const avgPos = toScalePos(avgPct);
-  const worstPos = toScalePos(worstPct);
-  const zeroPos = toScalePos(0);
 
   return (
     <div className="space-y-6">
@@ -345,143 +334,55 @@ export default async function CostsPage() {
         </p>
       </div>
 
-      {/* ⑦ サマリーバナー: 数直線ゲージ形式 */}
+      {/* ⑦ コストギャップ — 水平バー比較 */}
       <div className="card p-6">
-        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-lg font-bold mb-1" style={{ color: "var(--color-gov-primary)" }}>
           目標と実態のギャップ
         </h2>
+        <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>
+          当初「30%削減」の目標に対し、実態は平均+{avgPct}%の増加
+        </p>
 
-        {/* 3つの数値サマリー */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <div className="text-center p-3 rounded-lg border-2 border-green-200 bg-green-50">
-            <p className="text-xs text-green-600 font-semibold mb-0.5">当初目標</p>
-            <p className="text-3xl font-extrabold text-green-700 tabular-nums leading-tight">−30%</p>
-            <p className="text-xs text-green-500 mt-1">コスト削減</p>
+        {/* 水平バー比較 */}
+        <div className="space-y-5">
+          {/* 当初目標 */}
+          <div>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>当初目標</span>
+              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#10B981" }}>−30%</span>
+            </div>
+            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
+              <div className="h-3 rounded-full" style={{ width: "70%", backgroundColor: "#10B981", opacity: 0.7 }} />
+            </div>
           </div>
-          <div className="text-center p-3 rounded-lg border-2 border-red-200 bg-red-50">
-            <p className="text-xs text-red-500 font-semibold mb-0.5">実態平均</p>
-            <p className="text-3xl font-extrabold text-red-600 tabular-nums leading-tight">
-              +{avgPct}%
-            </p>
-            <p className="text-xs text-red-400 mt-1">コスト増加</p>
+
+          {/* 実態平均 */}
+          <div>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>実態平均</span>
+              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#EF4444" }}>+{avgPct}%</span>
+            </div>
+            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
+              <div className="h-3 rounded-full" style={{ width: `${Math.min(100, 50 + avgPct / 10)}%`, backgroundColor: "#EF4444", opacity: 0.7 }} />
+            </div>
           </div>
-          <div className="text-center p-3 rounded-lg border-2 border-red-300 bg-red-100">
-            <p className="text-xs text-red-600 font-semibold mb-0.5">最悪事例</p>
-            <p className="text-3xl font-extrabold text-red-800 tabular-nums leading-tight">
-              +{worstPct}%
-            </p>
-            <p className="text-xs text-red-500 mt-1">中核市</p>
+
+          {/* 最悪事例 */}
+          <div>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>最悪事例（中核市）</span>
+              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#991B1B" }}>+{worstPct}%</span>
+            </div>
+            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
+              <div className="h-3 rounded-full" style={{ width: "100%", backgroundColor: "#EF4444", opacity: 0.4 }} />
+            </div>
           </div>
         </div>
 
-        {/* 数直線ゲージ */}
-        <div className="relative px-2 mb-2">
-          {/* ラベル行 — 上段と下段に分散して文字被りを回避 */}
-          <div className="relative h-28 mb-1">
-            {/* 目標マーカー（上段） */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${targetPos}%`, transform: "translateX(-50%)", top: 0 }}>
-              <span className="text-[10px] font-bold text-green-700 whitespace-nowrap">目標</span>
-              <span className="text-sm font-extrabold text-green-700">−30%</span>
-              <div className="w-0.5 h-6 bg-green-600" />
-            </div>
-            {/* 0% = 現行運用経費 基準マーカー（下段） */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${zeroPos}%`, transform: "translateX(-50%)", top: 28 }}>
-              <span className="text-[10px] font-bold text-gray-600 whitespace-nowrap px-1 py-0.5 rounded" style={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}>
-                0%基準
-              </span>
-              <div className="w-0.5 h-5 bg-gray-500 mt-0.5" />
-            </div>
-            {/* 実態平均マーカー（上段） */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${avgPos}%`, transform: "translateX(-50%)", top: 0 }}>
-              <span className="text-[10px] font-bold text-red-600 whitespace-nowrap">実態平均</span>
-              <span className="text-sm font-extrabold text-red-600">+{avgPct}%</span>
-              <div className="w-0.5 h-6 bg-red-500" />
-            </div>
-            {/* 最悪事例マーカー（下段） */}
-            <div className="absolute flex flex-col items-center" style={{ left: `${worstPos}%`, transform: "translateX(-50%)", top: 28 }}>
-              <span className="text-[10px] font-bold text-red-800 whitespace-nowrap">最悪</span>
-              <span className="text-sm font-extrabold text-red-800">+{worstPct}%</span>
-              <div className="w-0.5 h-5 bg-red-800" />
-            </div>
-          </div>
-
-          {/* メインゲージバー */}
-          <div className="relative h-6 rounded-full overflow-hidden bg-gray-100 border border-gray-200">
-            {/* 削減ゾーン（緑グラデーション） */}
-            <div
-              className="absolute top-0 bottom-0 rounded-l-full"
-              style={{
-                left: 0,
-                width: `${zeroPos}%`,
-                background: "linear-gradient(90deg, #22c55e 0%, #bbf7d0 100%)",
-                opacity: 0.4,
-              }}
-            />
-            {/* 増加ゾーン（赤グラデーション） */}
-            <div
-              className="absolute top-0 bottom-0 rounded-r-full"
-              style={{
-                left: `${zeroPos}%`,
-                width: `${100 - zeroPos}%`,
-                background: "linear-gradient(90deg, #fecaca 0%, #ef4444 50%, #7f1d1d 100%)",
-                opacity: 0.3,
-              }}
-            />
-            {/* 0%基準線（現行運用経費） */}
-            <div className="absolute top-0 bottom-0 w-0.5 z-10 bg-gray-600" style={{ left: `${zeroPos}%` }} />
-            {/* 目標位置マーカー */}
-            <div
-              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
-              style={{ left: `${targetPos}%`, backgroundColor: "#15803d" }}
-            />
-            {/* 実態平均マーカー */}
-            <div
-              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
-              style={{ left: `${avgPos}%`, backgroundColor: "#dc2626" }}
-            />
-            {/* 最悪マーカー */}
-            <div
-              className="absolute top-0 bottom-0 w-1 z-20 rounded-full"
-              style={{ left: `${worstPos}%`, backgroundColor: "#7f1d1d" }}
-            />
-            {/* ギャップ矢印ゾーン（目標〜実態平均） */}
-            <div
-              className="absolute top-1/2 h-1 -translate-y-1/2 z-15"
-              style={{
-                left: `${targetPos}%`,
-                width: `${avgPos - targetPos}%`,
-                background: "repeating-linear-gradient(90deg, #ef4444 0px, #ef4444 4px, transparent 4px, transparent 8px)",
-                opacity: 0.6,
-              }}
-            />
-          </div>
-
-          {/* 目盛り */}
-          <div className="relative h-4 mt-0.5">
-            {[-30, 0, 50, 100, 200, 300, 400, 500].map((tick) => (
-              <span
-                key={tick}
-                className="absolute text-xs text-gray-400 tabular-nums"
-                style={{ left: `${toScalePos(tick)}%`, transform: "translateX(-50%)" }}
-              >
-                {tick > 0 ? `+${tick}%` : `${tick}%`}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* ギャップ注記 */}
-        <div className="bg-amber-50 px-4 py-2.5 rounded-lg border border-amber-200 mt-3 flex items-start gap-2">
-          <span className="text-amber-600 text-sm flex-shrink-0 mt-0.5">&#9888;</span>
-          <div className="text-xs text-amber-700">
-            <p className="font-semibold mb-0.5">
-              目標（−30%）と実態平均（+{avgPct}%）の間に約{avgPct + 30}ポイントの乖離
-            </p>
-            <p>
-              特に中小自治体・大規模カスタマイズ先で顕著。運用費・回線費の増加が主因。
-            </p>
-          </div>
-        </div>
+        {/* 乖離注記 */}
+        <p className="text-xs mt-5 pt-4" style={{ color: "var(--color-text-muted)", borderTop: "1px solid var(--color-border)" }}>
+          目標と実態の間に約{avgPct + 30}ポイントの乖離。特に中小自治体・大規模カスタマイズ先で顕著。運用費・回線費の増加が主因。
+        </p>
       </div>
 
       {/* 数値ハイライトバナー */}
