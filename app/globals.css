@@ -150,13 +150,18 @@ body {
     border-bottom-color: var(--color-brand-accent);
   }
 
-  /* ナビ: scroll-snap（モバイルスワイプ） */
-  .nav-scroll-snap {
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+  /* ナビ: scroll-snap（デスクトップのみ。モバイルではタップ優先） */
+  @media (min-width: 641px) {
+    .nav-scroll-snap {
+      scroll-snap-type: x mandatory;
+    }
+    .nav-scroll-snap > a,
+    .nav-scroll-snap > div {
+      scroll-snap-align: start;
+    }
   }
-  .nav-scroll-snap > a {
-    scroll-snap-align: start;
+  .nav-scroll-snap {
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ナビ: タッチターゲット最低44px保証 */
@@ -370,11 +375,11 @@ body {
     .page-title { font-size: 1.25rem; }
     .page-subtitle { font-size: 0.9rem; }
 
-    /* ナビ: タッチターゲット44px保証 + コンパクト幅 */
+    /* ナビ: タッチターゲット48px保証 + コンパクト幅 */
     .nav-link {
-      padding: 0.875rem 0.75rem;
-      font-size: 0.8125rem;
-      min-height: 44px;
+      padding: 0.875rem 1rem;
+      font-size: 0.875rem;
+      min-height: 48px;
     }
 
     /* バッジ */

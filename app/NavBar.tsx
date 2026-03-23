@@ -119,8 +119,9 @@ export default function NavBar() {
               return (
                 <div key={group.label} className="relative flex-shrink-0">
                   <button
-                    onClick={() => setOpenGroup(isOpen ? null : group.label)}
+                    onClick={(e) => { e.stopPropagation(); setOpenGroup(isOpen ? null : group.label); }}
                     className={`nav-link nav-touch-target whitespace-nowrap flex items-center gap-1 ${active ? "nav-link-active" : ""}`}
+                    style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }}
                   >
                     <span className="hidden sm:inline">{group.label}</span>
                     <span className="sm:hidden">{group.short}</span>
