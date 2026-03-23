@@ -92,73 +92,107 @@ function BusinessGroup({
         <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform">▼</span>
       </summary>
 
-      <div className="mt-2 overflow-x-auto">
-        <table className="w-full text-sm table-fixed">
-          <colgroup>
-            <col style={{ width: "auto" }} />
-            <col style={{ width: "7rem" }} />
-            <col style={{ width: "6rem" }} />
-            <col style={{ width: "7rem" }} />
-          </colgroup>
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>
-              <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">ベンダー</th>
-              <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">クラウド</th>
-              <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">確認日</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visiblePkgs.map((mp, idx) => {
-              const vendor = mp.vendor;
-              const platform = vendor?.cloud_platform ?? null;
-              const confirmed = vendor?.cloud_confirmed ?? false;
-              const badgeStyle = getCloudBadgeStyle(platform, confirmed);
-              return (
-                <tr
-                  key={`${mp.package_name}-${idx}`}
-                  className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                >
-                  <td className="py-2 px-3 font-medium text-gray-800">
-                    <span className="flex items-center gap-1.5">
-                      {displayValue(mp.package_name)}
-                      {mp.subCount > 1 && (
-                        <span
-                          className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-xs font-bold"
-                          style={{ backgroundColor: "#e0e7ff", color: "#3730a3", fontSize: 10 }}
-                          title={`${mp.subCount}件の適合番号（サブシステム）`}
-                        >
-                          {mp.subCount}件
-                        </span>
-                      )}
-                    </span>
-                  </td>
-                  <td className="py-2 px-3 text-gray-600">
-                    {displayValue(vendor?.short_name ?? vendor?.name)}
-                  </td>
-                  <td className="py-2 px-3">
-                    {badgeStyle ? (
-                      <span
-                        className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold"
-                        style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                      >
-                        {platform}
-                        {!confirmed && (
-                          <span className="opacity-80 text-xs ml-0.5">未確認</span>
+      <div className="mt-2">
+        {/* デスクトップ: テーブル表示 */}
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">ベンダー</th>
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">クラウド</th>
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">確認日</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visiblePkgs.map((mp, idx) => {
+                const vendor = mp.vendor;
+                const platform = vendor?.cloud_platform ?? null;
+                const confirmed = vendor?.cloud_confirmed ?? false;
+                const badgeStyle = getCloudBadgeStyle(platform, confirmed);
+                return (
+                  <tr
+                    key={`${mp.package_name}-${idx}`}
+                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="py-2 px-3 font-medium text-gray-800">
+                      <span className="flex items-center gap-1.5">
+                        {displayValue(mp.package_name)}
+                        {mp.subCount > 1 && (
+                          <span
+                            className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-xs font-bold"
+                            style={{ backgroundColor: "#e0e7ff", color: "#3730a3", fontSize: 10 }}
+                          >
+                            {mp.subCount}件
+                          </span>
                         )}
                       </span>
-                    ) : (
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>調査中</span>
+                    </td>
+                    <td className="py-2 px-3 text-gray-600 whitespace-nowrap">
+                      {displayValue(vendor?.short_name ?? vendor?.name)}
+                    </td>
+                    <td className="py-2 px-3">
+                      {badgeStyle ? (
+                        <span
+                          className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap"
+                          style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
+                        >
+                          {platform}
+                        </span>
+                      ) : (
+                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>調査中</span>
+                      )}
+                    </td>
+                    <td className="py-2 px-3 text-xs text-gray-500 whitespace-nowrap">
+                      {displayValue(mp.confirmed_date)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* モバイル: カード表示 */}
+        <div className="sm:hidden space-y-2">
+          {visiblePkgs.map((mp, idx) => {
+            const vendor = mp.vendor;
+            const platform = vendor?.cloud_platform ?? null;
+            const confirmed = vendor?.cloud_confirmed ?? false;
+            const badgeStyle = getCloudBadgeStyle(platform, confirmed);
+            return (
+              <div
+                key={`${mp.package_name}-${idx}`}
+                className="flex items-center justify-between gap-2 py-2.5 px-3 rounded-lg border border-gray-100"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {displayValue(mp.package_name)}
+                    {mp.subCount > 1 && (
+                      <span className="text-xs font-normal text-gray-400 ml-1">({mp.subCount}件)</span>
                     )}
-                  </td>
-                  <td className="py-2 px-3 text-xs text-gray-500">
-                    {displayValue(mp.confirmed_date)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {displayValue(vendor?.short_name ?? vendor?.name)}
+                    {mp.confirmed_date && mp.confirmed_date !== "調査中" && (
+                      <span className="text-gray-400 ml-1.5">{mp.confirmed_date}</span>
+                    )}
+                  </p>
+                </div>
+                {badgeStyle ? (
+                  <span
+                    className="flex-shrink-0 px-2 py-0.5 rounded text-xs font-semibold"
+                    style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
+                  >
+                    {platform}
+                  </span>
+                ) : (
+                  <span className="flex-shrink-0 text-xs text-gray-400">調査中</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {hasMore && (
           <button
