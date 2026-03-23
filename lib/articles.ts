@@ -107,7 +107,13 @@ export async function getArticlesByTags(
     }));
 }
 
-/** slug から記事本文（HTML）を取得 */
+/**
+ * slug から記事本文（HTML）を取得
+ *
+ * ⚠️ アーキテクチャ注意: DBには変換済みHTMLが格納されている。
+ * ここで remark 等の MD→HTML 変換を行ってはいけない（二重変換で内容が破壊される）。
+ * 変換は入口（POST /api/articles または scripts/migrate-articles-to-db.ts）で1回だけ行う。
+ */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
   const supabase = getSupabase();
   const { data } = await supabase

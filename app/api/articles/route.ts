@@ -51,6 +51,8 @@ export async function POST(req: NextRequest) {
   );
 
   // Markdown → HTML 変換（API経由は常にMDを受け取りHTMLで保存）
+  // ⚠️ sanitize: false 必須 — Mermaid コードブロック等のHTMLタグを保持するため。
+  // true にすると Mermaid 図・テーブル等のHTMLが除去されて表示が壊れる。
   const processed = await remark()
     .use(remarkGfm)
     .use(remarkHtml, { sanitize: false })

@@ -8,6 +8,8 @@ mermaid.initialize({
   theme: "neutral",
   fontFamily: "system-ui, sans-serif",
   fontSize: 18,
+  // ⚠️ securityLevel: "loose" 必須 — "strict" にすると innerHTML 挿入が制限され
+  // L75 の `wrapper.innerHTML = svg` が機能せず Mermaid 図が描画されなくなる。
   securityLevel: "loose",
   flowchart: {
     padding: 20,
