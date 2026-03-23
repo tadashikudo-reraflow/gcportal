@@ -206,11 +206,6 @@ export default function RisksPage() {
         )}
       </div>
 
-      {/* テーブル（フィルター付き Client Component） */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <RiskFilter rows={rows} prefectures={prefectures} />
-      </div>
-
       {/* 期限超過のデメリット */}
       <div className="card p-5">
         <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
@@ -290,6 +285,11 @@ export default function RisksPage() {
         <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
           ※ 標準化法は「努力義務」であり、直接的な罰則規定はありません。ただし特定移行支援システム認定を受けずに期限を超過した場合、上記のリスクが現実化する可能性が高まります。
         </p>
+      </div>
+
+      {/* テーブル（フィルター付き Client Component） */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <RiskFilter rows={rows} prefectures={prefectures} />
       </div>
 
       {/* 特定移行案内 */}
