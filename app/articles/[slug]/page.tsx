@@ -7,6 +7,9 @@ import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
 
+// ISR: DB更新後1時間以内に自動反映
+export const revalidate = 3600;
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {

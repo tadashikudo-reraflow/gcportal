@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllArticles } from "@/lib/articles";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "コラム・解説記事 | ガバメントクラウド移行状況ダッシュボード",
   description:
