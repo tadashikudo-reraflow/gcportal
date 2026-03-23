@@ -131,19 +131,22 @@ Markdown比較表も有効:
 
 ### Step 4: アイキャッチ画像生成
 
-Gemini画像生成でOGP用アイキャッチを作成:
+**HTML + Playwright スクリプトで生成**（統一フォーマット）:
 
+```bash
+cd ~/workspace/pj/PJ19_GCInsight/gcportal
+export $(grep -v '^#' .env.local | xargs)
+node scripts/generate-cover-images.mjs {slug}
 ```
-gemini-generate-image で以下を生成:
-- テーマに合った抽象的なビジュアル
-- アスペクト比: 16:9（OGP最適）
-- スタイル: クリーン・ビジネス・デジタル
-- 保存先: public/images/articles/{slug}.webp
-```
+
+- DBから記事データ（title, tags）を読むので **必ず Step 7.5（DB投入）の後に実行**
+- 出力: `public/images/articles/{slug}.png`（1200×630, Retina 2x）
+- テンプレート: 青グラデ背景 + カテゴリバッジ + タイトル + ハッシュタグ + GCInsightロゴ
+- **Gemini画像生成やOGエンドポイント(curl)は使わない**（スタイル不一致になるため）
 
 frontmatterの `coverImage` に画像パスを設定:
 ```yaml
-coverImage: "/images/articles/{slug}.webp"
+coverImage: "/images/articles/{slug}.png"
 ```
 
 ### Step 5: タグ設定（クラスター連動）
