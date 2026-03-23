@@ -15,7 +15,7 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
-      { href: "/businesses", label: "業務別の進捗を見る", desc: "20業務ごとの完了率" },
+      { href: "/businesses", label: "業務別の進捗を見る", desc: "20業務ごとの進捗率" },
       { href: "/benchmark",  label: "自治体同士を比較する", desc: "人口帯・地域別の比較" },
       { href: "/timeline",   label: "スケジュールを確認", desc: "移行タイムライン" },
     ],
@@ -24,7 +24,7 @@ const NAV_GROUPS = [
     label: "リスク",
     short: "リスク",
     children: [
-      { href: "/risks",   label: "遅延リスク自治体一覧", desc: "完了率50%未満の自治体" },
+      { href: "/risks",   label: "遅延リスク自治体一覧", desc: "進捗率50%未満の自治体" },
       { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "935団体の認定状況" },
     ],
   },

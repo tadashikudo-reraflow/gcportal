@@ -104,6 +104,10 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
   const tokuteiCount = sortedMunicipalities.filter(
     (m) => tokuteiSet.has(`${m.prefecture}/${m.city}`)
   ).length;
+  // 全業務完了（overall_rate >= 1.0 かつ特定移行でない）の自治体数
+  const allCompleteCount = sortedMunicipalities.filter(
+    (m) => m.overall_rate !== null && m.overall_rate >= 1.0 && !tokuteiSet.has(`${m.prefecture}/${m.city}`)
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -134,7 +138,7 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
               {formatRate(prefSummary.avg_rate)}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              完了 {prefSummary.completed} / 危機 {prefSummary.critical} / 特定移行 {tokuteiCount}
+              全業務完了 <strong style={{ color: allCompleteCount > 0 ? "#16a34a" : "#ef4444" }}>{allCompleteCount}</strong> / 危機 {prefSummary.critical} / 特定移行 {tokuteiCount}
             </p>
           </div>
         )}
@@ -150,7 +154,7 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
                   市区町村
                 </th>
                 <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium min-w-[160px]">
-                  完了率
+                  進捗率
                 </th>
                 <th className="text-center py-3 px-2 text-xs text-gray-500 font-medium min-w-[40px]" title="特定移行認定">
                   特定

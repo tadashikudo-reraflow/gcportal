@@ -31,7 +31,7 @@ export default function MigrationResultBanner({
   const metrics = [
     {
       value: `${(completionRate * 100).toFixed(1)}%`,
-      label: "完了率",
+      label: "システム移行率",
       sub: `(${completedSystems.toLocaleString()}/${totalSystems.toLocaleString()})`,
       note: "システム数ベース",
     },
@@ -120,8 +120,8 @@ export default function MigrationResultBanner({
         style={{ backgroundColor: "rgba(255,255,255,0.04)", color: "#94a3b8", borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <span style={{ color: "#60a5fa", fontWeight: 600 }}>指標の定義:</span>{" "}
-        完了率（{(completionRate * 100).toFixed(1)}%）はシステム数ベース（{completedSystems.toLocaleString()}/{totalSystems.toLocaleString()}システム）。
-        ダッシュボードの<strong style={{ color: "#e2e8f0" }}>{avgRatePct}%</strong>は全{totalMunicipalities.toLocaleString()}自治体・20業務の平均移行率（業務ベース）であり、別指標です。
+        システム移行率（{(completionRate * 100).toFixed(1)}%）はシステム数ベース（{completedSystems.toLocaleString()}/{totalSystems.toLocaleString()}システム）。
+        ダッシュボードの<strong style={{ color: "#e2e8f0" }}>手続き進捗率 {avgRatePct}%</strong>は全{totalMunicipalities.toLocaleString()}自治体・20業務の平均移行率（業務ベース）であり、別指標です。
         特定移行支援システム（{delayedMunicipalities.toLocaleString()}団体）は2026年度以降も移行継続。概ね5年以内（〜2030年度目安）の完了を目指す方針。
       </div>
     </div>

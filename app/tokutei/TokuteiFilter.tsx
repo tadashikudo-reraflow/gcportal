@@ -179,7 +179,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                     {group.rows.length}自治体
                   </span>
                   <span style={{ color: getRateColor(group.avgRate) }}>
-                    平均完了率: <span className="font-bold">{formatRate(group.avgRate)}</span>
+                    平均 手続き進捗率: <span className="font-bold">{formatRate(group.avgRate)}</span>
                   </span>
                 </div>
               </button>
@@ -192,7 +192,7 @@ export default function TokuteiFilter({ rows, prefectures }: TokuteiFilterProps)
                       <tr style={{ backgroundColor: "#f9fafb" }}>
                         <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium w-10">No.</th>
                         <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium">市区町村</th>
-                        <th className="text-right py-2 px-4 text-xs text-gray-500 font-medium">完了率（参考）</th>
+                        <th className="text-right py-2 px-4 text-xs text-gray-500 font-medium">進捗率（参考）</th>
                         <th className="text-left py-2 px-4 text-xs text-gray-500 font-medium">ステータス</th>
                       </tr>
                     </thead>

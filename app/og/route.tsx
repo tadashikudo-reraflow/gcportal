@@ -242,7 +242,7 @@ export async function GET(req: NextRequest) {
                     marginTop: "2px",
                   }}
                 >
-                  完了率
+                  進捗率
                 </span>
               </div>
             </div>

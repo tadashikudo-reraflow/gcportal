@@ -113,7 +113,7 @@ function PrefectureWidget() {
   return (
     <div className="p-4 space-y-3">
       <h3 className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
-        都道府県別完了率 TOP10
+        都道府県別 手続き進捗率 TOP10
       </h3>
       <div className="space-y-1.5">
         {sortedPrefectures.map((pref, i) => {
@@ -256,7 +256,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                 進捗サマリー (<code className="text-xs">type=progress</code>)
               </h3>
               <p className="text-xs text-gray-500 mb-2">
-                全国平均完了率・自治体数の概要を表示
+                全国平均 手続き進捗率・自治体数の概要を表示
               </p>
               <EmbedInstructions type="progress" />
             </div>
@@ -266,7 +266,7 @@ export default async function EmbedPage({ searchParams }: EmbedPageProps) {
                 都道府県ランキング (<code className="text-xs">type=prefecture</code>)
               </h3>
               <p className="text-xs text-gray-500 mb-2">
-                完了率上位10都道府県を表示
+                手続き進捗率上位10都道府県を表示
               </p>
               <EmbedInstructions type="prefecture" />
             </div>

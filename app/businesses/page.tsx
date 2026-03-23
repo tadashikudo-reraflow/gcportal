@@ -56,7 +56,7 @@ export default function BusinessesPage() {
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">業務別 標準化進捗</h1>
         <p className="page-subtitle">
-          全20業務の完了率を低い順に表示（全{data.summary.total.toLocaleString()}団体対象）
+          全20業務の手続き進捗率を低い順に表示（全{data.summary.total.toLocaleString()}団体対象）
         </p>
         <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#64748B", fontSize: 10, fontWeight: 700 }}>特定移行</span>
@@ -96,7 +96,7 @@ export default function BusinessesPage() {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <span className="text-xs text-gray-400 font-medium">
-                    完了率 {rank + 1}位（低）
+                    進捗率 {rank + 1}位（低）
                   </span>
                   <h2 className="text-xl font-bold text-gray-800 mt-0.5">
                     {biz.business}
@@ -113,7 +113,7 @@ export default function BusinessesPage() {
               {/* プログレスバー */}
               <div className="mb-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-500">全国平均完了率</span>
+                  <span className="text-xs text-gray-500">全国平均 手続き進捗率</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                   <div
@@ -161,7 +161,7 @@ export default function BusinessesPage() {
                         市区町村
                       </th>
                       <th className="text-right py-1 text-gray-400 font-medium">
-                        完了率
+                        進捗率
                       </th>
                     </tr>
                   </thead>

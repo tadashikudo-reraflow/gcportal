@@ -114,7 +114,7 @@ export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilt
                 市区町村
               </th>
               <th className="text-right py-2.5 px-2 text-xs text-gray-500 font-medium">
-                完了率
+                進捗率
               </th>
               <th className="text-left py-2.5 px-2 text-xs text-gray-500 font-medium">
                 最も遅れている業務

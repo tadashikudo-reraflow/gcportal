@@ -61,7 +61,7 @@ export default function PrefectureHeatmap({ prefectures }: PrefectureHeatmapProp
         都道府県ヒートマップ
       </h2>
       <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-        面積は自治体数に比例、色は完了率を示します。クリックで都道府県詳細へ。
+        面積は自治体数に比例、色は手続き進捗率を示します。クリックで都道府県詳細へ。
       </p>
 
       {/* Treemap-style grid */}
@@ -102,7 +102,7 @@ export default function PrefectureHeatmap({ prefectures }: PrefectureHeatmapProp
                 borderLeftWidth: "3px",
                 borderLeftColor: color,
               }}
-              title={`${pref.prefecture}: 完了率 ${(pref.avg_rate * 100).toFixed(1)}% / ${pref.count}自治体`}
+              title={`${pref.prefecture}: 手続き進捗率 ${(pref.avg_rate * 100).toFixed(1)}% / ${pref.count}自治体`}
             >
               <p
                 className="text-xs font-bold leading-tight truncate"
@@ -134,7 +134,7 @@ export default function PrefectureHeatmap({ prefectures }: PrefectureHeatmapProp
                   }}
                 >
                   <p className="font-bold">{pref.prefecture}</p>
-                  <p>完了率: <span className="font-black">{(pref.avg_rate * 100).toFixed(1)}%</span></p>
+                  <p>手続き進捗率: <span className="font-black">{(pref.avg_rate * 100).toFixed(1)}%</span></p>
                   <p>自治体数: {pref.count} / 完了: {pref.completed} / 危機: {pref.critical}</p>
                   <div
                     className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0"
@@ -153,7 +153,7 @@ export default function PrefectureHeatmap({ prefectures }: PrefectureHeatmapProp
 
       {/* Legend */}
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-        <span className="text-xs text-gray-500">完了率:</span>
+        <span className="text-xs text-gray-500">手続き進捗率:</span>
         {[
           { label: "80%以上", color: "#10B981", bg: "#ecfdf5" },
           { label: "60-80%", color: "#F5B500", bg: "#fefce8" },

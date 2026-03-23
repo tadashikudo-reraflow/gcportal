@@ -103,7 +103,7 @@ export default function RisksPage() {
       <div className="pb-2">
         <h1 className="page-title">遅延リスク 自治体一覧</h1>
         <p className="page-subtitle">
-          完了率50%未満かつ特定移行認定なしの自治体（2026年3月末期限）
+          手続き進捗率50%未満かつ特定移行認定なしの自治体（2026年3月末期限）
         </p>
       </div>
 
@@ -141,7 +141,7 @@ export default function RisksPage() {
             <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>
               {avgRate.toFixed(1)}%
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>危機自治体の平均完了率</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>危機自治体の平均 手続き進捗率</p>
           </div>
           <div className="text-center">
             <p className="text-3xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
@@ -164,7 +164,7 @@ export default function RisksPage() {
         {rows.length > 0 && (
           <div>
             <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>
-              危機レベル分布（完了率別）
+              危機レベル分布（手続き進捗率別）
             </p>
             <div className="flex rounded-lg overflow-hidden h-7 text-xs font-bold">
               {dist.critical > 0 && (

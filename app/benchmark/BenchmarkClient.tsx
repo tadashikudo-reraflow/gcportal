@@ -589,14 +589,14 @@ export default function BenchmarkClient({
     lines.push("【対象自治体】");
     lines.push(`自治体名\t${selectedMuni.prefecture} ${selectedMuni.city}`);
     lines.push(`人口帯\t${selectedMuni.popBand}`);
-    lines.push(`全体完了率\t${formatRate(myRate)}`);
+    lines.push(`全体 手続き進捗率\t${formatRate(myRate)}`);
     lines.push(`全国ステータス\t${getStatusLabel(myRate)}`);
     lines.push("");
 
     if (sameBandStats) {
       lines.push("【同規模自治体との比較】");
       lines.push(`人口帯\t${selectedMuni.popBand}`);
-      lines.push(`同帯平均完了率\t${formatRate(sameBandStats.avg)}`);
+      lines.push(`同帯平均 手続き進捗率\t${formatRate(sameBandStats.avg)}`);
       lines.push(`同帯内順位\t${sameBandStats.rank}位 / ${sameBandStats.total}団体`);
       lines.push(
         `平均との差\t${myRate >= sameBandStats.avg ? "+" : ""}${((myRate - sameBandStats.avg) * 100).toFixed(1)}pt`
@@ -605,7 +605,7 @@ export default function BenchmarkClient({
     }
 
     lines.push("【業務別進捗】");
-    lines.push("業務名\t完了率");
+    lines.push("業務名\t進捗率");
     const rates = selectedMuni.business_rates;
     for (const [biz, rate] of Object.entries(rates)) {
       if (rate !== null && rate !== undefined) {
@@ -616,7 +616,7 @@ export default function BenchmarkClient({
 
     if (samePrefMunis.length > 0) {
       lines.push(`【${selectedMuni.prefecture}内の他自治体（上位10団体）】`);
-      lines.push("自治体名\t完了率");
+      lines.push("自治体名\t進捗率");
       for (const m of samePrefMunis) {
         lines.push(`${m.city}\t${formatRate(m.overall_rate ?? 0)}`);
       }
@@ -669,13 +669,13 @@ export default function BenchmarkClient({
           ============================================================ */}
       {activeTab === "ranking" && (
         <div className="space-y-8">
-          {/* SECTION 1: 人口帯別の完了率比較 */}
+          {/* SECTION 1: 人口帯別の手続き進捗率比較 */}
           <section className="card p-5 sm:p-6">
             <h2
               className="text-lg font-bold mb-1"
               style={{ color: "var(--color-gov-primary)" }}
             >
-              人口帯別の完了率比較
+              人口帯別の手続き進捗率比較
             </h2>
             <p className="text-sm mb-5" style={{ color: "var(--color-text-secondary)" }}>
               自治体名の末尾（市/町/村/区）と主要都市リストに基づく推定分類
@@ -773,7 +773,7 @@ export default function BenchmarkClient({
                       都道府県
                     </th>
                     <th className="text-left py-2.5 px-3 text-xs font-medium min-w-[160px]" style={{ color: "#fff" }}>
-                      平均完了率
+                      平均 手続き進捗率
                     </th>
                     <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
                       対象数
@@ -1018,7 +1018,7 @@ export default function BenchmarkClient({
                           <tr style={{ backgroundColor: "var(--color-section-bg)" }}>
                             <th className="text-left py-2 px-3 text-xs font-medium">自治体名</th>
                             <th className="text-left py-2 px-3 text-xs font-medium">人口帯</th>
-                            <th className="text-left py-2 px-3 text-xs font-medium min-w-[120px]">完了率</th>
+                            <th className="text-left py-2 px-3 text-xs font-medium min-w-[120px]">進捗率</th>
                             <th className="text-center py-2 px-3 text-xs font-medium">状況</th>
                           </tr>
                         </thead>
@@ -1125,7 +1125,7 @@ export default function BenchmarkClient({
                           className="py-2 px-4 font-medium text-xs"
                           style={{ backgroundColor: "var(--color-section-bg)" }}
                         >
-                          全体完了率
+                          全体 手続き進捗率
                         </td>
                         <td
                           className="py-2 px-4 text-sm font-bold"

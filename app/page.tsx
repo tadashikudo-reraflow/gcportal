@@ -9,6 +9,7 @@ import JapanMap from "@/components/JapanMap";
 import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
 import GlossaryTooltip from "@/components/GlossaryTooltip";
+import ThreeMetricsWidget from "@/components/ThreeMetricsWidget";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
 
@@ -182,14 +183,34 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ========== 業務別完了率 ========== */}
+      {/* ========== 3指標比較ウィジェット ========== */}
+      <ThreeMetricsWidget
+        completeRate={completeCount / TOTAL}
+        systemRate={migrationStats.completion_rate}
+        stepRate={summary.avg_rate}
+        completeCount={completeCount}
+        totalMunicipalities={TOTAL}
+        completedSystems={migrationStats.completed_systems}
+        totalSystems={migrationStats.total_systems}
+      />
+
+      {/* ========== 進捗率の注釈バナー ========== */}
+      <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
+        <span style={{ color: "#dc2626", fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠</span>
+        <p className="text-xs leading-relaxed" style={{ color: "#991b1b" }}>
+          <strong>手続き進捗率は移行完了を意味しません。</strong>
+          予算要求・ベンダー選定などの準備ステップ（全40段階）が含まれます。全20業務の移行が完了した自治体は <strong>{completeCount} / {TOTAL.toLocaleString()}（{completedPct}%）</strong> です。
+        </p>
+      </div>
+
+      {/* ========== 業務別 手続き進捗率 ========== */}
       <div className="card p-6">
         <h2
           className="text-sm font-bold mb-3"
           style={{ color: "var(--color-text-primary)" }}
         >
-          業務別完了率
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>完了率降順</span>
+          業務別 手続き進捗率
+          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>進捗率降順</span>
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
           {sortedBusinesses.map((biz) => {
@@ -220,6 +241,10 @@ export default function DashboardPage() {
                     style={{ width: `${pct}%`, backgroundColor: barColor }}
                   />
                 </div>
+                <p className="text-[10px] leading-tight" style={{ color: "#94a3b8" }}>
+                  完了 <span style={{ color: "#16a34a", fontWeight: 700 }}>{biz.completed}</span>
+                  {" / "}未完了 <span style={{ color: "#ef4444", fontWeight: 700 }}>{TOTAL - biz.completed}</span>
+                </p>
               </div>
             );
           })}
@@ -227,10 +252,10 @@ export default function DashboardPage() {
         <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
           <span className="text-xs text-gray-500">凡例:</span>
           {[
-            { label: "完了(90%+)", color: "#378445" },
-            { label: "順調(70-89%)", color: "#1D4ED8" },
-            { label: "要注意(50-69%)", color: "#F59E0B" },
-            { label: "危機(<50%)", color: "#b91c1c" },
+            { label: "90%+", color: "#378445" },
+            { label: "70-89%", color: "#1D4ED8" },
+            { label: "50-69%", color: "#F59E0B" },
+            { label: "<50%", color: "#b91c1c" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: item.color }} />
@@ -247,7 +272,7 @@ export default function DashboardPage() {
       <div className="card p-4 sm:p-6">
         <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           都道府県別
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>完了率の低い順</span>
+          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>手続き進捗率の低い順</span>
         </h2>
         <PrefectureRanking prefectures={prefectures} tokuteiByPref={tokuteiByPref} />
       </div>
@@ -270,7 +295,7 @@ export default function DashboardPage() {
       <div className="card p-6">
         <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           遅延リスク TOP20
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>完了率50%未満・特定移行除く（全{riskMunis.length}件）</span>
+          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>手続き進捗率50%未満・特定移行除く（全{riskMunis.length}件）</span>
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -279,7 +304,7 @@ export default function DashboardPage() {
                 <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">順位</th>
                 <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
                 <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
-                <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">完了率</th>
+                <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">進捗率</th>
                 <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">ステータス</th>
               </tr>
             </thead>
@@ -336,7 +361,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-col gap-1">
             <span className="cta-card-title">遅延リスク自治体</span>
-            <span className="cta-card-desc">完了率50%未満を人口帯・地域でフィルター</span>
+            <span className="cta-card-desc">手続き進捗率50%未満を人口帯・地域でフィルター</span>
             <span className="cta-card-link">
               一覧を見る
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>

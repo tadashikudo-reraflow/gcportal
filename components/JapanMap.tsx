@@ -158,7 +158,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         日本地図（都道府県カルトグラム）
       </h2>
       <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-        色は標準化完了率を示します。クリックで都道府県詳細へ。
+        色は手続き進捗率を示します。クリックで都道府県詳細へ。
       </p>
 
       <div className="relative w-full mx-auto" style={{ maxWidth: 580 }}>
@@ -167,7 +167,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
           width="100%"
           height="auto"
           role="img"
-          aria-label="日本地図 都道府県別標準化完了率"
+          aria-label="日本地図 都道府県別手続き進捗率"
           style={{ display: "block" }}
         >
           {PREFECTURE_GRID.map(({ name, col, row }) => {
@@ -194,7 +194,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                 style={{ cursor: "pointer" }}
                 role="button"
                 tabIndex={0}
-                aria-label={`${name}: ${rate >= 0 ? `完了率 ${(rate * 100).toFixed(1)}%` : "データなし"}`}
+                aria-label={`${name}: ${rate >= 0 ? `手続き進捗率 ${(rate * 100).toFixed(1)}%` : "データなし"}`}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -266,7 +266,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-4 pt-4 border-t border-gray-100">
-        <span className="text-xs text-gray-500">完了率:</span>
+        <span className="text-xs text-gray-500">手続き進捗率:</span>
         {LEGEND_ITEMS.map((item) => (
           <div key={item.label} className="flex items-center gap-1.5">
             <span
@@ -341,7 +341,7 @@ function TooltipOverlay({
             {data.prefecture}
           </p>
           <p style={{ margin: "2px 0 0" }}>
-            完了率:{" "}
+            手続き進捗率:{" "}
             <span style={{ fontWeight: 800 }}>
               {(data.avg_rate * 100).toFixed(1)}%
             </span>

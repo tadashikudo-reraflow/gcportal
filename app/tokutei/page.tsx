@@ -90,7 +90,7 @@ export default function TokuteiPage() {
         <div style={{ color: "#1e40af" }}>
           <p className="font-bold text-sm mb-1">標準化とガバクラ移行は別の工程です</p>
           <p className="text-xs leading-relaxed">
-            完了率は「ガバクラへの移行進捗」（令和8年1月推計）。標準化とガバクラ移行は別工程のため、認定は業務システム単位で自治体全体の完了率とは連動しません。
+            手続き進捗率は「ガバクラへの移行進捗」（令和8年1月推計）。標準化とガバクラ移行は別工程のため、認定は業務システム単位で自治体全体の手続き進捗率とは連動しません。
           </p>
         </div>
       </div>
@@ -140,13 +140,13 @@ export default function TokuteiPage() {
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>
             {(avgRate * 100).toFixed(1)}%
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>平均完了率（参考）</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>平均 手続き進捗率（参考）</p>
         </div>
         <div className="card p-5 text-center">
           <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#b91c1c" }}>
             {below50}
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>完了率50%未満</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>進捗率50%未満</p>
         </div>
       </div>
 
@@ -172,7 +172,7 @@ export default function TokuteiPage() {
             </p>
           </div>
           <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-            ※ 完了率はガバクラ移行進捗の推計値（令和8年1月時点）。認定は業務単位のため自治体全体の完了率と連動しない場合あり。
+            ※ 手続き進捗率はガバクラ移行進捗の推計値（令和8年1月時点）。認定は業務単位のため自治体全体の手続き進捗率と連動しない場合あり。
           </p>
         </div>
       </div>

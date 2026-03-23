@@ -52,7 +52,7 @@ export default function PrefectureRanking({ prefectures, tokuteiByPref }: Props)
             <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
               <th className="text-center py-2.5 px-2 text-xs font-medium w-10" style={{ color: "#fff" }}>#</th>
               <th className="text-left py-2.5 px-2 text-xs font-medium" style={{ color: "#fff" }}>都道府県</th>
-              <th className="text-left py-2.5 px-2 text-xs font-medium min-w-[100px]" style={{ color: "#fff" }}>完了率</th>
+              <th className="text-left py-2.5 px-2 text-xs font-medium min-w-[100px]" style={{ color: "#fff" }}>進捗率</th>
               <th className="text-right py-2.5 px-2 text-xs font-medium" style={{ color: "#fff" }}>自治体</th>
               <th className="text-right py-2.5 px-2 text-xs font-medium" style={{ color: "#fff" }}>完了</th>
               <th className="text-right py-2.5 px-2 text-xs font-medium" style={{ color: "#fff" }}>危機</th>
