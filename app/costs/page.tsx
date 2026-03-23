@@ -848,6 +848,124 @@ export default async function CostsPage() {
         </ul>
       </div>
 
+      {/* コスト内訳（増加・減少項目） */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-base font-bold text-gray-800 mb-1 flex items-center gap-2">
+          <span className="w-1 h-5 rounded-full inline-block" style={{ backgroundColor: "#6366f1" }} />
+          コスト内訳（増加・減少項目）
+        </h2>
+        <p className="text-xs text-gray-400 mb-4">
+          出典: デジタル庁「運用経費に係る総合的な対策」(2025年6月)・内閣官房WT資料・中核市市長会調査
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-4 mb-5">
+          {/* 増加する経費 */}
+          <div className="rounded-lg border border-red-200 bg-red-50/50 p-4">
+            <h3 className="text-xs font-bold text-red-700 mb-3 flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-red-500"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+              増加する経費
+            </h3>
+            <div className="space-y-2.5">
+              {[
+                { name: "ソフトウェア借料・保守費", desc: "標準準拠パッケージのASP利用料・ライセンス。最大の増加項目", impact: "大" },
+                { name: "ガバクラ利用料", desc: "AWS/OCI等のコンピューティング・ストレージ・通信費。円安の影響を直接受ける", impact: "大" },
+                { name: "システム運用作業費", desc: "クラウド対応の複雑化・クラウド資格者確保に伴う単価上昇", impact: "中" },
+                { name: "ガバクラ接続回線費", desc: "Direct Connect等。冗長化で2倍以上。現行にない新規コスト", impact: "中" },
+                { name: "ガバナンス・セキュリティ費", desc: "CloudTrail・Config等の必須適用テンプレートに伴うデータ処理料金", impact: "小" },
+              ].map((item) => (
+                <div key={item.name} className="flex items-start gap-2">
+                  <span className={`flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold ${
+                    item.impact === "大" ? "bg-red-200 text-red-800" : item.impact === "中" ? "bg-orange-200 text-orange-800" : "bg-yellow-200 text-yellow-800"
+                  }`}>{item.impact}</span>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-800">{item.name}</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 減少する経費 */}
+          <div className="rounded-lg border border-green-200 bg-green-50/50 p-4">
+            <h3 className="text-xs font-bold text-green-700 mb-3 flex items-center gap-1">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-green-500"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              減少する経費
+            </h3>
+            <div className="space-y-2.5">
+              {[
+                { name: "ハードウェア借料・保守費", desc: "オンプレサーバー→共同利用基盤で削減。効果が出る数少ない項目" },
+                { name: "データセンター利用費", desc: "自前DC廃止→共同DCで削減。大規模自治体ほど効果大" },
+              ].map((item) => (
+                <div key={item.name} className="flex items-start gap-2">
+                  <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-green-200 text-green-800">減</span>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-800">{item.name}</p>
+                    <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 pt-3 border-t border-green-200">
+              <p className="text-[11px] text-green-700 font-medium">
+                ※ 増加5項目に対し減少は2項目のみ。先行8地域中5地域で移行後コスト増（デジタル庁2022年検証）
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 人口規模別コスト目安 */}
+        <h3 className="text-sm font-bold text-gray-700 mb-2">人口規模別コスト変化の目安</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">自治体規模</th>
+                <th className="text-right py-2 px-3 font-medium text-gray-600 border-b">移行前（年間）</th>
+                <th className="text-center py-2 px-3 font-medium text-gray-600 border-b">移行後変化</th>
+                <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">出典</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { scale: "小規模町村（〜1万人）", before: "数千万〜1億円", change: "3〜5倍以上", color: "text-red-600", source: "先行事業検証" },
+                { scale: "中小市（5〜10万人）", before: "1〜2億円", change: "2〜4倍", color: "text-red-600", source: "富山県14市町村" },
+                { scale: "中核市（20〜50万人）", before: "平均3.4億円", change: "平均2.3倍", color: "text-orange-600", source: "中核市市長会" },
+                { scale: "政令市・大都市", before: "数十億円規模", change: "1.5〜1.7倍", color: "text-yellow-600", source: "東京都調査" },
+              ].map((row) => (
+                <tr key={row.scale} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-2 px-3 font-medium text-gray-800">{row.scale}</td>
+                  <td className="py-2 px-3 text-right text-gray-600">{row.before}</td>
+                  <td className={`py-2 px-3 text-center font-bold ${row.color}`}>{row.change}</td>
+                  <td className="py-2 px-3 text-gray-400">{row.source}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-gray-400 mt-2">
+          ※ 小規模自治体ほどコスト増が顕著（回線費等の固定費が人口比で重くなるため）
+        </p>
+
+        {/* 公式資料リンク */}
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <p className="text-[11px] font-semibold text-gray-500 mb-2">公式資料</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "運用経費対策（デジタル庁）", url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/c58162cb-92e5-4a43-9ad5-095b7c45100c/dc96d895/20250613_policies_local_governments_doc_02.pdf" },
+              { label: "内閣官房WT資料", url: "https://www.cas.go.jp/jp/seisaku/digital_gyozaikaikaku/kyotsuwt3/siryou6.pdf" },
+              { label: "投資対効果検証（2022年）", url: "https://www.digital.go.jp/assets/contents/node/information/field_ref_resources/8c953d48-271d-467e-8e4c-f7baa8ec018b/4912aad2/20220914_news_local_governments_outline_03.pdf" },
+            ].map((link) => (
+              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded border border-gray-200 text-blue-600 hover:bg-blue-50 transition-colors">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* 注記 */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
         <p className="text-xs text-gray-400">
