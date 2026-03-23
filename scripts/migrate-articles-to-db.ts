@@ -1,17 +1,20 @@
 /**
- * Markdown記事 → Supabase DB ワンタイム移行スクリプト
+ * Markdown記事 → Supabase DB 同期スクリプト
  *
  * 使い方:
- *   npx tsx scripts/migrate-articles-to-db.ts
+ *   npx tsx scripts/migrate-articles-to-db.ts              # 新規のみ追加（既存はスキップ）
+ *   npx tsx scripts/migrate-articles-to-db.ts --update      # 既存記事も上書き更新
+ *   npx tsx scripts/migrate-articles-to-db.ts --slug gc-migration-cost-causes --update  # 1記事だけ更新
  *
  * 環境変数:
+ *   ARTICLES_DIR — 記事MDの読み込み元（省略時: content/articles/）
  *   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)
  *
  * 動作:
- *   1. content/articles/*.md を読み込み
+ *   1. ARTICLES_DIR/*.md を読み込み
  *   2. frontmatter を解析
  *   3. Markdown → HTML 変換
- *   4. Supabase articles テーブルに upsert（slug をキーに重複スキップ）
+ *   4. Supabase articles テーブルに insert or upsert
  */
 
 import fs from "fs";
@@ -22,9 +25,25 @@ import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 import { createClient } from "@supabase/supabase-js";
 
-const ARTICLES_DIR = path.join(process.cwd(), "content", "articles");
+/**
+ * 記事MDの読み込み元:
+ *   1. 環境変数 ARTICLES_DIR が設定されていればそちらを優先（Drive等の外部パス）
+ *   2. 未設定なら従来通り content/articles/ をフォールバック
+ */
+const ARTICLES_DIR =
+  process.env.ARTICLES_DIR ??
+  path.join(process.cwd(), "content", "articles");
+
+function parseArgs() {
+  const args = process.argv.slice(2);
+  return {
+    update: args.includes("--update"),
+    slug: args.includes("--slug") ? args[args.indexOf("--slug") + 1] : null,
+  };
+}
 
 async function main() {
+  const { update, slug: targetSlug } = parseArgs();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ??
@@ -38,14 +57,27 @@ async function main() {
   const supabase = createClient(url, key);
 
   if (!fs.existsSync(ARTICLES_DIR)) {
-    console.log("No articles directory found. Nothing to migrate.");
+    console.log(`No articles directory found at: ${ARTICLES_DIR}`);
     return;
   }
 
-  const files = fs.readdirSync(ARTICLES_DIR).filter((f) => f.endsWith(".md"));
-  console.log(`Found ${files.length} Markdown articles to migrate.\n`);
+  let files = fs.readdirSync(ARTICLES_DIR).filter((f) => f.endsWith(".md"));
 
-  let migrated = 0;
+  if (targetSlug) {
+    files = files.filter((f) => f.replace(/\.md$/, "") === targetSlug);
+    if (files.length === 0) {
+      console.error(`Slug not found: ${targetSlug}`);
+      process.exit(1);
+    }
+  }
+
+  const mode = update ? "INSERT + UPDATE" : "INSERT only (use --update to overwrite)";
+  console.log(`Source: ${ARTICLES_DIR}`);
+  console.log(`Mode:   ${mode}`);
+  console.log(`Found ${files.length} Markdown articles.\n`);
+
+  let inserted = 0;
+  let updated = 0;
   let skipped = 0;
   let errors = 0;
 
@@ -54,19 +86,6 @@ async function main() {
     const filePath = path.join(ARTICLES_DIR, filename);
     const raw = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(raw);
-
-    // Check if already exists in DB
-    const { data: existing } = await supabase
-      .from("articles")
-      .select("id")
-      .eq("slug", slug)
-      .single();
-
-    if (existing) {
-      console.log(`  SKIP  ${slug} (already in DB, id=${existing.id})`);
-      skipped++;
-      continue;
-    }
 
     // Convert Markdown → HTML
     const processed = await remark()
@@ -87,18 +106,48 @@ async function main() {
       sources: [],
     };
 
-    const { error } = await supabase.from("articles").insert(payload);
+    // Check if already exists in DB
+    const { data: existing } = await supabase
+      .from("articles")
+      .select("id")
+      .eq("slug", slug)
+      .single();
 
-    if (error) {
-      console.error(`  ERROR ${slug}: ${error.message}`);
-      errors++;
+    if (existing) {
+      if (!update) {
+        console.log(`  SKIP    ${slug} (already in DB, use --update to overwrite)`);
+        skipped++;
+        continue;
+      }
+
+      // Update existing
+      const { error } = await supabase
+        .from("articles")
+        .update(payload)
+        .eq("id", existing.id);
+
+      if (error) {
+        console.error(`  ERROR   ${slug}: ${error.message}`);
+        errors++;
+      } else {
+        console.log(`  UPDATE  ${slug} (id=${existing.id})`);
+        updated++;
+      }
     } else {
-      console.log(`  OK    ${slug}`);
-      migrated++;
+      // Insert new
+      const { error } = await supabase.from("articles").insert(payload);
+
+      if (error) {
+        console.error(`  ERROR   ${slug}: ${error.message}`);
+        errors++;
+      } else {
+        console.log(`  INSERT  ${slug}`);
+        inserted++;
+      }
     }
   }
 
-  console.log(`\nDone: ${migrated} migrated, ${skipped} skipped, ${errors} errors`);
+  console.log(`\nDone: ${inserted} inserted, ${updated} updated, ${skipped} skipped, ${errors} errors`);
 }
 
 main().catch((e) => {

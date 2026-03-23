@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import NavBar from "./NavBar";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
       {/* ヘッダー — 深紺 #002D72 */}
       <header style={{ backgroundColor: "var(--color-brand-secondary)" }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 no-underline">
             {/* ロゴ: クラウド+GC */}
             <div className="flex-shrink-0" style={{ width: 36, height: 32 }}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="36" height="32">
@@ -35,7 +36,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
                 デジタル庁 ガバメントクラウド移行状況インサイト｜全国1,741自治体の進捗を可視化
               </p>
             </div>
-          </div>
+          </Link>
         </div>
         <NavBar />
       </header>

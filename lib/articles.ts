@@ -3,10 +3,19 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 
+/** 公開データ読み取り用（anon key = RLS適用） */
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
+
+/** 管理操作用（Service Role Key = RLSバイパス） */
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
@@ -49,7 +58,7 @@ export async function getAllArticles(): Promise<ArticleMeta[]> {
 
 /** 全記事（下書き含む）を取得（管理用） */
 export async function getAllArticlesAdmin(): Promise<(ArticleMeta & { id: number; is_published: boolean })[]> {
-  const supabase = getSupabase();
+  const supabase = getSupabaseAdmin();
   const { data } = await supabase
     .from("articles")
     .select("id, slug, title, description, date, tags, author, cover_image, is_published")
@@ -115,7 +124,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 
   const processed = await remark()
     .use(remarkGfm)
-    .use(remarkHtml, { sanitize: false })
+    .use(remarkHtml, { sanitize: true })
     .process(data.content ?? "");
 
   return {
