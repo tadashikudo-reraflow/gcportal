@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const prefecturePages: MetadataRoute.Sitemap = PREFECTURES.map((pref) => ({
-    url: `${BASE_URL}/prefectures/${encodeURIComponent(pref)}`,
+    url: `${BASE_URL}/prefectures/${pref}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.7,

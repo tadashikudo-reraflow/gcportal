@@ -5,11 +5,10 @@ import data from "@/public/data/standardization.json";
 import { Municipality } from "@/lib/types";
 
 // SSG: 47都道府県分の静的パラメータを生成
+// Next.jsが自動でURLエンコードするため、ここでは生の日本語文字列を返す
 export function generateStaticParams() {
   const prefectures = data.prefectures.map((p) => p.prefecture);
-  return prefectures.map((prefecture) => ({
-    prefecture: encodeURIComponent(prefecture),
-  }));
+  return prefectures.map((prefecture) => ({ prefecture }));
 }
 
 function getRateColor(rate: number | null): string {
@@ -48,7 +47,7 @@ export async function generateMetadata({
   return {
     title: `${name}のガバメントクラウド移行進捗 | GCInsight`,
     description: `${name}の全市区町村のガバメントクラウド移行進捗状況。${rate ? `平均完了率${rate}%。` : ""}業務別の詳細データ付き。`,
-    alternates: { canonical: `/prefectures/${encodeURIComponent(name)}` },
+    alternates: { canonical: `/prefectures/${name}` },
     openGraph: {
       title: `${name} — ガバメントクラウド移行進捗`,
       description: rate
