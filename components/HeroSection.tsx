@@ -32,7 +32,7 @@ export default function HeroSection({
   return (
     <section className="hero-section">
       <div className="hero-inner hero-inner--impact">
-        {/* 左: テキスト + CTA */}
+        {/* 左: テキスト */}
         <div className="hero-left">
           <p className="hero-eyebrow" style={{ justifyContent: "flex-start" }}>
             出典: 総務省・デジタル庁公表データ（{formattedMonth}時点）
@@ -45,7 +45,8 @@ export default function HeroSection({
           <p className="hero-sub">
             業務別・自治体別にガバメントクラウド移行の進捗を追跡。
           </p>
-          <div className="hero-cta-row">
+          {/* デスクトップ用CTA（モバイルでは非表示） */}
+          <div className="hero-cta-row hero-cta--desktop">
             <Link href="/report" className="btn-cta">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
@@ -62,7 +63,6 @@ export default function HeroSection({
 
         {/* 右: リング + 3KPI */}
         <div className="hero-right">
-          {/* リング */}
           <div className="hero-ring--impact">
             <svg viewBox="0 0 160 160" className="hero-ring-svg">
               <circle cx="80" cy="80" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
@@ -77,7 +77,6 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* 3KPI横並び */}
           <div className="hero-three-kpis">
             <div className="hero-kpi-card">
               <span className="hero-kpi-value" style={{ color: "#EF4444" }}>{remainingDays}</span>
@@ -104,6 +103,21 @@ export default function HeroSection({
           <p className="hero-stats-footnote">
             「移行完了」= 全20業務の移行ステップ完了（特定移行除く）。{formattedMonth}末時点。
           </p>
+        </div>
+
+        {/* モバイル用CTA（デスクトップでは非表示） */}
+        <div className="hero-cta-row hero-cta--mobile">
+          <Link href="/report" className="btn-cta">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            無料レポート（PDF）
+          </Link>
+          <Link href="/articles" className="btn-outline">
+            コラム・解説を読む
+          </Link>
         </div>
       </div>
     </section>

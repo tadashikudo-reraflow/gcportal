@@ -699,6 +699,14 @@ body {
   text-align: center;
 }
 
+/* CTA visibility toggle */
+.hero-cta--mobile {
+  display: none;
+}
+.hero-cta--desktop {
+  display: flex;
+}
+
 /* Mobile: stack vertically */
 @media (max-width: 900px) {
   .hero-inner--impact {
@@ -710,6 +718,14 @@ body {
   .hero-right {
     width: 100%;
     max-width: 22rem;
+  }
+  .hero-cta--desktop {
+    display: none;
+  }
+  .hero-cta--mobile {
+    display: flex;
+    justify-content: center;
+    width: 100%;
   }
   .hero-ring--impact {
     width: 150px;
