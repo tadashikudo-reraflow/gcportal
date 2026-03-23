@@ -154,7 +154,7 @@ function FooterAttribution({ sources, pageId }: { sources: DataSource[]; pageId?
       {/* AI調査の警告 */}
       {confidenceCounts.ai_survey > 0 && (
         <div className="rounded px-3 py-2 text-xs leading-relaxed" style={{ backgroundColor: "#fef2f2", color: "#991b1b" }}>
-          <span className="font-semibold">注意:</span> 一部データはAI（Grok）によるウェブ調査に基づいています。
+          <span className="font-semibold">注意:</span> 一部データは独自調査（参考値）に基づいています。
           公式発表と異なる場合があります。最新情報は各機関の公式サイトをご確認ください。
         </div>
       )}

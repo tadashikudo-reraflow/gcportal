@@ -33,6 +33,7 @@ export default function MigrationResultBanner({
       value: `${(completionRate * 100).toFixed(1)}%`,
       label: "完了率",
       sub: `(${completedSystems.toLocaleString()}/${totalSystems.toLocaleString()})`,
+      note: "システム数ベース",
     },
     {
       value: `${delayedSystems.toLocaleString()}件`,
@@ -50,6 +51,10 @@ export default function MigrationResultBanner({
       sub: "(中核市平均)",
     },
   ];
+
+  // 全国平均完了率（業務ベース）= summary.avg_rate × 100
+  // ※システム数ベース完了率（completionRate）とは異なる指標
+  const avgRatePct = 81.6; // 全1,741自治体・20業務平均移行率の全国平均（業務ベース）
 
   return (
     <div
@@ -107,6 +112,17 @@ export default function MigrationResultBanner({
           <line x1="12" y1="8" x2="12.01" y2="8" />
         </svg>
         出典: 総務省・デジタル庁公表データ ({formattedMonth})
+      </div>
+
+      {/* 指標定義注釈 */}
+      <div
+        className="px-6 py-3 text-xs leading-relaxed"
+        style={{ backgroundColor: "rgba(255,255,255,0.04)", color: "#94a3b8", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <span style={{ color: "#60a5fa", fontWeight: 600 }}>指標の定義:</span>{" "}
+        完了率（{(completionRate * 100).toFixed(1)}%）はシステム数ベース（{completedSystems.toLocaleString()}/{totalSystems.toLocaleString()}システム）。
+        ダッシュボードの<strong style={{ color: "#e2e8f0" }}>{avgRatePct}%</strong>は全{totalMunicipalities.toLocaleString()}自治体・20業務の平均移行率（業務ベース）であり、別指標です。
+        特定移行支援システム（{delayedMunicipalities.toLocaleString()}団体）は2026年度以降も移行継続。概ね5年以内（〜2030年度目安）の完了を目指す方針。
       </div>
     </div>
   );

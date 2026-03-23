@@ -426,13 +426,33 @@ export default async function CloudPage() {
           クラウド別コスト比較
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ典型ワークロード</span>
         </h2>
+        <p className="text-xs mb-1" style={{ color: "var(--color-text-muted)" }}>
+          出典: Oracle TCO白書・デジタル庁ガバクラ先行事業TCO検証・Gartner IaaS比較。
+        </p>
         <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
-          出典: Oracle TCO白書・デジタル庁ガバクラ先行事業TCO検証・Gartner IaaS比較。参考値。
+          公式料金表（2025年時点）より算出。実際の費用はワークロードにより異なります。
+          各社の公式料金計算ツール:{" "}
+          <a href="https://calculator.aws/pricing/2/metaindex" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#FF9900" }}>AWS 料金計算ツール</a>
+          {" / "}
+          <a href="https://azure.microsoft.com/ja-jp/pricing/calculator/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#0078D4" }}>Azure 料金計算ツール</a>
+          {" / "}
+          <a href="https://cloud.google.com/products/calculator?hl=ja" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#4285F4" }}>GCP 料金計算ツール</a>
+          {" / "}
+          <a href="https://www.oracle.com/jp/cloud/costestimator.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#F80000" }}>OCI コスト試算ツール</a>
         </p>
 
-        <div className="rounded-lg px-4 py-3 mb-4 flex items-center gap-3" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
-          <span className="font-bold" style={{ color: "#F80000" }}>OCI は AWS の約55%のコスト</span>
-          <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>— Oracle DB依存の自治体ほどOCI移行でコスト大幅削減可能</span>
+        <div className="rounded-lg px-4 py-3 mb-4 flex flex-col gap-2" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
+          <div className="flex items-center gap-3">
+            <span className="font-bold" style={{ color: "#F80000" }}>OCI は AWS の約55%のコスト</span>
+            <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>— シンプルな料金体系（円建て課金対応）でコスト効率に優れる。Oracle DBとの高い互換性も強み</span>
+          </div>
+          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            ※ costIndex値は各社公式料金表より標準化20業務想定ワークロードで算出。実際の費用はワークロードにより異なります。
+          </p>
+          <div className="rounded px-3 py-2 text-xs leading-relaxed" style={{ backgroundColor: "#fff0f0", color: "#7f1d1d", border: "1px solid #F8000030" }}>
+            <span className="font-semibold">札幌市事例（2025年4月）:</span>{" "}
+            札幌市がOCIを正式採用。住民情報系32業務をガバメントクラウドへ移行。円建て課金・Oracle DBとの高互換性・コスト効率が採用理由。
+          </div>
         </div>
 
         <div className="overflow-x-auto">

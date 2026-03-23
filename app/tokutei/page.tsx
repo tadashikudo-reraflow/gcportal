@@ -78,6 +78,26 @@ export default function TokuteiPage() {
         </p>
       </div>
 
+      {/* 重要注記: 標準化とガバクラ移行は別工程 */}
+      <div
+        className="flex items-start gap-3 rounded-lg px-5 py-4"
+        style={{ backgroundColor: "#eff6ff", border: "1px solid #93c5fd", borderLeft: "4px solid #1d4ed8" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+          <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+        <div style={{ color: "#1e40af" }}>
+          <p className="font-bold text-sm mb-1">標準化とガバクラ移行は別の工程です</p>
+          <p className="text-xs leading-relaxed">
+            完了率は「標準準拠システムのガバメントクラウドへの移行進捗」を示します（令和8年1月時点の推計値）。
+            <strong>標準化（標準仕様への準拠）</strong>と<strong>ガバクラ移行（クラウド基盤への載せ替え）</strong>は別の工程であり、
+            認定は業務システム単位のため、自治体全体の完了率とは必ずしも連動しません。
+            特定移行認定を受けた自治体でも「標準化済み・ガバクラ未移行」のケースが多く存在します。
+          </p>
+        </div>
+      </div>
+
       {/* 出典バナー */}
       <div
         className="flex items-start gap-3 rounded-lg px-4 py-3 text-xs"
@@ -154,9 +174,19 @@ export default function TokuteiPage() {
             これらは標準準拠システムへの移行とガバメントクラウドへの移行を段階的に進める必要があり、
             一律の期限適用が困難なケースです。
           </p>
-          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+          <div
+            className="rounded-md px-4 py-3 mt-3"
+            style={{ backgroundColor: "#faf5ff", border: "1px solid #c4b5fd" }}
+          >
+            <p className="text-xs font-semibold mb-1" style={{ color: "#6d28d9" }}>移行継続スケジュール</p>
+            <p className="text-xs leading-relaxed" style={{ color: "#5b21b6" }}>
+              特定移行支援システム対象の<strong>{tokuteiTotalCount.toLocaleString()}団体</strong>は2026年度以降も移行を継続します。
+              <strong>概ね5年以内（〜2030年度目安）</strong>の完了を目指す方針が示されており、
+              2026〜2030年度にかけて段階的に移行が進む見込みです。
+            </p>
+          </div>
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             ※ 完了率は「標準準拠システムのガバメントクラウドへの移行進捗」を示します（令和8年1月時点の推計値）。
-            標準化（標準仕様への準拠）とガバクラ移行（クラウド基盤への載せ替え）は別の工程であり、
             認定は業務システム単位のため、自治体全体の完了率とは必ずしも連動しません。
           </p>
         </div>

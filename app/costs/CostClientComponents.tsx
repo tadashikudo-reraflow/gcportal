@@ -240,7 +240,7 @@ export function ExpandableCostCard({
       onClick={() => setOpen(!open)}
     >
       <div className="flex items-center justify-between mb-2 gap-3">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 overflow-hidden">
           {isReduction ? (
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-600 text-white flex-shrink-0">
               ✓ 削減事例
@@ -253,11 +253,13 @@ export function ExpandableCostCard({
               ▲ コスト増
             </span>
           )}
-          <span className="text-xs text-gray-500 flex-shrink-0">{scope}</span>
-          {vendorName !== "—" && <span className="text-xs text-gray-400">{vendorName}</span>}
+          <span className="text-xs text-gray-500 flex-shrink-0 truncate max-w-[8rem]">{scope}</span>
+          {vendorName !== "—" && (
+            <span className="text-xs text-gray-400 truncate min-w-0">{vendorName}</span>
+          )}
           <span className="text-xs text-gray-300 ml-auto flex-shrink-0">{open ? "▲" : "▼"}</span>
         </div>
-        <span className="text-2xl font-extrabold flex-shrink-0 tabular-nums" style={{ color: barColor }}>
+        <span className="text-2xl font-extrabold flex-shrink-0 tabular-nums whitespace-nowrap" style={{ color: barColor }}>
           {label}
         </span>
       </div>

@@ -56,9 +56,18 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
               データ出典: 総務省 令和8年1月版
             </p>
-            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              地方公共団体情報システムの標準化に関する法律（標準化法）に基づく移行状況
-            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/report"
+                className="text-xs font-medium no-underline"
+                style={{ color: "var(--color-brand-primary)" }}
+              >
+                無料レポート（PDF）
+              </Link>
+              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                地方公共団体情報システムの標準化に関する法律（標準化法）に基づく移行状況
+              </p>
+            </div>
           </div>
         </div>
       </footer>

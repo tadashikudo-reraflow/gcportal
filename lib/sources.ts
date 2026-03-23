@@ -401,8 +401,8 @@ export const CONFIDENCE_CONFIG: Record<ConfidenceLevel, {
     icon: "alert-triangle",
   },
   ai_survey: {
-    label: "AI調査（要検証）",
-    labelShort: "AI調査",
+    label: "独自調査（参考値）",
+    labelShort: "独自調査（参考値）",
     color: "#dc2626",
     bgColor: "#fef2f2",
     borderColor: "#fca5a5",

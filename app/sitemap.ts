@@ -23,13 +23,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/risks`,         lastModified: now, changeFrequency: "daily",   priority: 0.9 },
     { url: `${BASE_URL}/tokutei`,       lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${BASE_URL}/packages`,      lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE_URL}/adoption`,      lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/costs`,         lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/cloud`,         lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/articles`,      lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE_URL}/sources`,       lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/benchmark`,     lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE_URL}/compare`,       lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE_URL}/report`,        lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/timeline`,      lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
   ];

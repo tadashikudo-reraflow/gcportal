@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import type { PopBandStat, MunicipalityWithBand } from "./page";
 import type { PrefectureSummary } from "@/lib/types";
 
@@ -37,6 +37,457 @@ type PopBand = "1万未満" | "1-5万" | "5-10万" | "10-30万" | "30万以上";
 const ALL_BANDS: PopBand[] = ["1万未満", "1-5万", "5-10万", "10-30万", "30万以上"];
 
 /* ============================================================
+   Compare tab – colors for up to 4 selected municipalities
+   ============================================================ */
+const SLOT_COLORS = ["#1D4ED8", "#378445", "#FA6414", "#7C3AED"];
+
+/* ============================================================
+   Compare tab – Autocomplete Input
+   ============================================================ */
+function MuniAutocomplete({
+  municipalities,
+  value,
+  onChange,
+  placeholder,
+  excludeCities,
+  slotColor,
+}: {
+  municipalities: MunicipalityWithBand[];
+  value: string;
+  onChange: (city: string) => void;
+  placeholder: string;
+  excludeCities: string[];
+  slotColor: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!query) return [];
+    const q = query.toLowerCase();
+    return municipalities
+      .filter(
+        (m) =>
+          !excludeCities.includes(m.city) &&
+          (m.city.toLowerCase().includes(q) || m.prefecture.toLowerCase().includes(q))
+      )
+      .slice(0, 20);
+  }, [query, municipalities, excludeCities]);
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <input
+        type="text"
+        value={value ? value : query}
+        onChange={(e) => {
+          if (value) {
+            onChange("");
+          }
+          setQuery(e.target.value);
+          setIsOpen(true);
+        }}
+        onFocus={() => {
+          if (!value) setIsOpen(true);
+        }}
+        placeholder={placeholder}
+        className="w-full rounded-lg border px-3 py-2 text-sm"
+        style={{
+          borderColor: value ? slotColor : "var(--color-border, #e2e8f0)",
+          backgroundColor: value ? `${slotColor}10` : "var(--color-gov-bg, #f8fafc)",
+        }}
+      />
+      {value && (
+        <button
+          onClick={() => {
+            onChange("");
+            setQuery("");
+          }}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-sm px-1"
+          style={{ color: "var(--color-muted, #64748b)" }}
+          aria-label="クリア"
+        >
+          ×
+        </button>
+      )}
+      {isOpen && filtered.length > 0 && (
+        <div
+          className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-lg border shadow-lg"
+          style={{
+            backgroundColor: "var(--color-gov-bg, #fff)",
+            borderColor: "var(--color-border, #e2e8f0)",
+          }}
+        >
+          {filtered.map((m) => (
+            <button
+              key={`${m.prefecture}-${m.city}`}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 flex justify-between"
+              onClick={() => {
+                onChange(m.city);
+                setQuery("");
+                setIsOpen(false);
+              }}
+            >
+              <span>
+                {m.city}
+                <span className="ml-1 text-xs" style={{ color: "var(--color-muted, #64748b)" }}>
+                  ({m.prefecture})
+                </span>
+              </span>
+              <span className="font-medium" style={{ color: getRateColor(m.overall_rate ?? 0) }}>
+                {formatRate(m.overall_rate ?? 0)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   Compare tab – Radar Chart (SVG)
+   ============================================================ */
+function RadarChart({
+  items,
+  dimensions,
+}: {
+  items: { label: string; values: number[]; color: string }[];
+  dimensions: string[];
+}) {
+  const n = dimensions.length;
+  if (n < 3) return null;
+
+  const cx = 150;
+  const cy = 150;
+  const r = 110;
+
+  const angles = dimensions.map((_, i) => (i * 2 * Math.PI) / n - Math.PI / 2);
+  const rings = [0.25, 0.5, 0.75, 1.0];
+  const axisPoints = angles.map((a) => ({
+    x: cx + r * Math.cos(a),
+    y: cy + r * Math.sin(a),
+  }));
+
+  function makePolygon(values: number[]): string {
+    return values
+      .map((v, i) => {
+        const x = cx + r * v * Math.cos(angles[i]);
+        const y = cy + r * v * Math.sin(angles[i]);
+        return `${x},${y}`;
+      })
+      .join(" ");
+  }
+
+  return (
+    <svg viewBox="0 0 300 300" className="w-full max-w-xs mx-auto">
+      {rings.map((ring) => (
+        <polygon
+          key={ring}
+          points={angles
+            .map((a) => `${cx + r * ring * Math.cos(a)},${cy + r * ring * Math.sin(a)}`)
+            .join(" ")}
+          fill="none"
+          stroke="var(--color-border, #e2e8f0)"
+          strokeWidth="0.5"
+        />
+      ))}
+      {axisPoints.map((p, i) => (
+        <g key={i}>
+          <line x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="var(--color-border, #e2e8f0)" strokeWidth="0.5" />
+          <text
+            x={cx + (r + 18) * Math.cos(angles[i])}
+            y={cy + (r + 18) * Math.sin(angles[i])}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="8"
+            fill="var(--color-muted, #64748b)"
+          >
+            {dimensions[i].length > 5 ? dimensions[i].slice(0, 5) + "…" : dimensions[i]}
+          </text>
+        </g>
+      ))}
+      {items.map((item, idx) => (
+        <polygon
+          key={idx}
+          points={makePolygon(item.values)}
+          fill={item.color}
+          fillOpacity="0.12"
+          stroke={item.color}
+          strokeWidth="1.5"
+        />
+      ))}
+    </svg>
+  );
+}
+
+/* ============================================================
+   Compare tab – inner component
+   ============================================================ */
+function CompareTab({
+  municipalities,
+  dataMonth,
+}: {
+  municipalities: MunicipalityWithBand[];
+  dataMonth: string;
+}) {
+  const [selected, setSelected] = useState<string[]>(["", "", "", ""]);
+
+  const selectedMunis = useMemo(() => {
+    return selected
+      .map((city) => municipalities.find((m) => m.city === city))
+      .filter((m): m is MunicipalityWithBand => !!m);
+  }, [selected, municipalities]);
+
+  const handleSelect = useCallback((idx: number, city: string) => {
+    setSelected((prev) => {
+      const next = [...prev];
+      next[idx] = city;
+      return next;
+    });
+  }, []);
+
+  const businessNames = useMemo(() => {
+    const set = new Set<string>();
+    for (const m of selectedMunis) {
+      for (const key of Object.keys(m.business_rates)) {
+        set.add(key);
+      }
+    }
+    return Array.from(set).sort();
+  }, [selectedMunis]);
+
+  const radarDimensions = useMemo(() => {
+    const priority = [
+      "住民記録",
+      "固定資産税",
+      "国民健康保険",
+      "介護保険",
+      "児童手当",
+      "生活保護",
+      "戸籍",
+      "選挙人名簿管理",
+    ];
+    return priority.filter((b) => businessNames.includes(b)).slice(0, 8);
+  }, [businessNames]);
+
+  const radarItems = useMemo(() => {
+    return selectedMunis.map((m, i) => ({
+      label: m.city,
+      values: radarDimensions.map((dim) => m.business_rates[dim] ?? 0),
+      color: SLOT_COLORS[selected.indexOf(m.city)] ?? SLOT_COLORS[i],
+    }));
+  }, [selectedMunis, radarDimensions, selected]);
+
+  const [copiedCompare, setCopiedCompare] = useState(false);
+  const handleCopy = useCallback(() => {
+    if (selectedMunis.length === 0) return;
+    const lines = [`自治体比較結果（${dataMonth}時点）`, ""];
+    for (const m of selectedMunis) {
+      lines.push(`■ ${m.city}（${m.prefecture}）`);
+      lines.push(`  進捗率: ${formatRate(m.overall_rate ?? 0)}`);
+      const topBiz = Object.entries(m.business_rates)
+        .sort(([, a], [, b]) => (b ?? 0) - (a ?? 0))
+        .slice(0, 5);
+      for (const [biz, rate] of topBiz) {
+        lines.push(`  ${biz}: ${formatRate(rate ?? 0)}`);
+      }
+      lines.push("");
+    }
+    navigator.clipboard.writeText(lines.join("\n")).then(() => {
+      setCopiedCompare(true);
+      setTimeout(() => setCopiedCompare(false), 2000);
+    });
+  }, [selectedMunis, dataMonth]);
+
+  const excludeCities = selected.filter(Boolean);
+
+  return (
+    <div className="space-y-6">
+      {/* Municipality Selectors */}
+      <div className="card p-4 sm:p-6">
+        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-dark, #1e293b)" }}>
+          比較する自治体を選択（最大4つ）
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[0, 1, 2, 3].map((idx) => (
+            <MuniAutocomplete
+              key={idx}
+              municipalities={municipalities}
+              value={selected[idx]}
+              onChange={(city) => handleSelect(idx, city)}
+              placeholder={`自治体 ${idx + 1}`}
+              excludeCities={excludeCities.filter((c) => c !== selected[idx])}
+              slotColor={SLOT_COLORS[idx]}
+            />
+          ))}
+        </div>
+      </div>
+
+      {selectedMunis.length === 0 && (
+        <div className="card p-12 text-center" style={{ color: "var(--color-muted, #64748b)" }}>
+          <p className="text-lg mb-2">自治体を選択してください</p>
+          <p className="text-sm">上のフィールドに自治体名を入力すると候補が表示されます</p>
+        </div>
+      )}
+
+      {selectedMunis.length > 0 && (
+        <>
+          {/* Comparison Table */}
+          <div className="card overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ backgroundColor: "var(--color-gov-nav, #f1f5f9)" }}>
+                  <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--color-gov-dark, #1e293b)" }}>
+                    項目
+                  </th>
+                  {selectedMunis.map((m, i) => (
+                    <th
+                      key={m.city}
+                      className="text-center px-4 py-3 font-medium"
+                      style={{
+                        color: SLOT_COLORS[selected.indexOf(m.city)] ?? SLOT_COLORS[i],
+                        borderBottom: `3px solid ${SLOT_COLORS[selected.indexOf(m.city)] ?? SLOT_COLORS[i]}`,
+                      }}
+                    >
+                      {m.city}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {/* Basic info */}
+                <tr style={{ backgroundColor: "var(--color-gov-bg, #f8fafc)" }}>
+                  <td colSpan={selectedMunis.length + 1} className="px-4 py-2 font-bold text-xs" style={{ color: "var(--color-muted, #64748b)" }}>
+                    基本情報
+                  </td>
+                </tr>
+                <tr className="border-b" style={{ borderColor: "var(--color-border, #e2e8f0)" }}>
+                  <td className="px-4 py-2">都道府県</td>
+                  {selectedMunis.map((m) => (
+                    <td key={m.city} className="text-center px-4 py-2">
+                      {m.prefecture}
+                    </td>
+                  ))}
+                </tr>
+
+                {/* Overall rate */}
+                <tr style={{ backgroundColor: "var(--color-gov-bg, #f8fafc)" }}>
+                  <td colSpan={selectedMunis.length + 1} className="px-4 py-2 font-bold text-xs" style={{ color: "var(--color-muted, #64748b)" }}>
+                    移行進捗率
+                  </td>
+                </tr>
+                <tr className="border-b" style={{ borderColor: "var(--color-border, #e2e8f0)" }}>
+                  <td className="px-4 py-2">総合進捗率</td>
+                  {selectedMunis.map((m, i) => {
+                    const color = getRateColor(m.overall_rate ?? 0);
+                    const slotIdx = selected.indexOf(m.city);
+                    return (
+                      <td key={m.city} className="px-4 py-2">
+                        <div className="flex flex-col items-center gap-1">
+                          <span className="font-bold text-lg" style={{ color }}>
+                            {formatRate(m.overall_rate ?? 0)}
+                          </span>
+                          <div
+                            className="w-full h-2 rounded-full overflow-hidden"
+                            style={{ backgroundColor: "var(--color-border, #e2e8f0)" }}
+                          >
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{
+                                width: `${(m.overall_rate ?? 0) * 100}%`,
+                                backgroundColor: SLOT_COLORS[slotIdx] ?? SLOT_COLORS[i],
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+
+                {/* Business rates */}
+                <tr style={{ backgroundColor: "var(--color-gov-bg, #f8fafc)" }}>
+                  <td colSpan={selectedMunis.length + 1} className="px-4 py-2 font-bold text-xs" style={{ color: "var(--color-muted, #64748b)" }}>
+                    業務別進捗
+                  </td>
+                </tr>
+                {businessNames.map((biz) => (
+                  <tr key={biz} className="border-b" style={{ borderColor: "var(--color-border, #e2e8f0)" }}>
+                    <td className="px-4 py-1.5 text-xs">{biz}</td>
+                    {selectedMunis.map((m) => {
+                      const rate = m.business_rates[biz];
+                      return (
+                        <td key={m.city} className="text-center px-4 py-1.5 text-xs">
+                          {rate != null ? (
+                            <span style={{ color: getRateColor(rate) }}>{formatRate(rate)}</span>
+                          ) : (
+                            <span style={{ color: "var(--color-muted, #64748b)" }}>—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Radar Chart */}
+          {radarDimensions.length >= 3 && selectedMunis.length >= 2 && (
+            <div className="card p-4 sm:p-6">
+              <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-gov-dark, #1e293b)" }}>
+                業務別比較レーダー
+              </h2>
+              <p className="text-xs mb-4" style={{ color: "var(--color-muted, #64748b)" }}>
+                主要業務8分野の進捗率を多角的に比較
+              </p>
+              <RadarChart items={radarItems} dimensions={radarDimensions} />
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                {radarItems.map((item) => (
+                  <div key={item.label} className="flex items-center gap-1.5 text-sm">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Export */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleCopy}
+              className="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: copiedCompare ? "#378445" : "var(--color-brand-primary, #1D4ED8)",
+                color: "#fff",
+              }}
+            >
+              {copiedCompare ? "コピーしました" : "比較結果をコピー"}
+            </button>
+          </div>
+        </>
+      )}
+
+      <div className="text-xs text-right" style={{ color: "var(--color-muted, #64748b)" }}>
+        データ基準月: {dataMonth}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    Component
    ============================================================ */
 
@@ -53,7 +504,10 @@ export default function BenchmarkClient({
   prefectures,
   dataMonth,
 }: BenchmarkClientProps) {
-  /* --- State --- */
+  /* --- Tab state --- */
+  const [activeTab, setActiveTab] = useState<"ranking" | "compare">("ranking");
+
+  /* --- Ranking tab state --- */
   const [prefBandFilter, setPrefBandFilter] = useState<PopBand | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuni, setSelectedMuni] = useState<MunicipalityWithBand | null>(null);
@@ -66,7 +520,6 @@ export default function BenchmarkClient({
         ? municipalities
         : municipalities.filter((m) => m.popBand === prefBandFilter);
 
-    // Group by prefecture
     const map = new Map<string, { rates: number[]; completed: number; critical: number }>();
     for (const m of filtered) {
       const rate = m.overall_rate ?? 0;
@@ -175,560 +628,592 @@ export default function BenchmarkClient({
     });
   }, [selectedMuni, sameBandStats, samePrefMunis, dataMonth]);
 
+  /* ============================================================
+     Tabs
+     ============================================================ */
+  const tabs = [
+    { key: "ranking" as const, label: "ランキング" },
+    { key: "compare" as const, label: "自治体比較" },
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* ============================================================
-          SECTION 1: 人口帯別の完了率比較
-          ============================================================ */}
-      <section className="card p-5 sm:p-6">
-        <h2
-          className="text-lg font-bold mb-1"
-          style={{ color: "var(--color-gov-primary)" }}
-        >
-          人口帯別の完了率比較
-        </h2>
-        <p className="text-sm mb-5" style={{ color: "var(--color-text-secondary)" }}>
-          自治体名の末尾（市/町/村/区）と主要都市リストに基づく推定分類
-        </p>
-
-        <div className="space-y-4">
-          {popBandStats.map((s) => {
-            const pct = s.avgRate * 100;
-            return (
-              <div key={s.band}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium">{s.band}</span>
-                  <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    <span>{s.count}団体</span>
-                    <span className="text-green-700">{s.completedCount}完了</span>
-                    {s.criticalCount > 0 && (
-                      <span className="text-red-700">{s.criticalCount}危機</span>
-                    )}
-                    <span
-                      className="font-bold text-sm"
-                      style={{ color: getRateColor(s.avgRate) }}
-                    >
-                      {formatRate(s.avgRate)}
-                    </span>
-                  </div>
-                </div>
-                {/* Bar */}
-                <div
-                  className="w-full h-7 rounded-md overflow-hidden"
-                  style={{ backgroundColor: "var(--color-section-bg)" }}
-                >
-                  <div
-                    className="h-full rounded-md transition-all duration-500"
-                    style={{
-                      width: `${Math.max(pct, 2)}%`,
-                      backgroundColor: getRateColor(s.avgRate),
-                      opacity: 0.8,
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+    <div className="space-y-6">
+      {/* Tab bar */}
+      <div
+        className="flex border-b"
+        style={{ borderColor: "var(--color-border)" }}
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className="px-5 py-2.5 text-sm font-medium transition-colors -mb-px"
+            style={{
+              color:
+                activeTab === tab.key
+                  ? "var(--color-gov-primary)"
+                  : "var(--color-text-secondary)",
+              borderBottom:
+                activeTab === tab.key
+                  ? "2px solid var(--color-gov-primary)"
+                  : "2px solid transparent",
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* ============================================================
-          SECTION 2: 都道府県別ランキング（フィルタ付き）
+          TAB: ランキング
           ============================================================ */}
-      <section className="card p-5 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <div>
+      {activeTab === "ranking" && (
+        <div className="space-y-8">
+          {/* SECTION 1: 人口帯別の完了率比較 */}
+          <section className="card p-5 sm:p-6">
             <h2
               className="text-lg font-bold mb-1"
               style={{ color: "var(--color-gov-primary)" }}
             >
-              都道府県別ランキング
+              人口帯別の完了率比較
             </h2>
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              人口帯フィルタで同規模自治体を比較
+            <p className="text-sm mb-5" style={{ color: "var(--color-text-secondary)" }}>
+              自治体名の末尾（市/町/村/区）と主要都市リストに基づく推定分類
             </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <button
-              onClick={() => setPrefBandFilter("all")}
-              className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: prefBandFilter === "all" ? "var(--color-brand-primary)" : "var(--color-section-bg)",
-                color: prefBandFilter === "all" ? "#fff" : "var(--color-text-primary)",
-              }}
-            >
-              全体
-            </button>
-            {ALL_BANDS.map((band) => (
-              <button
-                key={band}
-                onClick={() => setPrefBandFilter(band)}
-                className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
-                style={{
-                  backgroundColor: prefBandFilter === band ? "var(--color-brand-primary)" : "var(--color-section-bg)",
-                  color: prefBandFilter === band ? "#fff" : "var(--color-text-primary)",
-                }}
-              >
-                {band}
-              </button>
-            ))}
-          </div>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
-                <th className="text-center py-2.5 px-3 text-xs font-medium w-14" style={{ color: "#fff" }}>
-                  順位
-                </th>
-                <th className="text-left py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
-                  都道府県
-                </th>
-                <th className="text-left py-2.5 px-3 text-xs font-medium min-w-[160px]" style={{ color: "#fff" }}>
-                  平均完了率
-                </th>
-                <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
-                  対象数
-                </th>
-                <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
-                  完了
-                </th>
-                <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
-                  危機
-                </th>
-                <th className="text-center py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
-                  状況
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {prefectureRanking.map((p, i) => {
-                const badge = getStatusBadgeStyle(p.avgRate);
+            <div className="space-y-4">
+              {popBandStats.map((s) => {
+                const pct = s.avgRate * 100;
                 return (
-                  <tr
-                    key={p.prefecture}
-                    className="border-b transition-colors hover:bg-gray-50"
-                    style={{ borderColor: "var(--color-border)" }}
-                  >
-                    <td className="text-center py-2.5 px-3 font-medium text-sm">{i + 1}</td>
-                    <td className="py-2.5 px-3 font-medium">{p.prefecture}</td>
-                    <td className="py-2.5 px-3">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="h-4 rounded-sm"
-                          style={{
-                            width: `${Math.max(p.avgRate * 100, 2)}%`,
-                            backgroundColor: getRateColor(p.avgRate),
-                            opacity: 0.7,
-                            maxWidth: "120px",
-                          }}
-                        />
+                  <div key={s.band}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-medium">{s.band}</span>
+                      <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                        <span>{s.count}団体</span>
+                        <span className="text-green-700">{s.completedCount}完了</span>
+                        {s.criticalCount > 0 && (
+                          <span className="text-red-700">{s.criticalCount}危機</span>
+                        )}
                         <span
-                          className="text-xs font-bold whitespace-nowrap"
-                          style={{ color: getRateColor(p.avgRate) }}
+                          className="font-bold text-sm"
+                          style={{ color: getRateColor(s.avgRate) }}
                         >
-                          {formatRate(p.avgRate)}
+                          {formatRate(s.avgRate)}
                         </span>
                       </div>
-                    </td>
-                    <td className="text-right py-2.5 px-3">{p.count}</td>
-                    <td className="text-right py-2.5 px-3 text-green-700">{p.completed}</td>
-                    <td className="text-right py-2.5 px-3 text-red-700">{p.critical}</td>
-                    <td className="text-center py-2.5 px-3">
-                      <span
-                        className="inline-block px-2 py-0.5 rounded-full text-[11px] font-medium"
-                        style={{ backgroundColor: badge.bg, color: badge.text }}
-                      >
-                        {getStatusLabel(p.avgRate)}
-                      </span>
-                    </td>
-                  </tr>
+                    </div>
+                    <div
+                      className="w-full h-7 rounded-md overflow-hidden"
+                      style={{ backgroundColor: "var(--color-section-bg)" }}
+                    >
+                      <div
+                        className="h-full rounded-md transition-all duration-500"
+                        style={{
+                          width: `${Math.max(pct, 2)}%`,
+                          backgroundColor: getRateColor(s.avgRate),
+                          opacity: 0.8,
+                        }}
+                      />
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-
-        {prefBandFilter !== "all" && (
-          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-            ※ 人口帯「{prefBandFilter}」の自治体のみで集計
-          </p>
-        )}
-      </section>
-
-      {/* ============================================================
-          SECTION 3: 類似団体検索
-          ============================================================ */}
-      <section className="card p-5 sm:p-6">
-        <h2
-          className="text-lg font-bold mb-1"
-          style={{ color: "var(--color-gov-primary)" }}
-        >
-          類似団体検索
-        </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          自治体名を入力して、同規模・同都道府県の自治体と比較
-        </p>
-
-        <div className="relative max-w-md">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setSelectedMuni(null);
-            }}
-            placeholder="自治体名で検索（例: 世田谷区、松本市）"
-            className="w-full px-4 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2"
-            style={{
-              borderColor: "var(--color-border)",
-              backgroundColor: "#fff",
-            }}
-          />
-        </div>
-
-        {/* Search results dropdown */}
-        {searchResults.length > 0 && !selectedMuni && (
-          <div
-            className="mt-2 max-w-md rounded-lg border shadow-sm overflow-hidden"
-            style={{ borderColor: "var(--color-border)", backgroundColor: "#fff" }}
-          >
-            {searchResults.map((m) => (
-              <button
-                key={`${m.prefecture}-${m.city}`}
-                onClick={() => {
-                  setSelectedMuni(m);
-                  setSearchQuery(m.city);
-                }}
-                className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors border-b flex items-center justify-between"
-                style={{ borderColor: "var(--color-border)" }}
-              >
-                <span>
-                  <span className="font-medium">{m.city}</span>
-                  <span className="ml-2" style={{ color: "var(--color-text-secondary)" }}>
-                    {m.prefecture}
-                  </span>
-                </span>
-                <span
-                  className="text-xs font-bold"
-                  style={{ color: getRateColor(m.overall_rate ?? 0) }}
-                >
-                  {formatRate(m.overall_rate ?? 0)}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Selected municipality detail */}
-        {selectedMuni && (
-          <div className="mt-5 space-y-5">
-            {/* Header card */}
-            <div
-              className="rounded-lg p-4 sm:p-5"
-              style={{ backgroundColor: "var(--color-section-bg)" }}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <h3 className="text-base font-bold">
-                    {selectedMuni.prefecture} {selectedMuni.city}
-                  </h3>
-                  <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                    <span>人口帯: {selectedMuni.popBand}</span>
-                    {sameBandStats && (
-                      <span>
-                        同帯順位: {sameBandStats.rank}位/{sameBandStats.total}団体
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className="text-2xl font-bold"
-                    style={{ color: getRateColor(selectedMuni.overall_rate ?? 0) }}
-                  >
-                    {formatRate(selectedMuni.overall_rate ?? 0)}
-                  </span>
-                  {(() => {
-                    const badge = getStatusBadgeStyle(selectedMuni.overall_rate ?? 0);
-                    return (
-                      <span
-                        className="px-2.5 py-1 rounded-full text-xs font-medium"
-                        style={{ backgroundColor: badge.bg, color: badge.text }}
-                      >
-                        {getStatusLabel(selectedMuni.overall_rate ?? 0)}
-                      </span>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Comparison with band average */}
-              {sameBandStats && (
-                <div className="mt-3 flex items-center gap-2 text-sm">
-                  <span style={{ color: "var(--color-text-secondary)" }}>
-                    同規模平均 {formatRate(sameBandStats.avg)}
-                  </span>
-                  {(() => {
-                    const diff = (selectedMuni.overall_rate ?? 0) - sameBandStats.avg;
-                    const isPositive = diff >= 0;
-                    return (
-                      <span
-                        className="font-bold"
-                        style={{ color: isPositive ? "#378445" : "#b91c1c" }}
-                      >
-                        ({isPositive ? "+" : ""}
-                        {(diff * 100).toFixed(1)}pt)
-                      </span>
-                    );
-                  })()}
-                </div>
-              )}
             </div>
+          </section>
 
-            {/* Business rates */}
-            <div>
-              <h4 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
-                業務別進捗
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {Object.entries(selectedMuni.business_rates)
-                  .filter(([, v]) => v !== null && v !== undefined)
-                  .sort(([, a], [, b]) => (a as number) - (b as number))
-                  .map(([biz, rate]) => {
-                    const r = rate as number;
-                    return (
-                      <div
-                        key={biz}
-                        className="flex items-center gap-2 px-3 py-2 rounded-md"
-                        style={{ backgroundColor: "var(--color-section-bg)" }}
-                      >
-                        <span className="text-xs flex-1 truncate">{biz}</span>
-                        <div className="w-20 h-3 rounded-sm overflow-hidden" style={{ backgroundColor: "#e5e7eb" }}>
-                          <div
-                            className="h-full rounded-sm"
-                            style={{
-                              width: `${r * 100}%`,
-                              backgroundColor: getRateColor(r),
-                              opacity: 0.8,
-                            }}
-                          />
-                        </div>
-                        <span
-                          className="text-xs font-bold w-12 text-right"
-                          style={{ color: getRateColor(r) }}
-                        >
-                          {formatRate(r)}
-                        </span>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-
-            {/* Same prefecture peers */}
-            {samePrefMunis.length > 0 && (
+          {/* SECTION 2: 都道府県別ランキング */}
+          <section className="card p-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
               <div>
-                <h4 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
-                  {selectedMuni.prefecture}の他自治体（上位10団体）
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr style={{ backgroundColor: "var(--color-section-bg)" }}>
-                        <th className="text-left py-2 px-3 text-xs font-medium">自治体名</th>
-                        <th className="text-left py-2 px-3 text-xs font-medium">人口帯</th>
-                        <th className="text-left py-2 px-3 text-xs font-medium min-w-[120px]">完了率</th>
-                        <th className="text-center py-2 px-3 text-xs font-medium">状況</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {samePrefMunis.map((m) => {
-                        const badge = getStatusBadgeStyle(m.overall_rate ?? 0);
-                        return (
-                          <tr
-                            key={m.city}
-                            className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
-                            style={{ borderColor: "var(--color-border)" }}
-                            onClick={() => {
-                              setSelectedMuni(m);
-                              setSearchQuery(m.city);
-                            }}
-                          >
-                            <td className="py-2 px-3 font-medium">{m.city}</td>
-                            <td className="py-2 px-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                              {m.popBand}
-                            </td>
-                            <td className="py-2 px-3">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="h-3 rounded-sm"
-                                  style={{
-                                    width: `${Math.max((m.overall_rate ?? 0) * 100, 2)}%`,
-                                    backgroundColor: getRateColor(m.overall_rate ?? 0),
-                                    opacity: 0.7,
-                                    maxWidth: "80px",
-                                  }}
-                                />
-                                <span
-                                  className="text-xs font-bold"
-                                  style={{ color: getRateColor(m.overall_rate ?? 0) }}
-                                >
-                                  {formatRate(m.overall_rate ?? 0)}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="text-center py-2 px-3">
-                              <span
-                                className="inline-block px-2 py-0.5 rounded-full text-[11px] font-medium"
-                                style={{ backgroundColor: badge.bg, color: badge.text }}
-                              >
-                                {getStatusLabel(m.overall_rate ?? 0)}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                <h2
+                  className="text-lg font-bold mb-1"
+                  style={{ color: "var(--color-gov-primary)" }}
+                >
+                  都道府県別ランキング
+                </h2>
+                <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                  人口帯フィルタで同規模自治体を比較
+                </p>
               </div>
-            )}
-          </div>
-        )}
-      </section>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setPrefBandFilter("all")}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+                  style={{
+                    backgroundColor: prefBandFilter === "all" ? "var(--color-brand-primary)" : "var(--color-section-bg)",
+                    color: prefBandFilter === "all" ? "#fff" : "var(--color-text-primary)",
+                  }}
+                >
+                  全体
+                </button>
+                {ALL_BANDS.map((band) => (
+                  <button
+                    key={band}
+                    onClick={() => setPrefBandFilter(band)}
+                    className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors"
+                    style={{
+                      backgroundColor: prefBandFilter === band ? "var(--color-brand-primary)" : "var(--color-section-bg)",
+                      color: prefBandFilter === band ? "#fff" : "var(--color-text-primary)",
+                    }}
+                  >
+                    {band}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-      {/* ============================================================
-          SECTION 4: 予算要求テンプレート出力
-          ============================================================ */}
-      <section className="card p-5 sm:p-6">
-        <h2
-          className="text-lg font-bold mb-1"
-          style={{ color: "var(--color-gov-primary)" }}
-        >
-          予算要求テンプレート出力
-        </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          選択した自治体のベンチマークデータを議会説明資料形式でクリップボードにコピー
-        </p>
-
-        {!selectedMuni ? (
-          <div
-            className="rounded-lg p-6 text-center text-sm"
-            style={{ backgroundColor: "var(--color-section-bg)", color: "var(--color-text-muted)" }}
-          >
-            上の「類似団体検索」で自治体を選択してください
-          </div>
-        ) : (
-          <>
-            {/* Preview table */}
-            <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm border-collapse">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
+                    <th className="text-center py-2.5 px-3 text-xs font-medium w-14" style={{ color: "#fff" }}>
+                      順位
+                    </th>
+                    <th className="text-left py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
+                      都道府県
+                    </th>
+                    <th className="text-left py-2.5 px-3 text-xs font-medium min-w-[160px]" style={{ color: "#fff" }}>
+                      平均完了率
+                    </th>
+                    <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
+                      対象数
+                    </th>
+                    <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
+                      完了
+                    </th>
+                    <th className="text-right py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
+                      危機
+                    </th>
+                    <th className="text-center py-2.5 px-3 text-xs font-medium" style={{ color: "#fff" }}>
+                      状況
+                    </th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
-                    <td
-                      colSpan={2}
-                      className="py-2.5 px-4 font-bold text-sm"
-                      style={{ color: "#fff" }}
-                    >
-                      {selectedMuni.prefecture} {selectedMuni.city} ベンチマークデータ
-                    </td>
-                  </tr>
-                  <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
-                    <td
-                      className="py-2 px-4 font-medium text-xs w-40"
-                      style={{ backgroundColor: "var(--color-section-bg)" }}
-                    >
-                      人口帯
-                    </td>
-                    <td className="py-2 px-4 text-sm">{selectedMuni.popBand}</td>
-                  </tr>
-                  <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
-                    <td
-                      className="py-2 px-4 font-medium text-xs"
-                      style={{ backgroundColor: "var(--color-section-bg)" }}
-                    >
-                      全体完了率
-                    </td>
-                    <td
-                      className="py-2 px-4 text-sm font-bold"
-                      style={{ color: getRateColor(selectedMuni.overall_rate ?? 0) }}
-                    >
-                      {formatRate(selectedMuni.overall_rate ?? 0)}
-                    </td>
-                  </tr>
-                  {sameBandStats && (
-                    <>
-                      <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
-                        <td
-                          className="py-2 px-4 font-medium text-xs"
-                          style={{ backgroundColor: "var(--color-section-bg)" }}
-                        >
-                          同規模平均
-                        </td>
-                        <td className="py-2 px-4 text-sm">{formatRate(sameBandStats.avg)}</td>
-                      </tr>
-                      <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
-                        <td
-                          className="py-2 px-4 font-medium text-xs"
-                          style={{ backgroundColor: "var(--color-section-bg)" }}
-                        >
-                          同帯内順位
-                        </td>
-                        <td className="py-2 px-4 text-sm">
-                          {sameBandStats.rank}位 / {sameBandStats.total}団体
-                        </td>
-                      </tr>
-                    </>
-                  )}
-                  <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
-                    <td
-                      colSpan={2}
-                      className="py-2 px-4 font-bold text-xs"
-                      style={{ color: "#fff" }}
-                    >
-                      業務別進捗
-                    </td>
-                  </tr>
-                  {Object.entries(selectedMuni.business_rates)
-                    .filter(([, v]) => v !== null && v !== undefined)
-                    .map(([biz, rate]) => (
+                  {prefectureRanking.map((p, i) => {
+                    const badge = getStatusBadgeStyle(p.avgRate);
+                    return (
                       <tr
-                        key={biz}
-                        className="border-b"
+                        key={p.prefecture}
+                        className="border-b transition-colors hover:bg-gray-50"
                         style={{ borderColor: "var(--color-border)" }}
                       >
-                        <td
-                          className="py-1.5 px-4 text-xs"
-                          style={{ backgroundColor: "var(--color-section-bg)" }}
-                        >
-                          {biz}
+                        <td className="text-center py-2.5 px-3 font-medium text-sm">{i + 1}</td>
+                        <td className="py-2.5 px-3 font-medium">{p.prefecture}</td>
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-4 rounded-sm"
+                              style={{
+                                width: `${Math.max(p.avgRate * 100, 2)}%`,
+                                backgroundColor: getRateColor(p.avgRate),
+                                opacity: 0.7,
+                                maxWidth: "120px",
+                              }}
+                            />
+                            <span
+                              className="text-xs font-bold whitespace-nowrap"
+                              style={{ color: getRateColor(p.avgRate) }}
+                            >
+                              {formatRate(p.avgRate)}
+                            </span>
+                          </div>
                         </td>
-                        <td
-                          className="py-1.5 px-4 text-sm font-medium"
-                          style={{ color: getRateColor(rate as number) }}
-                        >
-                          {formatRate(rate as number)}
+                        <td className="text-right py-2.5 px-3">{p.count}</td>
+                        <td className="text-right py-2.5 px-3 text-green-700">{p.completed}</td>
+                        <td className="text-right py-2.5 px-3 text-red-700">{p.critical}</td>
+                        <td className="text-center py-2.5 px-3">
+                          <span
+                            className="inline-block px-2 py-0.5 rounded-full text-[11px] font-medium"
+                            style={{ backgroundColor: badge.bg, color: badge.text }}
+                          >
+                            {getStatusLabel(p.avgRate)}
+                          </span>
                         </td>
                       </tr>
-                    ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
 
-            <button
-              onClick={handleCopyBudgetTemplate}
-              className="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
-              style={{
-                backgroundColor: copied ? "#378445" : "var(--color-brand-primary)",
-              }}
+            {prefBandFilter !== "all" && (
+              <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+                ※ 人口帯「{prefBandFilter}」の自治体のみで集計
+              </p>
+            )}
+          </section>
+
+          {/* SECTION 3: 類似団体検索 */}
+          <section className="card p-5 sm:p-6">
+            <h2
+              className="text-lg font-bold mb-1"
+              style={{ color: "var(--color-gov-primary)" }}
             >
-              {copied ? "コピーしました" : "クリップボードにコピー（タブ区切り）"}
-            </button>
-          </>
-        )}
-      </section>
+              類似団体検索
+            </h2>
+            <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+              自治体名を入力して、同規模・同都道府県の自治体と比較
+            </p>
+
+            <div className="relative max-w-md">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedMuni(null);
+                }}
+                placeholder="自治体名で検索（例: 世田谷区、松本市）"
+                className="w-full px-4 py-2.5 rounded-lg text-sm border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--color-border)",
+                  backgroundColor: "#fff",
+                }}
+              />
+            </div>
+
+            {searchResults.length > 0 && !selectedMuni && (
+              <div
+                className="mt-2 max-w-md rounded-lg border shadow-sm overflow-hidden"
+                style={{ borderColor: "var(--color-border)", backgroundColor: "#fff" }}
+              >
+                {searchResults.map((m) => (
+                  <button
+                    key={`${m.prefecture}-${m.city}`}
+                    onClick={() => {
+                      setSelectedMuni(m);
+                      setSearchQuery(m.city);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors border-b flex items-center justify-between"
+                    style={{ borderColor: "var(--color-border)" }}
+                  >
+                    <span>
+                      <span className="font-medium">{m.city}</span>
+                      <span className="ml-2" style={{ color: "var(--color-text-secondary)" }}>
+                        {m.prefecture}
+                      </span>
+                    </span>
+                    <span
+                      className="text-xs font-bold"
+                      style={{ color: getRateColor(m.overall_rate ?? 0) }}
+                    >
+                      {formatRate(m.overall_rate ?? 0)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {selectedMuni && (
+              <div className="mt-5 space-y-5">
+                <div
+                  className="rounded-lg p-4 sm:p-5"
+                  style={{ backgroundColor: "var(--color-section-bg)" }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-bold">
+                        {selectedMuni.prefecture} {selectedMuni.city}
+                      </h3>
+                      <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                        <span>人口帯: {selectedMuni.popBand}</span>
+                        {sameBandStats && (
+                          <span>
+                            同帯順位: {sameBandStats.rank}位/{sameBandStats.total}団体
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="text-2xl font-bold"
+                        style={{ color: getRateColor(selectedMuni.overall_rate ?? 0) }}
+                      >
+                        {formatRate(selectedMuni.overall_rate ?? 0)}
+                      </span>
+                      {(() => {
+                        const badge = getStatusBadgeStyle(selectedMuni.overall_rate ?? 0);
+                        return (
+                          <span
+                            className="px-2.5 py-1 rounded-full text-xs font-medium"
+                            style={{ backgroundColor: badge.bg, color: badge.text }}
+                          >
+                            {getStatusLabel(selectedMuni.overall_rate ?? 0)}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {sameBandStats && (
+                    <div className="mt-3 flex items-center gap-2 text-sm">
+                      <span style={{ color: "var(--color-text-secondary)" }}>
+                        同規模平均 {formatRate(sameBandStats.avg)}
+                      </span>
+                      {(() => {
+                        const diff = (selectedMuni.overall_rate ?? 0) - sameBandStats.avg;
+                        const isPositive = diff >= 0;
+                        return (
+                          <span
+                            className="font-bold"
+                            style={{ color: isPositive ? "#378445" : "#b91c1c" }}
+                          >
+                            ({isPositive ? "+" : ""}
+                            {(diff * 100).toFixed(1)}pt)
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
+                    業務別進捗
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {Object.entries(selectedMuni.business_rates)
+                      .filter(([, v]) => v !== null && v !== undefined)
+                      .sort(([, a], [, b]) => (a as number) - (b as number))
+                      .map(([biz, rate]) => {
+                        const r = rate as number;
+                        return (
+                          <div
+                            key={biz}
+                            className="flex items-center gap-2 px-3 py-2 rounded-md"
+                            style={{ backgroundColor: "var(--color-section-bg)" }}
+                          >
+                            <span className="text-xs flex-1 truncate">{biz}</span>
+                            <div className="w-20 h-3 rounded-sm overflow-hidden" style={{ backgroundColor: "#e5e7eb" }}>
+                              <div
+                                className="h-full rounded-sm"
+                                style={{
+                                  width: `${r * 100}%`,
+                                  backgroundColor: getRateColor(r),
+                                  opacity: 0.8,
+                                }}
+                              />
+                            </div>
+                            <span
+                              className="text-xs font-bold w-12 text-right"
+                              style={{ color: getRateColor(r) }}
+                            >
+                              {formatRate(r)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+
+                {samePrefMunis.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
+                      {selectedMuni.prefecture}の他自治体（上位10団体）
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr style={{ backgroundColor: "var(--color-section-bg)" }}>
+                            <th className="text-left py-2 px-3 text-xs font-medium">自治体名</th>
+                            <th className="text-left py-2 px-3 text-xs font-medium">人口帯</th>
+                            <th className="text-left py-2 px-3 text-xs font-medium min-w-[120px]">完了率</th>
+                            <th className="text-center py-2 px-3 text-xs font-medium">状況</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {samePrefMunis.map((m) => {
+                            const badge = getStatusBadgeStyle(m.overall_rate ?? 0);
+                            return (
+                              <tr
+                                key={m.city}
+                                className="border-b hover:bg-gray-50 cursor-pointer transition-colors"
+                                style={{ borderColor: "var(--color-border)" }}
+                                onClick={() => {
+                                  setSelectedMuni(m);
+                                  setSearchQuery(m.city);
+                                }}
+                              >
+                                <td className="py-2 px-3 font-medium">{m.city}</td>
+                                <td className="py-2 px-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                                  {m.popBand}
+                                </td>
+                                <td className="py-2 px-3">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className="h-3 rounded-sm"
+                                      style={{
+                                        width: `${Math.max((m.overall_rate ?? 0) * 100, 2)}%`,
+                                        backgroundColor: getRateColor(m.overall_rate ?? 0),
+                                        opacity: 0.7,
+                                        maxWidth: "80px",
+                                      }}
+                                    />
+                                    <span
+                                      className="text-xs font-bold"
+                                      style={{ color: getRateColor(m.overall_rate ?? 0) }}
+                                    >
+                                      {formatRate(m.overall_rate ?? 0)}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="text-center py-2 px-3">
+                                  <span
+                                    className="inline-block px-2 py-0.5 rounded-full text-[11px] font-medium"
+                                    style={{ backgroundColor: badge.bg, color: badge.text }}
+                                  >
+                                    {getStatusLabel(m.overall_rate ?? 0)}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+
+          {/* SECTION 4: 予算要求テンプレート出力 */}
+          <section className="card p-5 sm:p-6">
+            <h2
+              className="text-lg font-bold mb-1"
+              style={{ color: "var(--color-gov-primary)" }}
+            >
+              予算要求テンプレート出力
+            </h2>
+            <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+              選択した自治体のベンチマークデータを議会説明資料形式でクリップボードにコピー
+            </p>
+
+            {!selectedMuni ? (
+              <div
+                className="rounded-lg p-6 text-center text-sm"
+                style={{ backgroundColor: "var(--color-section-bg)", color: "var(--color-text-muted)" }}
+              >
+                上の「類似団体検索」で自治体を選択してください
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto mb-4">
+                  <table className="w-full text-sm border-collapse">
+                    <tbody>
+                      <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
+                        <td
+                          colSpan={2}
+                          className="py-2.5 px-4 font-bold text-sm"
+                          style={{ color: "#fff" }}
+                        >
+                          {selectedMuni.prefecture} {selectedMuni.city} ベンチマークデータ
+                        </td>
+                      </tr>
+                      <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
+                        <td
+                          className="py-2 px-4 font-medium text-xs w-40"
+                          style={{ backgroundColor: "var(--color-section-bg)" }}
+                        >
+                          人口帯
+                        </td>
+                        <td className="py-2 px-4 text-sm">{selectedMuni.popBand}</td>
+                      </tr>
+                      <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
+                        <td
+                          className="py-2 px-4 font-medium text-xs"
+                          style={{ backgroundColor: "var(--color-section-bg)" }}
+                        >
+                          全体完了率
+                        </td>
+                        <td
+                          className="py-2 px-4 text-sm font-bold"
+                          style={{ color: getRateColor(selectedMuni.overall_rate ?? 0) }}
+                        >
+                          {formatRate(selectedMuni.overall_rate ?? 0)}
+                        </td>
+                      </tr>
+                      {sameBandStats && (
+                        <>
+                          <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
+                            <td
+                              className="py-2 px-4 font-medium text-xs"
+                              style={{ backgroundColor: "var(--color-section-bg)" }}
+                            >
+                              同規模平均
+                            </td>
+                            <td className="py-2 px-4 text-sm">{formatRate(sameBandStats.avg)}</td>
+                          </tr>
+                          <tr className="border-b" style={{ borderColor: "var(--color-border)" }}>
+                            <td
+                              className="py-2 px-4 font-medium text-xs"
+                              style={{ backgroundColor: "var(--color-section-bg)" }}
+                            >
+                              同帯内順位
+                            </td>
+                            <td className="py-2 px-4 text-sm">
+                              {sameBandStats.rank}位 / {sameBandStats.total}団体
+                            </td>
+                          </tr>
+                        </>
+                      )}
+                      <tr style={{ backgroundColor: "var(--color-gov-primary)" }}>
+                        <td
+                          colSpan={2}
+                          className="py-2 px-4 font-bold text-xs"
+                          style={{ color: "#fff" }}
+                        >
+                          業務別進捗
+                        </td>
+                      </tr>
+                      {Object.entries(selectedMuni.business_rates)
+                        .filter(([, v]) => v !== null && v !== undefined)
+                        .map(([biz, rate]) => (
+                          <tr
+                            key={biz}
+                            className="border-b"
+                            style={{ borderColor: "var(--color-border)" }}
+                          >
+                            <td
+                              className="py-1.5 px-4 text-xs"
+                              style={{ backgroundColor: "var(--color-section-bg)" }}
+                            >
+                              {biz}
+                            </td>
+                            <td
+                              className="py-1.5 px-4 text-sm font-medium"
+                              style={{ color: getRateColor(rate as number) }}
+                            >
+                              {formatRate(rate as number)}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <button
+                  onClick={handleCopyBudgetTemplate}
+                  className="px-5 py-2.5 rounded-lg text-sm font-medium text-white transition-colors"
+                  style={{
+                    backgroundColor: copied ? "#378445" : "var(--color-brand-primary)",
+                  }}
+                >
+                  {copied ? "コピーしました" : "クリップボードにコピー（タブ区切り）"}
+                </button>
+              </>
+            )}
+          </section>
+        </div>
+      )}
+
+      {/* ============================================================
+          TAB: 自治体比較
+          ============================================================ */}
+      {activeTab === "compare" && (
+        <CompareTab municipalities={municipalities} dataMonth={dataMonth} />
+      )}
     </div>
   );
 }

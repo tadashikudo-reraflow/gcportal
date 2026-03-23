@@ -9,6 +9,7 @@ import CostSimulator from "./CostSimulator";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
+// ※ コストレンジは独自調査・参考値。実際の契約条件・規模により大幅に異なる場合があります。
 const VENDOR_COST_ESTIMATE: Record<string, {
   ratioMin: number; ratioMax: number; ratioTypical: number;
   mark: string; markColor: string; cloud: string; note: string;
@@ -16,37 +17,37 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   TKC: {
     ratioMin: 1.1, ratioMax: 1.6, ratioTypical: 1.3,
     mark: "◎", markColor: "#007a3d", cloud: "AWS",
-    note: "マルチテナント共同利用でコスト低減。中小自治体に有利。",
+    note: "マルチテナント共同利用でコスト低減。中小自治体に有利。【出典: デジタル庁先行事業TCO検証・中核市市長会調査 ※参考値】",
   },
   RKKCS: {
     ratioMin: 1.0, ratioMax: 1.5, ratioTypical: 1.2,
     mark: "◎", markColor: "#007a3d", cloud: "OCI",
-    note: "OCI基盤。シンプルな価格体系・Egress 10TB/月無料・OCPU課金で利用料自体が安価。Oracle DB利用時はライセンス込みでさらに有利。",
+    note: "OCI基盤。シンプルな料金体系・円建て課金・コスト効率に優れる。Egress 10TB/月無料・OCPU課金で利用料自体が安価。札幌市は2025年4月にOCIで32業務移行を発表。【出典: RKKCS公式・日本オラクル ※一部参考値】",
   },
   富士通: {
     ratioMin: 1.5, ratioMax: 3.0, ratioTypical: 2.0,
     mark: "△", markColor: "#d97706", cloud: "AWS",
-    note: "MICJET はAWS基盤。大規模カスタマイズ・移行遅延で追加費用リスクあり。",
+    note: "MICJET はAWS基盤。大規模カスタマイズ・移行遅延で追加費用リスクあり。【出典: 中核市市長会調査・デジタル庁TCO検証 ※参考値】",
   },
   NEC: {
     ratioMin: 1.3, ratioMax: 2.5, ratioTypical: 1.8,
     mark: "○", markColor: "#1d6fa4", cloud: "AWS",
-    note: "住民・税務系はAWS主軸。GPRIME行政経営のみOCI。",
+    note: "住民・税務系はAWS主軸。GPRIME行政経営のみOCI。【出典: NEC公式（2024/10） ※コストレンジは参考値】",
   },
   Gcom: {
     ratioMin: 1.2, ratioMax: 2.0, ratioTypical: 1.5,
     mark: "○", markColor: "#1d6fa4", cloud: "AWS",
-    note: "Acrocity/GRAP等をAWS基盤で提供。ガバメントクラウド対応推進中（採用情報・公式）。",
+    note: "Acrocity/GRAP等をAWS基盤で提供。ガバメントクラウド対応推進中（採用情報・公式）。【出典: Gcom公式採用情報 ※コストレンジは独自調査・参考値】",
   },
   電算: {
     ratioMin: 1.1, ratioMax: 1.8, ratioTypical: 1.4,
     mark: "◎", markColor: "#007a3d", cloud: "AWS",
-    note: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。甲信越・北海道中心（芽室町等2026年2月稼働予定）。",
+    note: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。甲信越・北海道中心（芽室町等2026年2月稼働予定）。【出典: 電算公式プレスリリース ※コストレンジは参考値】",
   },
   日立: {
     ratioMin: 1.3, ratioMax: 2.2, ratioTypical: 1.6,
     mark: "○", markColor: "#1d6fa4", cloud: "AWS",
-    note: "ADWORLD全20業務AWS対応。大規模自治体向け。",
+    note: "ADWORLD全20業務AWS対応。大規模自治体向け。【出典: 日立システムズ（2024/8） ※コストレンジは独自調査・参考値】",
   },
 };
 
@@ -118,7 +119,7 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
   },
   RKKCS: {
     label: "コスト効率◎",
-    detail: "OCI採用。シンプルな価格体系・Egress無料枠大・OCPU課金で利用料自体が安価。Oracle DB利用時はライセンス込みでさらに有利（RKKCS公式）",
+    detail: "OCI採用。シンプルな料金体系・円建て課金・コスト効率に優れる。Egress無料枠大・OCPU課金で利用料自体が安価。札幌市が2025年4月に32業務のOCI移行を発表（RKKCS公式・日本オラクル）",
     mark: "◎", markColor: "#007a3d", cloud: "OCI", confirmed: true,
   },
   日立: {
@@ -199,10 +200,10 @@ const CLOUD_COMPARISON = [
     cloud: "OCI",
     color: "#F80000",
     index: 55,
-    basis: "Compute OCPU + Autonomous DB。Egress月10TB無料（AWSは100GBで課金開始）。OCPU課金はvCPU換算で安価。Oracle DB利用時はライセンス込みでさらに有利。",
-    strengths: "シンプルな価格体系で利用料自体が安価。Egress 10TB/月無料。OCPU課金がvCPU比で低コスト。Oracle DB利用時はライセンス込みでTCO大幅削減。",
+    basis: "Compute OCPU + Autonomous DB。Egress月10TB無料（AWSは100GBで課金開始）。OCPU課金はvCPU換算で安価。円建て課金により為替リスクが低減。",
+    strengths: "シンプルな料金体系・円建て課金・コスト効率に優れる。Egress 10TB/月無料。OCPU課金がvCPU比で低コスト。Oracle DB利用時はライセンス込みでTCO大幅削減。",
     weaknesses: "サービスラインナップがAWS/Azureに比べ限定的。エコシステムの規模。非Oracle DBワークロードでの優位性は限定的。",
-    govCloudNote: "RKKCS・GCC等が採用。Oracle DB依存に限らず、シンプルな料金体系を評価して選定する自治体も。日本オラクルが自治体向け支援強化中。",
+    govCloudNote: "RKKCS・GCC等が採用。札幌市が2025年4月に32業務のOCI移行を発表。シンプルな料金体系・円建て課金を評価して選定する自治体が増加。日本オラクルが自治体向け支援強化中。",
   },
   {
     cloud: "さくらのクラウド",
@@ -377,7 +378,7 @@ export default async function CostsPage() {
         {/* 数直線ゲージ */}
         <div className="relative px-2 mb-2">
           {/* ラベル行 — 上段と下段に分散して文字被りを回避 */}
-          <div className="relative h-24 mb-1">
+          <div className="relative h-28 mb-1">
             {/* 目標マーカー（上段） */}
             <div className="absolute flex flex-col items-center" style={{ left: `${targetPos}%`, transform: "translateX(-50%)", top: 0 }}>
               <span className="text-[10px] font-bold text-green-700 whitespace-nowrap">目標</span>
@@ -499,7 +500,7 @@ export default async function CostsPage() {
         <div className="card p-5 text-center" style={{ borderTop: "4px solid #d97706" }}>
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>東京都</p>
           <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>1.6<span className="text-lg">倍</span></p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>特別区の平均増加率</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>+178億円/年（2025年6月発表）</p>
         </div>
       </div>
 
@@ -817,9 +818,34 @@ export default async function CostsPage() {
         <div className="mt-4 pt-3 border-t border-gray-100">
           <p className="text-xs text-gray-400">
             ※ コスト指数はAWSの標準料金を100とした場合の相対値。RI/SP/Committed Use等の割引適用前の参考値。
-            実際のコストは利用パターン・契約条件・ベンダー独自割引により大きく変動します。
+            各クラウドの公式料金表（2025年時点）を基に独自試算したもので、実際のコストは利用パターン・契約条件・ベンダー独自割引により大きく変動します。
+            公式の見積もりは各クラウドの料金計算ツールをご利用ください。
           </p>
         </div>
+      </div>
+
+      {/* デジタル庁コスト管理ガイド */}
+      <div className="bg-blue-50 rounded-lg border border-blue-200 px-6 py-4">
+        <h3 className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          デジタル庁コスト管理・FinOps動向
+        </h3>
+        <ul className="space-y-1.5 text-xs text-blue-700">
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">運用経費見積チェックリスト</span>: デジタル庁が移行費用の過小見積もりを防ぐため公開。クラウド利用料・回線費・SE費用の漏れ防止項目を整備。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">FinOpsガイド策定中</span>: 自治体向けクラウドコスト最適化（FinOps）ガイドラインをデジタル庁が策定中。RI/Savings Plans活用・タグ管理・コスト可視化の標準手法を整備予定。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">東京都+178億円/年</span>: 2025年6月発表。都内自治体の標準化移行に伴うシステム経費増が確認され、コスト超過問題が全国規模の政策課題として浮上。</span>
+          </li>
+        </ul>
       </div>
 
       {/* 注記 */}

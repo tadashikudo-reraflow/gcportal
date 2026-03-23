@@ -192,6 +192,52 @@ export default function CostSimulator() {
           人口規模とベンダーを選択してください
         </div>
       )}
+
+      {/* 公式料金計算ツール */}
+      <div className="mt-5 pt-4 border-t border-gray-200">
+        <p className="text-xs font-semibold text-gray-600 mb-2">公式料金計算ツール</p>
+        <p className="text-[11px] text-gray-400 mb-3">
+          各クラウドの公式見積もりツールで実際のコストを試算できます。
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <a
+            href="https://calculator.aws/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-orange-50 hover:border-orange-300 transition-colors text-xs font-medium text-gray-700 hover:text-orange-700"
+          >
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#FF9900" }} />
+            AWS
+          </a>
+          <a
+            href="https://azure.microsoft.com/pricing/calculator/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors text-xs font-medium text-gray-700 hover:text-blue-700"
+          >
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#0078D4" }} />
+            Azure
+          </a>
+          <a
+            href="https://cloud.google.com/products/calculator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors text-xs font-medium text-gray-700 hover:text-blue-600"
+          >
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#4285F4" }} />
+            GCP
+          </a>
+          <a
+            href="https://www.oracle.com/cloud/costestimator.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-red-50 hover:border-red-300 transition-colors text-xs font-medium text-gray-700 hover:text-red-700"
+          >
+            <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: "#F80000" }} />
+            OCI
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

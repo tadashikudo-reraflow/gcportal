@@ -4,20 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
-  { href: "/",             label: "ダッシュボード", short: "TOP"   },
-  { href: "/businesses",   label: "業務別",         short: "業務"   },
-  { href: "/risks",        label: "遅延リスク",     short: "リスク" },
-  { href: "/tokutei",      label: "特定移行認定",   short: "特定移行" },
-  { href: "/packages",     label: "パッケージ一覧", short: "PKG"   },
-  { href: "/adoption",     label: "導入実績",       short: "導入"   },
-  { href: "/costs",        label: "コスト効果",     short: "コスト" },
-  { href: "/cloud",        label: "クラウド基盤",   short: "Cloud"  },
-  { href: "/benchmark",   label: "ベンチマーク",   short: "比較"   },
-  { href: "/timeline",    label: "スケジュール",   short: "日程"   },
-  { href: "/compare",     label: "自治体比較",     short: "比較2"  },
-  { href: "/report",      label: "無料レポート",   short: "PDF"    },
-  { href: "/articles",     label: "コラム・解説",   short: "記事"   },
-{ href: "/sources",      label: "参照サイト",     short: "出典"   },
+  { href: "/",           label: "ダッシュボード", short: "TOP"    },
+  { href: "/businesses", label: "業務別",         short: "業務"   },
+  { href: "/risks",      label: "遅延リスク",     short: "リスク" },
+  { href: "/tokutei",    label: "特定移行認定",   short: "特定移行" },
+  { href: "/packages",   label: "パッケージ一覧", short: "PKG"    },
+  { href: "/costs",      label: "コスト効果",     short: "コスト" },
+  { href: "/cloud",      label: "クラウド基盤",   short: "Cloud"  },
+  { href: "/benchmark",  label: "ベンチマーク",   short: "比較"   },
+  { href: "/timeline",   label: "スケジュール",   short: "日程"   },
+  { href: "/articles",   label: "コラム・解説",   short: "記事"   },
+  { href: "/sources",    label: "参照サイト",     short: "出典"   },
 ] as const;
 
 export default function NavBar() {
