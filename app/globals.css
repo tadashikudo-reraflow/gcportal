@@ -594,6 +594,18 @@ body {
   flex-shrink: 0;
   width: 220px;
 }
+/* モバイル: hero-content内のstatsを表示、右側のstatsを非表示 */
+.hero-stats-mobile {
+  display: none;
+}
+@media (max-width: 900px) {
+  .hero-stats-mobile {
+    display: flex;
+  }
+  .hero-stats-desktop {
+    display: none;
+  }
+}
 
 /* Countdown */
 .hero-countdown {
@@ -692,6 +704,9 @@ body {
     justify-content: space-around;
     flex-wrap: nowrap;
     gap: 0.75rem;
+  }
+  .hero-stats-desktop {
+    display: none !important;
   }
   .hero-ring-container {
     width: 110px;

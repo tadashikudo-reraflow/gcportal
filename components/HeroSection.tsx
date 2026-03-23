@@ -63,6 +63,56 @@ export default function HeroSection({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - completionRate);
 
+  const statsContent = (
+    <>
+      {/* カウントダウン */}
+      <div className="hero-countdown">
+        <p className="hero-countdown-label">移行期限まで</p>
+        <p className="hero-countdown-number">{remainingDays}</p>
+        <p className="hero-countdown-unit">日</p>
+        <p className="hero-countdown-deadline">{deadline}</p>
+      </div>
+
+      {/* プログレスリング */}
+      <div className="hero-ring-container">
+        <svg viewBox="0 0 128 128" className="hero-ring-svg">
+          <circle
+            cx="64" cy="64" r={radius}
+            fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8"
+          />
+          <circle
+            cx="64" cy="64" r={radius}
+            fill="none"
+            stroke={completionRate >= 0.75 ? "#10B981" : completionRate >= 0.5 ? "#F59E0B" : "#EF4444"}
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            transform="rotate(-90 64 64)"
+            style={{ transition: "stroke-dashoffset 1s ease" }}
+          />
+        </svg>
+        <div className="hero-ring-text">
+          <span className="hero-ring-pct">{pct}%</span>
+          <span className="hero-ring-label">全国平均完了率</span>
+        </div>
+      </div>
+
+      {/* ミニ KPI */}
+      <div className="hero-mini-kpis">
+        <div className="hero-mini-kpi">
+          <span className="hero-mini-value" style={{ color: "#10B981" }}>{completeCount.toLocaleString()}</span>
+          <span className="hero-mini-label">完了自治体</span>
+        </div>
+        <div className="hero-mini-kpi-divider" />
+        <div className="hero-mini-kpi">
+          <span className="hero-mini-value" style={{ color: "#64748B" }}>{tokuteiCount.toLocaleString()}</span>
+          <span className="hero-mini-label">特定移行認定</span>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <section className="hero-section">
       <div className="hero-inner">
@@ -159,6 +209,11 @@ export default function HeroSection({
             )}
           </div>
 
+          {/* スタッツ: モバイルではCTAの上に表示 */}
+          <div className="hero-stats hero-stats-mobile">
+            {statsContent}
+          </div>
+
           {/* CTA ボタン群 */}
           <div className="hero-cta-row">
             <Link href="/report" className="btn-cta">
@@ -175,55 +230,9 @@ export default function HeroSection({
           </div>
         </div>
 
-        {/* 右: プログレスリング + カウントダウン */}
-        <div className="hero-stats">
-          {/* カウントダウン */}
-          <div className="hero-countdown">
-            <p className="hero-countdown-label">移行期限まで</p>
-            <p className="hero-countdown-number">{remainingDays}</p>
-            <p className="hero-countdown-unit">日</p>
-            <p className="hero-countdown-deadline">{deadline}</p>
-          </div>
-
-          {/* プログレスリング */}
-          <div className="hero-ring-container">
-            <svg viewBox="0 0 128 128" className="hero-ring-svg">
-              {/* 背景リング */}
-              <circle
-                cx="64" cy="64" r={radius}
-                fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8"
-              />
-              {/* 進捗リング */}
-              <circle
-                cx="64" cy="64" r={radius}
-                fill="none"
-                stroke={completionRate >= 0.75 ? "#10B981" : completionRate >= 0.5 ? "#F59E0B" : "#EF4444"}
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                transform="rotate(-90 64 64)"
-                style={{ transition: "stroke-dashoffset 1s ease" }}
-              />
-            </svg>
-            <div className="hero-ring-text">
-              <span className="hero-ring-pct">{pct}%</span>
-              <span className="hero-ring-label">全国平均完了率</span>
-            </div>
-          </div>
-
-          {/* ミニ KPI */}
-          <div className="hero-mini-kpis">
-            <div className="hero-mini-kpi">
-              <span className="hero-mini-value" style={{ color: "#10B981" }}>{completeCount.toLocaleString()}</span>
-              <span className="hero-mini-label">完了自治体</span>
-            </div>
-            <div className="hero-mini-kpi-divider" />
-            <div className="hero-mini-kpi">
-              <span className="hero-mini-value" style={{ color: "#64748B" }}>{tokuteiCount.toLocaleString()}</span>
-              <span className="hero-mini-label">特定移行認定</span>
-            </div>
-          </div>
+        {/* 右: デスクトップではサイドに表示 */}
+        <div className="hero-stats hero-stats-desktop">
+          {statsContent}
         </div>
       </div>
     </section>
