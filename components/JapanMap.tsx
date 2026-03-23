@@ -88,10 +88,10 @@ const PREFECTURE_GRID: { name: string; col: number; row: number }[] = [
 
 // --- Constants ---
 
-const CELL_SIZE = 64;
+const CELL_SIZE = 56;
 const GAP = 3;
 const STEP = CELL_SIZE + GAP;
-const PADDING = 6;
+const PADDING = 8;
 const COLS = 10;
 const ROWS = 12;
 const SVG_WIDTH = PADDING * 2 + COLS * STEP - GAP;
@@ -161,7 +161,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         色は標準化完了率を示します。クリックで都道府県詳細へ。
       </p>
 
-      <div className="relative w-full mx-auto">
+      <div className="relative w-full mx-auto" style={{ maxWidth: 580 }}>
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           width="100%"
@@ -224,8 +224,8 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={textColor}
-                  fontSize={shortName.length > 3 ? 11 : shortName.length > 2 ? 13 : 14}
-                  fontWeight={800}
+                  fontSize={shortName.length > 3 ? 10 : shortName.length > 2 ? 12 : 13}
+                  fontWeight={700}
                   style={{ pointerEvents: "none", userSelect: "none" }}
                 >
                   {shortName}
@@ -238,8 +238,8 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                     textAnchor="middle"
                     dominantBaseline="central"
                     fill={textColor}
-                    fontSize={13}
-                    fontWeight={800}
+                    fontSize={11}
+                    fontWeight={700}
                     opacity={0.9}
                     style={{ pointerEvents: "none", userSelect: "none" }}
                   >
