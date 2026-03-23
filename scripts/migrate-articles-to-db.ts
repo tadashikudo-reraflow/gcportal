@@ -102,6 +102,7 @@ async function main() {
       date: data.date ?? new Date().toISOString().slice(0, 10),
       tags: data.tags ?? [],
       author: data.author ?? "GCInsight編集部",
+      cover_image: data.coverImage ?? `/images/articles/${slug}.png`,
       is_published: true,
       sources: [],
     };
