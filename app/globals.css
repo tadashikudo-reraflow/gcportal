@@ -590,9 +590,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.5rem;
   flex-shrink: 0;
-  width: 220px;
+  width: 280px;
 }
 /* モバイル: hero-content内のstatsを表示、右側のstatsを非表示 */
 .hero-stats-mobile {
@@ -619,7 +619,7 @@ body {
   letter-spacing: 0.08em;
 }
 .hero-countdown-number {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 900;
   color: #EF4444;
   line-height: 1;
@@ -640,8 +640,8 @@ body {
 /* Progress Ring */
 .hero-ring-container {
   position: relative;
-  width: 140px;
-  height: 140px;
+  width: 180px;
+  height: 180px;
 }
 .hero-ring-svg {
   width: 100%;
@@ -657,7 +657,7 @@ body {
   overflow: hidden;
 }
 .hero-ring-pct {
-  font-size: 1.25rem;
+  font-size: 1.625rem;
   font-weight: 900;
   color: #ffffff;
   font-variant-numeric: tabular-nums;
@@ -681,12 +681,12 @@ body {
   align-items: center;
 }
 .hero-mini-value {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 .hero-mini-label {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   color: #cbd5e1;
   font-weight: 500;
   margin-top: 0.125rem;

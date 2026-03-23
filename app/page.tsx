@@ -117,9 +117,6 @@ export default function DashboardPage() {
   // 業務別: 完了率降順
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
 
-  // Hero用の自治体リスト
-  const heroMunis = allMunis.map((m) => ({ prefecture: m.prefecture, city: m.city }));
-
   return (
     <div className="space-y-6">
       {/* ========== Hero セクション ========== */}
@@ -131,7 +128,6 @@ export default function DashboardPage() {
         completeCount={completeCount}
         tokuteiCount={TOKUTEI_OFFICIAL}
         dataMonth={summary.data_month}
-        municipalities={heroMunis}
       />
 
       {/* データ鮮度バナー */}
