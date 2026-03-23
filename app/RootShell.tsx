@@ -18,7 +18,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {/* ヘッダー — 深紺 #002D72 */}
-      <header style={{ backgroundColor: "var(--color-brand-secondary)" }}>
+      <header style={{ backgroundColor: "var(--color-brand-secondary)", position: "relative", zIndex: 50 }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3 no-underline">
             {/* ロゴ: クラウド+GC */}
