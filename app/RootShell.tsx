@@ -30,10 +30,10 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </div>
             <div>
               <h1 className="text-white font-bold text-base sm:text-lg leading-tight">
-                ガバメントクラウド移行状況ダッシュボード
+                GC Insight
               </h1>
               <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
-                デジタル庁 ガバメントクラウド移行状況インサイト｜全国1,741自治体の進捗を可視化
+                全国1,741自治体の「現在地」と「遅延リスク」を可視化する
               </p>
             </div>
           </Link>
@@ -51,22 +51,31 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
         className="mt-12"
         style={{ borderTop: "2px solid var(--color-border)", backgroundColor: "var(--color-card)" }}
       >
-        <div className="max-w-7xl mx-auto px-4 py-5">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-              データ出典: 総務省 令和8年1月版
-            </p>
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                GC Insight
+              </p>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+                総務省・デジタル庁公表データに基づく移行状況の可視化サイト
+              </p>
+            </div>
             <div className="flex items-center gap-4">
               <Link
                 href="/report"
-                className="text-xs font-medium no-underline"
-                style={{ color: "var(--color-brand-primary)" }}
+                className="btn-cta text-xs"
+                style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
               >
                 無料レポート（PDF）
               </Link>
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                地方公共団体情報システムの標準化に関する法律（標準化法）に基づく移行状況
-              </p>
+              <Link
+                href="/sources"
+                className="text-xs font-medium no-underline hover:underline"
+                style={{ color: "var(--color-brand-primary)" }}
+              >
+                データソース一覧
+              </Link>
             </div>
           </div>
         </div>

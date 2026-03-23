@@ -166,6 +166,50 @@ body {
     align-items: center;
   }
 
+  /* ナビ: ドロップダウンメニュー */
+  .nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 280px;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    z-index: 40;
+    overflow: hidden;
+  }
+  @media (max-width: 640px) {
+    .nav-dropdown {
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: 0;
+      min-width: 0;
+      border-radius: 0 0 12px 12px;
+    }
+  }
+  .nav-dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    transition: background 0.1s;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .nav-dropdown-item:last-child { border-bottom: none; }
+  .nav-dropdown-item:hover { background: #f0f5ff; }
+  .nav-dropdown-item-active { background: #eff6ff; }
+  .nav-dropdown-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .nav-dropdown-desc {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
   /* ナビ: 右端フェード（続きがあることを示す） */
   .nav-fade-hint {
     position: absolute;
@@ -360,6 +404,435 @@ body {
     max-width: 0;
     width: 100%;
   }
+}
+
+/* ==========================================================
+   Hero Section — ファーストビュー強化
+   ========================================================== */
+.hero-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #002D72 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 70% 20%, rgba(0, 102, 255, 0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner {
+  position: relative;
+  display: flex;
+  gap: 2.5rem;
+  padding: 2.5rem 2rem;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .hero-inner {
+    flex-direction: column;
+    padding: 1.5rem 1.25rem;
+    gap: 1.5rem;
+  }
+}
+.hero-content {
+  flex: 1;
+  min-width: 0;
+}
+.hero-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #cbd5e1;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.hero-headline {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+@media (max-width: 640px) {
+  .hero-headline { font-size: 1.25rem; }
+}
+.hero-headline-accent {
+  color: var(--color-brand-accent);
+}
+.hero-sub {
+  font-size: 0.875rem;
+  color: #cbd5e1;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  max-width: 520px;
+}
+
+/* Hero Search */
+.hero-search-container {
+  position: relative;
+  margin-bottom: 1.25rem;
+  max-width: 520px;
+}
+.hero-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.hero-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #cbd5e1;
+  pointer-events: none;
+}
+.hero-search-input {
+  width: 100%;
+  padding: 0.875rem 2.75rem 0.875rem 3rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 0.9375rem;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.hero-search-input::placeholder {
+  color: #64748b;
+}
+.hero-search-input:focus {
+  border-color: var(--color-brand-primary);
+  background: rgba(255, 255, 255, 0.12);
+}
+.hero-search-clear {
+  position: absolute;
+  right: 0.75rem;
+  color: #cbd5e1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.hero-search-clear:hover { color: #e2e8f0; }
+.hero-suggestions {
+  position: absolute;
+  z-index: 30;
+  width: 100%;
+  margin-top: 0.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+}
+.hero-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  transition: background 0.1s;
+}
+.hero-suggestion-item:hover,
+.hero-suggestion-active {
+  background: #f0f5ff;
+}
+.hero-suggestions-empty {
+  position: absolute;
+  z-index: 30;
+  width: 100%;
+  margin-top: 0.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Hero CTA */
+.hero-cta-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 24px;
+  background: transparent;
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hero Stats (Right) */
+.hero-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+  width: 220px;
+}
+@media (max-width: 900px) {
+  .hero-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+  .hero-ring-container {
+    width: 100px;
+    height: 100px;
+  }
+  .hero-ring-pct {
+    font-size: 1.25rem;
+  }
+  .hero-ring-label {
+    font-size: 0.5625rem;
+  }
+  .hero-countdown-number {
+    font-size: 2rem;
+  }
+  .hero-mini-value {
+    font-size: 1rem;
+  }
+}
+
+/* Countdown */
+.hero-countdown {
+  text-align: center;
+}
+.hero-countdown-label {
+  font-size: 0.6875rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.hero-countdown-number {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #FF6B6B;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  margin: 0.25rem 0;
+}
+.hero-countdown-unit {
+  font-size: 0.875rem;
+  color: #FF6B6B;
+  font-weight: 700;
+}
+.hero-countdown-deadline {
+  font-size: 0.6875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* Progress Ring */
+.hero-ring-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+.hero-ring-svg {
+  width: 100%;
+  height: 100%;
+}
+.hero-ring-text {
+  position: absolute;
+  inset: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hero-ring-pct {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.hero-ring-label {
+  font-size: 0.625rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+/* Mini KPIs */
+.hero-mini-kpis {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-mini-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hero-mini-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.hero-mini-label {
+  font-size: 0.625rem;
+  color: #cbd5e1;
+  font-weight: 500;
+  margin-top: 0.125rem;
+}
+.hero-mini-kpi-divider {
+  width: 1px;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================
+   Glossary Tooltip — 専門用語ツールチップ
+   ========================================================== */
+.glossary-trigger {
+  position: relative;
+  display: inline;
+}
+.glossary-term {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: help;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  border-bottom: 1px dashed var(--color-text-muted);
+}
+.glossary-icon {
+  opacity: 0.4;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+.glossary-term:hover .glossary-icon {
+  opacity: 0.7;
+}
+.glossary-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: 280px;
+  max-width: 90vw;
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.glossary-popup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #1e293b;
+}
+/* 画面上部で見切れる場合は下に表示 */
+@media (max-height: 500px) {
+  .glossary-popup {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .glossary-popup::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: #1e293b;
+  }
+}
+.glossary-popup-title {
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #93c5fd;
+}
+.glossary-popup-body {
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+}
+
+/* ==========================================================
+   CTA セクション — 行動喚起カード
+   ========================================================== */
+.cta-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.cta-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.15s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.cta-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 102, 255, 0.12);
+  transform: translateY(-2px);
+}
+.cta-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cta-card-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.cta-card-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.cta-card-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 /* ==========================================================

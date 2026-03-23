@@ -4,10 +4,11 @@ import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
-import MigrationResultBanner from "@/components/MigrationResultBanner";
+import HeroSection from "@/components/HeroSection";
 import JapanMap from "@/components/JapanMap";
 import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
+import GlossaryTooltip from "@/components/GlossaryTooltip";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
 
@@ -15,15 +16,15 @@ const avgRate = (data.summary.avg_rate * 100).toFixed(1);
 
 export const metadata: Metadata = {
   title:
-    "ガバメントクラウド移行状況ダッシュボード｜全国1,741自治体の進捗をリアルタイム可視化",
+    "GC Insight｜全国1,741自治体の「現在地」と「遅延リスク」を可視化",
   description: `全国平均完了率${avgRate}%。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
-    title: "GCInsight — 全国ガバメントクラウド移行ダッシュボード",
+    title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
     description: `全国平均完了率${avgRate}%。1,741自治体の移行進捗をリアルタイム可視化。`,
     images: [
       {
-        url: `/og?title=${encodeURIComponent("全国ガバメントクラウド移行ダッシュボード")}&subtitle=${encodeURIComponent(`全国平均完了率 ${avgRate}%`)}&rate=${data.summary.avg_rate}`,
+        url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`全国平均完了率 ${avgRate}%`)}&rate=${data.summary.avg_rate}`,
         width: 1200,
         height: 630,
       },
@@ -41,7 +42,7 @@ type StandardMunicipality = {
   business_rates: Record<string, number>;
 };
 
-// 5段階ステータス（完了・順調・要注意・危機・特定移行）
+// 5段階ステータス
 function getStatus(rate: number, isTokutei: boolean): "tokutei" | "complete" | "ontrack" | "atrisk" | "critical" {
   if (isTokutei) return "tokutei";
   if (rate >= 1.0) return "complete";
@@ -72,23 +73,23 @@ export default function DashboardPage() {
   const { summary, prefectures, businesses, risk_municipalities } = data;
   const allMunis = (data as { municipalities: StandardMunicipality[] }).municipalities;
 
-  // 特定移行認定Set（prefecture/city キー）
+  // 特定移行認定Set
   const tokuteiSet = new Set<string>(
     (tokuteiData.municipalities as { prefecture: string; city: string }[]).map(
       (m) => `${m.prefecture}/${m.city}`
     )
   );
-  const TOKUTEI_OFFICIAL = tokuteiData.total_count as number; // 公式総数935（都道府県含む）
+  const TOKUTEI_OFFICIAL = tokuteiData.total_count as number;
 
-  // 特定移行の都道府県別カウント（PrefectureRanking用）
+  // 特定移行の都道府県別カウント
   const tokuteiByPref: Record<string, number> = {};
   for (const m of tokuteiData.municipalities as { prefecture: string; city: string }[]) {
     tokuteiByPref[m.prefecture] = (tokuteiByPref[m.prefecture] ?? 0) + 1;
   }
-  const TOKUTEI_MUNI_COUNT = tokuteiSet.size; // 市区町村のみ898（standardization.jsonとマッチする実数）
-  const TOTAL = summary.total; // 1741
+  const TOKUTEI_MUNI_COUNT = tokuteiSet.size;
+  const TOTAL = summary.total;
 
-  // 全自治体を5段階で分類
+  // 5段階分類
   let completeCount = 0;
   let ontrackCount = 0;
   let atriskCount = 0;
@@ -111,124 +112,59 @@ export default function DashboardPage() {
   const top20Risk = riskMunis.slice(0, 20);
 
   const remainingDays = calcRemainingDays(summary.deadline);
-  const completionPct = (summary.avg_rate * 100).toFixed(1);
   const completedPct = ((completeCount / TOTAL) * 100).toFixed(1);
 
   // 業務別: 完了率降順
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
 
-  // 都道府県別（PrefectureRanking コンポーネントで表示）
+  // Hero用の自治体リスト
+  const heroMunis = allMunis.map((m) => ({ prefecture: m.prefecture, city: m.city }));
 
   return (
     <div className="space-y-6">
-      {/* 最終移行結果バナー */}
-      <MigrationResultBanner
+      {/* ========== Hero セクション ========== */}
+      <HeroSection
         completionRate={summary.avg_rate}
-        totalSystems={migrationStats.total_systems}
-        completedSystems={migrationStats.completed_systems}
-        delayedSystems={tokuteiData.system_count}
-        delayedMunicipalities={TOKUTEI_OFFICIAL}
+        remainingDays={remainingDays}
+        deadline={summary.deadline}
         totalMunicipalities={TOTAL}
-        costMultiplier={COST_CONSTANTS.avgCostIncrease}
+        completeCount={completeCount}
+        tokuteiCount={TOKUTEI_OFFICIAL}
         dataMonth={summary.data_month}
+        municipalities={heroMunis}
       />
-
-      {/* ① 緊急アラートバナー */}
-      <div className="alert-banner flex-wrap gap-y-2">
-        <svg
-          width="18" height="18" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className="flex-shrink-0" style={{ color: "var(--color-status-critical)" }}
-          aria-hidden="true"
-        >
-          <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-          <line x1="12" y1="9" x2="12" y2="13" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold">
-            {summary.deadline} 移行期限まであと{" "}
-            <strong style={{ color: "var(--color-status-critical)", fontSize: "1rem" }}>
-              {remainingDays}日
-            </strong>
-          </p>
-          <p className="text-xs mt-0.5" style={{ color: "#991b1b" }}>
-            全国 {TOTAL.toLocaleString()} 自治体のうち完了は{" "}
-            {completeCount} 自治体（{completedPct}%）、
-            特定移行認定 {TOKUTEI_OFFICIAL.toLocaleString()} 団体を含む
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <p className="text-xs" style={{ color: "#991b1b" }}>基準: {summary.data_month}</p>
-          <span
-            className="px-2.5 py-1 rounded-full text-xs font-black tracking-wide text-white"
-            style={{ backgroundColor: "#b91c1c", letterSpacing: "0.04em" }}
-          >
-            緊急対応必要
-          </span>
-        </div>
-      </div>
 
       {/* データ鮮度バナー */}
       <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
 
-      {/* データ最終更新・出典リンク */}
-      <div
-        className="rounded-lg px-5 py-3 flex flex-wrap items-center justify-between gap-3"
-        style={{ backgroundColor: "#f0f5ff", border: "1px solid #bfdbfe" }}
-      >
-        <div className="flex items-center gap-2">
-          <svg
-            width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-          <p className="text-xs font-semibold" style={{ color: "#1e40af" }}>
-            データ最終更新: {summary.data_month.replace("-", "年")}月
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <a
-            href="https://www.digital.go.jp/policies/local_governments"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium underline"
-            style={{ color: "#0066FF" }}
-          >
-            デジタル庁公式
-          </a>
-          <a
-            href="https://www.soumu.go.jp/denshijiti/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-medium underline"
-            style={{ color: "#0066FF" }}
-          >
-            総務省
-          </a>
+      {/* ========== 5段階ステータスKPIカード ========== */}
+      <div>
+        <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          移行ステータスの全体像
+          <span className="text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
+            — いま、どれだけの自治体が完了しているのか
+          </span>
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
+          <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
+          <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#FA6414" cls="kpi-card kpi-card-atrisk"   />
+          <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
+          <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
+            <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", margin: 0, lineHeight: 1 }}>
+              {TOKUTEI_OFFICIAL.toLocaleString()}
+            </p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginTop: 6 }}>
+              <GlossaryTooltip term="特定移行認定">特定移行</GlossaryTooltip>
+            </p>
+            <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
+              認定団体（うち市区町村{TOKUTEI_MUNI_COUNT}） →
+            </p>
+          </Link>
         </div>
       </div>
 
-      {/* ② 5段階ステータスKPIカード */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
-        <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
-        <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#FA6414" cls="kpi-card kpi-card-atrisk"   />
-        <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
-        <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
-          <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#7C3AED", margin: 0, lineHeight: 1 }}>
-            {TOKUTEI_OFFICIAL.toLocaleString()}
-          </p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: "#7C3AED", marginTop: 6 }}>特定移行</p>
-          <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
-            認定団体（うち市区町村{TOKUTEI_MUNI_COUNT}） →
-          </p>
-        </Link>
-      </div>
-
-      {/* ステータス凡例バー */}
+      {/* ステータス分布バー */}
       <div className="card px-5 py-3">
         <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>
           全 {TOTAL.toLocaleString()} 自治体のステータス分布
@@ -256,19 +192,18 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ③ 業務別完了率バーチャート */}
+      {/* ========== 業務別完了率 ========== */}
       <div className="card p-6">
         <h2
-          className="text-sm font-bold mb-4 flex items-center gap-2"
+          className="text-sm font-bold mb-1 flex items-center gap-2"
           style={{ color: "var(--color-text-primary)" }}
         >
-          業務別完了率（20業務）
+          どの業務が遅れているのか？
         </h2>
-        <p className="text-xs mb-4 flex items-center gap-1.5" style={{ color: "var(--color-text-muted)" }}>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5 flex-shrink-0">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
-          </svg>
-          全国 {TOTAL.toLocaleString()} 自治体（特定移行含む）の業務ごとの<strong>平均</strong>完了率。完了率降順。
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          <GlossaryTooltip term="20業務">20業務</GlossaryTooltip>ごとの全国平均
+          <GlossaryTooltip term="完了率">完了率</GlossaryTooltip>。
+          下位の業務ほどボトルネックになりやすい。
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
           {sortedBusinesses.map((biz) => {
@@ -312,10 +247,7 @@ export default function DashboardPage() {
             { label: "危機(<50%)", color: "#b91c1c" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1">
-              <span
-                className="w-3 h-3 rounded-full inline-block"
-                style={{ backgroundColor: item.color }}
-              />
+              <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: item.color }} />
               <span className="text-xs text-gray-500">{item.label}</span>
             </div>
           ))}
@@ -325,16 +257,18 @@ export default function DashboardPage() {
       {/* 日本地図ヒートマップ */}
       <JapanMap prefectures={prefectures} />
 
-      {/* ④ 都道府県別一覧テーブル */}
+      {/* ========== 都道府県別一覧テーブル ========== */}
       <div className="card p-4 sm:p-6">
-        <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          都道府県別 標準化進捗
-          <span className="text-xs font-normal text-gray-400 ml-1">完了率の低い順</span>
+        <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          都道府県別 — どの地域が遅れているか
         </h2>
+        <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
+          完了率の低い順。自治体の多い都道府県ほど影響が大きい。
+        </p>
         <PrefectureRanking prefectures={prefectures} tokuteiByPref={tokuteiByPref} />
       </div>
 
-      {/* 📘 初見者向け読み方ガイド */}
+      {/* ========== 初見者向け「特定移行」ガイド ========== */}
       <div className="rounded-xl px-5 py-4 flex gap-3" style={{ backgroundColor: "#f0f5ff" }}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5" aria-hidden="true">
           <circle cx="12" cy="12" r="10"/>
@@ -342,7 +276,7 @@ export default function DashboardPage() {
         </svg>
         <div>
           <p className="text-sm font-bold mb-1.5" style={{ color: "var(--color-gov-primary)" }}>
-            「特定移行」ってなに？
+            期限延長が認められた「特定移行」対象自治体とは？
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
             デジタル庁が認定した<strong>特定移行支援システム</strong>の対象自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は、
@@ -350,19 +284,20 @@ export default function DashboardPage() {
             「遅延」や「危機」とは異なる扱いです。
           </p>
           <Link href="/tokutei" className="text-xs font-medium underline mt-1.5 inline-block" style={{ color: "var(--color-gov-primary)" }}>
-            特定移行認定団体を見る →
+            特定移行認定団体の詳細を見る →
           </Link>
         </div>
       </div>
 
-      {/* ⑤ 遅延リスク自治体TOP20テーブル（特定移行除外） */}
+      {/* ========== 遅延リスク自治体TOP20 ========== */}
       <div className="card p-6">
         <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          遅延リスク自治体 TOP20
+          いま最も遅れている自治体は？
           <span className="ml-1 text-xs text-gray-400 font-normal">※特定移行認定団体を除く</span>
         </h2>
         <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          完了率50%未満かつ特定移行認定を受けていない自治体（全{riskMunis.length}件中TOP20）
+          <GlossaryTooltip term="完了率">完了率</GlossaryTooltip>50%未満かつ
+          <GlossaryTooltip term="特定移行">特定移行</GlossaryTooltip>認定を受けていない自治体（全{riskMunis.length}件中TOP20）
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -414,6 +349,63 @@ export default function DashboardPage() {
             全件表示 →
           </Link>
         </div>
+      </div>
+
+      {/* ========== CTA セクション（行動喚起） ========== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* 1枚目: インパクト数字付き（大きめ、2列ぶち抜き） */}
+        <Link href="/risks" className="cta-card sm:col-span-2 sm:flex-row sm:items-center" style={{ flexDirection: "row", gap: "1.5rem" }}>
+          <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth: 80 }}>
+            <span className="tabular-nums font-black" style={{ fontSize: 36, color: "#B91C1C", lineHeight: 1 }}>
+              {riskMunis.length}
+            </span>
+            <span className="text-xs font-semibold mt-1" style={{ color: "#B91C1C" }}>自治体</span>
+          </div>
+          <div className="flex flex-col gap-1">
+            <span className="cta-card-title">期限内の完了が危ぶまれる遅延リスク自治体</span>
+            <span className="cta-card-desc">完了率50%未満の自治体を人口帯・地域でフィルター。対策の優先順位づけに。</span>
+            <span className="cta-card-link">
+              一覧を見る
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+            </span>
+          </div>
+        </Link>
+
+        {/* 2枚目: 標準カード（アイコン+テキスト） */}
+        <Link href="/costs" className="cta-card">
+          <div className="cta-card-icon" style={{ backgroundColor: "#FEF3C7" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+            </svg>
+          </div>
+          <span className="cta-card-title">コスト増の要因を分析</span>
+          <span className="cta-card-desc">移行でコストが平均{COST_CONSTANTS.avgCostIncrease}倍に。ベンダー別比較。</span>
+          <span className="cta-card-link">
+            コスト分析を見る
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+          </span>
+        </Link>
+
+        {/* 3枚目: テキスト主体（アイコンなし、背景色付き） */}
+        <Link
+          href="/report"
+          className="cta-card"
+          style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe" }}
+        >
+          <span className="cta-card-title" style={{ color: "#1E40AF" }}>
+            全体レポートをダウンロード（PDF）
+          </span>
+          <span className="cta-card-desc">最新の全国サマリーを取得。社内共有や報告資料に。</span>
+          <span className="cta-card-link">
+            無料ダウンロード
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </span>
+        </Link>
       </div>
 
       {/* 出典・データソース */}
