@@ -152,6 +152,53 @@ async function main() {
   }
 
   console.log(`\nDone: ${inserted} inserted, ${updated} updated, ${skipped} skipped, ${errors} errors`);
+
+  // KWプランナー自動同期
+  if (inserted > 0 || updated > 0) {
+    console.log("\nKWプランナー同期中...");
+    try {
+      const { execSync } = await import("child_process");
+      execSync(
+        `cd ${path.join(process.env.HOME ?? "", "workspace/pj/digital-go-jp-rag")} && source .venv/bin/activate && python3 -c "
+from openpyxl import load_workbook
+import re
+
+xlsx = '${process.env.GDRIVE_WORKSPACE ?? "/Users/tadashikudo/Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace"}/contents/PJ19/gcportal_kw_planner_v7_20260320.xlsx'
+wb = load_workbook(xlsx)
+ws = wb.active
+slugs = set(${JSON.stringify(files.map((f: string) => f.replace(/\\.md$/, "")))})
+updated = 0
+for row in range(2, ws.max_row + 1):
+    status = ws.cell(row=row, column=19).value
+    if status == '公開済み':
+        continue
+    memo = str(ws.cell(row=row, column=21).value or '')
+    for s in slugs:
+        if s in memo:
+            ws.cell(row=row, column=19, value='公開済み')
+            updated += 1
+            break
+    # タイトル列とKW列でも照合
+    kw = str(ws.cell(row=row, column=3).value or '')
+    title = str(ws.cell(row=row, column=14).value or '')
+    for s in slugs:
+        parts = s.replace('gc-', '').replace('-', ' ').split()
+        if len(parts) >= 2 and all(p in (kw + title).lower() for p in parts[:2]):
+            ws.cell(row=row, column=19, value='公開済み')
+            if s not in memo:
+                ws.cell(row=row, column=21, value=(memo + ' slug:' + s).strip())
+            updated += 1
+            break
+wb.save(xlsx)
+print(f'KWプランナー: {updated}件を公開済みに更新')
+"`,
+        { encoding: "utf-8", stdio: ["pipe", "pipe", "pipe"], shell: "/bin/bash" }
+      );
+      console.log("KWプランナー同期完了");
+    } catch (err) {
+      console.warn("KWプランナー同期スキップ（エラー）:", err instanceof Error ? err.message : String(err));
+    }
+  }
 }
 
 main().catch((e) => {
