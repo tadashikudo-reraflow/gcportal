@@ -54,11 +54,11 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 export const metadata: Metadata = {
   title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
   description:
-    "ガバメントクラウド移行コストが当初比156%増になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
+    "ガバメントクラウド移行コストが当初比156%増（中核市市長会調査2025年1月）になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
   openGraph: {
     title: "ガバメントクラウド移行コスト分析",
     description:
-      "移行コストが当初比156%増。ベンダー別コスト比較と費用対効果を可視化。",
+      "移行コストが当初比156%増（中核市市長会調査2025年1月）。ベンダー別コスト比較と費用対効果を可視化。",
     images: [
       {
         url: `/og?title=${encodeURIComponent("コスト分析")}&subtitle=${encodeURIComponent("ガバメントクラウド移行コスト増減を可視化")}&type=cost`,
@@ -400,7 +400,7 @@ export default async function CostsPage() {
         <div className="card p-5 text-center">
           <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>東京都</p>
           <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>1.6<span className="text-lg">倍</span></p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>+178億円/年（2025年6月発表）</p>
+          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>+178億円/年（東京都調査・2025年6月発表）</p>
         </div>
       </div>
 
@@ -778,7 +778,7 @@ export default async function CostsPage() {
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">東京都+178億円/年</span>: 2025年6月発表。コスト超過が全国規模の政策課題に。</span>
+            <span><span className="font-semibold">東京都+178億円/年</span>: 東京都調査（2024年）・デジタル庁「運用経費に係る総合的な対策」(2025年6月)。コスト超過が全国規模の政策課題に。</span>
           </li>
         </ul>
       </div>
@@ -904,6 +904,17 @@ export default async function CostsPage() {
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
         <p className="text-xs text-gray-400">
           ※ コスト比率は移行前=1.0基準。判明分のみ集計。
+        </p>
+      </div>
+
+      {/* 令和7年度補正予算 */}
+      <div
+        className="rounded-lg border border-blue-200 bg-blue-50/50 px-5 py-4"
+      >
+        <p className="text-xs font-bold text-blue-800 mb-1">令和7年度補正予算（支援措置）</p>
+        <p className="text-xs text-blue-700 leading-relaxed">
+          地方公共団体情報システム運用最適化支援事業：補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong>、補助率 1/2。
+          移行コスト増加への財政支援として計上。
         </p>
       </div>
 

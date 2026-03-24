@@ -25,8 +25,10 @@ export async function parsePdf(buffer: Buffer): Promise<PdfParseResult> {
   // Dynamic import for Node.js server environment
   const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
 
-  // Disable worker for server-side usage
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "";
+  // Disable worker for server-side / CLI usage
+  // For pdfjs-dist v5+, point to the actual worker file to avoid fake worker error
+  const workerPath = require.resolve("pdfjs-dist/legacy/build/pdf.worker.mjs");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerPath;
 
   const data = new Uint8Array(buffer);
 

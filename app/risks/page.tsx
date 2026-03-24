@@ -312,6 +312,24 @@ export default function RisksPage() {
         </div>
       </div>
 
+      {/* 指標の説明 */}
+      <div className="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4">
+        <p className="text-xs font-bold text-gray-700 mb-2">指標の定義</p>
+        <div className="space-y-2 text-xs text-gray-600 leading-relaxed">
+          <div className="flex items-start gap-2">
+            <span className="flex-shrink-0 font-semibold text-amber-700 mt-0.5">手続き進捗率（82%）</span>
+            <span>= 40ステップ中の完了ステップ割合（作業着手ベース）。書類手続き・計画策定が完了していても、システムが実際にガバメントクラウドへ移行済みとは限りません。</span>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="flex-shrink-0 font-semibold text-green-700 mt-0.5">システム移行率（38.4%）</span>
+            <span>= 実際にガバメントクラウドへ本番移行完了したシステムの割合（令和8年1月末時点、デジタル庁2026年2月27日公表）。</span>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">
+            ※ 2つの指標の大きなギャップ（約44ポイント）が移行の実態を表しています。手続きは進んでいても、実際のシステム移行は大幅に遅れています。
+          </p>
+        </div>
+      </div>
+
       <FreshnessBanner dataMonth={summary.data_month} pageLabel="遅延リスク" />
       <SourceAttribution sourceIds={PAGE_SOURCES.risks} pageId="risks" />
 

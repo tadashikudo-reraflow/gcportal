@@ -939,11 +939,18 @@ body {
 .prose-article a:hover {
   color: var(--color-brand-secondary);
 }
+/* テーブルラッパー: モバイルで横スクロール可能にする */
+.prose-article .table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1rem 0;
+  border-radius: 4px;
+}
 .prose-article table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
-  margin: 1rem 0;
+  margin: 0;
 }
 .prose-article th {
   background: var(--color-section-bg);
@@ -987,7 +994,7 @@ body {
   padding: 0;
   color: inherit;
 }
-/* Mermaid diagram — カード幅を突破して大きく表示 */
+/* Mermaid diagram — レスポンシブ対応 */
 .mermaid-diagram {
   display: flex;
   justify-content: center;
@@ -1000,10 +1007,16 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 .mermaid-diagram svg {
-  min-width: 700px;
-  max-width: none;
+  max-width: 100%;
   height: auto;
   font-size: 16px;
+}
+/* モバイルでは margin を縮小して画面幅に収める */
+@media (max-width: 640px) {
+  .mermaid-diagram {
+    margin: 1.5rem -1rem;
+    padding: 1.5rem 0.5rem;
+  }
 }
 .mermaid-error {
   border-left: 3px solid #ef4444;

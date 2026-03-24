@@ -15,7 +15,7 @@ mermaid.initialize({
     padding: 20,
     nodeSpacing: 40,
     rankSpacing: 60,
-    useMaxWidth: false,
+    useMaxWidth: true,
   },
 });
 
@@ -60,6 +60,17 @@ export default function MermaidRenderer({
           wrapper.appendChild(sibling);
         }
       }
+    });
+
+    // テーブルを横スクロール可能なラッパーで包む
+    const tables = ref.current.querySelectorAll("table");
+    tables.forEach((table) => {
+      // 既にラッパー済みの場合はスキップ
+      if (table.parentElement?.classList.contains("table-wrapper")) return;
+      const wrapper = document.createElement("div");
+      wrapper.className = "table-wrapper";
+      table.parentNode?.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
     });
 
     codeBlocks.forEach(async (block, i) => {

@@ -4,7 +4,11 @@ import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 import { getNextPendingJob, processScrapeJob, getScrapeJob } from "@/lib/scrape-pipeline";
 
 /**
- * POST /api/scrape/process — 次のpendingジョブを処理（cron向け）
+ * POST /api/scrape/process — 次のpendingスクレイプジョブを処理（cron向け）
+ *
+ * ダッシュボード表示用データ（scrape_jobs）のみ処理。
+ * RAGデータはローカル Oracle 23ai に格納するため、
+ * パブコメRSS/デジタル庁RSSのingestはローカル実行。
  *
  * Auth: JWT or CRON_SECRET header
  * Header: x-cron-secret: <CRON_SECRET>
@@ -38,28 +42,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // ── スクレイプジョブ処理（ダッシュボード用データ更新） ──
+  let scrapeResult: { processed: boolean; jobId?: number; status?: string } = {
+    processed: false,
+  };
+
   try {
     const job = await getNextPendingJob();
 
-    if (!job) {
-      return NextResponse.json({
-        message: "No pending jobs",
-        processed: false,
-      });
+    if (job) {
+      await processScrapeJob(job.id);
+      const updatedJob = await getScrapeJob(job.id);
+      scrapeResult = {
+        processed: true,
+        jobId: job.id,
+        status: updatedJob?.status ?? "unknown",
+      };
     }
-
-    await processScrapeJob(job.id);
-
-    // 処理後のステータスを取得
-    const updatedJob = await getScrapeJob(job.id);
-
-    return NextResponse.json({
-      message: `Job ${job.id} processed`,
-      processed: true,
-      job: updatedJob,
-    });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: message }, { status: 500 });
+    scrapeResult = {
+      processed: false,
+      status: `error: ${err instanceof Error ? err.message : String(err)}`,
+    };
   }
+
+  return NextResponse.json({
+    scrape: scrapeResult,
+    message: scrapeResult.processed
+      ? `Scrape job ${scrapeResult.jobId} ${scrapeResult.status}`
+      : "No pending scrape jobs",
+  });
 }

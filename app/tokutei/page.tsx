@@ -150,6 +150,29 @@ export default function TokuteiPage() {
         </div>
       </div>
 
+      {/* システム移行完了率 */}
+      <div
+        className="flex items-start gap-3 rounded-lg px-5 py-4"
+        style={{ backgroundColor: "#f0fdf4", border: "1px solid #86efac" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div style={{ color: "#14532d" }}>
+          <p className="font-bold text-sm mb-0.5">
+            システム移行完了率: <span className="text-green-700">38.4%</span>（令和8年1月末時点）
+          </p>
+          <p className="text-xs leading-relaxed">
+            13,283システムが本番移行完了（全34,594システム中）。
+            手続き進捗率（82%）とのギャップが実態を示しています。
+          </p>
+          <p className="text-[11px] mt-1 text-green-700">
+            出典: デジタル庁 2026年2月27日公表
+          </p>
+        </div>
+      </div>
+
       {/* 特定移行とは */}
       <div className="card p-5">
         <h2 className="text-sm font-bold mb-2" style={{ color: "#475569" }}>
@@ -175,6 +198,49 @@ export default function TokuteiPage() {
             ※ 手続き進捗率はガバクラ移行進捗の推計値（令和8年1月時点）。認定は業務単位のため自治体全体の手続き進捗率と連動しない場合あり。
           </p>
         </div>
+      </div>
+
+      {/* 特定移行 事由別内訳 */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+          特定移行認定 事由別内訳
+        </h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr style={{ backgroundColor: "#f8fafc" }}>
+                <th className="text-left py-2 px-3 font-semibold border-b text-gray-600">事由</th>
+                <th className="text-right py-2 px-3 font-semibold border-b text-gray-600">システム数</th>
+                <th className="text-right py-2 px-3 font-semibold border-b text-gray-600">団体数</th>
+                <th className="text-left py-2 px-3 font-semibold border-b text-gray-600">内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { jiyuu: "事由1", systems: 44, orgs: 7, desc: "メインフレーム", highlight: false },
+                { jiyuu: "事由2", systems: 189, orgs: 26, desc: "個別開発", highlight: false },
+                { jiyuu: "事由3", systems: 184, orgs: 97, desc: "ベンダー撤退", highlight: false },
+                { jiyuu: "事由4", systems: 8539, orgs: 907, desc: "SEリソース不足（95.3%）", highlight: true },
+              ].map((row) => (
+                <tr key={row.jiyuu} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-2 px-3 font-medium text-gray-700">{row.jiyuu}</td>
+                  <td className="py-2 px-3 text-right tabular-nums text-gray-700">{row.systems.toLocaleString()}</td>
+                  <td className="py-2 px-3 text-right tabular-nums text-gray-700">{row.orgs.toLocaleString()}</td>
+                  <td className={`py-2 px-3 ${row.highlight ? "font-semibold text-red-700" : "text-gray-500"}`}>{row.desc}</td>
+                </tr>
+              ))}
+              <tr style={{ backgroundColor: "#f1f5f9" }}>
+                <td className="py-2 px-3 font-bold text-gray-700">合計</td>
+                <td className="py-2 px-3 text-right tabular-nums font-bold text-gray-700">8,956</td>
+                <td className="py-2 px-3 text-right tabular-nums font-bold text-gray-700">935</td>
+                <td className="py-2 px-3 text-gray-400">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-gray-400 mt-2">
+          ※ 事由4（SEリソース不足）が全体の95.3%を占める。出典: デジタル庁（令和7年12月末時点）
+        </p>
       </div>
 
       {/* 都道府県別集計 */}

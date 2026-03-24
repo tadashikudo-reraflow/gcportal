@@ -92,22 +92,48 @@ function getServiceClient(): SupabaseClient {
 // Embedding
 // ---------------------------------------------------------------------------
 
+/** 指数バックオフで OpenAI Embedding API を呼ぶ共通ヘルパー */
+async function fetchEmbeddingWithBackoff(
+  apiKey: string,
+  input: string | string[]
+): Promise<Response> {
+  const MAX_RETRIES = 4;
+  let delay = 3000; // 3s → 6s → 12s → 24s
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const res = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: EMBEDDING_MODEL,
+        input,
+        dimensions: EMBEDDING_DIMENSIONS,
+      }),
+    });
+
+    if (res.status !== 429) return res;
+
+    if (attempt === MAX_RETRIES) return res; // 最終試行後は呼び出し側でエラー処理
+
+    // Retry-After ヘッダーを優先、なければ指数バックオフ
+    const retryAfter = res.headers.get("retry-after");
+    const waitMs = retryAfter ? Number(retryAfter) * 1000 : delay;
+    await new Promise((r) => setTimeout(r, waitMs));
+    delay *= 2;
+  }
+
+  // 到達しないが TypeScript 対策
+  throw new Error("Unexpected exit from retry loop");
+}
+
 async function getEmbedding(text: string): Promise<number[]> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
-  const res = await fetch("https://api.openai.com/v1/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: EMBEDDING_MODEL,
-      input: text,
-      dimensions: EMBEDDING_DIMENSIONS,
-    }),
-  });
+  const res = await fetchEmbeddingWithBackoff(apiKey, text);
 
   if (!res.ok) {
     const err = await res.text();
@@ -123,18 +149,7 @@ async function getEmbeddingBatch(texts: string[]): Promise<number[][]> {
   if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
   // OpenAI supports batch embedding natively
-  const res = await fetch("https://api.openai.com/v1/embeddings", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: EMBEDDING_MODEL,
-      input: texts,
-      dimensions: EMBEDDING_DIMENSIONS,
-    }),
-  });
+  const res = await fetchEmbeddingWithBackoff(apiKey, texts);
 
   if (!res.ok) {
     const err = await res.text();
@@ -261,10 +276,14 @@ export async function ingestDocument(opts: {
     const chunks = chunkText(opts.content);
 
     // 3. バッチエンベディング（最大20件ずつ）
+    // text-embedding-3-small の上限: 8192トークン ≈ 約5500文字（日本語）
+    const MAX_CHUNK_CHARS = 5500;
     const BATCH_SIZE = 20;
     const allEmbeddings: number[][] = [];
     for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-      const batch = chunks.slice(i, i + BATCH_SIZE);
+      const batch = chunks.slice(i, i + BATCH_SIZE).map((c) =>
+        c.length > MAX_CHUNK_CHARS ? c.slice(0, MAX_CHUNK_CHARS) : c
+      );
       const embeddings = await getEmbeddingBatch(batch);
       allEmbeddings.push(...embeddings);
     }
@@ -479,10 +498,13 @@ export async function reindexDocument(id: number): Promise<{ chunkCount: number 
   const newChunks = chunkText(fullText);
 
   // 再エンベディング
+  const MAX_CHUNK_CHARS = 5500;
   const BATCH_SIZE = 20;
   const allEmbeddings: number[][] = [];
   for (let i = 0; i < newChunks.length; i += BATCH_SIZE) {
-    const batch = newChunks.slice(i, i + BATCH_SIZE);
+    const batch = newChunks.slice(i, i + BATCH_SIZE).map((c) =>
+      c.length > MAX_CHUNK_CHARS ? c.slice(0, MAX_CHUNK_CHARS) : c
+    );
     const embeddings = await getEmbeddingBatch(batch);
     allEmbeddings.push(...embeddings);
   }
