@@ -210,7 +210,7 @@ export default function RisksPage() {
           移行期限に間に合わない場合のデメリット
         </h2>
         <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          期限超過時に想定されるリスク。罰則規定はないが実質的な不利益あり。<Link href="/articles" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
+          期限超過時に想定されるリスク。罰則規定はないが実質的な不利益あり。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
@@ -280,7 +280,7 @@ export default function RisksPage() {
           ))}
         </div>
         <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-          ※ 標準化法は「努力義務」。特定移行認定なしで超過した場合、上記リスクが現実化する可能性あり。
+          ※ 標準化法は「努力義務」。特定移行認定なしで超過した場合、上記リスクが現実化する可能性あり。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
         </p>
       </div>
 
