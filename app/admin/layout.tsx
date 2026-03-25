@@ -12,46 +12,55 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
-      {/* 左サイドバー */}
+    <div className="flex min-h-screen" style={{ backgroundColor: "#f7f7f7" }}>
+      {/* 左サイドバー — note風白背景 */}
       <aside
         className="flex-shrink-0 flex flex-col"
         style={{
           width: 220,
-          backgroundColor: "#002D72",
+          backgroundColor: "#ffffff",
           minHeight: "100vh",
+          borderRight: "1px solid #e5e7eb",
         }}
       >
         {/* ロゴ */}
-        <div
-          className="px-5 py-5 border-b"
-          style={{ borderColor: "rgba(255,255,255,0.1)" }}
-        >
+        <div className="px-5 py-5">
           <div className="flex items-center gap-2">
-            <span className="text-lg">&#9881;</span>
+            <span
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-extrabold flex-shrink-0"
+              style={{ backgroundColor: "#002D72" }}
+            >
+              GC
+            </span>
             <span
               className="font-extrabold text-sm tracking-wide"
-              style={{ color: "#F5B500" }}
+              style={{ color: "#002D72" }}
             >
-              GCInsight Admin
+              GCInsight
+            </span>
+            <span
+              className="text-xs px-1.5 py-0.5 rounded font-bold"
+              style={{ backgroundColor: "#F5B500", color: "#fff", fontSize: "9px" }}
+            >
+              Admin
             </span>
           </div>
         </div>
 
-        {/* ナビゲーション（クライアントコンポーネント） */}
+        {/* ナビゲーション */}
         <AdminSidebar />
 
-        {/* フッター: サイトを見る + ログアウト */}
+        {/* フッター */}
         <div
-          className="mt-auto px-3 py-4 border-t space-y-1"
-          style={{ borderColor: "rgba(255,255,255,0.1)" }}
+          className="mt-auto px-3 py-4 border-t space-y-0.5"
+          style={{ borderColor: "#e5e7eb" }}
         >
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors"
-            style={{ color: "rgba(255,255,255,0.6)" }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors hover:bg-gray-50"
+            style={{ color: "#9ca3af" }}
           >
             <span>&#127760;</span>
             <span>サイトを見る &#8599;</span>
@@ -59,8 +68,8 @@ export default function AdminLayout({
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left"
-              style={{ color: "rgba(255,255,255,0.6)" }}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left hover:bg-gray-50"
+              style={{ color: "#9ca3af" }}
             >
               <span>&#128682;</span>
               <span>ログアウト</span>

@@ -27,22 +27,26 @@ export default function AdminSidebar() {
   }
 
   return (
-    <nav className="flex-1 px-3 py-4 space-y-0.5">
+    <nav className="flex-1 px-2 py-3 space-y-0.5">
       {NAV_ITEMS.map((item) => {
         const active = isActive(item.href);
         return (
           <Link
             key={`${item.href}-${item.label}`}
             href={item.href}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors"
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all"
             style={
               active
                 ? {
-                    backgroundColor: "rgba(245,181,0,0.15)",
-                    color: "#F5B500",
+                    backgroundColor: "#eef2fa",
+                    color: "#002D72",
+                    borderLeft: "3px solid #002D72",
+                    paddingLeft: "9px",
                   }
                 : {
-                    color: "rgba(255,255,255,0.75)",
+                    color: "#6b7280",
+                    borderLeft: "3px solid transparent",
+                    paddingLeft: "9px",
                   }
             }
           >
@@ -51,12 +55,6 @@ export default function AdminSidebar() {
               dangerouslySetInnerHTML={{ __html: item.icon }}
             />
             <span>{item.label}</span>
-            {active && (
-              <span
-                className="ml-auto w-1 h-4 rounded-full"
-                style={{ backgroundColor: "#F5B500" }}
-              />
-            )}
           </Link>
         );
       })}

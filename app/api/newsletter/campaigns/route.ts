@@ -43,20 +43,25 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: err2.message }, { status: 500 });
     }
 
-    // fetch open counts separately
-    const { data: opens } = await supabase
+    // fetch open/click counts separately
+    const { data: events } = await supabase
       .from("email_events")
-      .select("campaign_id")
-      .eq("event_type", "open");
+      .select("campaign_id, event_type");
 
     const openMap: Record<number, number> = {};
-    for (const o of opens ?? []) {
-      openMap[o.campaign_id] = (openMap[o.campaign_id] ?? 0) + 1;
+    const clickMap: Record<number, number> = {};
+    for (const e of events ?? []) {
+      if (e.event_type === "open") {
+        openMap[e.campaign_id] = (openMap[e.campaign_id] ?? 0) + 1;
+      } else if (e.event_type === "click") {
+        clickMap[e.campaign_id] = (clickMap[e.campaign_id] ?? 0) + 1;
+      }
     }
 
     const result = (simple ?? []).map((c) => ({
       ...c,
       open_count: openMap[c.id] ?? 0,
+      click_count: clickMap[c.id] ?? 0,
     }));
     return NextResponse.json(result);
   }
