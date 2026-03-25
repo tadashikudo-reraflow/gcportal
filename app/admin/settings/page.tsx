@@ -9,15 +9,27 @@ type EnvItem = {
 
 export default function SettingsPage() {
   const items: EnvItem[] = [
+    // サイト基本
     { label: "サイトURL", value: "https://gcinsight.jp" },
     { label: "GA4 Measurement ID", value: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID },
+    // 認証
+    { label: "Admin Password", value: process.env.ADMIN_PASSWORD, mask: true },
+    { label: "GCInsight Admin Key", value: process.env.GCINSIGHT_ADMIN_KEY, mask: true },
+    { label: "Cron Secret", value: process.env.CRON_SECRET, mask: true },
+    // Supabase
     { label: "Supabase URL", value: process.env.NEXT_PUBLIC_SUPABASE_URL },
+    { label: "Supabase Anon Key", value: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, mask: true },
+    { label: "Supabase Service Role Key", value: process.env.SUPABASE_SERVICE_ROLE_KEY, mask: true },
+    // メール配信
     { label: "Resend APIキー", value: process.env.RESEND_API_KEY, mask: true },
+    { label: "通知メール先 (NOTIFY_EMAIL)", value: process.env.NOTIFY_EMAIL },
+    // Beehiiv
     { label: "Beehiiv Publication ID", value: process.env.BEEHIIV_PUBLICATION_ID },
     { label: "Beehiiv APIキー", value: process.env.BEEHIIV_API_KEY, mask: true },
+    // 通知
     { label: "Telegram Bot Token", value: process.env.TELEGRAM_BOT_TOKEN, mask: true },
     { label: "Telegram Chat ID", value: process.env.TELEGRAM_CHAT_ID },
-    { label: "Cron Secret", value: process.env.CRON_SECRET, mask: true },
+    { label: "Slack Webhook URL", value: process.env.SLACK_WEBHOOK_URL, mask: true },
   ];
 
   function display(item: EnvItem): { text: string; set: boolean } {
