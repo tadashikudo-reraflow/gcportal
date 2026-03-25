@@ -68,8 +68,7 @@ async function sendPdfEmail({
   downloadUrl: string | null;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) { console.log("sendPdfEmail: RESEND_API_KEY not set"); return; }
-  if (!downloadUrl) { console.log("sendPdfEmail: downloadUrl is null"); return; }
+  if (!apiKey || !downloadUrl) return;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -93,11 +92,9 @@ async function sendPdfEmail({
 </div>`,
     }),
   });
-  const resBody = await res.json().catch(() => ({}));
   if (!res.ok) {
-    console.error("sendPdfEmail error:", res.status, JSON.stringify(resBody));
-  } else {
-    console.log("sendPdfEmail sent:", resBody);
+    const body = await res.json().catch(() => ({}));
+    console.error("sendPdfEmail error:", res.status, JSON.stringify(body));
   }
 }
 
