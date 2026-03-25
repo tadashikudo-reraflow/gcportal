@@ -1,7 +1,27 @@
+import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
 const BASE_URL = "https://gcinsight.jp";
+
+function generateUnsubscribeToken(leadId: number): string {
+  const secret = process.env.CRON_SECRET ?? "fallback-secret";
+  return crypto.createHmac("sha256", secret).update(String(leadId)).digest("hex");
+}
+
+function addUnsubscribeFooter(html: string, leadId: number): string {
+  const token = generateUnsubscribeToken(leadId);
+  const unsubscribeUrl = `${BASE_URL}/api/unsubscribe?token=${token}&lid=${leadId}`;
+  const footer = `<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
+  <p>配信停止は<a href="${unsubscribeUrl}" style="color:#6b7280;">こちら</a>からお願いします。</p>
+  <p>© 2026 GCInsight | 〒100-0000 東京都</p>
+</div>`;
+  if (html.includes("</body>")) {
+    return html.replace("</body>", `${footer}</body>`);
+  }
+  return html + footer;
+}
+
 const FROM = "GCInsight編集部 <noreply@gcinsight.jp>";
 const BATCH_SIZE = 100;
 
@@ -89,10 +109,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // リード一覧取得
+  // リード一覧取得（未購読解除のみ）
   const { data: leads, error: leadsErr } = await supabase
     .from("leads")
-    .select("id, email");
+    .select("id, email")
+    .or("unsubscribed.is.null,unsubscribed.eq.false");
 
   if (leadsErr) {
     return NextResponse.json({ error: leadsErr.message }, { status: 500 });
@@ -119,7 +140,10 @@ export async function POST(req: NextRequest) {
 
     const emails = batch.map((lead) => {
       const personalizedHtml = addTrackingPixel(
-        replaceLinks(campaign.body_html, campaign_id, lead.id),
+        addUnsubscribeFooter(
+          replaceLinks(campaign.body_html, campaign_id, lead.id),
+          lead.id
+        ),
         campaign_id,
         lead.id
       );
