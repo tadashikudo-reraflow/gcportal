@@ -13,16 +13,16 @@ export type Vendor = {
   cloud_confirmed: boolean;
   multitenancy: boolean;
   municipality_count: number | null;
-  notes: string | null;
+  notes?: string | null;
 };
 
 export type Package = {
   id: number;
   vendor_id: number;
   package_name: string;
-  business: string;
-  exemption_number: string | null;
-  confirmed_date: string | null;
+  business?: string | null;
+  exemption_number?: string | null;
+  confirmed_date?: string | null;
   vendors?: Vendor;
 };
 

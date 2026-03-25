@@ -60,7 +60,7 @@ function mergePackages(pkgs: PackageWithVendor[]): MergedPackage[] {
         package_name: pkg.package_name,
         vendor: pkg.vendors,
         business: pkg.business ?? "不明",
-        confirmed_date: pkg.confirmed_date,
+        confirmed_date: pkg.confirmed_date ?? null,
         subCount: 1,
       });
     }
