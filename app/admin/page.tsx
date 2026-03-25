@@ -22,7 +22,6 @@ async function getStats() {
     supabase.from("email_events").select("campaign_id").eq("event_type", "open"),
   ]);
 
-  // 直近の送信済みキャンペーンの開封率を計算
   const openMap: Record<number, number> = {};
   for (const o of opens ?? []) {
     openMap[o.campaign_id] = (openMap[o.campaign_id] ?? 0) + 1;
@@ -48,151 +47,122 @@ export default async function AdminPage() {
   const { totalLeads, sentCampaigns, openRate, recentCampaigns, openMap } = await getStats();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#f7f7f7" }}>
-      <div className="max-w-3xl mx-auto px-8 py-10 space-y-8">
+    <div>
+      {/* 挨拶 */}
+      <div style={{ marginBottom: 48 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111111", margin: 0 }}>
+          ダッシュボード
+        </h1>
+        <p style={{ marginTop: 8, fontSize: 14, color: "#6b7280" }}>
+          GCInsight 管理パネル
+        </p>
+      </div>
 
-        {/* 挨拶 */}
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "#111827" }}>
-            こんにちは 👋
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: "#6b7280" }}>
-            GCInsight 管理パネル — 本日も配信を続けましょう
-          </p>
+      {/* KPI 3列 */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 0, marginBottom: 48, borderTop: "1px solid #f3f4f6" }}>
+        {[
+          { label: "購読者数", value: totalLeads, unit: "人", href: "/admin/newsletter/subscribers" },
+          { label: "配信数", value: sentCampaigns, unit: "回", href: null },
+          { label: "開封率（推定）", value: openRate, unit: "%", href: null },
+        ].map((kpi, i) => (
+          <div
+            key={kpi.label}
+            style={{
+              padding: "32px 0",
+              borderRight: i < 2 ? "1px solid #f3f4f6" : "none",
+              paddingLeft: i > 0 ? 32 : 0,
+            }}
+          >
+            <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>{kpi.label}</p>
+            <p style={{ fontSize: 36, fontWeight: 700, color: "#111111", lineHeight: 1 }}>
+              {kpi.value}
+              <span style={{ fontSize: 16, fontWeight: 400, marginLeft: 4, color: "#6b7280" }}>{kpi.unit}</span>
+            </p>
+            {kpi.href && (
+              <Link href={kpi.href} style={{ fontSize: 13, color: "#111111", marginTop: 8, display: "inline-block" }}>
+                一覧を見る &rarr;
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* 直近の配信リスト */}
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: "#111111", margin: 0 }}>
+            直近の配信
+          </h2>
+          <Link href="/admin/newsletter" style={{ fontSize: 13, color: "#6b7280" }}>
+            すべて見る &rarr;
+          </Link>
         </div>
 
-        {/* KPIカード */}
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: "購読者数", value: totalLeads, unit: "人", color: "#002D72", href: "/admin/newsletter/subscribers" },
-            { label: "配信数", value: sentCampaigns, unit: "回", color: "#16a34a", href: null },
-            { label: "開封率（推定）", value: openRate, unit: "%", color: "#d97706", href: null },
-          ].map((kpi) => (
-            <div
-              key={kpi.label}
-              className="rounded-2xl bg-white p-5 shadow-sm"
-              style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
+        {recentCampaigns.length === 0 ? (
+          <div style={{ padding: "48px 0", textAlign: "center", borderTop: "1px solid #f3f4f6" }}>
+            <p style={{ fontSize: 14, color: "#9ca3af" }}>まだ配信はありません</p>
+            <Link
+              href="/admin/newsletter/compose"
+              style={{ fontSize: 13, color: "#111111", marginTop: 12, display: "inline-block" }}
             >
-              <p className="text-xs font-medium mb-2" style={{ color: "#9ca3af" }}>
-                {kpi.label}
-              </p>
-              <p className="text-3xl font-extrabold tabular-nums" style={{ color: kpi.color }}>
-                {kpi.value}
-                <span className="text-base font-medium ml-0.5">{kpi.unit}</span>
-              </p>
-              {kpi.href && (
-                <Link href={kpi.href} className="text-xs mt-2 inline-block font-medium" style={{ color: kpi.color }}>
-                  一覧を見る &rarr;
-                </Link>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* 大きなCTAボタン */}
-        <Link
-          href="/admin/newsletter/compose"
-          className="flex items-center justify-center gap-3 w-full rounded-2xl py-5 text-white font-bold text-base transition-opacity hover:opacity-90 shadow-sm"
-          style={{ backgroundColor: "#002D72", boxShadow: "0 2px 8px rgba(0,45,114,0.25)" }}
-        >
-          <span className="text-xl">&#9998;</span>
-          <span>新しいメールを書く</span>
-        </Link>
-
-        {/* 直近の配信リスト */}
-        <div className="rounded-2xl bg-white shadow-sm overflow-hidden" style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}>
-          <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: "#f3f4f6" }}>
-            <h2 className="text-sm font-bold" style={{ color: "#111827" }}>
-              直近の配信
-            </h2>
-            <Link href="/admin/newsletter" className="text-xs font-medium" style={{ color: "#002D72" }}>
-              すべて見る &rarr;
+              最初のメールを作成する &rarr;
             </Link>
           </div>
-
-          {recentCampaigns.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <p className="text-sm" style={{ color: "#9ca3af" }}>まだ配信はありません</p>
-              <Link
-                href="/admin/newsletter/compose"
-                className="inline-block mt-3 text-sm font-medium"
-                style={{ color: "#002D72" }}
+        ) : (
+          <div>
+            {recentCampaigns.map((c: { id: number; subject: string; status: string; sent_at: string | null; created_at: string }) => (
+              <div
+                key={c.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "16px 0",
+                  borderTop: "1px solid #f3f4f6",
+                }}
               >
-                最初のメールを作成する &rarr;
-              </Link>
-            </div>
-          ) : (
-            <div className="divide-y" style={{ borderColor: "#f3f4f6" }}>
-              {recentCampaigns.map((c: { id: number; subject: string; status: string; sent_at: string | null; created_at: string }) => (
-                <div key={c.id} className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-semibold flex-shrink-0"
-                      style={
-                        c.status === "sent"
-                          ? { backgroundColor: "#dcfce7", color: "#16a34a" }
-                          : { backgroundColor: "#fef3c7", color: "#d97706" }
-                      }
-                    >
-                      {c.status === "sent" ? "送信済" : "下書き"}
-                    </span>
-                    <p className="text-sm font-medium truncate" style={{ color: "#111827" }}>
-                      {c.subject}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 flex-shrink-0 ml-4">
-                    {c.status === "sent" && (
-                      <span className="text-xs" style={{ color: "#9ca3af" }}>
-                        開封 {openMap[c.id] ?? 0}
-                      </span>
-                    )}
-                    <span className="text-xs" style={{ color: "#9ca3af" }}>
-                      {new Date(c.sent_at ?? c.created_at).toLocaleDateString("ja-JP")}
-                    </span>
-                    {c.status === "sent" ? (
-                      <Link
-                        href={`/admin/newsletter/${c.id}`}
-                        className="text-xs font-medium"
-                        style={{ color: "#002D72" }}
-                      >
-                        詳細
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/admin/newsletter/compose?id=${c.id}`}
-                        className="text-xs font-medium"
-                        style={{ color: "#002D72" }}
-                      >
-                        編集
-                      </Link>
-                    )}
-                  </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      fontWeight: 500,
+                      flexShrink: 0,
+                      ...(c.status === "sent"
+                        ? { backgroundColor: "#f0fdf4", color: "#16a34a" }
+                        : { backgroundColor: "#fef9ec", color: "#d97706" }),
+                    }}
+                  >
+                    {c.status === "sent" ? "送信済" : "下書き"}
+                  </span>
+                  <p style={{ fontSize: 14, color: "#111111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {c.subject}
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* クイックリンク */}
-        <div className="flex gap-3">
-          <Link
-            href="/admin/newsletter/subscribers"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-sm font-medium shadow-sm hover:shadow transition"
-            style={{ color: "#374151", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-          >
-            <span>&#128101;</span>
-            <span>購読者一覧</span>
-          </Link>
-          <Link
-            href="/admin/newsletter"
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-sm font-medium shadow-sm hover:shadow transition"
-            style={{ color: "#374151", boxShadow: "0 1px 4px rgba(0,0,0,0.07)" }}
-          >
-            <span>&#128140;</span>
-            <span>キャンペーン管理</span>
-          </Link>
-        </div>
-
+                <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0, marginLeft: 16 }}>
+                  {c.status === "sent" && (
+                    <span style={{ fontSize: 13, color: "#6b7280" }}>
+                      開封 {openMap[c.id] ?? 0}
+                    </span>
+                  )}
+                  <span style={{ fontSize: 13, color: "#9ca3af" }}>
+                    {new Date(c.sent_at ?? c.created_at).toLocaleDateString("ja-JP")}
+                  </span>
+                  {c.status === "sent" ? (
+                    <Link href={`/admin/newsletter/${c.id}`} style={{ fontSize: 13, color: "#111111" }}>
+                      詳細
+                    </Link>
+                  ) : (
+                    <Link href={`/admin/newsletter/compose?id=${c.id}`} style={{ fontSize: 13, color: "#111111" }}>
+                      編集
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
