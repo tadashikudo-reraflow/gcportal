@@ -9,18 +9,31 @@ function getSupabase() {
   );
 }
 
-function checkAuth(req: NextRequest): boolean {
+async function checkAuth(req: NextRequest): Promise<boolean> {
+  // 1. JWT cookie（管理画面ブラウザ）
+  const cookieToken = req.cookies.get("admin_token")?.value;
+  if (cookieToken) {
+    const { verifyAdminToken } = await import("@/lib/auth");
+    const payload = await verifyAdminToken(cookieToken);
+    if (payload) return true;
+  }
+
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
 
-  // Authorizationヘッダーで確認
+  // 2. Authorizationヘッダーで確認
   const authHeader = req.headers.get("authorization");
   if (authHeader) {
     const expectedBasic = `Basic ${Buffer.from(`:${adminPassword}`).toString("base64")}`;
     if (authHeader === expectedBasic) return true;
+    // Bearer token (Claude / 外部API)
+    if (authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
+    }
   }
 
-  // クエリパラメータのauth（ブラウザ直接アクセス用）
+  // 3. クエリパラメータのauth（ブラウザ直接アクセス用）
   const authParam = req.nextUrl.searchParams.get("auth");
   if (authParam) {
     const expectedBasic = Buffer.from(`:${adminPassword}`).toString("base64");
@@ -32,7 +45,7 @@ function checkAuth(req: NextRequest): boolean {
 
 // GET /api/newsletter/subscribers/export — CSVエクスポート
 export async function GET(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!await checkAuth(req)) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 

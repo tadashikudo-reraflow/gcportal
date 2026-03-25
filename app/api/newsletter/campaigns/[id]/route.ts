@@ -9,16 +9,24 @@ function getSupabase() {
   );
 }
 
-function checkAuth(req: NextRequest): boolean {
+async function checkAuth(req: NextRequest): Promise<boolean> {
+  // 1. JWT cookie（管理画面ブラウザ）
+  const cookieToken = req.cookies.get("admin_token")?.value;
+  if (cookieToken) {
+    const { verifyAdminToken } = await import("@/lib/auth");
+    const payload = await verifyAdminToken(cookieToken);
+    if (payload) return true;
+  }
+
   const authHeader = req.headers.get("authorization");
-  // Basic auth (管理画面)
+  // 2. Basic auth（レガシー・後方互換）
   if (authHeader?.startsWith("Basic ")) {
     const encoded = authHeader.slice(6);
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
     const [, password] = decoded.split(":");
     if (password === process.env.ADMIN_PASSWORD) return true;
   }
-  // Bearer token (Claude / API)
+  // 3. Bearer token (Claude / 外部API)
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
@@ -31,7 +39,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAuth(req)) {
+  if (!await checkAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -60,4 +68,47 @@ export async function PATCH(
   }
 
   return NextResponse.json(data);
+}
+
+// POST /api/newsletter/campaigns/[id] — 複製
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!await checkAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const campaignId = parseInt(id, 10);
+  if (isNaN(campaignId)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  const supabase = getSupabase();
+  const { data: original, error: fetchErr } = await supabase
+    .from("campaigns")
+    .select("subject, body_html")
+    .eq("id", campaignId)
+    .single();
+
+  if (fetchErr || !original) {
+    return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
+  }
+
+  const { data: duplicated, error: insertErr } = await supabase
+    .from("campaigns")
+    .insert({
+      subject: `[複製] ${original.subject}`,
+      body_html: original.body_html,
+      status: "draft",
+    })
+    .select()
+    .single();
+
+  if (insertErr) {
+    return NextResponse.json({ error: insertErr.message }, { status: 500 });
+  }
+
+  return NextResponse.json(duplicated, { status: 201 });
 }

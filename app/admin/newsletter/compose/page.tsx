@@ -170,7 +170,7 @@ function ComposeForm() {
     const id = parseInt(editId, 10);
     if (isNaN(id)) return;
     ensurePass();
-    fetch(`/api/newsletter/campaigns`, { headers: { Authorization: getAuth() } })
+    fetch(`/api/newsletter/campaigns`, { headers: { Authorization: getAuth() }, credentials: "include" })
       .then((r) => r.json())
       .then((list: Array<{ id: number; subject: string; body_html?: string }>) => {
         const found = list.find((c) => c.id === id);
@@ -208,6 +208,7 @@ function ComposeForm() {
         await fetch(`/api/newsletter/campaigns/${campaignId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json", Authorization: getAuth() },
+          credentials: "include",
           body: JSON.stringify({ subject, body_html: bodyHtml }),
         });
         setSaveMsg("保存しました");
@@ -215,6 +216,7 @@ function ComposeForm() {
         const res = await fetch("/api/newsletter/campaigns", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: getAuth() },
+          credentials: "include",
           body: JSON.stringify({ subject, body_html: bodyHtml }),
         });
         const data = await res.json();
@@ -242,6 +244,7 @@ function ComposeForm() {
       const res = await fetch("/api/newsletter/send", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: getAuth() },
+        credentials: "include",
         body: JSON.stringify({ campaign_id: campaignId }),
       });
       const data = await res.json();

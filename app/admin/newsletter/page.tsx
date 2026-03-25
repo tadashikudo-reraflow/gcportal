@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
+import { DuplicateButton } from "./CampaignActions";
 
 export const metadata = { title: "ニュースレター管理 | GCInsight Admin" };
 export const dynamic = "force-dynamic";
@@ -167,6 +168,7 @@ export default async function NewsletterPage() {
                     </div>
                   </>
                 )}
+                <DuplicateButton campaignId={c.id} />
                 {c.status === "sent" ? (
                   <Link
                     href={`/admin/newsletter/${c.id}`}

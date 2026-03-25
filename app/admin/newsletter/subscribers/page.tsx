@@ -30,6 +30,9 @@ export default function SubscribersPage() {
   const [tab, setTab] = useState<TabType>("active");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [actionMsg, setActionMsg] = useState("");
+  const [showImport, setShowImport] = useState(false);
+  const [importCsv, setImportCsv] = useState("");
+  const [importing, setImporting] = useState(false);
 
   const getAuth = () => {
     const pass = sessionStorage.getItem("admin_pass") ?? "";
@@ -40,6 +43,7 @@ export default function SubscribersPage() {
     try {
       const res = await fetch("/api/newsletter/subscribers", {
         headers: { Authorization: getAuth() },
+        credentials: "include",
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -121,6 +125,7 @@ export default function SubscribersPage() {
           "Content-Type": "application/json",
           Authorization: getAuth(),
         },
+        credentials: "include",
         body: JSON.stringify({ ids, unsubscribed: true }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -147,6 +152,7 @@ export default function SubscribersPage() {
           "Content-Type": "application/json",
           Authorization: getAuth(),
         },
+        credentials: "include",
         body: JSON.stringify({ ids }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -156,6 +162,33 @@ export default function SubscribersPage() {
       await fetchLeads();
     } catch (e) {
       setActionMsg(`エラー: ${String(e)}`);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importCsv.trim()) return;
+    setImporting(true);
+    try {
+      const res = await fetch("/api/newsletter/subscribers/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getAuth(),
+        },
+        credentials: "include",
+        body: JSON.stringify({ csv: importCsv }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      setActionMsg(`インポート完了: ${data.imported} 件追加、${data.skipped} 件スキップ`);
+      setShowImport(false);
+      setImportCsv("");
+      setLoading(true);
+      await fetchLeads();
+    } catch (e) {
+      setActionMsg(`エラー: ${String(e)}`);
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -179,6 +212,81 @@ export default function SubscribersPage() {
 
   return (
     <div>
+      {/* CSVインポートモーダル */}
+      {showImport && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 50,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <div style={{ borderRadius: 12, padding: 28, width: 480, backgroundColor: "#fff" }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "#111111", marginBottom: 8 }}>
+              CSVインポート
+            </h3>
+            <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 12 }}>
+              1行1メールアドレス、または email,organization_type 形式で入力してください。
+            </p>
+            <textarea
+              value={importCsv}
+              onChange={(e) => setImportCsv(e.target.value)}
+              placeholder={"example@municipality.go.jp\nexample2@city.go.jp,municipality"}
+              rows={10}
+              style={{
+                width: "100%",
+                fontSize: 13,
+                padding: "8px 12px",
+                border: "1px solid #e5e7eb",
+                borderRadius: 6,
+                outline: "none",
+                resize: "vertical",
+                fontFamily: "monospace",
+                boxSizing: "border-box",
+                color: "#374151",
+              }}
+            />
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 16 }}>
+              <button
+                onClick={() => { setShowImport(false); setImportCsv(""); }}
+                style={{
+                  background: "none",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                  fontSize: 13,
+                  color: "#374151",
+                  padding: "7px 16px",
+                }}
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleImport}
+                disabled={importing}
+                style={{
+                  backgroundColor: "#111111",
+                  color: "#ffffff",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: importing ? "not-allowed" : "pointer",
+                  fontSize: 13,
+                  fontWeight: 600,
+                  padding: "7px 20px",
+                  opacity: importing ? 0.5 : 1,
+                }}
+              >
+                {importing ? "インポート中..." : "インポート"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ヘッダー */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
         <div>
@@ -191,6 +299,20 @@ export default function SubscribersPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            onClick={() => setShowImport(true)}
+            style={{
+              fontSize: 13,
+              color: "#374151",
+              background: "none",
+              border: "1px solid #e5e7eb",
+              borderRadius: 6,
+              cursor: "pointer",
+              padding: "6px 14px",
+            }}
+          >
+            CSVインポート
+          </button>
           <button
             onClick={handleExport}
             style={{
