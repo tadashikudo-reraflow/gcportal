@@ -52,6 +52,9 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   },
 };
 
+// ISR: コストデータは週次更新のため1時間キャッシュで十分
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
   description:
@@ -244,7 +247,7 @@ export default async function CostsPage() {
         .from("cost_reports")
         .select("*, vendors(name, short_name, cloud_platform)")
         .order("change_ratio"),
-      supabase.from("vendors").select("*").order("name"),
+      supabase.from("vendors").select("id, name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count, notes").order("name"),
       supabase
         .from("municipality_packages")
         .select("municipality_id, municipalities(city, prefecture), packages(vendor_id, vendors(id, short_name, name, cloud_platform))")

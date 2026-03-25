@@ -29,7 +29,10 @@ export async function GET(req: NextRequest) {
     }
 
     const snapshots = await getSnapshots();
-    return NextResponse.json({ snapshots, savedByCron: isCron ? true : undefined });
+    return NextResponse.json(
+      { snapshots, savedByCron: isCron ? true : undefined },
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } }
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });

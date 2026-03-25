@@ -90,7 +90,10 @@ export async function GET() {
       ],
     };
 
-    return NextResponse.json(report);
+    return NextResponse.json(
+      report,
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" } }
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: message }, { status: 500 });

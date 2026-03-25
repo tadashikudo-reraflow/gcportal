@@ -8,6 +8,9 @@ import VendorRanking from "@/components/VendorRanking";
 import BusinessPackageList from "@/components/BusinessPackageList";
 import MunicipalitySearch from "@/components/MunicipalitySearch";
 
+// ISR: デジタル庁データは日次更新のため1時間キャッシュで十分
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "自治体向けガバメントクラウド対応パッケージ一覧 | ガバメントクラウド移行状況ダッシュボード",
   description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
@@ -41,10 +44,10 @@ export default async function PackagesPage() {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     const [vendorRes, packageRes, municipalityRes, mpRes] = await Promise.all([
-      supabase.from("vendors").select("*").order("name"),
+      supabase.from("vendors").select("id, name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count").order("name"),
       supabase
         .from("packages")
-        .select("*, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count)")
+        .select("id, package_name, business, vendor_id, confirmed_date, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count)")
         .order("business"),
       supabase
         .from("municipalities")
@@ -54,12 +57,13 @@ export default async function PackagesPage() {
       supabase
         .from("municipality_packages")
         .select(
-          "id, municipality_id, package_id, business, adoption_year, source, confidence, packages(id, package_name, business, vendor_id, confirmed_date, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count))"
-        ),
+          "id, municipality_id, package_id, business, adoption_year, confidence, packages(id, package_name, business, vendor_id, confirmed_date, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count))"
+        )
+        .limit(3000),
     ]);
 
-    vendors = vendorRes.data ?? [];
-    packages = packageRes.data ?? [];
+    vendors = (vendorRes.data ?? []) as unknown as Vendor[];
+    packages = (packageRes.data ?? []) as unknown as (Package & { vendors?: Vendor })[];
     municipalities = municipalityRes.data ?? [];
 
     // municipality_id をキーにした Map を構築

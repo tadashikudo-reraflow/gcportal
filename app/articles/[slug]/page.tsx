@@ -100,8 +100,12 @@ export default async function ArticlePage({ params }: Props) {
 
       {article.coverImage && (
         <div className="card overflow-hidden">
+          {/* fetchpriority=high: LCPヒーロー画像をブラウザに最優先プリロードさせる */}
           <img src={article.coverImage} alt={article.title}
-            className="w-full aspect-[16/9] object-cover" />
+            className="w-full aspect-[16/9] object-cover"
+            fetchPriority="high"
+            decoding="async"
+            width={1200} height={675} />
         </div>
       )}
 
