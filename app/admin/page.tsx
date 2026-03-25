@@ -145,6 +145,31 @@ export default async function AdminPage() {
             {/* 検索・フィルター付き記事テーブル（クライアントコンポーネント） */}
             <SearchFilter articles={articles} />
 
+            {/* ニュースレター管理へのリンク */}
+            <div
+              className="rounded-lg border px-5 py-4 flex items-center justify-between"
+              style={{ borderColor: "#bfdbfe", backgroundColor: "#eff6ff" }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl">&#128140;</span>
+                <div>
+                  <p className="text-sm font-bold" style={{ color: "#1d4ed8" }}>
+                    ニュースレター管理
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "#3b82f6" }}>
+                    購読者への一斉配信・開封率計測
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/admin/newsletter"
+                className="text-xs font-bold px-3 py-1.5 rounded-lg"
+                style={{ backgroundColor: "#1d4ed8", color: "#fff" }}
+              >
+                管理画面へ &rarr;
+              </Link>
+            </div>
+
             {/* ヒント */}
             <div
               className="rounded-lg border border-dashed border-gray-300 px-5 py-4 text-xs"
