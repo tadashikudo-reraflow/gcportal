@@ -6,6 +6,7 @@ import { getClusterForTags } from "@/lib/clusters";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
+import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
 
 // ISR: DB更新後1時間以内に自動反映
 export const revalidate = 3600;
@@ -131,6 +132,8 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </div>
 
+      <ArticlePdfDownloadBanner articleTitle={article.title} slug={slug} />
+
       <MermaidRenderer
         html={article.contentHtml}
         className="card p-6 prose-article"
@@ -191,6 +194,8 @@ export default async function ArticlePage({ params }: Props) {
           </>
         );
       })()}
+
+      <ArticlePdfDownloadBanner articleTitle={article.title} slug={slug} />
 
       <div className="flex items-center justify-between pt-2">
         <Link href="/articles" className="text-sm font-semibold hover:underline"

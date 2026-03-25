@@ -1043,3 +1043,67 @@ body {
   word-break: break-all;
   font-size: 0.75rem;
 }
+
+/* ===== 印刷・PDF出力スタイル ===== */
+@media print {
+  /* ナビ・ヘッダー・フッター・UIパーツ非表示 */
+  header, footer, nav,
+  .print\:hidden,
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  /* ページ余白 */
+  @page {
+    margin: 15mm 18mm;
+  }
+
+  body {
+    font-size: 10pt;
+    line-height: 1.7;
+    color: #111827;
+    background: #fff;
+  }
+
+  /* カードのボーダー・影をシンプルに */
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 4px !important;
+    page-break-inside: avoid;
+  }
+
+  /* GCInsight ロゴ印刷ヘッダー */
+  .prose-article::before {
+    content: "GCInsight — gcinsight.jp";
+    display: block;
+    font-size: 8pt;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+  }
+
+  /* 記事本文 */
+  .prose-article {
+    font-size: 10pt;
+    color: #111827;
+  }
+
+  .prose-article h1, .prose-article h2, .prose-article h3 {
+    color: #002D72;
+    page-break-after: avoid;
+  }
+
+  /* リンクはURLを表示しない（読みやすさ優先） */
+  a::after {
+    content: none !important;
+  }
+
+  /* タグ・バッジ */
+  span[class*="rounded-full"] {
+    border: 1px solid #e5e7eb !important;
+    background: transparent !important;
+    color: #374151 !important;
+  }
+}
