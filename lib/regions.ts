@@ -36,7 +36,3 @@ export const STATUS_OPTIONS = [
   { key: 'tokutei', label: '特定移行' },
 ] as const;
 
-/** 主要ベンダー */
-export const VENDOR_OPTIONS = [
-  'TKC', '富士通', 'NEC', 'NTTデータ', '日立', 'RKKCS', 'Gcom', '電算', 'GCC', 'JIP', 'アイネス',
-] as const;

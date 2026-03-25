@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { REGIONS, POPULATION_BANDS, STATUS_OPTIONS, VENDOR_OPTIONS } from "@/lib/regions";
+import { REGIONS, POPULATION_BANDS, STATUS_OPTIONS } from "@/lib/regions";
+
+/** /api/vendors レスポンスの型 */
+type VendorOption = { id: number; name: string; short_name: string | null };
 
 export type FilterConfig = {
   population?: boolean;
@@ -29,6 +32,22 @@ type FilterBarProps = {
 
 export default function FilterBar({ filters, values, onChange, businessOptions }: FilterBarProps) {
   const [collapsed, setCollapsed] = useState(true);
+
+  // ベンダー選択肢: vendor フィルタが有効な場合のみ /api/vendors から動的取得
+  const [vendorOptions, setVendorOptions] = useState<VendorOption[]>([]);
+  useEffect(() => {
+    if (!filters.vendor) return;
+    fetch("/api/vendors")
+      .then((res) => res.json())
+      .then((json: { vendors?: VendorOption[] }) => {
+        if (Array.isArray(json.vendors)) {
+          setVendorOptions(json.vendors);
+        }
+      })
+      .catch(() => {
+        // フェッチ失敗時は空のまま（全ベンダー表示）
+      });
+  }, [filters.vendor]);
 
   // URL同期: 初回マウント時にURLパラメータから値を読み込む
   useEffect(() => {
@@ -161,11 +180,14 @@ export default function FilterBar({ filters, values, onChange, businessOptions }
             className={selectClass}
           >
             <option value="">全ベンダー</option>
-            {VENDOR_OPTIONS.map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
+            {vendorOptions.map((v) => {
+              const label = v.short_name ?? v.name;
+              return (
+                <option key={v.id} value={String(v.id)}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </div>
       )}
