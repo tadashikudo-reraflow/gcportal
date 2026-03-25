@@ -1,14 +1,23 @@
 export interface NewsletterSections {
   issueNumber: number;
   intro: string;
+  // 市民・現場の声（メイン）
+  voicePicks: Array<{
+    source: "x" | "note";
+    author: string;
+    text: string;
+    url: string;
+  }>;
+  // GCInsightデータ更新
   migrationStats?: { rate: string; completed: string; total: string };
-  xPicks: Array<{ author: string; text: string; url: string }>;
-  newsItems: Array<{ title: string; summary: string; url: string; source: string }>;
-  scheduleItems: Array<{ date: string; title: string; detail: string }>;
+  // GCInsight上のアップデート（資料公開・データ更新など）
+  gcupdates: Array<{ date: string; title: string; detail: string }>;
+  // 公式情報（補足）
+  officialNews: Array<{ title: string; summary: string; url: string; source: string }>;
 }
 
 export function renderNewsletterHtml(sections: NewsletterSections): string {
-  const { issueNumber, intro, migrationStats, xPicks, newsItems, scheduleItems } = sections;
+  const { issueNumber, intro, migrationStats, voicePicks, gcupdates, officialNews } = sections;
 
   const migrationBlock = migrationStats
     ? `
@@ -30,18 +39,40 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     </div>`
     : "";
 
-  const xPicksHtml = xPicks
-    .map(
-      (p) => `
-    <div style="border-left:3px solid #e5e7eb;background:#f9fafb;padding:12px;margin-bottom:12px;border-radius:0 4px 4px 0;">
-      <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">@${p.author}</div>
+  const voicePicksHtml = voicePicks
+    .map((p) => {
+      if (p.source === "x") {
+        return `
+    <div style="border-left:3px solid #1d9bf0;background:#f0f9ff;padding:12px;margin-bottom:12px;border-radius:0 4px 4px 0;">
+      <div style="font-size:11px;font-weight:600;color:#1d9bf0;margin-bottom:4px;">&#x1D54F; @${escapeHtml(p.author)}</div>
       <div style="font-size:14px;color:#111;line-height:1.6;">${escapeHtml(p.text)}</div>
-      ${p.url && p.url !== "#" ? `<a href="${p.url}" style="font-size:12px;color:#6b7280;margin-top:6px;display:inline-block;">ポストを見る &rarr;</a>` : ""}
+      ${p.url && p.url !== "#" ? `<a href="${p.url}" style="font-size:12px;color:#1d9bf0;margin-top:6px;display:inline-block;">ポストを見る &rarr;</a>` : ""}
+    </div>`;
+      } else {
+        return `
+    <div style="border-left:3px solid #41c9b4;background:#f0fdfb;padding:12px;margin-bottom:12px;border-radius:0 4px 4px 0;">
+      <div style="font-size:11px;font-weight:600;color:#41c9b4;margin-bottom:4px;">note ${escapeHtml(p.author)}</div>
+      <div style="font-size:14px;color:#111;line-height:1.6;">${escapeHtml(p.text)}</div>
+      ${p.url && p.url !== "#" ? `<a href="${p.url}" style="font-size:12px;color:#41c9b4;margin-top:6px;display:inline-block;">記事を読む &rarr;</a>` : ""}
+    </div>`;
+      }
+    })
+    .join("");
+
+  const gcupdatesHtml = gcupdates
+    .map(
+      (s) => `
+    <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;">
+      <div style="flex-shrink:0;background:#111;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;">${escapeHtml(s.date)}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:#111;">${escapeHtml(s.title)}</div>
+        <div style="font-size:13px;color:#6b7280;">${escapeHtml(s.detail)}</div>
+      </div>
     </div>`
     )
     .join("");
 
-  const newsHtml = newsItems
+  const officialNewsHtml = officialNews
     .map(
       (n) => `
     <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
@@ -50,19 +81,6 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
         <span style="display:inline-block;margin-left:8px;font-size:11px;background:#f3f4f6;color:#6b7280;padding:2px 6px;border-radius:3px;">${escapeHtml(n.source)}</span>
       </div>
       <div style="font-size:13px;color:#4b5563;line-height:1.6;">${escapeHtml(n.summary)}</div>
-    </div>`
-    )
-    .join("");
-
-  const scheduleHtml = scheduleItems
-    .map(
-      (s) => `
-    <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;">
-      <div style="flex-shrink:0;background:#111;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;">${escapeHtml(s.date)}</div>
-      <div>
-        <div style="font-size:14px;font-weight:600;color:#111;margin-bottom:2px;">${escapeHtml(s.title)}</div>
-        <div style="font-size:13px;color:#6b7280;">${escapeHtml(s.detail)}</div>
-      </div>
     </div>`
     )
     .join("");
@@ -93,30 +111,31 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       ${escapeHtml(intro).replace(/\n/g, "<br>")}
     </div>
 
+    <!-- 現場・市民の声 -->
+    <div style="margin-bottom:32px;">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F5E3; 現場・市民の声</div>
+      ${voicePicksHtml}
+    </div>
+
     <!-- 移行状況 -->
     ${migrationBlock ? `
     <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">📊 移行状況サマリー</div>
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4CA; 移行状況サマリー</div>
       ${migrationBlock}
     </div>` : ""}
 
-    <!-- X投稿ピックアップ -->
+    <!-- GCInsightアップデート -->
+    ${gcupdates.length > 0 ? `
     <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">📱 今週のXピックアップ</div>
-      ${xPicksHtml}
-    </div>
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4C5; GCInsightアップデート</div>
+      ${gcupdatesHtml}
+    </div>` : ""}
 
-    <!-- ニュース -->
+    <!-- 公式情報（補足） -->
+    ${officialNews.length > 0 ? `
     <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">📰 注目ニュース</div>
-      ${newsHtml}
-    </div>
-
-    <!-- スケジュール -->
-    ${scheduleItems.length > 0 ? `
-    <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">📅 今後のスケジュール</div>
-      ${scheduleHtml}
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4F0; 公式情報</div>
+      ${officialNewsHtml}
     </div>` : ""}
 
   </div>

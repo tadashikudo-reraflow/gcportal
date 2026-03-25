@@ -15,7 +15,7 @@ export default function SubscriberChart() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    fetch("/api/newsletter/subscribers/stats")
+    fetch("/api/newsletter/subscribers/stats", { credentials: "include" })
       .then((r) => r.json())
       .then((d: StatsData) => {
         setData(d);

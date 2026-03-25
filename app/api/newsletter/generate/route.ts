@@ -35,18 +35,25 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
-const defaultXPicks = [
+const defaultVoicePicks = [
   {
+    source: "x" as const,
     author: "（Claudeが収集・挿入）",
     text: "X投稿ピックアップはClaude実行時に挿入されます",
     url: "#",
   },
+  {
+    source: "note" as const,
+    author: "（Claudeが収集・挿入）",
+    text: "note記事ピックアップはClaude実行時に挿入されます",
+    url: "#",
+  },
 ];
 
-const defaultNews = [
+const defaultOfficialNews = [
   {
     title: "（Claudeが収集・挿入）",
-    summary: "最新ニュースはClaude実行時に挿入されます",
+    summary: "公式ニュースはClaude実行時に挿入されます",
     url: "#",
     source: "デジタル庁",
   },
@@ -87,8 +94,28 @@ export async function POST(req: NextRequest) {
     // テーブルが存在しない場合はスキップ
   }
 
-  // 3. デジタル庁公式サイトのニュースをfetch（失敗してもスキップ）
-  let newsItems = defaultNews;
+  // 3. Supabaseから最新スナップショットの更新履歴を取得（gcupdates）
+  let gcupdates: Array<{ date: string; title: string; detail: string }> = [];
+  try {
+    const { data: snaps } = await supabase
+      .from("migration_snapshots")
+      .select("snapshot_date, migration_rate, completed_count")
+      .order("snapshot_date", { ascending: false })
+      .limit(3);
+
+    if (snaps && snaps.length > 0) {
+      gcupdates = snaps.map((s) => ({
+        date: s.snapshot_date?.slice(0, 10) ?? "",
+        title: "移行状況データ更新",
+        detail: `移行率 ${s.migration_rate ?? 0}% / 完了 ${s.completed_count ?? 0}団体`,
+      }));
+    }
+  } catch {
+    // テーブルが存在しない場合はスキップ
+  }
+
+  // 4. デジタル庁公式サイトのニュースをfetch（失敗してもスキップ）
+  let newsItems = defaultOfficialNews;
   try {
     const res = await fetch("https://www.digital.go.jp/news/", {
       signal: AbortSignal.timeout(5000),
@@ -111,21 +138,21 @@ export async function POST(req: NextRequest) {
     // fetch失敗時はデフォルト値を使用
   }
 
-  // 4. HTMLを生成
+  // 5. HTMLを生成
   const now = new Date();
   const dateLabel = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
   const subject = `GCInsight週次レポート #${issueNumber} — ${dateLabel}号`;
 
   const html = renderNewsletterHtml({
     issueNumber,
-    intro: `今週のガバメントクラウド動向をお届けします。引き続きGCInsightをよろしくお願いいたします。`,
+    intro: `今週のガバメントクラウド動向をお届けします。`,
+    voicePicks: defaultVoicePicks,
     migrationStats,
-    xPicks: defaultXPicks,
-    newsItems,
-    scheduleItems: [],
+    gcupdates,
+    officialNews: newsItems,
   });
 
-  // 5. campaignsテーブルに下書きとして保存
+  // 6. campaignsテーブルに下書きとして保存
   const { data: campaign, error: insertError } = await supabase
     .from("campaigns")
     .insert({
