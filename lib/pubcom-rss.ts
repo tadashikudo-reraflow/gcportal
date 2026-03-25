@@ -5,7 +5,7 @@
  * Playwrightは不要（RSSはfetch+XMLパースのみ）
  */
 
-import { ingestDocument, type DocumentCategory } from "./rag";
+import type { DocumentCategory } from "./rag";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -207,25 +207,25 @@ export async function ingestPubcomCase(rssCase: RssCase): Promise<{
       const { text } = await parsePdf(buffer);
       if (!text || text.trim().length < 50) continue;
 
-      // Ingest to RAG
-      await ingestDocument({
-        title: `[パブコメ] ${rssCase.title} - ${pdf.label}`,
-        content: text,
-        fileName: `${rssCase.caseId}_${pdf.seqNo}.pdf`,
-        fileType: "application/pdf",
-        sourceUrl: pdf.url,
-        organization: "e-Gov パブコメ",
-        category: "regulation" as DocumentCategory,
-        metadata: {
-          source: "e-gov-pubcom",
-          case_id: rssCase.caseId,
-          case_title: rssCase.title,
-          ministry: rssCase.ministry,
-          published_date: rssCase.date,
-          pdf_seq_no: pdf.seqNo,
-          pdf_label: pdf.label,
-        },
-      });
+      // TODO: Oracle RAG に移行済み
+      // await ingestDocument({
+      //   title: `[パブコメ] ${rssCase.title} - ${pdf.label}`,
+      //   content: text,
+      //   fileName: `${rssCase.caseId}_${pdf.seqNo}.pdf`,
+      //   fileType: "application/pdf",
+      //   sourceUrl: pdf.url,
+      //   organization: "e-Gov パブコメ",
+      //   category: "regulation" as DocumentCategory,
+      //   metadata: {
+      //     source: "e-gov-pubcom",
+      //     case_id: rssCase.caseId,
+      //     case_title: rssCase.title,
+      //     ministry: rssCase.ministry,
+      //     published_date: rssCase.date,
+      //     pdf_seq_no: pdf.seqNo,
+      //     pdf_label: pdf.label,
+      //   },
+      // });
 
       ingestedCount++;
     } catch {

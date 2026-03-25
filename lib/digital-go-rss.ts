@@ -8,7 +8,7 @@
  * Vercel Cron（/api/scrape/process）から呼び出し
  */
 
-import { ingestDocument, type DocumentCategory } from "./rag";
+import type { DocumentCategory } from "./rag";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -200,23 +200,24 @@ async function ingestAttachment(
 
     if (!text || text.trim().length < 50) return false;
 
-    await ingestDocument({
-      title: `[デジタル庁] ${newsItem.title} - ${label}`,
-      content: text,
-      fileName: attachUrl.split("/").pop() ?? "unknown",
-      fileType: header === "%PDF-" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      sourceUrl: attachUrl,
-      organization: "デジタル庁",
-      category: "official" as DocumentCategory,
-      metadata: {
-        source: "digital-go-jp",
-        news_title: newsItem.title,
-        news_url: newsItem.link,
-        news_category: newsItem.category,
-        news_date: newsItem.pubDate,
-        attachment_label: label,
-      },
-    });
+    // TODO: Oracle RAG に移行済み
+    // await ingestDocument({
+    //   title: `[デジタル庁] ${newsItem.title} - ${label}`,
+    //   content: text,
+    //   fileName: attachUrl.split("/").pop() ?? "unknown",
+    //   fileType: header === "%PDF-" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //   sourceUrl: attachUrl,
+    //   organization: "デジタル庁",
+    //   category: "official" as DocumentCategory,
+    //   metadata: {
+    //     source: "digital-go-jp",
+    //     news_title: newsItem.title,
+    //     news_url: newsItem.link,
+    //     news_category: newsItem.category,
+    //     news_date: newsItem.pubDate,
+    //     attachment_label: label,
+    //   },
+    // });
 
     return true;
   } catch {
@@ -248,26 +249,26 @@ export async function checkDigitalGoNews(
     try {
       const { text, pdfs } = await fetchArticleContent(item.link);
 
-      // Ingest article text
-      if (text && text.length > 100) {
-        await ingestDocument({
-          title: `[デジタル庁] ${item.title}`,
-          content: text,
-          fileName: `digital-go-${item.guid || Date.now()}.html`,
-          fileType: "text/html",
-          sourceUrl: item.link,
-          organization: "デジタル庁",
-          category: "official" as DocumentCategory,
-          metadata: {
-            source: "digital-go-jp",
-            news_title: item.title,
-            news_url: item.link,
-            news_category: item.category,
-            news_date: item.pubDate,
-          },
-        });
-        ingestedCount++;
-      }
+      // TODO: Oracle RAG に移行済み
+      // if (text && text.length > 100) {
+      //   await ingestDocument({
+      //     title: `[デジタル庁] ${item.title}`,
+      //     content: text,
+      //     fileName: `digital-go-${item.guid || Date.now()}.html`,
+      //     fileType: "text/html",
+      //     sourceUrl: item.link,
+      //     organization: "デジタル庁",
+      //     category: "official" as DocumentCategory,
+      //     metadata: {
+      //       source: "digital-go-jp",
+      //       news_title: item.title,
+      //       news_url: item.link,
+      //       news_category: item.category,
+      //       news_date: item.pubDate,
+      //     },
+      //   });
+      //   ingestedCount++;
+      // }
 
       // Ingest PDF/Excel attachments (max 3 per article)
       for (const pdf of pdfs.slice(0, 3)) {

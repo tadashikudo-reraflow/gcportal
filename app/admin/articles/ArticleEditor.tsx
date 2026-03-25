@@ -130,12 +130,6 @@ export default function ArticleEditor({ article }: { article?: ArticleData }) {
     article?.sources ?? []
   );
 
-  // ファクト検証
-  const [verifying, setVerifying] = useState(false);
-  const [verifyResults, setVerifyResults] = useState<
-    { claim: string; status: "supported" | "contradicted" | "unverified"; confidence: number }[]
-  >([]);
-
   // 変更検知用の前回値
   const prevContentRef = useRef(content);
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -216,45 +210,6 @@ export default function ArticleEditor({ article }: { article?: ArticleData }) {
     });
   };
 
-  // ファクト検証: 記事内の数値・統計を抽出して検証
-  const handleVerify = async () => {
-    setVerifying(true);
-    setVerifyResults([]);
-    try {
-      // HTMLからテキスト抽出し、数値を含む文を抽出
-      const textContent = content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-      const sentences = textContent.split(/(?<=[。！？\.\!\?])\s*/).filter(Boolean);
-      const claims = sentences
-        .filter((s) => /\d/.test(s) && s.length > 10 && s.length < 300)
-        .slice(0, 10);
-
-      if (claims.length === 0) {
-        setVerifyResults([{ claim: "検証対象の数値・統計が見つかりませんでした", status: "unverified", confidence: 0 }]);
-        return;
-      }
-
-      const res = await fetch("/api/rag/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ claims }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setVerifyResults(data.results);
-      } else {
-        setVerifyResults([{ claim: `エラー: ${data.error}`, status: "unverified", confidence: 0 }]);
-      }
-    } catch (err) {
-      setVerifyResults([{
-        claim: `エラー: ${err instanceof Error ? err.message : String(err)}`,
-        status: "unverified",
-        confidence: 0,
-      }]);
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   const descLen = description.length;
   const descColor =
     descLen >= 80 && descLen <= 120
@@ -318,26 +273,6 @@ export default function ArticleEditor({ article }: { article?: ArticleData }) {
           </button>
 
           <button
-            onClick={handleVerify}
-            disabled={verifying}
-            className="px-3 py-2 rounded-lg text-xs font-semibold border transition-colors hover:bg-blue-50"
-            style={{
-              borderColor: "#3b82f6",
-              color: "#3b82f6",
-              backgroundColor: "white",
-            }}
-          >
-            {verifying ? (
-              <span className="flex items-center gap-1.5">
-                <Spinner />
-                検証中
-              </span>
-            ) : (
-              "RAG検証"
-            )}
-          </button>
-
-          <button
             onClick={() => handleSubmit(true)}
             disabled={isPending}
             className="px-4 py-2 rounded-lg text-sm font-bold text-white transition-opacity hover:opacity-90"
@@ -379,42 +314,6 @@ export default function ArticleEditor({ article }: { article?: ArticleData }) {
             placeholder="本文をリッチテキストで入力してください..."
           />
 
-          {/* ファクト検証結果 */}
-          {verifyResults.length > 0 && (
-            <div className="card p-4 space-y-2">
-              <h3 className="text-xs font-bold uppercase tracking-wide" style={{ color: "#3b82f6" }}>
-                RAG ファクト検証結果
-              </h3>
-              {verifyResults.map((r, i) => {
-                const statusStyle =
-                  r.status === "supported"
-                    ? { bg: "#dcfce7", text: "#166534", label: "裏付けあり" }
-                    : r.status === "contradicted"
-                    ? { bg: "#fee2e2", text: "#991b1b", label: "矛盾あり" }
-                    : { bg: "#f3f4f6", text: "#6b7280", label: "未検証" };
-                return (
-                  <div
-                    key={i}
-                    className="flex items-start gap-2 p-2 rounded text-xs"
-                    style={{ backgroundColor: statusStyle.bg }}
-                  >
-                    <span
-                      className="flex-shrink-0 px-1.5 py-0.5 rounded font-bold"
-                      style={{ color: statusStyle.text }}
-                    >
-                      {statusStyle.label}
-                    </span>
-                    <span className="leading-relaxed" style={{ color: statusStyle.text }}>
-                      {r.claim}
-                      {r.confidence > 0 && (
-                        <span className="ml-1 opacity-70">({(r.confidence * 100).toFixed(0)}%)</span>
-                      )}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         {/* 右: サイドバー */}

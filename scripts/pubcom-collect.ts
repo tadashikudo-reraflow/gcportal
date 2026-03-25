@@ -314,51 +314,30 @@ async function downloadPdf(
 // RAG ingest (calls existing pipeline)
 // ---------------------------------------------------------------------------
 
-async function ingestPdfToRag(
-  pdfInfo: PubcomPdf,
-  caseInfo: PubcomCase
-): Promise<void> {
-  if (!pdfInfo.localPath || !fs.existsSync(pdfInfo.localPath)) {
-    log(`  [skip-rag] No local file for ${pdfInfo.seqNo}`);
-    return;
-  }
-
-  // Dynamic import of project's rag + pdf-parser
-  const { parsePdf } = await import("../lib/pdf-parser");
-  const { ingestDocument } = await import("../lib/rag");
-
-  const buf = fs.readFileSync(pdfInfo.localPath);
-  const { text } = await parsePdf(buf);
-
-  if (!text || text.trim().length < 50) {
-    log(`  [skip-rag] Too short after parse: ${pdfInfo.label}`);
-    return;
-  }
-
-  const { documentId, chunkCount } = await ingestDocument({
-    title: `[パブコメ] ${caseInfo.title} - ${pdfInfo.label}`,
-    content: text,
-    fileName: path.basename(pdfInfo.localPath),
-    fileType: "application/pdf",
-    sourceUrl: pdfInfo.url,
-    organization: "e-Gov パブコメ",
-    category: "regulation",
-    metadata: {
-      source: "e-gov-pubcom",
-      case_id: caseInfo.caseId,
-      case_title: caseInfo.title,
-      ministry: caseInfo.ministry,
-      published_date: caseInfo.publishedDate,
-      pdf_seq_no: pdfInfo.seqNo,
-      pdf_label: pdfInfo.label,
-      file_hash: pdfInfo.fileHash,
-    },
-  });
-
-  log(
-    `  [rag] Ingested: docId=${documentId}, chunks=${chunkCount}, "${pdfInfo.label}"`
-  );
-}
+// TODO: Oracle RAG に移行済み
+// async function ingestPdfToRag(
+//   pdfInfo: PubcomPdf,
+//   caseInfo: PubcomCase
+// ): Promise<void> {
+//   if (!pdfInfo.localPath || !fs.existsSync(pdfInfo.localPath)) {
+//     log(`  [skip-rag] No local file for ${pdfInfo.seqNo}`);
+//     return;
+//   }
+//
+//   const { parsePdf } = await import("../lib/pdf-parser");
+//   const { ingestDocument } = await import("../lib/rag");
+//
+//   const buf = fs.readFileSync(pdfInfo.localPath);
+//   const { text } = await parsePdf(buf);
+//
+//   if (!text || text.trim().length < 50) {
+//     log(`  [skip-rag] Too short after parse: ${pdfInfo.label}`);
+//     return;
+//   }
+//
+//   const { documentId, chunkCount } = await ingestDocument({ ... });
+//   log(`  [rag] Ingested: docId=${documentId}, chunks=${chunkCount}, "${pdfInfo.label}"`);
+// }
 
 // ---------------------------------------------------------------------------
 // Search patterns
@@ -493,20 +472,18 @@ async function main() {
       }
       caseInfo.pdfs = downloadedPdfs;
 
-      // RAG ingest
-      if (!DRY_RUN && !DOWNLOAD_ONLY) {
-        for (const pdf of downloadedPdfs) {
-          if (pdf.localPath) {
-            try {
-              await ingestPdfToRag(pdf, caseInfo);
-            } catch (err) {
-              log(
-                `  [rag-error] ${err instanceof Error ? err.message : String(err)}`
-              );
-            }
-          }
-        }
-      }
+      // TODO: Oracle RAG に移行済み
+      // if (!DRY_RUN && !DOWNLOAD_ONLY) {
+      //   for (const pdf of downloadedPdfs) {
+      //     if (pdf.localPath) {
+      //       try {
+      //         await ingestPdfToRag(pdf, caseInfo);
+      //       } catch (err) {
+      //         log(`  [rag-error] ${err instanceof Error ? err.message : String(err)}`);
+      //       }
+      //     }
+      //   }
+      // }
 
       // Add to manifest
       manifest.cases.push(caseInfo);
