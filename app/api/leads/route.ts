@@ -124,17 +124,42 @@ async function notifyTelegram({
   });
 }
 
+/** Supabase Storage から 48h Signed URL を生成 */
+async function generateDownloadUrl(): Promise<string | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!supabaseUrl || !serviceRoleKey) return null;
+
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const { data } = await supabase.storage
+    .from("reports")
+    .createSignedUrl("report-2026.pdf", 60 * 60 * 48); // 48h
+  return data?.signedUrl ?? null;
+}
+
 /** Beehiiv 購読者追加 (BEEHIIV_API_KEY + BEEHIIV_PUBLICATION_ID が設定されている場合のみ) */
 async function notifyBeehiiv({
   email,
   orgType,
+  downloadUrl,
 }: {
   email: string;
   orgType: string;
+  downloadUrl: string | null;
 }) {
   const apiKey = process.env.BEEHIIV_API_KEY;
   const pubId = process.env.BEEHIIV_PUBLICATION_ID;
   if (!apiKey || !pubId) return;
+
+  const customFields: { name: string; value: string }[] = [
+    { name: "organization_type", value: orgType },
+  ];
+  if (downloadUrl) {
+    customFields.push({ name: "download_url", value: downloadUrl });
+  }
 
   await fetch(
     `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
@@ -148,7 +173,7 @@ async function notifyBeehiiv({
         email: email.toLowerCase().trim(),
         reactivate_existing: true,
         send_welcome_email: true,
-        custom_fields: [{ name: "organization_type", value: orgType }],
+        custom_fields: customFields,
       }),
     }
   );
@@ -199,11 +224,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // PDF Signed URL（48h）生成 → Beehiiv custom_fields に渡す
+    const downloadUrl = await generateDownloadUrl();
+
     // 通知: Slack / メール / Telegram（設定されていれば並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: source || "report" }),
       notifyEmail({ email, orgType, source: source || "report" }),
-      notifyBeehiiv({ email, orgType }),
+      notifyBeehiiv({ email, orgType, downloadUrl }),
       notifyTelegram({ email, orgType, source: source || "report" }),
     ]);
 

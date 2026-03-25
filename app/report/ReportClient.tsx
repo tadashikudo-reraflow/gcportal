@@ -11,143 +11,6 @@ const ORG_OPTIONS = [
   { value: "other", label: "その他" },
 ];
 
-type PrefData = { prefecture: string; avg_rate: number };
-
-type ReportData = {
-  title: string;
-  dataMonth: string;
-  generatedAt: string;
-  executive_summary: {
-    total_municipalities: number;
-    avg_rate: number;
-    completed_count: number;
-    critical_count: number;
-    deadline: string;
-  };
-  prefecture_ranking: { top10: PrefData[]; bottom10: PrefData[] };
-  cost: {
-    avgCostIncrease: number;
-    maxCostIncrease: number;
-    source: string;
-    costFactors: string[];
-  };
-  sections: { title: string; content: string }[];
-};
-
-function generatePrintHTML(report: ReportData): string {
-  return `<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>${report.title}</title>
-  <style>
-    @page { margin: 15mm 20mm; }
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Hiragino Kaku Gothic Pro', 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
-      color: #111827; line-height: 1.7; font-size: 10pt; margin: 0;
-    }
-    h1 { font-size: 17pt; color: #002D72; border-bottom: 3px solid #002D72; padding-bottom: 8px; margin-bottom: 4px; }
-    h2 { font-size: 12pt; color: #002D72; margin-top: 22px; margin-bottom: 8px; }
-    .meta { color: #6b7280; font-size: 8pt; margin-bottom: 18px; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
-    .stat { border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; text-align: center; background: #f9fafb; }
-    .stat-num { font-size: 17pt; font-weight: 800; color: #002D72; }
-    .stat-label { font-size: 7pt; color: #6b7280; margin-top: 2px; }
-    .section { margin: 12px 0; page-break-inside: avoid; }
-    .section-body { background: #eff6ff; border-left: 4px solid #002D72; padding: 10px 14px; border-radius: 0 6px 6px 0; font-size: 9.5pt; }
-    table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 8.5pt; }
-    th { background: #002D72; color: white; padding: 5px 8px; text-align: left; }
-    td { border: 1px solid #e5e7eb; padding: 5px 8px; }
-    tr:nth-child(even) td { background: #f9fafb; }
-    .ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .cost-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 12px 16px; margin: 10px 0; }
-    .cost-num { font-size: 18pt; font-weight: 800; color: #c2410c; }
-    .footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 7.5pt; color: #9ca3af; }
-    @media print { body { print-color-adjust: exact; -webkit-print-color-adjust: exact; } }
-  </style>
-</head>
-<body>
-  <h1>${report.title}</h1>
-  <p class="meta">
-    データ基準月: ${report.dataMonth} &nbsp;|&nbsp;
-    生成: ${new Date(report.generatedAt).toLocaleString("ja-JP")} &nbsp;|&nbsp;
-    移行目標時期: ${report.executive_summary.deadline} &nbsp;|&nbsp;
-    © GCInsight (gcinsight.jp)
-  </p>
-
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-num">${report.executive_summary.total_municipalities.toLocaleString()}</div>
-      <div class="stat-label">対象自治体数</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">${(report.executive_summary.avg_rate * 100).toFixed(1)}%</div>
-      <div class="stat-label">平均移行率</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">${report.executive_summary.completed_count}</div>
-      <div class="stat-label">移行完了</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">${report.executive_summary.critical_count}</div>
-      <div class="stat-label">深刻な遅延</div>
-    </div>
-  </div>
-
-  ${report.sections
-    .map(
-      (s) => `
-  <div class="section">
-    <h2>${s.title}</h2>
-    <div class="section-body">${s.content}</div>
-  </div>`
-    )
-    .join("")}
-
-  <h2>コスト分析ハイライト</h2>
-  <div class="cost-box">
-    先行事業参加団体の移行後コストは平均 <span class="cost-num">${report.cost.avgCostIncrease}x</span>（最大 ${report.cost.maxCostIncrease}x）に増加。<br>
-    主因: ${report.cost.costFactors.join(" / ")}<br>
-    <small style="color:#9ca3af">出典: ${report.cost.source} ／ ※GCInsight編集部算出の推計値。先行事業参加の限られた団体群のデータに基づく。全国平均を示すものではない。</small>
-  </div>
-
-  <h2>都道府県別ランキング</h2>
-  <div class="ranking-grid">
-    <div>
-      <p style="font-weight:600;margin-bottom:4px">▲ 上位10都道府県</p>
-      <table>
-        <tr><th>#</th><th>都道府県</th><th>移行率</th></tr>
-        ${report.prefecture_ranking.top10
-          .map(
-            (p, i) =>
-              `<tr><td>${i + 1}</td><td>${p.prefecture}</td><td>${(p.avg_rate * 100).toFixed(1)}%</td></tr>`
-          )
-          .join("")}
-      </table>
-    </div>
-    <div>
-      <p style="font-weight:600;margin-bottom:4px">▼ 下位10都道府県</p>
-      <table>
-        <tr><th>#</th><th>都道府県</th><th>移行率</th></tr>
-        ${report.prefecture_ranking.bottom10
-          .map(
-            (p, i) =>
-              `<tr><td>${report.prefecture_ranking.bottom10.length - i}</td><td>${p.prefecture}</td><td>${(p.avg_rate * 100).toFixed(1)}%</td></tr>`
-          )
-          .join("")}
-      </table>
-    </div>
-  </div>
-
-  <div class="footer">
-    GCInsight — ガバメントクラウド移行データベース &nbsp;|&nbsp; gcinsight.jp &nbsp;|&nbsp;
-    本レポートは公開情報を基にした参考資料です。正確な情報は各自治体・デジタル庁の公式資料をご確認ください。
-  </div>
-</body>
-</html>`;
-}
-
 export default function ReportClient() {
   const [email, setEmail] = useState("");
   const [orgType, setOrgType] = useState("");
@@ -181,31 +44,7 @@ export default function ReportClient() {
         return;
       }
 
-      // 2. Supabase Storage から signed URL を取得して直接DL
-      const dlRes = await fetch("/api/report/download");
-      if (dlRes.ok) {
-        const { url } = await dlRes.json();
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "gcinsight-report-2026.pdf";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        // Storage 未設定時のフォールバック: 印刷ダイアログ
-        const reportRes = await fetch("/api/report");
-        if (!reportRes.ok) throw new Error("report fetch failed");
-        const report: ReportData = await reportRes.json();
-        const html = generatePrintHTML(report);
-        const win = window.open("", "_blank", "width=900,height=700");
-        if (win) {
-          win.document.write(html);
-          win.document.close();
-          win.focus();
-          setTimeout(() => win.print(), 700);
-        }
-      }
-
+      // 2. PDFリンクはBeehiiv Welcome Emailで送信 → サンクス画面に誘導
       setShowThanks(true);
     } catch {
       setError("処理に失敗しました。もう一度お試しください。");
@@ -345,14 +184,16 @@ export default function ReportClient() {
       {showThanks && (
         <div className="text-center max-w-lg mx-auto">
           <div className="bg-green-50 border border-green-200 rounded-2xl p-8 md:p-12">
-            <div className="text-5xl mb-4">&#128196;</div>
+            <div className="text-5xl mb-4">&#9993;</div>
             <h2 className="text-2xl font-bold text-green-800 mb-3">
-              PDFを開いています
+              登録ありがとうございます
             </h2>
             <p className="text-green-700 mb-6">
-              今後のデータ更新・解説レポートは
+              <strong>{email}</strong> 宛に
               <br />
-              <strong>{email}</strong> 宛にお届けします。
+              PDFダウンロードリンクをお送りしました。
+              <br />
+              <span className="text-sm">※リンクの有効期限は<strong>48時間</strong>です。</span>
             </p>
             <div className="bg-white rounded-xl p-5 mb-6 text-left">
               <h3 className="font-bold text-gray-800 mb-3">
