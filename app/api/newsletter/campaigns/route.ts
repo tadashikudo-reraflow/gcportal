@@ -11,11 +11,19 @@ function getSupabase() {
 
 function checkAuth(req: NextRequest): boolean {
   const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Basic ")) return false;
-  const encoded = authHeader.slice(6);
-  const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-  const [, password] = decoded.split(":");
-  return password === process.env.ADMIN_PASSWORD;
+  // Basic auth (管理画面)
+  if (authHeader?.startsWith("Basic ")) {
+    const encoded = authHeader.slice(6);
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    const [, password] = decoded.split(":");
+    if (password === process.env.ADMIN_PASSWORD) return true;
+  }
+  // Bearer token (Claude / API)
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
+  }
+  return false;
 }
 
 // GET /api/newsletter/campaigns — 一覧取得

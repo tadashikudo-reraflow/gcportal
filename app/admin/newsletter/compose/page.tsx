@@ -270,6 +270,23 @@ function ComposeForm() {
 
   return (
     <div style={{ minHeight: "calc(100vh - 56px)" }}>
+      {/* Claudeワークフロー説明バナー */}
+      <div
+        style={{
+          marginBottom: 24,
+          padding: "12px 16px",
+          backgroundColor: "#eff6ff",
+          border: "1px solid #bfdbfe",
+          borderRadius: 8,
+          fontSize: 13,
+          color: "#1e40af",
+          lineHeight: 1.6,
+        }}
+      >
+        <strong>このエディターはプレビュー・微調整用です。</strong>
+        {" "}Claudeが下書き作成 → ここで確認・調整 → 「送信する」ボタンで配信
+      </div>
+
       {/* エディタ上部: 右にアクションボタン */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
         <button

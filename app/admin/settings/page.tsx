@@ -26,6 +26,9 @@ export default function SettingsPage() {
     // Beehiiv
     { label: "Beehiiv Publication ID", value: process.env.BEEHIIV_PUBLICATION_ID },
     { label: "Beehiiv APIキー", value: process.env.BEEHIIV_API_KEY, mask: true },
+    // Note コミュニティ
+    { label: "Note CTA 表示", value: process.env.NOTE_CTA_ENABLED ?? "false" },
+    { label: "Note URL", value: process.env.NOTE_URL },
     // 通知
     { label: "Telegram Bot Token", value: process.env.TELEGRAM_BOT_TOKEN, mask: true },
     { label: "Telegram Chat ID", value: process.env.TELEGRAM_CHAT_ID },

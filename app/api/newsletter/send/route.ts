@@ -12,7 +12,18 @@ function generateUnsubscribeToken(leadId: number): string {
 function addUnsubscribeFooter(html: string, leadId: number): string {
   const token = generateUnsubscribeToken(leadId);
   const unsubscribeUrl = `${BASE_URL}/api/unsubscribe?token=${token}&lid=${leadId}`;
-  const footer = `<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
+
+  // Note CTA ブロック（NOTE_CTA_ENABLED=true の場合のみ追加）
+  const noteCtaEnabled = process.env.NOTE_CTA_ENABLED === "true";
+  const noteUrl = process.env.NOTE_URL ?? "https://note.com/";
+  const noteCta = noteCtaEnabled
+    ? `<div style="margin-top:24px;padding:20px;background:#f9fafb;border-radius:8px;text-align:center;">
+  <p style="font-size:14px;color:#374151;margin:0 0 12px;">さらに深い分析はnoteで</p>
+  <a href="${noteUrl}" style="display:inline-block;padding:10px 24px;background:#111;color:#fff;border-radius:6px;font-size:13px;text-decoration:none;">noteで読む →</a>
+</div>`
+    : "";
+
+  const footer = `${noteCta}<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
   <p>配信停止は<a href="${unsubscribeUrl}" style="color:#6b7280;">こちら</a>からお願いします。</p>
   <p>© 2026 GCInsight | 〒100-0000 東京都</p>
 </div>`;
@@ -35,11 +46,19 @@ function getSupabase() {
 
 function checkAuth(req: NextRequest): boolean {
   const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Basic ")) return false;
-  const encoded = authHeader.slice(6);
-  const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-  const [, password] = decoded.split(":");
-  return password === process.env.ADMIN_PASSWORD;
+  // Basic auth (管理画面)
+  if (authHeader?.startsWith("Basic ")) {
+    const encoded = authHeader.slice(6);
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    const [, password] = decoded.split(":");
+    if (password === process.env.ADMIN_PASSWORD) return true;
+  }
+  // Bearer token (Claude / API)
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
+  }
+  return false;
 }
 
 /** href属性のURLをトラッキングURLに置換する */
