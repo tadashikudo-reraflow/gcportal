@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { createClient } from "@supabase/supabase-js";
+import SubscriberChart from "./newsletter/SubscriberChart";
 
 export const metadata = { title: "管理ダッシュボード | GCInsight Admin" };
 export const dynamic = "force-dynamic";
@@ -85,6 +87,16 @@ export default async function AdminPage() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* 購読者推移グラフ */}
+      <div style={{ marginBottom: 48 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 600, color: "#111111", margin: "0 0 16px 0" }}>
+          購読者推移（30日）
+        </h2>
+        <Suspense fallback={null}>
+          <SubscriberChart />
+        </Suspense>
       </div>
 
       {/* 直近の配信リスト */}
