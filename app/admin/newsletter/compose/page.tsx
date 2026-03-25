@@ -20,28 +20,6 @@ function ComposeForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // 編集モード: 既存キャンペーンを取得
-  useEffect(() => {
-    if (!editId) return;
-    const id = parseInt(editId, 10);
-    if (isNaN(id)) return;
-
-    fetch(`/api/newsletter/campaigns`, {
-      headers: {
-        Authorization: `Basic ${btoa(`:${prompt("管理者パスワードを入力してください") ?? ""}`)}`,
-      },
-    })
-      .then((r) => r.json())
-      .then((list: Array<{ id: number; subject: string }>) => {
-        const found = list.find((c) => c.id === id);
-        if (found) {
-          setSubject(found.subject);
-          // body_html は別途取得する必要があるが、簡略化のためスキップ
-        }
-      })
-      .catch(() => {});
-  }, [editId]);
-
   const getAuth = () => {
     const pass = sessionStorage.getItem("admin_pass") ?? "";
     return `Basic ${btoa(`:${pass}`)}`;
@@ -53,6 +31,31 @@ function ComposeForm() {
       if (p) sessionStorage.setItem("admin_pass", p);
     }
   };
+
+  // 編集モード: 既存キャンペーンを取得
+  useEffect(() => {
+    if (!editId) return;
+    const id = parseInt(editId, 10);
+    if (isNaN(id)) return;
+
+    ensurePass();
+
+    fetch(`/api/newsletter/campaigns`, {
+      headers: {
+        Authorization: getAuth(),
+      },
+    })
+      .then((r) => r.json())
+      .then((list: Array<{ id: number; subject: string; body_html?: string }>) => {
+        const found = list.find((c) => c.id === id);
+        if (found) {
+          setSubject(found.subject);
+          if (found.body_html) setBodyHtml(found.body_html);
+        }
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editId]);
 
   const handleSave = async () => {
     if (!subject.trim()) {
