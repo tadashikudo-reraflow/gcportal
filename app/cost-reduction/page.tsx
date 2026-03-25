@@ -10,8 +10,8 @@ const awsOciComparison = [
   {
     factor: "RDB",
     ratio: "10-25%",
-    aws: "RDS/Aurora は選択肢が多い一方、I/O や構成次第でコストが読みにくくなりやすい。Oracle依存が強い構成では、移行時の設計整理が必要。",
-    oci: "Oracle系ワークロードでは相性を取りやすく、PostgreSQL系でも OCI Database with PostgreSQL がある。既存Oracleの高ライセンス負担を見直す論点とつなげやすい。",
+    aws: "比較前提を RDS for PostgreSQL に置くと、構成は分かりやすい一方、I/O や接続数、読み取り構成次第でコストが積み上がりやすい。",
+    oci: "比較前提を Base Database Service Standard に置くと、構成は比較的シンプルに整理しやすい。DB費用を単純比較しやすいのが利点です。",
     trigger: "Oracleの高ライセンス負担、I/O増、クエリ未最適化、DBの役割が肥大化していると増えやすい。",
     action: "PostgreSQLマネージド移行、クエリ最適化、Read Replica、バッチ分離など低改修策から着手。",
   },
@@ -26,10 +26,10 @@ const awsOciComparison = [
   {
     factor: "コンピュート",
     ratio: "30-40%",
-    aws: "インスタンスタイプが豊富で最適化余地が大きい反面、常時稼働の過剰スペックが残りやすい。予約割引の設計が効く。",
+    aws: "インスタンスタイプが豊富で最適化余地が大きい反面、常時稼働の過剰スペックが残りやすい。割引を使わなくても Rightsizing の余地は大きい。",
     oci: "シンプルな料金体系でサイズ調整しやすく、Rightsizing の効果を出しやすい。OCPUベースで設計整理しやすい。",
     trigger: "常時稼働の過剰スペック、夜間停止なし、用途別分離不足がコスト増のきっかけ。",
-    action: "Rightsizing、予約・コミット割引、停止ルール、自動スケールの導入。",
+    action: "Rightsizing、停止ルール、自動スケールの導入。",
   },
   {
     factor: "ストレージ",
@@ -86,7 +86,7 @@ const recommendedMoves = [
   },
   {
     title: "5. FinOpsは『最後に効かせる運用レイヤー』として使う",
-    body: "構成が固まった後に、利用料の可視化、権限設計、停止ルール、予約・割引、ストレージ階層化を当てると効果が出やすいです。",
+    body: "構成が固まった後に、利用料の可視化、権限設計、停止ルール、ストレージ階層化を当てると効果が出やすいです。",
   },
 ];
 
@@ -222,7 +222,7 @@ export default function CostReductionPage() {
         <h2 className="text-xl font-bold" style={{ color: "#111827" }}>AWS と OCI の実務比較</h2>
         <p className="mt-2 text-sm leading-7" style={{ color: "#4b5563" }}>
           ここでは、実務上の主要比較対象として AWS と OCI を、RDB、回線/Egress、コンピュート、ストレージの4観点で並べます。
-          特にコスト削減では、単価だけでなく「多くなるきっかけ」と「低改修で効く対策」を合わせて見ることが重要です。
+          DBは `RDS for PostgreSQL` と `Base Database Service Standard` を前提にし、割引は考慮しない比較にそろえています。特にコスト削減では、単価だけでなく「多くなるきっかけ」と「低改修で効く対策」を合わせて見ることが重要です。
         </p>
 
         <div className="mt-5 overflow-x-auto">
@@ -268,6 +268,15 @@ export default function CostReductionPage() {
             </Link>
             も参照してください。
           </p>
+        </div>
+
+        <div className="mt-4 rounded-xl border p-4" style={{ borderColor: "#e5e7eb", backgroundColor: "#fafafa" }}>
+          <p className="text-sm font-semibold" style={{ color: "#111827" }}>DB比較時の注意点</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6" style={{ color: "#475569" }}>
+            <li>RDS for PostgreSQL は、DBインスタンス料金だけでなく、ストレージ種別やI/O特性によって総額が動きやすい。</li>
+            <li>Base Database Service Standard は標準料金の見え方が比較的単純でも、冗長化や追加構成を入れると総額は増えるため、標準構成の範囲確認が必要です。</li>
+            <li>DB比較は vCPU やメモリだけでなく、I/Oが多い運用か、バックアップが長いか、HA構成が前提かまで揃えないと逆転しうります。</li>
+          </ul>
         </div>
       </section>
 
