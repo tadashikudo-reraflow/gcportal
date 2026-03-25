@@ -34,6 +34,7 @@ const NAV_GROUPS = [
     children: [
       { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
       { href: "/costs",    label: "コスト増の要因を分析", desc: "ベンダー別コスト比較" },
+      { href: "/cost-reduction", label: "コスト削減の現実解", desc: "移行済み最適化と未移行見直し" },
       { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
     ],
   },
@@ -59,18 +60,19 @@ export default function NavBar() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ left: number; maxLeft: number } | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // ドロップダウン位置を計算
   const updateDropdownPos = useCallback((label: string) => {
     const btn = buttonRefs.current[label];
-    const nav = navRef.current;
-    if (!btn || !nav) return;
+    const inner = innerRef.current;
+    if (!btn || !inner) return;
     const btnRect = btn.getBoundingClientRect();
-    const navRect = nav.getBoundingClientRect();
+    const innerRect = inner.getBoundingClientRect();
     setDropdownPos({
-      left: btnRect.left - navRect.left,
-      maxLeft: navRect.width - 280, // min-width: 280px
+      left: btnRect.left - innerRect.left,
+      maxLeft: innerRect.width - 280, // min-width: 280px
     });
   }, []);
 
@@ -117,7 +119,7 @@ export default function NavBar() {
 
   return (
     <nav style={{ backgroundColor: "var(--color-gov-nav)" }} ref={navRef}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 relative">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 relative" ref={innerRef}>
         {/* スクロール可能なボタン列 */}
         <div className="flex items-center gap-0 overflow-x-auto scrollbar-none nav-scroll-snap">
           {NAV_GROUPS.map((group) => {
@@ -182,7 +184,7 @@ export default function NavBar() {
               return (
                 <Link
                   key={child.href}
-                  href={child.href}
+                  href={child.href === "/report" ? "/report?from=nav" : child.href}
                   className={`nav-dropdown-item ${childActive ? "nav-dropdown-item-active" : ""}`}
                 >
                   <span className="nav-dropdown-label">{child.label}</span>

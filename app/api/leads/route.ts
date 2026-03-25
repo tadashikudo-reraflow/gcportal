@@ -265,9 +265,12 @@ export async function POST(req: NextRequest) {
 
     const effectiveSource = source || "report";
 
-    // PDF配信メール: source="report" の場合のみ Resend でユーザーに直接送信
+    const isReportLead =
+      effectiveSource === "report" || effectiveSource.startsWith("report:");
+
+    // PDF配信メール: レポート導線からの登録時のみユーザーに直接送信
     const downloadUrl =
-      effectiveSource === "report" ? await generateDownloadUrl() : null;
+      isReportLead ? await generateDownloadUrl() : null;
 
     // 通知: Slack / 管理者メール / Beehiiv / Telegram（並列実行）
     await Promise.allSettled([
@@ -275,7 +278,7 @@ export async function POST(req: NextRequest) {
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyBeehiiv({ email, orgType, downloadUrl: null }), // Beehiivはニュースレター購読のみ
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report のみ）
+      sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report導線のみ）
     ]);
 
     return NextResponse.json({ success: true, lead: data });

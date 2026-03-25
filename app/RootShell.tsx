@@ -20,23 +20,33 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
       {/* ヘッダー — 深紺 #002D72 */}
       <header style={{ backgroundColor: "var(--color-brand-secondary)", position: "relative", zIndex: 50 }}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3">
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 no-underline">
-            {/* ロゴ: クラウド+GC */}
-            <div className="flex-shrink-0" style={{ width: 36, height: 32 }}>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="36" height="32">
-                <path d="M155 128H48C25 128 8 110 8 88C8 68 22 52 42 48C42 47 42 46 42 44C42 22 60 4 82 4C100 4 114 15 122 30C128 26 135 24 143 24C164 24 182 42 182 64C182 66 182 68 181 70C192 76 198 87 198 100C198 116 184 128 166 128" stroke="white" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                <text x="56" y="108" fontFamily="Helvetica Neue,Arial,sans-serif" fontSize="60" fontWeight="800" fill="white" letterSpacing="-2">GC</text>
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-white font-bold text-base sm:text-lg leading-tight">
-                GC Insight
-              </h1>
-              <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
-                ガバメントクラウド移行状況ダッシュボード
-              </p>
-            </div>
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/" className="flex items-center gap-2.5 sm:gap-3 no-underline">
+              {/* ロゴ: クラウド+GC */}
+              <div className="flex-shrink-0" style={{ width: 36, height: 32 }}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="36" height="32">
+                  <path d="M155 128H48C25 128 8 110 8 88C8 68 22 52 42 48C42 47 42 46 42 44C42 22 60 4 82 4C100 4 114 15 122 30C128 26 135 24 143 24C164 24 182 42 182 64C182 66 182 68 181 70C192 76 198 87 198 100C198 116 184 128 166 128" stroke="white" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  <text x="56" y="108" fontFamily="Helvetica Neue,Arial,sans-serif" fontSize="60" fontWeight="800" fill="white" letterSpacing="-2">GC</text>
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-white font-bold text-base sm:text-lg leading-tight">
+                  GC Insight
+                </h1>
+                <p className="hidden sm:block text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  ガバメントクラウド移行状況ダッシュボード
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              href="/report?from=header"
+              className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold no-underline"
+              style={{ backgroundColor: "#ffffff", color: "var(--color-brand-secondary)" }}
+            >
+              無料レポート（PDF）
+            </Link>
+          </div>
         </div>
         <NavBar />
       </header>
@@ -63,7 +73,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href="/report"
+                href="/report?from=footer"
                 className="btn-cta text-xs"
                 style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
               >

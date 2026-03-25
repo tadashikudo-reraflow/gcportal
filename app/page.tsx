@@ -198,8 +198,8 @@ export default function DashboardPage() {
       <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
         <span style={{ color: "#dc2626", fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠</span>
         <p className="text-xs leading-relaxed" style={{ color: "#991b1b" }}>
-          <strong>手続き進捗率は移行完了を意味しません。</strong>
-          予算要求・ベンダー選定などの準備ステップ（全40段階）が含まれます。全20業務の移行が完了した自治体は <strong>{completeCount} / {TOTAL.toLocaleString()}（{completedPct}%）</strong> です。
+          <strong>手続き進捗率は移行完了ではありません。</strong>
+          準備工程を含むため、全20業務が完了した自治体は <strong>{completeCount} / {TOTAL.toLocaleString()}（{completedPct}%）</strong> にとどまります。
         </p>
       </div>
 
@@ -284,7 +284,7 @@ export default function DashboardPage() {
           <path d="M12 16v-4M12 8h.01"/>
         </svg>
         <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-          <strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong>（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠扱いです。{" "}
+          <strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong>（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠です。{" "}
           <Link href="/tokutei" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
             詳しくは特定移行ページへ →
           </Link>
@@ -361,7 +361,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-col gap-1">
             <span className="cta-card-title">遅延リスク自治体</span>
-            <span className="cta-card-desc">手続き進捗率50%未満を人口帯・地域でフィルター</span>
+            <span className="cta-card-desc">進捗率50%未満を地域や人口帯で確認</span>
             <span className="cta-card-link">
               一覧を見る
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
@@ -378,7 +378,7 @@ export default function DashboardPage() {
             </svg>
           </div>
           <span className="cta-card-title">コスト分析</span>
-          <span className="cta-card-desc">移行コスト平均{COST_CONSTANTS.avgCostIncrease}倍の要因をベンダー別に比較</span>
+          <span className="cta-card-desc">平均{COST_CONSTANTS.avgCostIncrease}倍の要因を比較</span>
           <span className="cta-card-link">
             コスト分析を見る
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
@@ -387,20 +387,37 @@ export default function DashboardPage() {
 
         {/* 3枚目: テキスト主体（アイコンなし、背景色付き） */}
         <Link
-          href="/report"
+          href="/report?from=home_cta"
           className="cta-card"
           style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe" }}
         >
           <span className="cta-card-title" style={{ color: "#1E40AF" }}>
             全体レポート（PDF）
           </span>
-          <span className="cta-card-desc">最新の全国サマリーを社内共有・報告資料に</span>
+          <span className="cta-card-desc">全国サマリーを報告資料向けに整理</span>
           <span className="cta-card-link">
             無料ダウンロード
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </span>
+        </Link>
+
+        <Link
+          href="/cost-reduction"
+          className="cta-card"
+          style={{ backgroundColor: "#fff7ed", border: "1px solid #fdba74" }}
+        >
+          <span className="cta-card-title" style={{ color: "#9a3412" }}>
+            コスト削減特設
+          </span>
+          <span className="cta-card-desc">移行済み最適化と未移行見直しを整理</span>
+          <span className="cta-card-link" style={{ color: "#c2410c" }}>
+            特設ページを見る
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="9 18 15 12 9 6" />
             </svg>
           </span>
         </Link>

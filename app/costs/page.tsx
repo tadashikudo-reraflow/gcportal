@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
+import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
@@ -250,7 +251,7 @@ export default async function CostsPage() {
       supabase.from("vendors").select("id, name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count, notes").order("name"),
       supabase
         .from("municipality_packages")
-        .select("municipality_id, municipalities(city, prefecture), packages(vendor_id, vendors(id, short_name, name, cloud_platform))")
+        .select("municipality_id, municipalities(city, prefecture), packages(vendor_id, cloud_platform, vendors(id, short_name, name, cloud_platform))")
         .limit(2000),
     ]);
 
@@ -277,14 +278,36 @@ export default async function CostsPage() {
     markColor: string;
   };
 
-  const muniMap: Record<number, { city: string; prefecture: string; vendorCounts: Record<string, number> }> = {};
+  const muniMap: Record<number, {
+    city: string;
+    prefecture: string;
+    vendorCounts: Record<string, number>;
+    cloudCounts: Record<string, number>;
+  }> = {};
   for (const row of muniPkgData) {
     const mid = row.municipality_id;
     const city = row.municipalities?.city ?? "不明";
     const prefecture = row.municipalities?.prefecture ?? "";
     const vendorShort = row.packages?.vendors?.short_name ?? row.packages?.vendors?.name ?? "不明";
-    if (!muniMap[mid]) muniMap[mid] = { city, prefecture, vendorCounts: {} };
+    const packageCloud = row.packages?.cloud_platform ?? row.packages?.vendors?.cloud_platform ?? null;
+    if (!muniMap[mid]) muniMap[mid] = { city, prefecture, vendorCounts: {}, cloudCounts: {} };
     muniMap[mid].vendorCounts[vendorShort] = (muniMap[mid].vendorCounts[vendorShort] ?? 0) + 1;
+    if (packageCloud) {
+      muniMap[mid].cloudCounts[packageCloud] = (muniMap[mid].cloudCounts[packageCloud] ?? 0) + 1;
+    }
+  }
+
+  function getMainCloud(
+    cloudCounts: Record<string, number>,
+    fallback: string
+  ): string {
+    const entries = Object.entries(cloudCounts).sort((a, b) => b[1] - a[1]);
+    if (entries.length === 0) return fallback;
+    if (entries.length === 1) return entries[0][0];
+    const [firstCloud, firstCount] = entries[0];
+    const secondCount = entries[1]?.[1] ?? 0;
+    if (firstCount === secondCount) return "混在";
+    return firstCloud;
   }
 
   const muniEstimates: MuniCostEstimate[] = Object.entries(muniMap).map(([midStr, info]) => {
@@ -296,7 +319,7 @@ export default async function CostsPage() {
       city: info.city,
       prefecture: info.prefecture,
       primaryVendor,
-      cloud: est?.cloud ?? "調査中",
+      cloud: getMainCloud(info.cloudCounts, est?.cloud ?? "調査中"),
       ratioTypical: est?.ratioTypical ?? 1.5,
       ratioMin: est?.ratioMin ?? 1.0,
       ratioMax: est?.ratioMax ?? 2.5,
@@ -318,6 +341,13 @@ export default async function CostsPage() {
     return bTyp - aTyp;
   });
 
+  function getGroupCloudLabel(items: MuniCostEstimate[], fallback: string): string {
+    const uniqueClouds = [...new Set(items.map((item) => item.cloud).filter(Boolean))];
+    if (uniqueClouds.length === 0) return fallback;
+    if (uniqueClouds.length === 1) return uniqueClouds[0];
+    return "混在";
+  }
+
   // 最小・最大・平均
   const ratios = costs.map((c) => c.change_ratio).filter((r) => r != null);
   const avgRatio = ratios.length > 0 ? ratios.reduce((a, b) => a + b, 0) / ratios.length : null;
@@ -334,7 +364,7 @@ export default async function CostsPage() {
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">コスト効果分析</h1>
         <p className="page-subtitle">
-          標準化移行によるコスト変化の実態。TCO比較・ベンダー別評価。
+          標準化移行に伴うコスト変化を、実績と比較表で整理
         </p>
       </div>
 
@@ -347,7 +377,7 @@ export default async function CostsPage() {
           当初「30%削減」の目標に対し、実態は平均+{avgPct}%の増加
         </p>
         <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          ※ +{avgPct}%は中核市市長会調査・デジタル庁TCO検証等の複数調査を編集部が集計した参考値です。単一の公式統計ではありません。個別事例の2.3倍・5.7倍はデジタル庁2025年6月会議資料で確認可能です。
+          ※ +{avgPct}%は複数調査をもとにした参考値です。2.3倍・5.7倍の事例はデジタル庁2025年6月資料で確認できます。
         </p>
 
         {/* 水平バー比較 */}
@@ -388,7 +418,7 @@ export default async function CostsPage() {
 
         {/* 乖離注記 */}
         <p className="text-xs mt-5 pt-4" style={{ color: "var(--color-text-muted)", borderTop: "1px solid var(--color-border)" }}>
-          目標と実態の間に約{avgPct + 30}ポイントの乖離。特に中小自治体・大規模カスタマイズ先で顕著。運用費・回線費の増加が主因。
+          目標と実態には約{avgPct + 30}ポイントの乖離があり、運用費と回線費の増加が重く出ています。
         </p>
       </div>
 
@@ -428,7 +458,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ガバメントクラウド利用料</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  IaaS利用料が新規発生。小規模自治体ほどスケールメリットが効かず割高に。
+                  新たに発生する利用料。小規模団体ほど割高になりやすい費目です。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
@@ -453,7 +483,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ソフトウェア借料</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  SaaS/ライセンス料が増加。標準化仕様でアドオン費用が発生するケースも。
+                  利用料やライセンス料が増えやすく、追加機能費も乗りやすい項目です。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
@@ -478,7 +508,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">ネットワーク費用</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  クラウド直接接続（Direct Connect等）への切替。閉域網・VPN費用が新規発生。
+                  接続回線や閉域網の費用が新たに発生しやすい領域です。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
@@ -504,7 +534,7 @@ export default async function CostsPage() {
               <div>
                 <p className="text-sm font-bold text-gray-800 mb-1">SE単価高騰</p>
                 <p className="text-xs text-gray-500 leading-relaxed">
-                  全国同時移行でSE逼迫。期限が迫るほど単価上昇の傾向。
+                  全国同時移行で人材が逼迫し、期限が近いほど単価が上がりやすい状況です。
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">
@@ -527,7 +557,7 @@ export default async function CostsPage() {
           コスト変化実績
         </h2>
         <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
-          移行前コストを0%基準として、増減率で表示。各カードをクリックでコスト内訳を表示。
+          移行前を基準に増減率で表示。カードを開くと内訳を確認できます。
           <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
         </p>
 
@@ -644,7 +674,7 @@ export default async function CostsPage() {
           <span className="text-xs font-normal text-gray-400 ml-1">AWSを100とした相対指数</span>
         </h2>
         <p className="text-xs text-gray-400 mb-4">
-          標準化20業務想定でのコスト指数比較。値が低いほど低コスト。
+          標準化20業務を想定した参考比較です。値が低いほど低コストです。
         </p>
 
         {/* モバイル: カード型レイアウト */}
@@ -777,30 +807,39 @@ export default async function CostsPage() {
         <ul className="space-y-1.5 text-xs text-blue-700">
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">運用経費見積チェックリスト</span>: デジタル庁が公開。費用漏れ防止項目を整備。</span>
+            <span><span className="font-semibold">運用経費見積チェックリスト</span>: 費用漏れを防ぐ確認項目が公開済み。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">FinOpsガイド策定中</span>: デジタル庁がクラウドコスト最適化ガイドラインを策定中。</span>
+            <span><span className="font-semibold">FinOpsガイド策定中</span>: 運用最適化の標準化が進められています。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">東京都+178億円/年</span>: 東京都調査（2024年）・デジタル庁「運用経費に係る総合的な対策」(2025年6月)。コスト超過が全国規模の政策課題に。</span>
+            <span><span className="font-semibold">東京都+178億円/年</span>: コスト超過が全国規模の政策課題になっています。</span>
           </li>
         </ul>
 
         <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-800">特設: FinOpsだけで足りるのか</p>
-            <p className="text-xs text-slate-600">公式資料と先行事業データから、共同化、SaaS化、基盤選定を含む削減論点を整理しました。</p>
+            <p className="text-sm font-semibold text-slate-800">特設: 移行済み最適化と未移行見直し</p>
+            <p className="text-xs text-slate-600">運用最適化と基盤再選定を分けて整理しています。</p>
           </div>
-          <Link
-            href="/cost-reduction"
-            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
-          >
-            コスト削減特設を見る
-          </Link>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/cost-reduction"
+              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+            >
+              コスト削減特設を見る
+            </Link>
+            <Link
+              href="/report?from=costs"
+              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
+            >
+              無料レポートを受け取る
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -810,7 +849,7 @@ export default async function CostsPage() {
           コスト内訳（増加・減少項目）
         </h2>
         <p className="text-xs text-gray-400 mb-4">
-          出典: デジタル庁「運用経費に係る総合的な対策」(2025年6月)・内閣官房WT資料・中核市市長会調査
+          出典: デジタル庁資料、内閣官房資料、中核市市長会調査
         </p>
 
         <div className="grid md:grid-cols-2 gap-4 mb-5">
@@ -823,10 +862,10 @@ export default async function CostsPage() {
             <div className="space-y-2.5">
               {[
                 { name: "ソフトウェア借料・保守費", desc: "標準準拠パッケージのASP利用料・ライセンス。最大の増加項目", impact: "大" },
-                { name: "ガバクラ利用料", desc: "AWS/OCI等のコンピューティング・ストレージ・通信費。円安の影響を直接受ける", impact: "大" },
-                { name: "システム運用作業費", desc: "クラウド対応の複雑化・クラウド資格者確保に伴う単価上昇", impact: "中" },
-                { name: "ガバクラ接続回線費", desc: "Direct Connect等。冗長化で2倍以上。現行にない新規コスト", impact: "中" },
-                { name: "ガバナンス・セキュリティ費", desc: "CloudTrail・Config等の必須適用テンプレートに伴うデータ処理料金", impact: "小" },
+                { name: "ガバクラ利用料", desc: "計算資源、保存、通信の費用。為替影響も受けやすい", impact: "大" },
+                { name: "システム運用作業費", desc: "クラウド対応や要員確保で単価が上がりやすい", impact: "中" },
+                { name: "ガバクラ接続回線費", desc: "接続回線や冗長化で増えやすい新規コスト", impact: "中" },
+                { name: "ガバナンス・セキュリティ費", desc: "監査や設定管理に伴う追加費用", impact: "小" },
               ].map((item) => (
                 <div key={item.name} className="flex items-start gap-2">
                   <span className={`flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold ${
@@ -849,8 +888,8 @@ export default async function CostsPage() {
             </h3>
             <div className="space-y-2.5">
               {[
-                { name: "ハードウェア借料・保守費", desc: "オンプレサーバー→共同利用基盤で削減。効果が出る数少ない項目" },
-                { name: "データセンター利用費", desc: "自前DC廃止→共同DCで削減。大規模自治体ほど効果大" },
+                { name: "ハードウェア借料・保守費", desc: "共同利用基盤への移行で削減しやすい項目" },
+                { name: "データセンター利用費", desc: "自前設備の縮小で削減しやすい項目" },
               ].map((item) => (
                 <div key={item.name} className="flex items-start gap-2">
                   <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-green-200 text-green-800">減</span>
@@ -863,7 +902,7 @@ export default async function CostsPage() {
             </div>
             <div className="mt-3 pt-3 border-t border-green-200">
               <p className="text-[11px] text-green-700 font-medium">
-                ※ 増加5項目に対し減少は2項目のみ。先行8地域中5地域で移行後コスト増（デジタル庁2022年検証）
+                ※ 増加項目の方が多く、先行8地域中5地域で移行後コスト増が確認されています。
               </p>
             </div>
           </div>
@@ -899,7 +938,7 @@ export default async function CostsPage() {
           </table>
         </div>
         <p className="text-[11px] text-gray-400 mt-2">
-          ※ 小規模自治体ほどコスト増が顕著（回線費等の固定費が人口比で重くなるため）
+          ※ 小規模団体ほど固定費の影響が重くなりやすい傾向があります。
         </p>
 
         {/* 公式資料リンク */}
@@ -934,13 +973,19 @@ export default async function CostsPage() {
       >
         <p className="text-xs font-bold text-blue-800 mb-1">令和7年度補正予算（支援措置）</p>
         <p className="text-xs text-blue-700 leading-relaxed">
-          地方公共団体情報システム運用最適化支援事業：補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong>、補助率 1/2。
-          移行コスト増加への財政支援として計上。
+          地方公共団体情報システム運用最適化支援事業として、補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong> が計上されています。
         </p>
       </div>
 
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.costs} pageId="costs" />
+
+      <ReportLeadCta
+        source="costs"
+        compact
+        title="コスト比較の背景をPDFでまとめて確認"
+        description="ベンダー別の見方だけでなく、進捗や遅延構造まで含めて無料レポートで確認できます。"
+      />
 
       {/* ⑧ 自治体別コスト影響推定（ベンダー別グループ） */}
       {muniEstimates.length > 0 && (
@@ -950,7 +995,7 @@ export default async function CostsPage() {
             <span className="text-xs font-normal text-gray-400 ml-1">（全{muniEstimates.length}件・ベンダー別）</span>
           </h2>
           <p className="text-xs text-gray-400 mb-4">
-            採用ベンダー別のコスト変化レンジを適用した推定値（実際の請求額ではありません）。各行クリックで詳細展開。
+            ベンダー別のコスト変化レンジを当てた参考推定です。各行を開くと詳細を確認できます。
           </p>
 
           <div className="space-y-3">
@@ -961,7 +1006,7 @@ export default async function CostsPage() {
                 <VendorGroup
                   key={vendorName}
                   vendorName={vendorName}
-                  cloud={est?.cloud ?? "調査中"}
+                  cloud={getGroupCloudLabel(items, est?.cloud ?? "調査中")}
                   mark={est?.mark ?? "—"}
                   markColor={est?.markColor ?? "#9ca3af"}
                   note={est?.note ?? ""}
@@ -975,7 +1020,7 @@ export default async function CostsPage() {
                           <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
                           <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
                           <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主ベンダー</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">クラウド</th>
+                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主なクラウド</th>
                           <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">推定増加率</th>
                           <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">増加レンジ</th>
                           <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium">評価</th>

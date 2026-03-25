@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import RelatedArticles from "@/components/RelatedArticles";
+import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
@@ -9,7 +11,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| ガバメントクラウド移行状況ダッシュボード",
-  description: "ガバメントクラウドのインフラシェア（AWS 97%・Azure・GCP・OCI）とコスト指標を分析。自治体が選ぶべきクラウド基盤と認定状況を可視化。",
+  description: "認定クラウドごとのインフラシェア、対応ベンダー、コスト目安を整理。",
   alternates: { canonical: "/cloud" },
 };
 
@@ -196,7 +198,7 @@ export default async function CloudPage() {
       <div className="pb-2">
         <h1 className="page-title">クラウド基盤分析</h1>
         <p className="page-subtitle">
-          ガバクラ認定クラウド別の対応ベンダー・パッケージ一覧
+          認定クラウドごとの対応ベンダー・パッケージとコスト目安
         </p>
       </div>
 
@@ -268,7 +270,7 @@ export default async function CloudPage() {
                         className="px-2 py-0.5 rounded-full font-semibold"
                         style={{ backgroundColor: cfg.color + "20", color: cfg.color }}
                       >
-                        {entries.length}社 / {pkgCount}PKG
+                        {entries.length}社 / {pkgCount}パッケージ
                       </span>
                     )}
                   </div>
@@ -320,7 +322,7 @@ export default async function CloudPage() {
                               {pkgs.length > 0 && (
                                 <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
                                   style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
-                                  {pkgs.length} PKG
+                                  {pkgs.length} パッケージ
                                 </span>
                               )}
                               {/* 展開矢印 */}
@@ -427,7 +429,7 @@ export default async function CloudPage() {
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ典型ワークロード</span>
         </h2>
         <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
-          出典: 各社公式料金表（2025年時点）より算出。実際の費用はワークロードにより異なります。料金計算ツール:{" "}
+          各社公式料金表ベースの参考値です。実費は構成で変動します。料金計算ツール:{" "}
           <a href="https://calculator.aws/pricing/2/metaindex" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#FF9900" }}>AWS 料金計算ツール</a>
           {" / "}
           <a href="https://azure.microsoft.com/ja-jp/pricing/calculator/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#0078D4" }}>Azure 料金計算ツール</a>
@@ -439,15 +441,15 @@ export default async function CloudPage() {
 
         <div className="rounded-lg px-4 py-3 mb-4 flex flex-col gap-2" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
           <div className="flex items-center gap-3">
-            <span className="font-bold" style={{ color: "#F80000" }}>OCI は AWS の約55%のコスト</span>
-            <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>— 円建て課金・Oracle DB互換に強み</span>
+            <span className="font-bold" style={{ color: "#F80000" }}>参考比較では OCI が低コスト側に出やすい</span>
+            <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>通信費と料金体系の差が効きやすい</span>
           </div>
           <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-            ※ 公式料金表より算出。実際の費用はワークロードにより異なります。
+            ※ 公式料金表ベースの参考値です。
           </p>
           <div className="rounded px-3 py-2 text-xs leading-relaxed" style={{ backgroundColor: "#fff0f0", color: "#7f1d1d", border: "1px solid #F8000030" }}>
-            <span className="font-semibold">札幌市事例（2025年4月）:</span>{" "}
-            OCIを正式採用。住民情報系32業務をガバクラ移行。
+            <span className="font-semibold">参考事例:</span>{" "}
+            札幌市は2025年4月にOCI採用を公表しています。
           </div>
         </div>
 
@@ -517,12 +519,52 @@ export default async function CloudPage() {
       <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
         <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
           <span className="font-semibold">免責事項:</span>{" "}
-          公開情報をもとに調査・編集。<span className="font-semibold">正確性・完全性を保証するものではありません。</span>最新情報は各社公式サイトで確認ください。
+          公開情報ベースの整理です。最新条件は各社公式サイトで確認してください。
         </p>
+      </div>
+
+      <div
+        className="rounded-xl border px-5 py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+        style={{ borderColor: "#dbeafe", backgroundColor: "#f8fbff" }}
+      >
+        <div>
+          <p className="text-xs font-semibold" style={{ color: "#1d4ed8" }}>
+            関連導線
+          </p>
+          <p className="mt-1 text-sm font-semibold" style={{ color: "#111827" }}>
+            コスト削減の考え方と無料レポートをあわせて確認
+          </p>
+          <p className="mt-1 text-xs leading-6" style={{ color: "#475569" }}>
+            基盤比較だけでなく、移行済み最適化と未移行見直しの整理、全体レポートへの導線も用意しています。
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link
+            href="/cost-reduction"
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+          >
+            コスト削減特設を見る
+          </Link>
+          <Link
+            href="/report?from=cloud"
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
+          >
+            無料レポートを受け取る
+          </Link>
+        </div>
       </div>
 
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.cloud} pageId="cloud" />
+
+      <ReportLeadCta
+        source="cloud"
+        compact
+        title="基盤比較の背景をPDFでまとめて確認"
+        description="クラウド比較だけでなく、進捗、コスト、遅延構造までまとめた無料レポートを受け取れます。"
+      />
 
       <RelatedArticles cluster={CLUSTERS.tech} />
     </div>

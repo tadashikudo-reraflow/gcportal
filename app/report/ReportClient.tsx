@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const ORG_OPTIONS = [
   { value: "municipality", label: "自治体職員" },
@@ -12,12 +13,29 @@ const ORG_OPTIONS = [
 ];
 
 export default function ReportClient() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [orgType, setOrgType] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showThanks, setShowThanks] = useState(false);
   const [error, setError] = useState("");
+
+  const from = searchParams.get("from");
+  const source = from ? `report:${from}` : "report";
+
+  const sourceLabels: Record<string, string> = {
+    hero: "トップページ",
+    hero_mobile: "トップページ",
+    home_cta: "トップページ",
+    header: "ヘッダー",
+    footer: "フッター",
+    nav: "メニュー",
+    costs: "コスト分析ページ",
+    cloud: "クラウド基盤分析ページ",
+    cost_reduction: "コスト削減特設ページ",
+  };
+  const sourceLabel = from ? sourceLabels[from] ?? "関連ページ" : null;
 
   const canSubmit = email.includes("@") && orgType && agreed && !loading;
 
@@ -34,7 +52,7 @@ export default function ReportClient() {
         body: JSON.stringify({
           email,
           organization_type: orgType,
-          source: "report",
+          source,
         }),
       });
 
@@ -59,6 +77,11 @@ export default function ReportClient() {
       {!showThanks && (
         <div className="text-center">
           <div className="bg-gradient-to-br from-[#002D72] to-[#001440] text-white rounded-2xl p-8 md:p-12 mb-8">
+            {sourceLabel && (
+              <p className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold mb-4">
+                {sourceLabel}をご覧の方向け
+              </p>
+            )}
             <p className="text-blue-300 text-sm font-medium tracking-widest mb-2 uppercase">
               2025年度末（2026-03-31）移行目標時期の全実態
             </p>

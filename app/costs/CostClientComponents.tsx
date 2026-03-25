@@ -128,7 +128,7 @@ export function ExpandableMuniRow({
                     <span className="font-medium text-gray-700">{primaryVendor}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">利用クラウド</span>
+                    <span className="text-gray-500">主なクラウド</span>
                     <span className="font-medium" style={{ color: cloudColor }}>{cloud}</span>
                   </div>
                   <div className="flex justify-between">
