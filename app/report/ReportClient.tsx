@@ -181,19 +181,29 @@ export default function ReportClient() {
         return;
       }
 
-      // 2. レポートデータ取得
-      const reportRes = await fetch("/api/report");
-      if (!reportRes.ok) throw new Error("report fetch failed");
-      const report: ReportData = await reportRes.json();
-
-      // 3. 印刷ウィンドウを開いてPDF保存を促す
-      const html = generatePrintHTML(report);
-      const win = window.open("", "_blank", "width=900,height=700");
-      if (win) {
-        win.document.write(html);
-        win.document.close();
-        win.focus();
-        setTimeout(() => win.print(), 700);
+      // 2. Supabase Storage から signed URL を取得して直接DL
+      const dlRes = await fetch("/api/report/download");
+      if (dlRes.ok) {
+        const { url } = await dlRes.json();
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "gcinsight-report-2026.pdf";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        // Storage 未設定時のフォールバック: 印刷ダイアログ
+        const reportRes = await fetch("/api/report");
+        if (!reportRes.ok) throw new Error("report fetch failed");
+        const report: ReportData = await reportRes.json();
+        const html = generatePrintHTML(report);
+        const win = window.open("", "_blank", "width=900,height=700");
+        if (win) {
+          win.document.write(html);
+          win.document.close();
+          win.focus();
+          setTimeout(() => win.print(), 700);
+        }
       }
 
       setShowThanks(true);
