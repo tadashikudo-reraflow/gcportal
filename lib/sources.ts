@@ -344,6 +344,17 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     dataMonth: null,
     confidence: "verified",
   },
+  "applic-tekigo-excel": {
+    id: "applic-tekigo-excel",
+    name: "APPLIC適合システム一覧（Excel）",
+    org: "APPLIC",
+    url: null,
+    description: "各業務×パッケージの適合番号・確認日を収録したExcelファイル。クラウド対応状況「調査中」の基準日として使用。",
+    category: "research",
+    lastAccessed: "2026-03-25",
+    dataMonth: "2026-03",
+    confidence: "official",
+  },
 
   // ベンダー関連
   "oracle-tco": {
@@ -416,7 +427,7 @@ export const PAGE_SOURCES: Record<string, string[]> = {
   costs:     ["digital-cho-senkou-tco", "chukakushi-survey-2025", "grok-web-survey", "vendor-press"],
   costReduction: ["digital-cho-cost-measures-2025-06", "digital-cho-senkou-tco", "chukakushi-survey-2025", "oracle-network-pricing", "aws-ec2-pricing", "azure-bandwidth-pricing", "sakura-cloud-pricing"],
   cloud:     ["digital-cho-senkou-infra", "applic-products", "oracle-tco", "gartner-iaas", "vendor-press", "grok-web-survey"],
-  packages:  ["applic-products", "vendor-press"],
+  packages:  ["applic-tekigo-excel", "applic-products", "vendor-press"],
   adoption:  ["vendor-press", "grok-web-survey"],
   risks:     ["soumu-progress-excel"],
   tokutei:   ["digital-cho-tokutei"],

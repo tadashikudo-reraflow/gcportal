@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import type { Vendor, Package } from "@/lib/supabase";
+import { DATA_SOURCES } from "@/lib/sources";
+
+// 適合システムExcelの最終確認日（調査中アイテムの基準日として使用）
+const TEKIGO_LAST_ACCESSED = DATA_SOURCES["applic-tekigo-excel"]?.lastAccessed ?? "";
 
 const INITIAL_COUNT = 10;
 
@@ -29,6 +33,14 @@ function displayValue(val: string | null | undefined): string {
   const trimmed = val.trim();
   if (trimmed === "ー" || trimmed === "—" || trimmed === "-" || trimmed === "") return "調査中";
   return trimmed;
+}
+
+/** confirmed_date が未設定の場合、適合システム確認日を返す */
+function displayConfirmedDate(date: string | null | undefined): string {
+  if (!date || displayValue(date) === "調査中") {
+    return TEKIGO_LAST_ACCESSED || "調査中";
+  }
+  return date;
 }
 
 type PackageWithVendor = Package & { vendors?: Vendor };
@@ -150,7 +162,7 @@ function BusinessGroup({
                       )}
                     </td>
                     <td className="py-2 px-3 text-xs text-gray-500 whitespace-nowrap">
-                      {displayValue(mp.confirmed_date)}
+                      {displayConfirmedDate(mp.confirmed_date)}
                     </td>
                   </tr>
                 );
@@ -180,9 +192,7 @@ function BusinessGroup({
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
                     {displayValue(vendor?.short_name ?? vendor?.name)}
-                    {mp.confirmed_date && mp.confirmed_date !== "調査中" && (
-                      <span className="text-gray-400 ml-1.5">{mp.confirmed_date}</span>
-                    )}
+                    <span className="text-gray-400 ml-1.5">{displayConfirmedDate(mp.confirmed_date)}</span>
                   </p>
                 </div>
                 {badgeStyle ? (
