@@ -2,6 +2,126 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, Suspense } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
+import Placeholder from "@tiptap/extension-placeholder";
+
+// ツールバーボタンのスタイル
+const toolbarBtnStyle = (active = false): React.CSSProperties => ({
+  width: 28,
+  height: 28,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: active ? "#e5e7eb" : "none",
+  border: "none",
+  borderRadius: 4,
+  cursor: "pointer",
+  fontSize: 13,
+  fontWeight: active ? "bold" : "normal",
+  color: "#374151",
+  padding: 0,
+  flexShrink: 0,
+});
+
+function TiptapToolbar({ editor }: { editor: ReturnType<typeof useEditor> }) {
+  if (!editor) return null;
+
+  const handleLink = () => {
+    const url = window.prompt("URLを入力してください", "https://");
+    if (url && url !== "https://") {
+      editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    }
+  };
+
+  const handleImage = () => {
+    const url = window.prompt("画像URLを入力してください", "https://");
+    if (url && url !== "https://") {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 4,
+        paddingBottom: 8,
+        borderBottom: "1px solid #e5e7eb",
+        marginBottom: 16,
+        flexWrap: "wrap",
+      }}
+    >
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }}
+        style={toolbarBtnStyle(editor.isActive("bold"))}
+        title="太字"
+      >
+        <strong>B</strong>
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }}
+        style={toolbarBtnStyle(editor.isActive("italic"))}
+        title="斜体"
+      >
+        <em>I</em>
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run(); }}
+        style={toolbarBtnStyle(editor.isActive("heading", { level: 2 }))}
+        title="見出し2"
+      >
+        H2
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run(); }}
+        style={toolbarBtnStyle(editor.isActive("heading", { level: 3 }))}
+        title="見出し3"
+      >
+        H3
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run(); }}
+        style={toolbarBtnStyle(editor.isActive("bulletList"))}
+        title="箇条書き"
+      >
+        &#8226;&#8212;
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run(); }}
+        style={toolbarBtnStyle(editor.isActive("orderedList"))}
+        title="番号リスト"
+      >
+        1.
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); handleLink(); }}
+        style={toolbarBtnStyle(editor.isActive("link"))}
+        title="リンク挿入"
+      >
+        🔗
+      </button>
+      <button
+        type="button"
+        onMouseDown={(e) => { e.preventDefault(); handleImage(); }}
+        style={toolbarBtnStyle(false)}
+        title="画像挿入"
+      >
+        🖼
+      </button>
+    </div>
+  );
+}
 
 function ComposeForm() {
   const router = useRouter();
@@ -9,7 +129,6 @@ function ComposeForm() {
   const editId = searchParams.get("id");
 
   const [subject, setSubject] = useState("");
-  const [bodyHtml, setBodyHtml] = useState("");
   const [campaignId, setCampaignId] = useState<number | null>(
     editId ? parseInt(editId, 10) : null
   );
@@ -19,7 +138,20 @@ function ComposeForm() {
   const [showPreview, setShowPreview] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [sendTarget, setSendTarget] = useState<"all" | "segment">("all");
+  const [editorReady, setEditorReady] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const initialHtmlRef = useRef<string>("");
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Link.configure({ openOnClick: false }),
+      Image,
+      Placeholder.configure({ placeholder: "本文を入力してください..." }),
+    ],
+    content: "",
+    onCreate: () => setEditorReady(true),
+  });
 
   const getAuth = () => {
     const pass = sessionStorage.getItem("admin_pass") ?? "";
@@ -44,12 +176,23 @@ function ComposeForm() {
         const found = list.find((c) => c.id === id);
         if (found) {
           setSubject(found.subject);
-          if (found.body_html) setBodyHtml(found.body_html);
+          if (found.body_html) {
+            initialHtmlRef.current = found.body_html;
+          }
         }
       })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId]);
+
+  // editorが準備できてからinitialHtmlをセット
+  useEffect(() => {
+    if (editorReady && editor && initialHtmlRef.current) {
+      editor.commands.setContent(initialHtmlRef.current);
+    }
+  }, [editorReady, editor]);
+
+  const getBodyHtml = () => editor?.getHTML() ?? "";
 
   const handleSave = async () => {
     if (!subject.trim()) {
@@ -59,6 +202,7 @@ function ComposeForm() {
     ensurePass();
     setSaving(true);
     setSaveMsg("");
+    const bodyHtml = getBodyHtml();
     try {
       if (campaignId) {
         await fetch(`/api/newsletter/campaigns/${campaignId}`, {
@@ -116,30 +260,16 @@ function ComposeForm() {
 
   const handlePreview = () => {
     setShowPreview(true);
+    const html = getBodyHtml();
     setTimeout(() => {
       if (iframeRef.current) {
-        iframeRef.current.srcdoc = bodyHtml;
+        iframeRef.current.srcdoc = html;
       }
     }, 50);
   };
 
-  const insertHtml = (tag: string) => {
-    const ta = document.getElementById("body-textarea") as HTMLTextAreaElement;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = bodyHtml.slice(start, end);
-    let insert = "";
-    if (tag === "b") insert = `<strong>${selected}</strong>`;
-    else if (tag === "h2") insert = `<h2>${selected || "見出し"}</h2>`;
-    else if (tag === "a") insert = `<a href="https://">${selected || "リンクテキスト"}</a>`;
-    const newVal = bodyHtml.slice(0, start) + insert + bodyHtml.slice(end);
-    setBodyHtml(newVal);
-  };
-
   return (
     <div style={{ minHeight: "calc(100vh - 56px)" }}>
-
       {/* エディタ上部: 右にアクションボタン */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 32 }}>
         <button
@@ -159,6 +289,20 @@ function ComposeForm() {
           {saveMsg && (
             <span style={{ fontSize: 13, color: "#6b7280" }}>{saveMsg}</span>
           )}
+          <button
+            onClick={handlePreview}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 13,
+              color: "#6b7280",
+              padding: "4px 8px",
+              borderRadius: 4,
+            }}
+          >
+            プレビュー
+          </button>
           <button
             onClick={handleSave}
             disabled={saving}
@@ -200,7 +344,7 @@ function ComposeForm() {
         </div>
       </div>
 
-      {/* 件名 input — 大きく、枠なし */}
+      {/* 件名 input */}
       <input
         type="text"
         value={subject}
@@ -219,84 +363,61 @@ function ComposeForm() {
         }}
       />
 
-      {/* シンプルツールバー */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-          paddingBottom: 12,
-          borderBottom: "1px solid #f3f4f6",
-          marginBottom: 16,
-        }}
-      >
-        {[
-          { label: "B", tag: "b", title: "太字" },
-          { label: "H2", tag: "h2", title: "見出し" },
-          { label: "Link", tag: "a", title: "リンク" },
-        ].map((btn) => (
-          <button
-            key={btn.tag}
-            onClick={() => insertHtml(btn.tag)}
-            title={btn.title}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: 13,
-              fontWeight: 600,
-              color: "#6b7280",
-              padding: "4px 8px",
-              borderRadius: 4,
-            }}
-          >
-            {btn.label}
-          </button>
-        ))}
-        <button
-          onClick={handlePreview}
-          disabled={!bodyHtml.trim()}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: !bodyHtml.trim() ? "not-allowed" : "pointer",
-            fontSize: 13,
-            color: "#6b7280",
-            padding: "4px 8px",
-            borderRadius: 4,
-            marginLeft: 8,
-            opacity: !bodyHtml.trim() ? 0.4 : 1,
-          }}
-        >
-          プレビュー
-        </button>
-        <span style={{ marginLeft: "auto", fontSize: 12, color: "#d1d5db" }}>HTML</span>
+      {/* TipTapツールバー */}
+      <TiptapToolbar editor={editor} />
+
+      {/* TipTapエディター本体 */}
+      <style>{`
+        .tiptap-editor .ProseMirror {
+          min-height: 500px;
+          outline: none;
+          font-size: 16px;
+          line-height: 1.8;
+          color: #374151;
+        }
+        .tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+          content: attr(data-placeholder);
+          float: left;
+          color: #9ca3af;
+          pointer-events: none;
+          height: 0;
+        }
+        .tiptap-editor .ProseMirror h2 {
+          font-size: 22px;
+          font-weight: 700;
+          margin: 20px 0 8px;
+          color: #111111;
+        }
+        .tiptap-editor .ProseMirror h3 {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 16px 0 6px;
+          color: #111111;
+        }
+        .tiptap-editor .ProseMirror a {
+          color: #2563eb;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        .tiptap-editor .ProseMirror ul,
+        .tiptap-editor .ProseMirror ol {
+          padding-left: 24px;
+          margin: 8px 0;
+        }
+        .tiptap-editor .ProseMirror img {
+          max-width: 100%;
+          border-radius: 4px;
+        }
+        .tiptap-editor .ProseMirror strong {
+          font-weight: 700;
+        }
+        .tiptap-editor .ProseMirror em {
+          font-style: italic;
+        }
+      `}</style>
+      <div className="tiptap-editor">
+        <EditorContent editor={editor} />
       </div>
-
-      {/* 本文 textarea */}
-      <textarea
-        id="body-textarea"
-        value={bodyHtml}
-        onChange={(e) => setBodyHtml(e.target.value)}
-        placeholder={`<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">\n  <h2>タイトル</h2>\n  <p>本文を入力してください。</p>\n  <p><a href="https://gcinsight.jp">GCInsight を見る →</a></p>\n</div>`}
-        style={{
-          width: "100%",
-          minHeight: 500,
-          border: "none",
-          outline: "none",
-          resize: "none",
-          fontSize: 16,
-          lineHeight: 1.8,
-          color: "#374151",
-          backgroundColor: "transparent",
-          fontFamily: "ui-monospace, monospace",
-          padding: 0,
-        }}
-      />
-
-      <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 16 }}>
-        HTMLで記述してください。リンクは送信時に自動的にトラッキングURLに置換されます。
-      </p>
 
       {/* 送信先設定 */}
       <div style={{ marginTop: 32, paddingTop: 24, borderTop: "1px solid #f3f4f6" }}>
