@@ -1,284 +1,123 @@
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
-import { logoutAction, quickDraftAction } from "./actions";
-import SearchFilter from "./components/SearchFilter";
+import { logoutAction } from "./actions";
 
-export const metadata = { title: "記事管理 | GCInsight Admin" };
+export const metadata = { title: "管理ダッシュボード | GCInsight Admin" };
 export const dynamic = "force-dynamic";
 
-type Article = {
-  id: number;
-  slug: string;
-  title: string;
-  date: string;
-  tags: string[];
-  is_published: boolean;
-  updated_at: string;
-};
-
-async function getArticles(): Promise<Article[]> {
+async function getStats() {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  const { data } = await supabase
-    .from("articles")
-    .select("id, slug, title, date, tags, is_published, updated_at")
-    .order("updated_at", { ascending: false });
-  return (data ?? []) as Article[];
+
+  const [{ count: totalLeads }, { count: sentCampaigns }, { data: recentCampaigns }] =
+    await Promise.all([
+      supabase.from("leads").select("*", { count: "exact", head: true }),
+      supabase.from("campaigns").select("*", { count: "exact", head: true }).eq("status", "sent"),
+      supabase.from("campaigns").select("id, subject, status, sent_at, created_at").order("created_at", { ascending: false }).limit(5),
+    ]);
+
+  return {
+    totalLeads: totalLeads ?? 0,
+    sentCampaigns: sentCampaigns ?? 0,
+    recentCampaigns: recentCampaigns ?? [],
+  };
 }
 
 export default async function AdminPage() {
-  const articles = await getArticles();
-  const published = articles.filter((a) => a.is_published).length;
-  const drafts = articles.filter((a) => !a.is_published).length;
-
-  // 本日更新した記事数
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const todayUpdated = articles.filter((a) =>
-    a.updated_at?.startsWith(todayStr)
-  ).length;
-
-  // 最近の記事5件
-  const recentArticles = articles.slice(0, 5);
+  const { totalLeads, sentCampaigns, recentCampaigns } = await getStats();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#f8f9fb" }}>
-      {/* 管理ヘッダー */}
       <header
         className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 shadow-sm"
         style={{ backgroundColor: "var(--color-brand-secondary)" }}
       >
+        <span className="text-white font-extrabold text-sm tracking-wide">GCInsight Admin</span>
         <div className="flex items-center gap-3">
-          <span className="text-white font-extrabold text-sm tracking-wide">
-            GCInsight Admin
-          </span>
-          <span
-            className="text-xs px-2 py-0.5 rounded-full"
-            style={{ backgroundColor: "#ffffff20", color: "#fff" }}
-          >
-            記事管理
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            target="_blank"
-            className="text-xs text-white/70 hover:text-white"
-          >
+          <Link href="/" target="_blank" className="text-xs text-white/70 hover:text-white">
             サイトを見る &nearr;
           </Link>
           <form action={logoutAction}>
-            <button
-              className="text-xs px-3 py-1.5 rounded-lg font-medium"
-              style={{ backgroundColor: "#ffffff20", color: "#fff" }}
-            >
+            <button className="text-xs px-3 py-1.5 rounded-lg font-medium" style={{ backgroundColor: "#ffffff20", color: "#fff" }}>
               ログアウト
             </button>
           </form>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* 本日の統計バナー */}
-        {todayUpdated > 0 && (
-          <div
-            className="mb-4 rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm"
-            style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8" }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 6v6l4 2" strokeLinecap="round" />
-            </svg>
-            <span>
-              本日 <strong>{todayUpdated}件</strong> の記事が更新されました
-            </span>
-          </div>
-        )}
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+        {/* サマリーカード */}
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { label: "購読者数", value: totalLeads, color: "var(--color-brand-secondary)", bg: "#f0f4ff", icon: "👥" },
+            { label: "配信済み", value: sentCampaigns, color: "#16a34a", bg: "#f0fdf4", icon: "📨" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl p-5 text-center shadow-sm" style={{ backgroundColor: s.bg }}>
+              <div className="text-2xl mb-1">{s.icon}</div>
+              <p className="text-4xl font-extrabold tabular-nums" style={{ color: s.color }}>{s.value}</p>
+              <p className="text-xs mt-1 font-medium" style={{ color: "var(--color-text-secondary)" }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
 
-        <div className="flex gap-6">
-          {/* 左カラム (70%) */}
-          <div className="flex-1 min-w-0 space-y-6">
-            {/* サマリーカード */}
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                {
-                  label: "総記事数",
-                  value: articles.length,
-                  color: "var(--color-brand-secondary)",
-                  bg: "#f0f4ff",
-                },
-                {
-                  label: "公開中",
-                  value: published,
-                  color: "#16a34a",
-                  bg: "#f0fdf4",
-                },
-                {
-                  label: "下書き",
-                  value: drafts,
-                  color: "#d97706",
-                  bg: "#fffbeb",
-                },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="card p-4 text-center"
-                  style={{ backgroundColor: s.bg }}
-                >
-                  <p
-                    className="text-3xl font-extrabold tabular-nums"
-                    style={{ color: s.color }}
-                  >
-                    {s.value}
-                  </p>
-                  <p
-                    className="text-xs mt-1 font-medium"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
-                    {s.label}
+        {/* クイックアクション */}
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/admin/newsletter/compose"
+            className="flex items-center gap-3 rounded-xl p-4 shadow-sm hover:opacity-90 transition"
+            style={{ backgroundColor: "#1d4ed8", color: "#fff" }}>
+            <span className="text-xl">✏️</span>
+            <div>
+              <p className="text-sm font-bold">新規メール作成</p>
+              <p className="text-xs opacity-75">ニュースレターを作成・配信</p>
+            </div>
+          </Link>
+          <Link href="/admin/newsletter/subscribers"
+            className="flex items-center gap-3 rounded-xl p-4 shadow-sm hover:opacity-90 transition"
+            style={{ backgroundColor: "#0f766e", color: "#fff" }}>
+            <span className="text-xl">👥</span>
+            <div>
+              <p className="text-sm font-bold">購読者一覧</p>
+              <p className="text-xs opacity-75">リスト管理・確認</p>
+            </div>
+          </Link>
+        </div>
+
+        {/* 直近の配信 */}
+        <div className="rounded-xl shadow-sm bg-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>直近の配信</h2>
+            <Link href="/admin/newsletter" className="text-xs font-medium" style={{ color: "#1d4ed8" }}>
+              すべて見る &rarr;
+            </Link>
+          </div>
+          {recentCampaigns.length === 0 ? (
+            <p className="text-xs text-center py-6" style={{ color: "var(--color-text-muted)" }}>
+              まだ配信はありません
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {recentCampaigns.map((c: { id: number; subject: string; status: string; sent_at: string | null; created_at: string }) => (
+                <div key={c.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                      style={c.status === "sent"
+                        ? { backgroundColor: "#dcfce7", color: "#16a34a" }
+                        : { backgroundColor: "#fef3c7", color: "#d97706" }}>
+                      {c.status === "sent" ? "送信済" : "下書き"}
+                    </span>
+                    <p className="text-xs font-medium truncate" style={{ color: "var(--color-text-primary)" }}>
+                      {c.subject}
+                    </p>
+                  </div>
+                  <p className="text-xs flex-shrink-0 ml-2" style={{ color: "var(--color-text-muted)" }}>
+                    {new Date(c.sent_at ?? c.created_at).toLocaleDateString("ja-JP")}
                   </p>
                 </div>
               ))}
             </div>
-
-            {/* 検索・フィルター付き記事テーブル（クライアントコンポーネント） */}
-            <SearchFilter articles={articles} />
-
-            {/* ニュースレター管理へのリンク */}
-            <div
-              className="rounded-lg border px-5 py-4 flex items-center justify-between"
-              style={{ borderColor: "#bfdbfe", backgroundColor: "#eff6ff" }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xl">&#128140;</span>
-                <div>
-                  <p className="text-sm font-bold" style={{ color: "#1d4ed8" }}>
-                    ニュースレター管理
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: "#3b82f6" }}>
-                    購読者への一斉配信・開封率計測
-                  </p>
-                </div>
-              </div>
-              <Link
-                href="/admin/newsletter"
-                className="text-xs font-bold px-3 py-1.5 rounded-lg"
-                style={{ backgroundColor: "#1d4ed8", color: "#fff" }}
-              >
-                管理画面へ &rarr;
-              </Link>
-            </div>
-
-            {/* ヒント */}
-            <div
-              className="rounded-lg border border-dashed border-gray-300 px-5 py-4 text-xs"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              <span className="font-semibold">ヒント:</span> Claude Code で
-              <code className="mx-1 px-1.5 py-0.5 rounded bg-gray-100 text-xs">
-                /gc-article キーワード
-              </code>
-              を実行するとSEO記事を自動生成できます。
-            </div>
-          </div>
-
-          {/* 右カラム (30%) */}
-          <div className="flex-shrink-0 space-y-4" style={{ width: "300px" }}>
-            {/* クイックドラフト */}
-            <div className="card p-4 space-y-3">
-              <h3
-                className="text-sm font-bold"
-                style={{ color: "var(--color-text-primary)" }}
-              >
-                クイックドラフト
-              </h3>
-              <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                アイデアをすばやく下書き保存
-              </p>
-              <form action={quickDraftAction} className="space-y-2">
-                <input
-                  type="text"
-                  name="title"
-                  required
-                  placeholder="タイトル"
-                  className="w-full px-3 py-2 text-sm rounded-lg border outline-none"
-                  style={{ border: "1.5px solid var(--color-border)" }}
-                />
-                <textarea
-                  name="content"
-                  rows={4}
-                  placeholder="本文（メモ）"
-                  className="w-full px-3 py-2 text-sm rounded-lg border outline-none resize-none"
-                  style={{ border: "1.5px solid var(--color-border)" }}
-                />
-                <button
-                  type="submit"
-                  className="w-full px-4 py-2 rounded-lg text-sm font-bold text-white"
-                  style={{ backgroundColor: "var(--color-brand-secondary)" }}
-                >
-                  下書き保存
-                </button>
-              </form>
-            </div>
-
-            {/* 最近の更新 */}
-            <div className="card p-4 space-y-3">
-              <h3
-                className="text-sm font-bold"
-                style={{ color: "var(--color-text-primary)" }}
-              >
-                最近の更新
-              </h3>
-              {recentArticles.length === 0 ? (
-                <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                  記事がありません
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  {recentArticles.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/admin/articles/${article.id}`}
-                      className="flex items-start gap-2 py-2 border-b border-gray-100 last:border-0 hover:bg-gray-50 -mx-1 px-1 rounded transition-colors"
-                    >
-                      <span
-                        className="mt-0.5 flex-shrink-0 text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                        style={
-                          article.is_published
-                            ? { backgroundColor: "#dcfce7", color: "#16a34a" }
-                            : { backgroundColor: "#fef3c7", color: "#d97706" }
-                        }
-                      >
-                        {article.is_published ? "公" : "草"}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className="text-xs font-medium truncate"
-                          style={{ color: "var(--color-text-primary)" }}
-                        >
-                          {article.title || "(タイトルなし)"}
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          {new Date(article.updated_at).toLocaleDateString("ja-JP")}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-              <Link
-                href="/admin"
-                className="text-xs font-medium"
-                style={{ color: "var(--color-brand-secondary)" }}
-              >
-                すべて見る &rarr;
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
