@@ -54,6 +54,17 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     dataMonth: "2025-09",
     confidence: "official",
   },
+  "digital-cho-cost-measures-2025-06": {
+    id: "digital-cho-cost-measures-2025-06",
+    name: "自治体情報システムの標準化・ガバメントクラウド移行後の運用経費に係る総合的な対策＜概要＞",
+    org: "デジタル庁",
+    url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/c58162cb-92e5-4a43-9ad5-095b7c45100c/9b626d3b/20250613_policies_local_governments_doc_01.pdf",
+    description: "2025年6月13日公表。運用経費増加の構造要因、当面の対策、FinOpsを含むコスト最適化支援の方向性を整理。",
+    category: "government",
+    lastAccessed: "2026-03-25",
+    dataMonth: "2025-06",
+    confidence: "official",
+  },
   "digital-cho-senkou-infra": {
     id: "digital-cho-senkou-infra",
     name: "デジタル庁先行事業インフラ調査（令和6年9月）",
@@ -355,6 +366,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
 export const PAGE_SOURCES: Record<string, string[]> = {
   dashboard: ["soumu-progress-excel", "digital-cho-tokutei"],
   costs:     ["digital-cho-senkou-tco", "chukakushi-survey-2025", "grok-web-survey", "vendor-press"],
+  costReduction: ["digital-cho-cost-measures-2025-06", "digital-cho-senkou-tco", "chukakushi-survey-2025", "oracle-govcloud"],
   cloud:     ["digital-cho-senkou-infra", "applic-products", "oracle-tco", "gartner-iaas", "vendor-press", "grok-web-survey"],
   packages:  ["applic-products", "vendor-press"],
   adoption:  ["vendor-press", "grok-web-survey"],

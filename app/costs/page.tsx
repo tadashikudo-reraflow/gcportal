@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
@@ -784,6 +785,20 @@ export default async function CostsPage() {
             <span><span className="font-semibold">東京都+178億円/年</span>: 東京都調査（2024年）・デジタル庁「運用経費に係る総合的な対策」(2025年6月)。コスト超過が全国規模の政策課題に。</span>
           </li>
         </ul>
+
+        <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-800">特設: FinOpsだけで足りるのか</p>
+            <p className="text-xs text-slate-600">公式資料と先行事業データから、OCI・共同化・SaaS化まで含めて整理しました。</p>
+          </div>
+          <Link
+            href="/cost-reduction"
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+          >
+            コスト削減特設を見る
+          </Link>
+        </div>
       </div>
 
       {/* コスト内訳（増加・減少項目） */}
