@@ -8,8 +8,8 @@ import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
 import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
 
-// ISR: DB更新後1時間以内に自動反映
-export const revalidate = 3600;
+// ISR: DB更新後60秒以内に自動反映（公開直後の表示崩れを最小化）
+export const revalidate = 60;
 
 type Props = { params: Promise<{ slug: string }> };
 

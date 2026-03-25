@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
@@ -84,6 +85,12 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // 公開時はVercelのISRキャッシュを即時パージ
+  if (is_published) {
+    revalidatePath(`/articles/${slug}`);
+    revalidatePath("/articles");
   }
 
   return NextResponse.json({
