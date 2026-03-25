@@ -789,7 +789,7 @@ export default async function CostsPage() {
         <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-800">特設: FinOpsだけで足りるのか</p>
-            <p className="text-xs text-slate-600">公式資料と先行事業データから、OCI・共同化・SaaS化まで含めて整理しました。</p>
+            <p className="text-xs text-slate-600">公式資料と先行事業データから、共同化、SaaS化、基盤選定を含む削減論点を整理しました。</p>
           </div>
           <Link
             href="/cost-reduction"

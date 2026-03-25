@@ -9,7 +9,7 @@ import { COST_CONSTANTS } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "ガバメントクラウド コスト削減特設 | GC Insight",
   description:
-    "FinOpsだけで30%削減は難しい。デジタル庁の2025年6月資料と先行事業データをもとに、OCI・共同調達・SaaS化を含む抜本的なコスト削減策を整理。",
+    "デジタル庁の2025年6月資料と先行事業データをもとに、FinOps、共同調達、SaaS化、基盤選定を含むコスト削減論点を整理。",
   alternates: { canonical: "/cost-reduction" },
 };
 
@@ -31,11 +31,11 @@ const structuralFactors = [
 const recommendedMoves = [
   {
     title: "1. まずアーキテクチャを簡素化する",
-    body: "FinOpsは請求最適化には効きますが、構造的な高コストまでは消せません。共同利用、SaaS化、運用自動化を先に置く方が効きます。",
+    body: "FinOpsは利用料の可視化や最適化に有効ですが、それだけで高コスト構造全体を解消できるとは限りません。共同利用、SaaS化、運用自動化もあわせて検討する余地があります。",
   },
   {
-    title: "2. Oracle DB中心なら OCI を第一候補に置く",
-    body: "円建て課金、シンプルな料金体系、Oracle DBとの親和性は実務上の利点です。Oracle前提ワークロードでは設計と運用の複雑さを抑えやすい有力案です。",
+    title: "2. Oracle DB中心なら OCI も有力な選択肢になる",
+    body: "円建て課金、料金体系、Oracle DBとの親和性は検討材料になります。Oracle前提ワークロードでは、設計や運用の複雑さを抑えられる可能性がありますが、他クラウドや共同化案との比較が前提です。",
   },
   {
     title: "3. 共同調達・共同運用をコスト削減の本丸にする",
@@ -48,7 +48,7 @@ const recommendedMoves = [
 ];
 
 const discussionPoints = [
-  "OCI移行を前提にする対象を『Oracle DB依存が強い業務』に絞るか、全体方針にするか",
+  "OCIを有力な選択肢として扱う対象を『Oracle DB依存が強い業務』に絞るか、より広く比較対象に含めるか",
   "共同利用・共同調達を前提にしたコストモデルをページ上でどこまで前面に出すか",
   "FinOpsを主役ではなく補助線として扱う編集方針で良いか",
 ];
@@ -65,14 +65,14 @@ export default function CostReductionPage() {
           </div>
           <div className="space-y-2">
             <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "#111827" }}>
-              FinOpsだけでは足りない。
+              FinOpsだけで十分か。
               <br />
-              構造見直しまで踏み込むコスト削減策へ
+              構造見直しを含むコスト削減論点を整理
             </h1>
             <p className="text-sm leading-7" style={{ color: "#374151" }}>
               デジタル庁の2025年6月13日資料では、移行後の運用経費増加要因を「構造的な要因」「機能強化要因」「外部要因」に整理しています。
-              先行事業や自治体ヒアリングでは、当初見積より平均 {increasePct} の増加が問題化しており、単純な利用料管理だけでなく、
-              基盤選定・共同化・SaaS化を含めた再設計が必要です。
+              中核市市長会調査を踏まえた既存分析では、一部自治体で当初見積より平均 {increasePct} の増加が課題化しており、
+              利用料管理だけでなく、基盤選定・共同化・SaaS化を含めた見直し論点が議論されています。
             </p>
           </div>
 
@@ -82,7 +82,7 @@ export default function CostReductionPage() {
               className="rounded-full px-4 py-2 text-sm font-semibold"
               style={{ backgroundColor: "#111827", color: "#ffffff", textDecoration: "none" }}
             >
-              OCIを含む基盤比較を見る
+              基盤比較を見る
             </Link>
             <Link
               href="/costs"
@@ -98,7 +98,7 @@ export default function CostReductionPage() {
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-xl border p-5" style={{ borderColor: "#e5e7eb", backgroundColor: "#ffffff" }}>
           <p className="text-xs font-semibold" style={{ color: "#6b7280" }}>公式資料の温度感</p>
-          <p className="mt-2 text-2xl font-extrabold" style={{ color: "#111827" }}>即時30%削減ではない</p>
+          <p className="mt-2 text-2xl font-extrabold" style={{ color: "#111827" }}>即時の3割削減を約束する資料ではない</p>
           <p className="mt-2 text-sm leading-6" style={{ color: "#4b5563" }}>
             2025年6月13日の総合対策は、中期的に3割削減に向けた環境整備を掲げています。足元では見積精査、共同化、競争促進が中心です。
           </p>
@@ -107,14 +107,14 @@ export default function CostReductionPage() {
           <p className="text-xs font-semibold" style={{ color: "#6b7280" }}>いま起きている課題</p>
           <p className="mt-2 text-2xl font-extrabold" style={{ color: "#111827" }}>当初比 {increasePct}</p>
           <p className="mt-2 text-sm leading-6" style={{ color: "#4b5563" }}>
-            中核市市長会調査を踏まえた既存分析では、移行コストは当初比で平均2.3倍相当。局所的な最適化だけでは吸収しきれません。
+            中核市市長会調査を踏まえた既存分析では、一部自治体で移行コストが当初比平均2.3倍相当とされています。局所的な最適化だけでは吸収しにくいケースがあります。
           </p>
         </div>
         <div className="rounded-xl border p-5" style={{ borderColor: "#e5e7eb", backgroundColor: "#ffffff" }}>
-          <p className="text-xs font-semibold" style={{ color: "#6b7280" }}>編集部仮説</p>
-          <p className="mt-2 text-2xl font-extrabold" style={{ color: "#111827" }}>OCIは有力な第一候補</p>
+          <p className="text-xs font-semibold" style={{ color: "#6b7280" }}>比較論点</p>
+          <p className="mt-2 text-2xl font-extrabold" style={{ color: "#111827" }}>OCIも有力な選択肢の一つ</p>
           <p className="mt-2 text-sm leading-6" style={{ color: "#4b5563" }}>
-            Oracle DB中心の業務では、OCIの方が設計判断を単純化しやすい可能性があります。ただし、ベンダー対応状況と共同化余地の確認は前提です。
+            Oracle DB中心の業務では、OCIが比較上有利になる可能性があります。ただし、ベンダー対応状況、共同化余地、既存運用との整合を含めた比較が前提です。
           </p>
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function CostReductionPage() {
       <section className="rounded-2xl border p-6" style={{ borderColor: "#e5e7eb", backgroundColor: "#ffffff" }}>
         <h2 className="text-xl font-bold" style={{ color: "#111827" }}>なぜFinOpsだけでは足りないのか</h2>
         <p className="mt-2 text-sm leading-7" style={{ color: "#4b5563" }}>
-          OracleDB RAGで確認した2025年6月のデジタル庁資料でも、問題の中心はクラウド利用料単体ではなく、移行構造そのものにあります。
+          2025年6月のデジタル庁資料でも、問題の中心はクラウド利用料単体ではなく、移行構造そのものにあると読めます。
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           {structuralFactors.map((item) => (
@@ -139,8 +139,8 @@ export default function CostReductionPage() {
           <div className="max-w-3xl">
             <h2 className="text-xl font-bold" style={{ color: "#111827" }}>特設ページの主張案</h2>
             <p className="mt-2 text-sm leading-7" style={{ color: "#4b5563" }}>
-              ページの軸は「コスト管理」ではなく「高コスト構造の分解」に置くのが自然です。特にOracle DB系のワークロードでは、
-              OCI移行を単なる価格比較ではなく、設計単純化と運用負荷削減の打ち手として位置づけられます。
+              ページの軸は「コスト管理」だけでなく「高コスト構造の分解」にも置くのが自然です。特にOracle DB系のワークロードでは、
+              OCIを単なる価格比較だけでなく、設計や運用負荷の観点から比較対象に含める余地があります。
             </p>
           </div>
           <a
@@ -181,8 +181,8 @@ export default function CostReductionPage() {
           <h2 className="text-xl font-bold" style={{ color: "#991b1b" }}>現時点の結論</h2>
           <p className="mt-3 text-sm leading-7" style={{ color: "#7f1d1d" }}>
             「FinOpsで30%削減」をメインコピーにするより、
-            「いまの2倍超コストをどう構造的に下げるか」を正面に出した方が、問題設定として強いです。
-            そのうえで Oracle DB 前提領域は OCI を第一候補として扱う編集方針が、いちばんシンプルで説得力があります。
+            「コスト増加の背景をどう構造的に見直すか」を正面に出した方が、中立的で説明しやすい構成です。
+            そのうえで Oracle DB 前提領域では、OCIを含む複数案を比較対象として扱う編集方針が妥当です。
           </p>
         </div>
       </section>
