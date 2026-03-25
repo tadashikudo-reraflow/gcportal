@@ -59,6 +59,41 @@ async function notifySlack({
   });
 }
 
+/** Resend: ユーザーへのPDF配信メール (source="report" のみ) */
+async function sendPdfEmail({
+  email,
+  downloadUrl,
+}: {
+  email: string;
+  downloadUrl: string | null;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !downloadUrl) return;
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "GCInsight編集部 <noreply@gcinsight.jp>",
+      to: email,
+      subject: "レポートのダウンロードありがとうございます｜GCInsight",
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
+<p style="font-size:18px;font-weight:bold;margin-bottom:16px">
+  📄 <a href="${downloadUrl}" style="color:#2563eb">PDFをダウンロードする（48時間以内有効）→</a>
+</p>
+<p>ガバメントクラウド移行 全実態レポート2026をダウンロードいただき、ありがとうございます。</p>
+<p>本レポートでは、全国1,741自治体の移行状況を約20,000字で徹底解説しています。38.4%というシステム移行率の実態、935団体に上る延長認定の背景、コスト2.3倍増加の構造まで、現場で使えるデータをまとめました。</p>
+<p>GCInsightでは今後も、ガバメントクラウド移行に関する最新動向・データ分析・現場の声を定期配信します。次号のニュースレターをぜひお楽しみに。</p>
+<p>▶ <a href="https://gcinsight.jp" style="color:#2563eb">ダッシュボードで最新データを確認する →</a></p>
+<p>GCInsight編集部</p>
+</div>`,
+    }),
+  });
+}
+
 /** Resend メール通知 (RESEND_API_KEY + NOTIFY_EMAIL が設定されている場合のみ) */
 async function notifyEmail({
   email,
@@ -224,15 +259,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // PDF Signed URL（48h）生成 → Beehiiv custom_fields に渡す
-    const downloadUrl = await generateDownloadUrl();
+    const effectiveSource = source || "report";
 
-    // 通知: Slack / メール / Telegram（設定されていれば並列実行）
+    // PDF配信メール: source="report" の場合のみ Resend でユーザーに直接送信
+    const downloadUrl =
+      effectiveSource === "report" ? await generateDownloadUrl() : null;
+
+    // 通知: Slack / 管理者メール / Beehiiv / Telegram（並列実行）
     await Promise.allSettled([
-      notifySlack({ email, orgType, source: source || "report" }),
-      notifyEmail({ email, orgType, source: source || "report" }),
-      notifyBeehiiv({ email, orgType, downloadUrl }),
-      notifyTelegram({ email, orgType, source: source || "report" }),
+      notifySlack({ email, orgType, source: effectiveSource }),
+      notifyEmail({ email, orgType, source: effectiveSource }),
+      notifyBeehiiv({ email, orgType, downloadUrl: null }), // Beehiivはニュースレター購読のみ
+      notifyTelegram({ email, orgType, source: effectiveSource }),
+      sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report のみ）
     ]);
 
     return NextResponse.json({ success: true, lead: data });
