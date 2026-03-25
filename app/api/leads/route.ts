@@ -95,6 +95,35 @@ async function notifyEmail({
   });
 }
 
+/** Telegram Bot 通知 (TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID が設定されている場合のみ) */
+async function notifyTelegram({
+  email,
+  orgType,
+  source,
+}: {
+  email: string;
+  orgType: string;
+  source: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const now = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+  const org = ORG_LABELS[orgType] ?? orgType;
+  const text = `📨 *GCInsight 新規リード*\n\n📧 ${email}\n🏢 ${org}\n📄 ${source}\n🕐 ${now}`;
+
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text,
+      parse_mode: "Markdown",
+    }),
+  });
+}
+
 /** Beehiiv 購読者追加 (BEEHIIV_API_KEY + BEEHIIV_PUBLICATION_ID が設定されている場合のみ) */
 async function notifyBeehiiv({
   email,
@@ -170,11 +199,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 通知: Slack / メール（設定されていれば並列実行）
+    // 通知: Slack / メール / Telegram（設定されていれば並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: source || "report" }),
       notifyEmail({ email, orgType, source: source || "report" }),
       notifyBeehiiv({ email, orgType }),
+      notifyTelegram({ email, orgType, source: source || "report" }),
     ]);
 
     return NextResponse.json({ success: true, lead: data });
