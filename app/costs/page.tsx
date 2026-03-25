@@ -54,11 +54,11 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 export const metadata: Metadata = {
   title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
   description:
-    "ガバメントクラウド移行コストが当初比156%増（中核市市長会調査2025年1月）になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
+    "ガバメントクラウド移行コストが当初比+156%（複数調査の編集部集計・参考値）になる実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
   openGraph: {
     title: "ガバメントクラウド移行コスト分析",
     description:
-      "移行コストが当初比156%増（中核市市長会調査2025年1月）。ベンダー別コスト比較と費用対効果を可視化。",
+      "移行コストが当初比+156%（編集部推計・参考値）。ベンダー別コスト比較と費用対効果を可視化。",
     images: [
       {
         url: `/og?title=${encodeURIComponent("コスト分析")}&subtitle=${encodeURIComponent("ガバメントクラウド移行コスト増減を可視化")}&type=cost`,
@@ -339,8 +339,11 @@ export default async function CostsPage() {
         <h2 className="text-lg font-bold mb-1" style={{ color: "var(--color-gov-primary)" }}>
           目標と実態のギャップ
         </h2>
-        <p className="text-sm mb-6" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-sm mb-2" style={{ color: "var(--color-text-secondary)" }}>
           当初「30%削減」の目標に対し、実態は平均+{avgPct}%の増加
+        </p>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          ※ +{avgPct}%は中核市市長会調査・デジタル庁TCO検証等の複数調査を編集部が集計した参考値です。単一の公式統計ではありません。個別事例の2.3倍・5.7倍はデジタル庁2025年6月会議資料で確認可能です。
         </p>
 
         {/* 水平バー比較 */}

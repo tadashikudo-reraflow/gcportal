@@ -14,14 +14,14 @@ export const metadata: Metadata = {
   title:
     "ガバメントクラウド移行 遅延リスク自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
   description:
-    "2026年3月末期限までにガバメントクラウド移行が完了していない遅延リスク自治体の一覧。完了率・都道府県フィルターで検索可能。特定移行認定団体を除く。",
+    "2026年3月末を移行目標期限としてガバメントクラウド移行が完了していない遅延リスク自治体の一覧。完了率・都道府県フィルターで検索可能。特定移行支援対象団体を除く。",
   openGraph: {
     title: "遅延リスク自治体一覧 — GCInsight",
     description:
-      "2026年3月末期限に間に合わない遅延リスク自治体を完了率順に一覧表示。",
+      "2026年3月末の移行目標期限に間に合わない遅延リスク自治体を完了率順に一覧表示。",
     images: [
       {
-        url: `/og?title=${encodeURIComponent("遅延リスク自治体一覧")}&subtitle=${encodeURIComponent("2026年3月末期限の移行遅延リスクを可視化")}&type=risk`,
+        url: `/og?title=${encodeURIComponent("遅延リスク自治体一覧")}&subtitle=${encodeURIComponent("2026年3月末移行目標の遅延リスクを可視化")}&type=risk`,
         width: 1200,
         height: 630,
       },
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export default function RisksPage() {
   const { summary } = data;
 
-  // 特定移行認定自治体のSetを構築（除外用）
+  // 特定移行支援対象自治体のSetを構築（除外用）
   const tokuteiSet = new Set<string>(
     (tokuteiData.municipalities as { prefecture: string; city: string }[]).map(
       (m) => `${m.prefecture}/${m.city}`
@@ -43,7 +43,7 @@ export default function RisksPage() {
 
   const allRisk: Municipality[] = data.risk_municipalities as Municipality[];
 
-  // 特定移行認定自治体を除外した純粋な遅延リスク
+  // 特定移行支援対象自治体を除外した純粋な遅延リスク
   const riskMunicipalities = allRisk.filter(
     (m) => !tokuteiSet.has(`${m.prefecture}/${m.city}`)
   );
@@ -103,7 +103,7 @@ export default function RisksPage() {
       <div className="pb-2">
         <h1 className="page-title">遅延リスク 自治体一覧</h1>
         <p className="page-subtitle">
-          手続き進捗率50%未満かつ特定移行認定なしの自治体（2026年3月末期限）
+          手続き進捗率50%未満かつ特定移行支援対象外の自治体（2026年3月末 移行目標）
         </p>
       </div>
 
@@ -118,7 +118,7 @@ export default function RisksPage() {
             <circle cx="12" cy="12" r="10"/>
           </svg>
           <span style={{ color: "#475569" }}>
-            50%未満のうち<strong>{tokuteiOverlapCount}自治体</strong>は特定移行認定済み（期限延長対象）のため本リストから除外。{" "}
+            50%未満のうち<strong>{tokuteiOverlapCount}自治体</strong>は特定移行支援の対象として整理済み（移行計画延長）のため本リストから除外。{" "}
             <Link href="/tokutei" className="underline font-semibold">特定移行ページ →</Link>
           </span>
         </div>
@@ -153,7 +153,7 @@ export default function RisksPage() {
             <p className="text-base font-extrabold" style={{ color: "#b91c1c" }}>
               2026/3/31
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行期限まで</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限まで</p>
             <p className="text-xs tabular-nums font-semibold" style={{ color: "#b91c1c" }}>
               {Math.max(0, Math.ceil((new Date("2026-03-31").getTime() - Date.now()) / 86400000))}日
             </p>
@@ -204,26 +204,29 @@ export default function RisksPage() {
         )}
       </div>
 
-      {/* 期限超過のデメリット */}
+      {/* 移行目標超過のリスク */}
       <div className="card p-5">
         <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          移行期限に間に合わない場合のデメリット
+          移行目標期限を超過した場合の想定リスク
         </h2>
-        <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          期限超過時に想定されるリスク。罰則規定はないが実質的な不利益あり。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
+        <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>
+          以下は編集部が法令・公式資料をもとに整理した想定リスクです。標準化法の「努力義務」規定に基づく解釈であり、法的判断は各自治体の顧問弁護士・総務省へご確認ください。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
+        </p>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          ※ 罰則規定はなく、目標期限は法的強制力のない努力目標です。
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             {
               label: "財政",
               title: "補助金・財政支援の喪失",
-              desc: "デジタル基盤改革支援補助金の対象外となり、移行費用が全額自治体負担になる可能性。期限内完了を前提とした補助スキームが適用されなくなる。",
+              desc: "デジタル基盤改革支援補助金の対象外となり、移行費用が全額自治体負担となる可能性が懸念されます。目標期限内完了を前提とした補助スキームが適用されなくなることが想定されます。",
               severity: "高",
             },
             {
               label: "法務",
               title: "法的・行政的リスク",
-              desc: "標準化法上の「努力義務」違反として、総務省・デジタル庁からの是正勧告や個別ヒアリングの対象に。移行計画の再提出を求められる。",
+              desc: "標準化法上の「努力義務」の観点から、総務省・デジタル庁からの個別ヒアリングや移行計画の再提出を求められる可能性があると考えられます。",
               severity: "中",
             },
             {
@@ -280,7 +283,7 @@ export default function RisksPage() {
           ))}
         </div>
         <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-          ※ 標準化法は「努力義務」。特定移行認定なしで超過した場合、上記リスクが現実化する可能性あり。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
+          ※ 上記は編集部の解釈に基づく想定リスクです。特定移行支援対象として整理されていない状態で目標期限を超過した場合、これらのリスクが顕在化する可能性があります。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
         </p>
       </div>
 
@@ -300,7 +303,7 @@ export default function RisksPage() {
             特定移行支援システム認定とは
           </p>
           <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-            特定移行認定自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長対象。遅延とは異なるため本リストから除外。
+            特定移行支援の対象として整理された自治体（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は移行計画延長として扱われるため、本リストから除外しています。
           </p>
           <Link
             href="/tokutei"
