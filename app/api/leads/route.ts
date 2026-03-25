@@ -68,9 +68,10 @@ async function sendPdfEmail({
   downloadUrl: string | null;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || !downloadUrl) return;
+  if (!apiKey) { console.log("sendPdfEmail: RESEND_API_KEY not set"); return; }
+  if (!downloadUrl) { console.log("sendPdfEmail: downloadUrl is null"); return; }
 
-  await fetch("https://api.resend.com/emails", {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -92,6 +93,12 @@ async function sendPdfEmail({
 </div>`,
     }),
   });
+  const resBody = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    console.error("sendPdfEmail error:", res.status, JSON.stringify(resBody));
+  } else {
+    console.log("sendPdfEmail sent:", resBody);
+  }
 }
 
 /** Resend メール通知 (RESEND_API_KEY + NOTIFY_EMAIL が設定されている場合のみ) */
