@@ -73,7 +73,7 @@ export default function HeroSection({
             <div className="hero-ring-text--impact">
               <span className="hero-ring-number">{completeCount}</span>
               <span className="hero-ring-denom">/ {totalMunicipalities.toLocaleString()}</span>
-              <span className="hero-ring-desc">移行完了（{completePct}%）</span>
+              <span className="hero-ring-desc">全業務完了・団体ベース（{completePct}%）</span>
             </div>
           </div>
 

@@ -16,11 +16,11 @@ import { COST_CONSTANTS } from "@/lib/constants";
 export const metadata: Metadata = {
   title:
     "GC Insight｜全国1,741自治体の「現在地」と「遅延リスク」を可視化",
-  description: `移行完了はわずか${data.summary.completed_count}自治体。1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化するダッシュボード。`,
+  description: `システム移行率38.4%（13,283/34,592システム）、全20業務完了の自治体はわずか${data.summary.completed_count}団体（3.7%）。1,741自治体のガバメントクラウド移行進捗・コスト・遅延リスクを可視化するダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
     title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
-    description: `移行完了はわずか${data.summary.completed_count}自治体。残り期限内の現在地を可視化。`,
+    description: `システム移行率38.4%・全20業務完了は${data.summary.completed_count}団体（3.7%）。1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
     images: [
       {
         url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`移行完了 ${data.summary.completed_count} / 1,741自治体`)}&rate=${data.summary.completed_count / data.summary.total}`,
@@ -169,7 +169,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           {[
-            { label: "完了", color: "#378445", count: completeCount },
+            { label: "完了（全業務）", color: "#378445", count: completeCount },
             { label: "順調", color: "#1D4ED8", count: ontrackCount },
             { label: "要注意", color: "#F59E0B", count: atriskCount },
             { label: "危機", color: "#b91c1c", count: criticalCount },
