@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
  * GCInsight 記事カバー画像生成スクリプト
- * HTML テンプレート → Playwright → PNG (1200×630, OGP最適)
+ * HTML テンプレート → Playwright → PNG
  *
  * Usage:
- *   node scripts/generate-cover-images.mjs                  # 全記事生成
- *   node scripts/generate-cover-images.mjs gc-finops-guide   # 指定slug のみ
+ *   node scripts/generate-cover-images.mjs                        # 全記事 OGP (1200×630)
+ *   node scripts/generate-cover-images.mjs gc-finops-guide        # 指定slug のみ OGP
+ *   node scripts/generate-cover-images.mjs --x-article            # 全記事 X Articles (1500×600, 5:2)
+ *   node scripts/generate-cover-images.mjs --x-article gc-finops  # 指定slug X Articles
  */
 
 import { chromium } from "playwright";
@@ -18,7 +20,8 @@ const SUPABASE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY ??
   "***REDACTED_SUPABASE_SERVICE_ROLE***";
 
-const OUT_DIR = resolve(import.meta.dirname, "../public/images/articles");
+const OUT_DIR_OGP = resolve(import.meta.dirname, "../public/images/articles");
+const OUT_DIR_X   = `${process.env.GDRIVE_WORKSPACE}/contents/PJ19/x_articles`;
 
 // カテゴリ別アイコン & アクセントカラー
 const CATEGORY_MAP = {
@@ -41,16 +44,17 @@ function pickCategory(tags) {
   return { label: "ガバメントクラウド", icon: "☁️", accent: "#0066FF" };
 }
 
-function buildHTML(article) {
+function buildHTML(article, opts = {}) {
   const cat = pickCategory(article.tags ?? []);
   // タイトルを「｜」で分割（前半=メイン、後半=サブ）
   const parts = article.title.split("｜");
   const mainTitle = parts[0].trim();
   const subTitle = parts.length > 1 ? parts[1].trim() : "";
 
-  // タイトル長に応じてフォントサイズ調整
-  const titleLen = mainTitle.length;
-  const fontSize = titleLen > 25 ? 36 : titleLen > 18 ? 42 : 48;
+  const fontSize = 48;
+
+  const W = opts?.xArticle ? 1500 : 1200;
+  const H = opts?.xArticle ? 600  : 630;
 
   return `<!DOCTYPE html>
 <html>
@@ -62,20 +66,20 @@ function buildHTML(article) {
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    width: 1200px;
-    height: 630px;
+    width: ${W}px;
+    height: ${H}px;
     font-family: 'Noto Sans JP', sans-serif;
     overflow: hidden;
   }
 
   .card {
-    width: 1200px;
-    height: 630px;
+    width: ${W}px;
+    height: ${H}px;
     background: linear-gradient(135deg, #001F54 0%, #002D72 40%, #003D99 100%);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 56px 64px 48px;
+    padding: 56px ${opts?.xArticle ? 80 : 64}px 48px;
     position: relative;
     overflow: hidden;
   }
@@ -145,6 +149,8 @@ function buildHTML(article) {
     line-height: 1.35;
     letter-spacing: -0.5px;
     text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   .sub-title {
@@ -251,15 +257,23 @@ function buildHTML(article) {
 }
 
 async function main() {
-  const targetSlug = process.argv[2]; // optional: specific slug
+  // 引数パース: --x-article フラグと slug
+  const args = process.argv.slice(2);
+  const xArticle = args.includes("--x-article");
+  const targetSlug = args.find((a) => !a.startsWith("--")) ?? null;
+
+  const W = xArticle ? 1500 : 1200;
+  const H = xArticle ? 600  : 630;
+  const OUT_DIR = xArticle ? OUT_DIR_X : OUT_DIR_OGP;
+  const mode = xArticle ? "X Articles (1500×600, 5:2)" : "OGP (1200×630)";
 
   // 1. Fetch articles
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   let query = supabase
     .from("articles")
-    .select("slug, title, description, tags")
+    .select("id, slug, title, description, tags")
     .eq("is_published", true)
-    .order("date", { ascending: false });
+    .order("id", { ascending: true });
 
   if (targetSlug) {
     query = query.eq("slug", targetSlug);
@@ -271,7 +285,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`📸 ${articles.length} 記事のカバー画像を生成します...\n`);
+  console.log(`📸 ${articles.length} 記事のカバー画像を生成します [${mode}]...\n`);
 
   // 2. Ensure output directory
   if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
@@ -279,24 +293,30 @@ async function main() {
   // 3. Launch browser
   const browser = await chromium.launch();
   const context = await browser.newContext({
-    viewport: { width: 1200, height: 630 },
+    viewport: { width: W, height: H },
     deviceScaleFactor: 2, // Retina品質
   });
 
   for (const article of articles) {
     const page = await context.newPage();
-    const html = buildHTML(article);
+    const html = buildHTML(article, { xArticle });
 
     await page.setContent(html, { waitUntil: "networkidle" });
-    // Google Fontsの読み込み待ち
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1500); // Google Fonts読み込み待ち
 
-    const outPath = resolve(OUT_DIR, `${article.slug}.png`);
+    // X Articles: id別フォルダ / OGP: フラット
+    let outPath;
+    if (xArticle) {
+      const idDir = resolve(OUT_DIR, `id${article.id}`);
+      if (!existsSync(idDir)) mkdirSync(idDir, { recursive: true });
+      outPath = resolve(idDir, `cover_1500x600_generated.png`);
+    } else {
+      outPath = resolve(OUT_DIR, `${article.slug}.png`);
+    }
+
     await page.screenshot({ path: outPath, type: "png" });
     await page.close();
-
-    const sizeKB = (writeFileSync.length / 1024).toFixed(0);
-    console.log(`  ✅ ${article.slug}.png`);
+    console.log(`  ✅ id${article.id} ${article.slug}`);
   }
 
   await browser.close();
