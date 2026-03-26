@@ -58,8 +58,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
 
       {/* フッター */}
       <footer
-        className="mt-12"
-        style={{ borderTop: "2px solid var(--color-border)", backgroundColor: "var(--color-card)" }}
+        className="mt-12 border-t-2 border-[var(--color-border)] bg-[var(--color-card)]"
       >
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -87,6 +86,17 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
                 データソース一覧
               </Link>
             </div>
+          </div>
+          <div className="flex flex-wrap gap-4 mt-4 pt-3 border-t border-[var(--color-border)]">
+            <Link href="/privacy" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
+              プライバシーポリシー
+            </Link>
+            <Link href="/terms" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
+              利用規約・免責事項
+            </Link>
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+              &copy; 2026 GC Insight
+            </span>
           </div>
         </div>
       </footer>

@@ -63,13 +63,8 @@ export default function CostReductionPage() {
               同じ思想で移す前に
             </h1>
             <p className="text-sm leading-7" style={{ color: "#374151" }}>
-              一部自治体では、移行コストが当初見積より平均 {averageIncrease}
-              まで膨らんだとされています。2025年6月のデジタル庁資料も、
-              FinOpsによる継続改善に加えて、共同利用、見積精査、要件見直しを並行論点として示しています。
-            </p>
-            <p className="text-sm leading-7" style={{ color: "#374151" }}>
-              このページでは、移行済みは運用最適化、未移行は移行前の基盤再選定という順で、
-              今すぐ動きやすい打ち手だけに絞って整理します。
+              移行コストが平均 {averageIncrease} まで膨張した事例を踏まえ、
+              移行済み→運用最適化、未移行→基盤再選定の順で打ち手を整理します。
             </p>
           </div>
 
@@ -157,8 +152,7 @@ export default function CostReductionPage() {
           なぜ見直しが必要か
         </h2>
         <p className="mt-2 text-sm leading-7" style={{ color: "#4b5563" }}>
-          FinOpsは、移行後の運用費を継続的に整えるうえで有効です。ただし、足元の負担を押し上げているのは利用料だけではありません。
-          回線費、運用補助、二重負担、競争不足、過剰要件が重なると、運用最適化だけでは追いつかない局面が出てきます。
+          FinOpsだけでは不十分な理由——回線費・二重負担・競争不足が重なると運用最適化では追いつきません。
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           {[
@@ -187,8 +181,7 @@ export default function CostReductionPage() {
           今すぐやること
         </h2>
         <p className="mt-2 text-sm leading-7" style={{ color: "#4b5563" }}>
-          現場で動かしやすいのは、パッケージやアプリケーションに大きく手を入れずに進められる打ち手です。
-          優先順はシンプルで、移行済みは運用最適化、未移行は基盤再選定です。
+          移行済み→運用最適化、未移行→基盤再選定。アプリに大きく手を入れない打ち手を優先します。
         </p>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2">

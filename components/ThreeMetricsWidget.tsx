@@ -46,7 +46,7 @@ export default function ThreeMetricsWidget({
     {
       label: "システム移行率",
       rate: systemRate,
-      color: "#3b82f6",
+      color: "#60a5fa",
       bgColor: "rgba(59,130,246,0.15)",
       annotation: `${completedSystems.toLocaleString()} / ${totalSystems.toLocaleString()} システム`,
       annotationColor: "#93c5fd",
@@ -55,10 +55,10 @@ export default function ThreeMetricsWidget({
     {
       label: "手続き進捗率",
       rate: stepRate,
-      color: "#6b7280",
+      color: "#d1d5db",
       bgColor: "rgba(107,114,128,0.2)",
       annotation: "手続きが進んだだけ",
-      annotationColor: "#9ca3af",
+      annotationColor: "#d1d5db",
       meta: "2026年1月末時点 · 総務省PMOツール",
     },
   ];
@@ -112,7 +112,7 @@ export default function ThreeMetricsWidget({
                 </span>
               </div>
               {/* 基準日・母数・出典 */}
-              <p className="text-[10px] mt-0.5 ml-0" style={{ color: "#475569" }}>
+              <p className="text-[10px] mt-0.5 ml-0" style={{ color: "#94a3b8" }}>
                 {row.meta}
               </p>
             </div>

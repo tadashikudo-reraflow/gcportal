@@ -190,7 +190,7 @@ const CLOUD_COMPARISON = [
     basis: "Compute Engine CUD 1年 + Cloud SQL + GCS。Sustained Use Discount自動適用。Egress料金がAWSより安価。",
     strengths: "ネットワーク性能高い。BigQuery等のデータ分析基盤。Sustained Use Discount自動適用。",
     weaknesses: "ガバメントクラウドでの採用実績がまだ限定的。エンタープライズサポート体制の充実度。",
-    govCloudNote: "電算等一部ベンダーが採用。データ分析系ワークロードに強み。",
+    govCloudNote: "ガバメントクラウド認定済。データ分析系ワークロードに強み。採用実績は限定的。",
   },
   {
     cloud: "Azure",

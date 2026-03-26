@@ -1,11 +1,15 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   // X-Powered-By ヘッダー削除（不要な情報露出防止）
   poweredByHeader: false,
 
-  // 静的アセット・データファイルの長期キャッシュ
+  // 静的アセット・データファイルの長期キャッシュ（本番のみ）
+  // dev環境でimmutableを設定するとTurbopackのHMR後もブラウザが古いチャンクを返し続ける
   async headers() {
+    if (!isProd) return [];
     return [
       {
         source: "/images/:path*",

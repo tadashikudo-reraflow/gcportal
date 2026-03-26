@@ -392,29 +392,71 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* ② ガバクラ インフラシェア実態（コンパクト） */}
+      {/* ② ガバクラ インフラシェア実態（ドーナツ + バー） */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
           インフラシェア実態
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
             本番稼働システム数（2024年10月・デジタル庁調査）
           </span>
         </h2>
 
-        <div className="space-y-2">
-          {INFRA_SHARE.map((item) => {
-            const pct = (item.systems / INFRA_TOTAL) * 100;
-            return (
-              <div key={item.cloud} className="flex items-center gap-2">
-                <span className="text-xs w-24 flex-shrink-0 text-right font-semibold" style={{ color: item.color }}>{item.cloud}</span>
-                <div className="bar-track flex-1">
-                  <div className="bar-fill" style={{ width: `${Math.max(pct, 0.3)}%`, backgroundColor: item.color }} />
+        <div className="flex flex-col sm:flex-row gap-6 items-center">
+          {/* ドーナツチャート */}
+          <div className="flex-shrink-0">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              {(() => {
+                const cx = 90, cy = 90, r = 70, strokeW = 28;
+                let cumAngle = -90;
+                return INFRA_SHARE.map((item) => {
+                  const pct = item.systems / INFRA_TOTAL;
+                  const angle = pct * 360;
+                  const startAngle = cumAngle;
+                  cumAngle += angle;
+                  const endAngle = cumAngle;
+                  const largeArc = angle > 180 ? 1 : 0;
+                  const rad = (a: number) => (a * Math.PI) / 180;
+                  const x1 = cx + r * Math.cos(rad(startAngle));
+                  const y1 = cy + r * Math.sin(rad(startAngle));
+                  const x2 = cx + r * Math.cos(rad(endAngle));
+                  const y2 = cy + r * Math.sin(rad(endAngle));
+                  return (
+                    <path
+                      key={item.cloud}
+                      d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`}
+                      fill="none"
+                      stroke={item.color}
+                      strokeWidth={strokeW}
+                      strokeLinecap="butt"
+                    />
+                  );
+                });
+              })()}
+              <text x="90" y="82" textAnchor="middle" fontSize="28" fontWeight="800" fill="var(--color-text-primary)">
+                {INFRA_TOTAL.toLocaleString()}
+              </text>
+              <text x="90" y="104" textAnchor="middle" fontSize="11" fill="var(--color-text-muted)">
+                システム
+              </text>
+            </svg>
+          </div>
+
+          {/* バーチャート（凡例兼用） */}
+          <div className="flex-1 space-y-2 w-full">
+            {INFRA_SHARE.map((item) => {
+              const pct = (item.systems / INFRA_TOTAL) * 100;
+              return (
+                <div key={item.cloud} className="flex items-center gap-2">
+                  <span className="text-xs w-24 flex-shrink-0 text-right font-semibold" style={{ color: item.color }}>{item.cloud}</span>
+                  <div className="bar-track flex-1">
+                    <div className="bar-fill" style={{ width: `${Math.max(pct, 0.3)}%`, backgroundColor: item.color }} />
+                  </div>
+                  <span className="text-sm font-bold w-12 flex-shrink-0 text-right tabular-nums" style={{ color: item.color }}>{pct.toFixed(1)}%</span>
+                  <span className="text-xs w-16 flex-shrink-0 text-right tabular-nums" style={{ color: "var(--color-text-muted)" }}>{item.systems.toLocaleString()}</span>
                 </div>
-                <span className="text-sm font-bold w-12 flex-shrink-0 text-right tabular-nums" style={{ color: item.color }}>{pct.toFixed(1)}%</span>
-                <span className="text-xs w-16 flex-shrink-0 text-right tabular-nums" style={{ color: "var(--color-text-muted)" }}>{item.systems.toLocaleString()}システム</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-3 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ backgroundColor: "#fff8ed", color: "#92400e" }}>
@@ -428,90 +470,134 @@ export default async function CloudPage() {
           クラウド別コスト比較
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ典型ワークロード</span>
         </h2>
-        <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
-          各社公式料金表ベースの参考値です。実費は構成で変動します。料金計算ツール:{" "}
-          <a href="https://calculator.aws/pricing/2/metaindex" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#FF9900" }}>AWS 料金計算ツール</a>
-          {" / "}
-          <a href="https://azure.microsoft.com/ja-jp/pricing/calculator/" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#0078D4" }}>Azure 料金計算ツール</a>
-          {" / "}
-          <a href="https://cloud.google.com/products/calculator?hl=ja" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#4285F4" }}>GCP 料金計算ツール</a>
-          {" / "}
-          <a href="https://www.oracle.com/jp/cloud/costestimator.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: "#F80000" }}>OCI コスト試算ツール</a>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          各社公式料金表ベースの参考値。実費は構成で変動します。
         </p>
 
-        <div className="rounded-lg px-4 py-3 mb-4 flex flex-col gap-2" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
-          <div className="flex items-center gap-3">
-            <span className="font-bold" style={{ color: "#F80000" }}>参考比較では OCI が低コスト側に出やすい</span>
-            <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>通信費と料金体系の差が効きやすい</span>
-          </div>
-          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-            ※ 公式料金表ベースの参考値です。
+        {/* TCO指数バーチャート（ビジュアル） */}
+        <div className="mb-5 rounded-xl p-4" style={{ backgroundColor: "#f8fafc" }}>
+          <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            TCO総合推定比（AWS=100）
           </p>
-          <div className="rounded px-3 py-2 text-xs leading-relaxed" style={{ backgroundColor: "#fff0f0", color: "#7f1d1d", border: "1px solid #F8000030" }}>
-            <span className="font-semibold">参考事例:</span>{" "}
-            札幌市は2025年4月にOCI採用を公表しています。
+          <div className="space-y-3">
+            {CLOUD_ORDER.map((cloudKey) => {
+              const cfg = CLOUD_CONFIG[cloudKey];
+              const idx = cfg.costIndex;
+              return (
+                <div key={cloudKey} className="flex items-center gap-3">
+                  <span className="text-xs w-16 flex-shrink-0 text-right font-bold" style={{ color: cfg.color }}>
+                    {cloudKey === "Sakura" ? "さくら" : cloudKey}
+                  </span>
+                  <div className="flex-1 h-7 rounded-full overflow-hidden relative" style={{ backgroundColor: cfg.color + "15" }}>
+                    <div
+                      className="h-full rounded-full flex items-center justify-end pr-2"
+                      style={{ width: `${idx}%`, backgroundColor: cfg.color + "30" }}
+                    >
+                      <span className="text-xs font-extrabold" style={{ color: cfg.color }}>{idx}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
+            Oracle TCO白書・ガバクラTCO検証。参考値。
+          </p>
+        </div>
+
+        {/* OCI注記 */}
+        <div className="rounded-lg px-4 py-3 mb-4 flex items-start gap-3" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
+          <span className="text-sm flex-shrink-0 mt-0.5" style={{ color: "#F80000" }}>&#9432;</span>
+          <div>
+            <p className="text-xs font-bold" style={{ color: "#F80000" }}>参考比較ではOCIが低コスト側に出やすい</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+              通信費と料金体系の差が効きやすい。札幌市は2025年4月にOCI採用を公表。
+            </p>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">項目</th>
-                {(["AWS", "Azure", "GCP", "OCI", "Sakura"] as const).map((id) => {
-                  const cfg = CLOUD_CONFIG[id];
+        {/* 詳細テーブル（折りたたみ） */}
+        <details className="group">
+          <summary className="cursor-pointer text-xs font-semibold py-2 flex items-center gap-1" style={{ color: "var(--color-brand-primary)" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-open:rotate-90"><polyline points="9 6 15 12 9 18" /></svg>
+            項目別の詳細比較を見る
+          </summary>
+          <div className="overflow-x-auto mt-2">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">項目</th>
+                  {(["AWS", "Azure", "GCP", "OCI", "Sakura"] as const).map((id) => {
+                    const cfg = CLOUD_CONFIG[id];
+                    return (
+                      <th key={id} className="text-right py-2 px-2 text-xs font-bold" style={{ color: cfg.color }}>
+                        {id}
+                      </th>
+                    );
+                  })}
+                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-normal hidden md:table-cell">備考</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COST_COMPARE.map((row) => {
+                  const vals = [row.aws, row.azure, row.gcp, row.oci, row.sakura].filter((v): v is number => v !== null);
+                  const minVal = Math.min(...vals);
                   return (
-                    <th key={id} className="text-right py-2 px-2 text-xs font-bold" style={{ color: cfg.color }}>
-                      {id}
-                    </th>
+                    <tr key={row.item} className="border-b border-gray-100">
+                      <td className="py-2.5 px-3 text-xs text-gray-600 leading-tight">
+                        {row.item}
+                        <br /><span className="text-gray-400">{row.unit}</span>
+                      </td>
+                      {[
+                        { id: "AWS",    val: row.aws },
+                        { id: "Azure",  val: row.azure },
+                        { id: "GCP",    val: row.gcp },
+                        { id: "OCI",    val: row.oci },
+                        { id: "Sakura", val: row.sakura },
+                      ].map(({ id, val }) => {
+                        const cfg = CLOUD_CONFIG[id];
+                        const isCheapest = val !== null && val === minVal;
+                        return (
+                          <td key={id} className="py-2.5 px-2 text-right tabular-nums">
+                            {val === null ? (
+                              <span className="text-gray-300 text-xs">—</span>
+                            ) : (
+                              <span
+                                className={`font-bold text-sm ${isCheapest ? "px-1.5 py-0.5 rounded" : ""}`}
+                                style={{
+                                  color: isCheapest ? cfg.color : "var(--color-text-secondary)",
+                                  backgroundColor: isCheapest ? cfg.color + "18" : "transparent",
+                                }}
+                              >
+                                {val}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="py-2.5 px-3 text-xs text-gray-400 max-w-xs leading-relaxed hidden md:table-cell">{row.note}</td>
+                    </tr>
                   );
                 })}
-                <th className="text-left py-2 px-3 text-xs text-gray-400 font-normal hidden md:table-cell">備考</th>
-              </tr>
-            </thead>
-            <tbody>
-              {COST_COMPARE.map((row) => {
-                const vals = [row.aws, row.azure, row.gcp, row.oci, row.sakura].filter((v): v is number => v !== null);
-                const minVal = Math.min(...vals);
-                return (
-                  <tr key={row.item} className="border-b border-gray-100">
-                    <td className="py-2.5 px-3 text-xs text-gray-600 leading-tight">
-                      {row.item}
-                      <br /><span className="text-gray-400">{row.unit}</span>
-                    </td>
-                    {[
-                      { id: "AWS",    val: row.aws },
-                      { id: "Azure",  val: row.azure },
-                      { id: "GCP",    val: row.gcp },
-                      { id: "OCI",    val: row.oci },
-                      { id: "Sakura", val: row.sakura },
-                    ].map(({ id, val }) => {
-                      const cfg = CLOUD_CONFIG[id];
-                      const isCheapest = val !== null && val === minVal;
-                      return (
-                        <td key={id} className="py-2.5 px-2 text-right tabular-nums">
-                          {val === null ? (
-                            <span className="text-gray-300 text-xs">—</span>
-                          ) : (
-                            <span
-                              className={`font-bold text-sm ${isCheapest ? "px-1.5 py-0.5 rounded" : ""}`}
-                              style={{
-                                color: isCheapest ? cfg.color : "var(--color-text-secondary)",
-                                backgroundColor: isCheapest ? cfg.color + "18" : "transparent",
-                              }}
-                            >
-                              {val}
-                            </span>
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td className="py-2.5 px-3 text-xs text-gray-400 max-w-xs leading-relaxed hidden md:table-cell">{row.note}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        {/* 料金計算ツールリンク */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[
+            { id: "AWS", url: "https://calculator.aws/pricing/2/metaindex" },
+            { id: "Azure", url: "https://azure.microsoft.com/ja-jp/pricing/calculator/" },
+            { id: "GCP", url: "https://cloud.google.com/products/calculator?hl=ja" },
+            { id: "OCI", url: "https://www.oracle.com/jp/cloud/costestimator.html" },
+          ].map(({ id, url }) => (
+            <a key={id} href={url} target="_blank" rel="noopener noreferrer"
+              className="text-xs px-2.5 py-1 rounded-full no-underline hover:opacity-80"
+              style={{ backgroundColor: CLOUD_CONFIG[id].color + "15", color: CLOUD_CONFIG[id].color, border: `1px solid ${CLOUD_CONFIG[id].color}30` }}>
+              {id} 料金計算ツール ↗
+            </a>
+          ))}
         </div>
       </div>
 
