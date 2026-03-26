@@ -169,10 +169,14 @@ export default function SourcesPage() {
                   </td>
                   <td className="py-2 px-3 text-xs tabular-nums">{label}</td>
                   <td className="py-2 px-3 text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
-                    {daysOld}日前
+                    {source.updateCycle === "reference" ? "—" : `${daysOld}日前`}
                   </td>
                   <td className="py-2 px-3 text-center">
-                    {isVeryStale ? (
+                    {source.updateCycle === "reference" ? (
+                      <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                        公表時点
+                      </span>
+                    ) : isVeryStale ? (
                       <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
                         要更新
                       </span>
@@ -352,13 +356,29 @@ export default function SourcesPage() {
         >
           ← コラム・解説記事へ
         </Link>
-        <Link
-          href="/"
-          className="text-sm font-semibold hover:underline"
-          style={{ color: "var(--color-text-muted)" }}
-        >
-          ダッシュボードへ →
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/terms"
+            className="text-xs hover:underline"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            利用規約
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-xs hover:underline"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            プライバシーポリシー
+          </Link>
+          <Link
+            href="/"
+            className="text-sm font-semibold hover:underline"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            ダッシュボードへ →
+          </Link>
+        </div>
       </div>
     </div>
   );
