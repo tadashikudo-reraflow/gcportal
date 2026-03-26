@@ -198,6 +198,26 @@ print(f'KWプランナー: {updated}件を公開済みに更新')
     } catch (err) {
       console.warn("KWプランナー同期スキップ（エラー）:", err instanceof Error ? err.message : String(err));
     }
+
+    // SEOカバー画像生成
+    console.log("\nSEOカバー画像生成中...");
+    try {
+      const { execSync: exec2 } = await import("child_process");
+      const scriptDir = path.join(process.cwd(), "scripts");
+      const slugArg = targetSlug ?? "";
+      exec2(
+        `node ${path.join(scriptDir, "generate-cover-images.mjs")} ${slugArg}`,
+        { encoding: "utf-8", stdio: "inherit", shell: "/bin/zsh" }
+      );
+      // git push
+      exec2(
+        `cd ${process.cwd()} && git add public/images/articles/ && git diff --cached --quiet || git commit -m "Auto: SEO cover images for ${slugArg || "all articles"}" && git push`,
+        { encoding: "utf-8", stdio: "inherit", shell: "/bin/zsh" }
+      );
+      console.log("SEOカバー画像生成・デプロイ完了");
+    } catch (err) {
+      console.warn("SEOカバー画像生成スキップ（エラー）:", err instanceof Error ? err.message : String(err));
+    }
   }
 }
 
