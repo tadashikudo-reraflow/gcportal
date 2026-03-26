@@ -130,8 +130,9 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
 }
 
 // POST /api/newsletter/generate — ニュースレター下書き自動生成
-// body（任意）: { voicePicks?: [...], intro?: string }
+// body（任意）: { voicePicks?: [...], intro?: string, ragNews?: [...] }
 // → voicePicksを直接渡せばClaude収集分を使用、なければnote自動収集
+// → ragNewsを渡すとOracle RAG経由のニュース記事をofficialNewsにマージ
 export async function POST(req: NextRequest) {
   if (!(await checkAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -142,6 +143,13 @@ export async function POST(req: NextRequest) {
     voicePicks?: Array<{ source: "x" | "note"; author: string; text: string; url: string }>;
     intro?: string;
     officialNews?: Array<{ title: string; summary: string; url: string; source: string }>;
+    ragNews?: Array<{
+      title: string;
+      summary: string;
+      url: string;
+      source: string;  // "産経新聞", "日経クロステック" etc
+      published_at?: string;
+    }>;
   } = {};
   try {
     bodyData = await req.json();
@@ -247,6 +255,19 @@ export async function POST(req: NextRequest) {
 
   // 6. デジタル庁公式ニュース
   let officialNews = bodyData.officialNews ?? [];
+
+  // RAG経由のニュース記事を公式情報にマージ
+  if (bodyData.ragNews && bodyData.ragNews.length > 0) {
+    officialNews = [
+      ...bodyData.ragNews.map(r => ({
+        title: r.title,
+        summary: r.summary,
+        url: r.url,
+        source: r.source,
+      })),
+      ...officialNews,
+    ];
+  }
   if (officialNews.length === 0) {
     try {
       const res = await fetch("https://www.digital.go.jp/news/", {
@@ -339,6 +360,7 @@ export async function POST(req: NextRequest) {
       official_news: officialNews.length,
       voice_picks: voicePicks.length,
       gcupdates: gcupdates.length,
+      rag_news: bodyData.ragNews?.length ?? 0,
     },
     ...(warnings.length > 0 && { warnings }),
   });
