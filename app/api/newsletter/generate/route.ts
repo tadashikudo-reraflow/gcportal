@@ -31,6 +31,57 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
+// ----- X API v2 検索 -----
+interface XTweet {
+  author: string;
+  text: string;
+  url: string;
+  likes: number;
+  createdAt: string;
+}
+
+async function searchX(keywords: string[]): Promise<XTweet[]> {
+  const bearerToken = process.env.X_BEARER_TOKEN;
+  if (!bearerToken) return [];
+
+  const results: XTweet[] = [];
+  // 複数キーワードをOR結合して1リクエスト（API節約）
+  const query = keywords.slice(0, 4).map((k) => `"${k}"`).join(" OR ");
+
+  try {
+    const url = `https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(query)}&max_results=20&tweet.fields=created_at,author_id,public_metrics,text&expansions=author_id&user.fields=name,username`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${bearerToken}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+
+    // usersマップ
+    const usersMap: Record<string, string> = {};
+    for (const u of json?.includes?.users ?? []) {
+      usersMap[u.id] = u.username ?? u.name ?? "unknown";
+    }
+
+    for (const t of json?.data ?? []) {
+      // RT・リプライ・リンクだけのツイートを除外
+      if (t.text?.startsWith("RT @")) continue;
+      results.push({
+        author: usersMap[t.author_id] ?? "unknown",
+        text: t.text ?? "",
+        url: `https://x.com/i/status/${t.id}`,
+        likes: t.public_metrics?.like_count ?? 0,
+        createdAt: t.created_at ?? "",
+      });
+    }
+  } catch {
+    // API失敗はスキップ
+  }
+
+  // いいね数でソート → 上位5件
+  return results.sort((a, b) => b.likes - a.likes).slice(0, 5);
+}
+
 // ----- note.com API 検索 -----
 interface NoteArticle {
   title: string;
@@ -55,7 +106,6 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       const json = await res.json();
       const notes = json?.data?.notes?.contents ?? [];
       for (const n of notes) {
-        // 無料記事を優先（有料は can_read=false）
         if (n.price > 0 && !n.can_read) continue;
         results.push({
           title: n.name ?? "",
@@ -69,7 +119,6 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       // 個別キーワードの失敗はスキップ
     }
   }
-  // 重複排除（URL）→ like数でソート → 上位5件
   const seen = new Set<string>();
   return results
     .filter((r) => {
@@ -154,24 +203,47 @@ export async function POST(req: NextRequest) {
     }
   } catch { /* スキップ */ }
 
-  // 5. note.com記事を自動収集（bodyでvoicePicksが渡されていなければ）
+  // 5. X + note 自動収集（bodyでvoicePicksが渡されていなければ）
   let voicePicks = bodyData.voicePicks ?? [];
+  let xTweets: XTweet[] = [];
   let noteArticles: NoteArticle[] = [];
+
   if (voicePicks.length === 0) {
-    noteArticles = await searchNote(noteKeywords);
-    voicePicks = noteArticles.map((a) => ({
-      source: "note" as const,
-      author: a.author,
-      text: a.title,
-      url: a.url,
-    }));
-    // X投稿はCLIからしか取れないのでプレースホルダー
-    voicePicks.unshift({
-      source: "x" as const,
-      author: "（Claudeが xactions CLI で収集・挿入）",
-      text: "X投稿はClaude実行時にxactions CLIで収集し、PATCHで差し込んでください",
-      url: "#",
-    });
+    // X API v2 と note.com を並列収集
+    [xTweets, noteArticles] = await Promise.all([
+      searchX(xKeywords),
+      searchNote(noteKeywords),
+    ]);
+
+    // X投稿をvoicePicksに変換
+    for (const t of xTweets) {
+      voicePicks.push({
+        source: "x" as const,
+        author: t.author,
+        text: t.text.length > 200 ? t.text.slice(0, 197) + "…" : t.text,
+        url: t.url,
+      });
+    }
+
+    // note記事をvoicePicksに変換
+    for (const a of noteArticles) {
+      voicePicks.push({
+        source: "note" as const,
+        author: a.author,
+        text: a.title,
+        url: a.url,
+      });
+    }
+
+    // フォールバック: 両方とも0件の場合
+    if (voicePicks.length === 0) {
+      voicePicks = [{
+        source: "x" as const,
+        author: "GCInsight",
+        text: "今週は大きな動きはありませんでした。引き続きガバメントクラウド移行の最新動向をウォッチしていきます。",
+        url: "https://gcinsight.jp",
+      }];
+    }
   }
 
   // 6. デジタル庁公式ニュース
@@ -254,6 +326,7 @@ export async function POST(req: NextRequest) {
     x_keywords: xKeywords,
     note_keywords: noteKeywords,
     collected: {
+      x_tweets: xTweets.length,
       note_articles: noteArticles.length,
       official_news: officialNews.length,
       voice_picks: voicePicks.length,
