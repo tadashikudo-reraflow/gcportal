@@ -44,7 +44,7 @@ export default function SourcesPage() {
   const sourcesWithMonth = allSources.filter((s) => s.dataMonth);
   const freshnessList = sourcesWithMonth.map((s) => ({
     source: s,
-    ...getDataFreshness(s.dataMonth!),
+    ...getDataFreshness(s.dataMonth!, s.updateCycle),
   })).sort((a, b) => b.daysOld - a.daysOld);
 
   // ページ別ソースマッピング

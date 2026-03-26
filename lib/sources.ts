@@ -4,6 +4,8 @@
 export type SourceCategory = "government" | "research" | "media" | "vendor" | "ai_survey";
 export type ConfidenceLevel = "official" | "verified" | "estimated" | "ai_survey";
 
+export type UpdateCycle = "monthly" | "quarterly" | "adhoc";
+
 export type DataSource = {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export type DataSource = {
   lastAccessed: string;   // ISO date: 最終確認日
   dataMonth: string | null; // "YYYY-MM": データの基準月
   confidence: ConfidenceLevel;
+  updateCycle?: UpdateCycle; // 更新サイクル（鮮度判定の閾値に使用）
   notes?: string;
 };
 
@@ -31,6 +34,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-03-01",
     dataMonth: "2026-01",
     confidence: "official",
+    updateCycle: "quarterly",
   },
   "digital-cho-govcloud": {
     id: "digital-cho-govcloud",
@@ -53,6 +57,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2025-09",
     confidence: "official",
+    updateCycle: "adhoc",
   },
   "digital-cho-cost-measures-2025-06": {
     id: "digital-cho-cost-measures-2025-06",
@@ -75,6 +80,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2024-10",
     confidence: "official",
+    updateCycle: "adhoc",
   },
   "digital-cho-tokutei": {
     id: "digital-cho-tokutei",
@@ -86,6 +92,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-27",
     dataMonth: "2026-02",
     confidence: "official",
+    updateCycle: "quarterly",
   },
   "cas-digital-gyozai": {
     id: "cas-digital-gyozai",
@@ -119,6 +126,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-03-01",
     dataMonth: "2026-01",
     confidence: "official",
+    updateCycle: "quarterly",
   },
   "soumu-kiban-kikin": {
     id: "soumu-kiban-kikin",
@@ -163,6 +171,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2025-06",
     confidence: "verified",
+    updateCycle: "adhoc",
   },
 
   // 総務省（Deepリサーチ L1追加分）
@@ -504,7 +513,14 @@ export function getSourcesForPage(pageId: string): DataSource[] {
   return ids.map((id) => DATA_SOURCES[id]).filter(Boolean);
 }
 
-export function getDataFreshness(dataMonth: string): {
+// updateCycle別の鮮度閾値（日数）
+const FRESHNESS_THRESHOLDS: Record<UpdateCycle, { stale: number; veryStale: number }> = {
+  monthly:   { stale: 45,  veryStale: 75 },
+  quarterly: { stale: 120, veryStale: 180 },
+  adhoc:     { stale: 30,  veryStale: 60 },
+};
+
+export function getDataFreshness(dataMonth: string, updateCycle: UpdateCycle = "adhoc"): {
   daysOld: number;
   isStale: boolean;
   isVeryStale: boolean;
@@ -515,18 +531,22 @@ export function getDataFreshness(dataMonth: string): {
   const dataDate = new Date(year, month, 0); // month=1-based → month番目の0日 = 前月末日
   const now = new Date();
   const daysOld = Math.floor((now.getTime() - dataDate.getTime()) / (1000 * 60 * 60 * 24));
+  const threshold = FRESHNESS_THRESHOLDS[updateCycle];
 
   return {
     daysOld: Math.max(0, daysOld),
-    isStale: daysOld > 30,
-    isVeryStale: daysOld > 60,
+    isStale: daysOld > threshold.stale,
+    isVeryStale: daysOld > threshold.veryStale,
     label: `${year}年${month}月時点`,
   };
 }
 
-export function isStale(source: DataSource, thresholdDays = 30): boolean {
+export function isStale(source: DataSource, thresholdDays?: number): boolean {
   if (!source.dataMonth) return false;
-  return getDataFreshness(source.dataMonth).daysOld > thresholdDays;
+  if (thresholdDays !== undefined) {
+    return getDataFreshness(source.dataMonth, source.updateCycle).daysOld > thresholdDays;
+  }
+  return getDataFreshness(source.dataMonth, source.updateCycle).isStale;
 }
 
 /** ページの全ソースのうち、最も新しいdataMonthを返す */
