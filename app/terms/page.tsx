@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "利用規約・免責事項｜GC Insight",
   description: "GC Insightの利用規約・免責事項。データの正確性、著作権、引用ルールについて。",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

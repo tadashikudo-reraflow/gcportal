@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "プライバシーポリシー｜GC Insight",
   description: "GC Insightのプライバシーポリシー。アクセス解析・Cookie利用・個人情報の取り扱いについて。",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {
