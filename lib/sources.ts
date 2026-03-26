@@ -4,7 +4,7 @@
 export type SourceCategory = "government" | "research" | "media" | "vendor" | "ai_survey";
 export type ConfidenceLevel = "official" | "verified" | "estimated" | "ai_survey";
 
-export type UpdateCycle = "monthly" | "quarterly" | "adhoc";
+export type UpdateCycle = "monthly" | "quarterly" | "reference" | "adhoc";
 
 export type DataSource = {
   id: string;
@@ -57,7 +57,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2025-09",
     confidence: "official",
-    updateCycle: "adhoc",
+    updateCycle: "reference",
   },
   "digital-cho-cost-measures-2025-06": {
     id: "digital-cho-cost-measures-2025-06",
@@ -69,6 +69,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-03-25",
     dataMonth: "2025-06",
     confidence: "official",
+    updateCycle: "reference",
   },
   "digital-cho-senkou-infra": {
     id: "digital-cho-senkou-infra",
@@ -80,7 +81,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2024-10",
     confidence: "official",
-    updateCycle: "adhoc",
+    updateCycle: "reference",
   },
   "digital-cho-tokutei": {
     id: "digital-cho-tokutei",
@@ -171,7 +172,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2025-06",
     confidence: "verified",
-    updateCycle: "adhoc",
+    updateCycle: "reference",
   },
 
   // 総務省（Deepリサーチ L1追加分）
@@ -207,6 +208,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-03-21",
     dataMonth: "2024-07",
     confidence: "official",
+    updateCycle: "reference",
   },
 
   // CSP公式ブログ（Deepリサーチ L2追加分）
@@ -363,6 +365,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-03-25",
     dataMonth: "2026-03",
     confidence: "official",
+    updateCycle: "quarterly",
   },
 
   // ベンダー関連
@@ -376,6 +379,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-02-15",
     dataMonth: "2024-06",
     confidence: "verified",
+    updateCycle: "reference",
     notes: "ベンダー公表値のため中立性に留意",
   },
   "gartner-iaas": {
@@ -388,6 +392,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     lastAccessed: "2026-01-15",
     dataMonth: "2024-09",
     confidence: "verified",
+    updateCycle: "reference",
   },
   "vendor-press": {
     id: "vendor-press",
@@ -517,7 +522,8 @@ export function getSourcesForPage(pageId: string): DataSource[] {
 const FRESHNESS_THRESHOLDS: Record<UpdateCycle, { stale: number; veryStale: number }> = {
   monthly:   { stale: 45,  veryStale: 75 },
   quarterly: { stale: 120, veryStale: 180 },
-  adhoc:     { stale: 30,  veryStale: 60 },
+  reference: { stale: 365, veryStale: 730 },  // 白書・調査等の単発公表物
+  adhoc:     { stale: 90,  veryStale: 180 },
 };
 
 export function getDataFreshness(dataMonth: string, updateCycle: UpdateCycle = "adhoc"): {
