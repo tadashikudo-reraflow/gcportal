@@ -150,17 +150,20 @@ async function notifyTelegram({
 
   const now = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
   const org = ORG_LABELS[orgType] ?? orgType;
-  const text = `📨 *GCInsight 新規リード*\n\n📧 ${email}\n🏢 ${org}\n📄 ${source}\n🕐 ${now}`;
+  const text = `📨 GCInsight 新規リード\n\n📧 ${email}\n🏢 ${org}\n📄 ${source}\n🕐 ${now}`;
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       chat_id: chatId,
       text,
-      parse_mode: "Markdown",
     }),
   });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    console.error("notifyTelegram error:", res.status, JSON.stringify(body));
+  }
 }
 
 /** Supabase Storage から 48h Signed URL を生成 */
@@ -179,44 +182,6 @@ async function generateDownloadUrl(): Promise<string | null> {
   return data?.signedUrl ?? null;
 }
 
-/** Beehiiv 購読者追加 (BEEHIIV_API_KEY + BEEHIIV_PUBLICATION_ID が設定されている場合のみ) */
-async function notifyBeehiiv({
-  email,
-  orgType,
-  downloadUrl,
-}: {
-  email: string;
-  orgType: string;
-  downloadUrl: string | null;
-}) {
-  const apiKey = process.env.BEEHIIV_API_KEY;
-  const pubId = process.env.BEEHIIV_PUBLICATION_ID;
-  if (!apiKey || !pubId) return;
-
-  const customFields: { name: string; value: string }[] = [
-    { name: "organization_type", value: orgType },
-  ];
-  if (downloadUrl) {
-    customFields.push({ name: "download_url", value: downloadUrl });
-  }
-
-  await fetch(
-    `https://api.beehiiv.com/v2/publications/${pubId}/subscriptions`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email.toLowerCase().trim(),
-        reactivate_existing: true,
-        send_welcome_email: true,
-        custom_fields: customFields,
-      }),
-    }
-  );
-}
 
 /**
  * POST /api/leads — リード（メアド+所属）を保存
@@ -272,11 +237,10 @@ export async function POST(req: NextRequest) {
     const downloadUrl =
       isReportLead ? await generateDownloadUrl() : null;
 
-    // 通知: Slack / 管理者メール / Beehiiv / Telegram（並列実行）
+    // 通知: Slack / 管理者メール / Telegram（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
-      notifyBeehiiv({ email, orgType, downloadUrl: null }), // Beehiivはニュースレター購読のみ
       notifyTelegram({ email, orgType, source: effectiveSource }),
       sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report導線のみ）
     ]);

@@ -12,18 +12,5 @@
       "permanent": true
     }
   ],
-  "crons": [
-    {
-      "path": "/api/snapshots",
-      "schedule": "0 4 1 * *"
-    },
-    {
-      "path": "/api/schedule",
-      "schedule": "0 5 * * *"
-    },
-    {
-      "path": "/api/cron/newsletter",
-      "schedule": "0 22 * * 0"
-    }
-  ]
+  "crons": []
 }
