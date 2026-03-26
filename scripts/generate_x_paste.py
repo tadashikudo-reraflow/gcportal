@@ -41,7 +41,10 @@ PDF_URL  = "https://gcinsight.jp/report?from=nav"
 GCPORTAL_DIR   = Path(__file__).parent.parent  # gcportal/
 SCRIPTS_DIR    = GCPORTAL_DIR / "scripts"
 PUBLIC_IMGS    = GCPORTAL_DIR / "public" / "images" / "articles"
+PUBLIC_X_IMGS  = GCPORTAL_DIR / "public" / "images" / "x-articles"
 OUT_DIR        = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ19" / "x_articles"
+
+XAI_KEY = os.environ.get("XAI_API_KEY", "")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -223,41 +226,142 @@ def render_blocks_to_png(blocks, slug, tmp_dir: Path):
 
     return [p for p in png_paths if Path(p).exists()]
 
-# ── カバー画像生成 ─────────────────────────────────────────────────
+# ── カバー画像生成（Grok + HTML テンプレート + Playwright）────────────
 
-def generate_cover_image(slug, article_id):
-    """generate-cover-images.mjs --x-article <slug> を実行"""
-    # 既存のX用カバー画像を確認（前回生成済みの場合はスキップ）
-    existing = OUT_DIR / f"id{article_id}" / "cover_1500x600_generated.png"
-    dest_fname = f"{slug}-x.png"
-    dest_public = PUBLIC_IMGS / dest_fname
+def _grok_prompt_from_article(article):
+    """記事タイトル・タグからGrok画像生成プロンプトを生成"""
+    title = article["title"].split("｜")[0].strip()
+    tags = article.get("tags") or []
+    tag_str = ", ".join(tags[:3])
+    return (
+        f"Isometric illustration for Japanese government cloud article about '{title}', "
+        f"themes: {tag_str}, Japan National Diet Building connected to cloud servers, "
+        "deep blue and sky blue tones, clean vector style, no text, minimalist modern design"
+    )
 
-    if not existing.exists():
-        print(f"🖼  カバー画像生成: {slug} (1500×600)")
-        result = subprocess.run(
-            ["node", "scripts/generate-cover-images.mjs", "--x-article", slug],
-            cwd=str(GCPORTAL_DIR),
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            print(f"⚠️  カバー画像生成エラー:\n{result.stderr}")
-        else:
-            print(f"  生成完了")
-    else:
-        print(f"🖼  カバー画像: 既存を流用 ({existing.name})")
+def _gen_grok_image(prompt, save_path):
+    """xAI REST API で画像生成 → save_path に保存"""
+    from PIL import Image
+    from io import BytesIO
+    import base64
 
-    if existing.exists():
-        shutil.copy2(str(existing), str(dest_public))
-        print(f"  コピー → public/images/articles/{dest_fname}")
-        return dest_fname
+    r = requests.post(
+        "https://api.x.ai/v1/images/generations",
+        headers={"Authorization": f"Bearer {XAI_KEY}", "Content-Type": "application/json"},
+        json={"model": "grok-imagine-image", "prompt": prompt, "n": 1, "response_format": "b64_json"},
+        timeout=120,
+    )
+    r.raise_for_status()
+    b64 = r.json()["data"][0]["b64_json"]
+    img = Image.open(BytesIO(base64.b64decode(b64)))
+    img.save(save_path)
+    return img.size
 
-    # フォールバック: OGP画像
-    ogp = PUBLIC_IMGS / f"{slug}.png"
-    if ogp.exists():
-        print(f"  ⚠️  X用画像なし → OGP画像を流用: {ogp.name}")
-        return ogp.name
-    return None
+def _render_cover_html(article, illust_b64, out_path):
+    """左テキスト＋右イラストのHTMLテンプレートをPlaywrightで1500×600レンダリング"""
+    import asyncio
+    from playwright.async_api import async_playwright
+
+    title_parts = article["title"].split("｜")
+    title = title_parts[0].strip()
+    subtitle = title_parts[1].strip() if len(title_parts) > 1 else ""
+    tags = article.get("tags") or []
+    tag = tags[0] if tags else "ガバメントクラウド"
+
+    html = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{ width:1500px; height:600px; background:#EEF4FB;
+       font-family:"Hiragino Sans","ヒラギノ角ゴシック",sans-serif; overflow:hidden; position:relative; }}
+.grid {{ position:absolute; inset:0;
+  background-image: linear-gradient(rgba(30,90,180,0.08) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(30,90,180,0.08) 1px,transparent 1px);
+  background-size:40px 40px; }}
+.container {{ position:relative; display:flex; align-items:center; height:100%; padding:60px 0 60px 80px; }}
+.text-area {{ flex:0 0 620px; display:flex; flex-direction:column; gap:20px; z-index:2; }}
+.label {{ font-size:22px; font-weight:600; color:#1E5AB4; letter-spacing:0.05em; }}
+.title {{ font-size:52px; font-weight:800; color:#0D1F3C; line-height:1.25; letter-spacing:-0.01em;
+          word-break:keep-all; overflow-wrap:break-word; }}
+.subtitle {{ font-size:20px; font-weight:400; color:#4A6FA5; line-height:1.6; }}
+.tag {{ display:inline-block; background:#1E5AB4; color:white; font-size:16px;
+        font-weight:600; padding:6px 16px; border-radius:4px; }}
+.illust-area {{ flex:1; height:100%; position:relative; }}
+.illust-area img {{ height:560px; width:auto; object-fit:contain;
+                   position:absolute; right:-10px; bottom:0;
+                   filter:drop-shadow(0 8px 24px rgba(30,90,180,0.15)); }}
+</style></head>
+<body>
+<div class="grid"></div>
+<div class="container">
+  <div class="text-area">
+    <span class="label">GCInsight コラム</span>
+    <h1 class="title">{title}</h1>
+    {"<p class='subtitle'>" + subtitle + "</p>" if subtitle else ""}
+    <span class="tag"># {tag}</span>
+  </div>
+  <div class="illust-area">
+    <img src="data:image/png;base64,{illust_b64}">
+  </div>
+</div>
+</body></html>"""
+
+    html_file = Path("/tmp/cover_render.html")
+    html_file.write_text(html)
+
+    async def _render():
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            ctx = await browser.new_context(viewport={"width": 1500, "height": 600})
+            page = await ctx.new_page()
+            await page.goto("http://localhost:9876/cover_render.html")
+            await page.wait_for_timeout(500)
+            await page.screenshot(path=str(out_path), clip={"x": 0, "y": 0, "width": 1500, "height": 600})
+            await browser.close()
+
+    asyncio.run(_render())
+
+
+def generate_cover_image(article):
+    """Grok画像生成 → HTMLテンプレート合成 → Playwright → x-articles/id{N}/cover.png"""
+    import base64
+    slug = article["slug"]
+    article_id = article["id"]
+
+    x_img_dir = PUBLIC_X_IMGS / f"id{article_id}"
+    x_img_dir.mkdir(parents=True, exist_ok=True)
+    cover_path = x_img_dir / "cover.png"
+
+    if cover_path.exists():
+        print(f"🖼  カバー画像: 既存を流用 (x-articles/id{article_id}/cover.png)")
+        return f"id{article_id}/cover.png"
+
+    print(f"🖼  カバー画像生成 (Grok+HTML): id{article_id} {slug}")
+
+    # Step1: Grok画像生成
+    illust_path = Path(f"/tmp/grok_illust_id{article_id}.png")
+    prompt = _grok_prompt_from_article(article)
+    try:
+        size = _gen_grok_image(prompt, str(illust_path))
+        print(f"  ✅ Grokイラスト生成: {size}")
+    except Exception as e:
+        print(f"  ⚠️  Grok生成失敗: {e} → OGP画像をフォールバック")
+        ogp = PUBLIC_IMGS / f"{slug}.png"
+        return f"articles/{slug}.png" if ogp.exists() else None
+
+    # Step2: Base64変換
+    with open(illust_path, "rb") as f:
+        b64 = base64.b64encode(f.read()).decode()
+
+    # Step3: HTML合成 → Playwright レンダリング
+    try:
+        _render_cover_html(article, b64, cover_path)
+        print(f"  ✅ カバー保存: x-articles/id{article_id}/cover.png")
+    except Exception as e:
+        print(f"  ⚠️  Playwright失敗: {e}")
+        return None
+
+    return f"id{article_id}/cover.png"
 
 # ── git push ─────────────────────────────────────────────────────
 
@@ -265,8 +369,8 @@ def git_push(slug):
     """新規PNGをコミット＆プッシュ（Vercel自動デプロイ）"""
     print("🚀 git push → Vercel デプロイ...")
     cmds = [
-        ["git", "add", "public/images/articles/"],
-        ["git", "commit", "-m", f"feat: X Article figures for {slug}"],
+        ["git", "add", "public/images/x-articles/"],
+        ["git", "commit", "-m", f"feat: X Article images for {slug}"],
         ["git", "push"],
     ]
     for cmd in cmds:
@@ -291,7 +395,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
     # figure置換
     for block, fname in zip(blocks, figure_filenames):
-        img_url = f"{SITE_URL}/images/articles/{fname}"
+        img_url = f"{SITE_URL}/images/x-articles/{fname}"
         img_tag = f'<img src="{img_url}" alt="図解" style="max-width:100%;border-radius:8px;margin:16px 0;">'
         body = body.replace(block["placeholder"], img_tag)
 
@@ -299,7 +403,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
     body = re.sub(r'__FIGURE_\d+__', '', body)
 
     # カバー画像URL
-    cover_url = f"{SITE_URL}/images/articles/{cover_filename}" if cover_filename else ""
+    cover_url = f"{SITE_URL}/images/x-articles/{cover_filename}" if cover_filename else ""
 
     # タイトル・リード
     title = article["title"]
@@ -377,18 +481,24 @@ def process_article(article, no_push=False, open_browser=True):
             tmp_dir = Path(tmp)
             png_paths = render_blocks_to_png(blocks, slug, tmp_dir)
 
+            x_img_dir = PUBLIC_X_IMGS / f"id{article['id']}"
+            x_img_dir.mkdir(parents=True, exist_ok=True)
             for i, (block, png_path) in enumerate(zip(blocks, png_paths)):
-                fname = f"{slug}-figure-{i+1}.png"
-                dest_public = PUBLIC_IMGS / fname
-                shutil.copy2(png_path, str(dest_public))
+                fname = f"figure-{i+1}.png"
+                shutil.copy2(png_path, str(x_img_dir / fname))
                 shutil.copy2(png_path, str(article_out_dir / fname))
-                figure_filenames.append(fname)
-                print(f"  ✅ {fname}")
+                figure_filenames.append(f"id{article['id']}/{fname}")
+                print(f"  ✅ x-articles/id{article['id']}/{fname}")
     else:
         print("  (図解ブロックなし)")
 
-    # カバー画像生成
-    cover_fname = generate_cover_image(slug, article["id"])
+    # カバー画像生成（Grok+HTML+Playwright）
+    cover_fname = generate_cover_image(article)
+
+    # Drive側にもカバーをコピー
+    cover_src = PUBLIC_X_IMGS / f"id{article['id']}" / "cover.png"
+    if cover_src.exists():
+        shutil.copy2(str(cover_src), str(article_out_dir / "cover.png"))
 
     # git push（バッチ時は最後にまとめてpushするため個別にはスキップ可）
     if not no_push:
@@ -443,8 +553,8 @@ def main():
         if not args.no_push:
             print("\n🚀 全PNG/カバー画像をまとめてgit push...")
             import subprocess as sp
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "add", "public/images/articles/"], check=True)
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X paste images batch ({len(articles)} articles)"], check=True)
+            sp.run(["git", "-C", str(GCPORTAL_DIR), "add", "public/images/x-articles/"], check=True)
+            sp.run(["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"], check=True)
             sp.run(["git", "-C", str(GCPORTAL_DIR), "push"], check=True)
             print("  ⏳ Vercelデプロイ完了まで約30秒お待ちください\n")
 
