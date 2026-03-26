@@ -138,7 +138,34 @@ export async function POST(req: NextRequest) {
     // fetch失敗時はデフォルト値を使用
   }
 
-  // 5. HTMLを生成
+  // 5. newsletter_config取得
+  const { data: config } = await supabase
+    .from("newsletter_config")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  // Claude向けシステムプロンプト生成
+  const systemPrompt = config
+    ? `
+あなたは「${config.author_name}」として以下のスタイルでニュースレターを執筆します。
+
+【著者プロフィール】
+肩書き: ${config.author_title}
+執筆スタイル: ${config.author_style}
+
+【読者ペルソナ】
+想定読者: ${config.reader_persona}
+トーン: ${config.reader_tone}
+関心トピック: ${config.reader_topics}
+
+【収集キーワード】
+X: ${config.x_keywords}
+note: ${config.note_keywords}
+`
+    : "";
+
+  // 6. HTMLを生成
   const now = new Date();
   const dateLabel = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
   const subject = `GCInsight週次レポート #${issueNumber} — ${dateLabel}号`;
@@ -150,9 +177,13 @@ export async function POST(req: NextRequest) {
     migrationStats,
     gcupdates,
     officialNews: newsItems,
+    authorName: config?.author_name,
+    authorTitle: config?.author_title,
+    authorStyle: config?.author_style,
+    authorSignatureHtml: config?.author_signature_html,
   });
 
-  // 6. campaignsテーブルに下書きとして保存
+  // 7. campaignsテーブルに下書きとして保存
   const { data: campaign, error: insertError } = await supabase
     .from("campaigns")
     .insert({
@@ -175,5 +206,8 @@ export async function POST(req: NextRequest) {
     campaign_id: campaignId,
     subject,
     preview_url: previewUrl,
+    system_prompt: systemPrompt,
+    x_keywords: config?.x_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"],
+    note_keywords: config?.note_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"],
   });
 }

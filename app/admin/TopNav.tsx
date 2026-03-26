@@ -14,6 +14,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "ニュースレター", href: "/admin/newsletter" },
   { label: "購読者", href: "/admin/newsletter/subscribers" },
   { label: "設定", href: "/admin/settings" },
+  { label: "NL設定", href: "/admin/newsletter/config" },
 ];
 
 export default function TopNav() {

@@ -14,10 +14,26 @@ export interface NewsletterSections {
   gcupdates: Array<{ date: string; title: string; detail: string }>;
   // 公式情報（補足）
   officialNews: Array<{ title: string; summary: string; url: string; source: string }>;
+  // 著者情報（newsletter_configから渡す）
+  authorName?: string;
+  authorTitle?: string;
+  authorStyle?: string;
+  authorSignatureHtml?: string;
 }
 
 export function renderNewsletterHtml(sections: NewsletterSections): string {
-  const { issueNumber, intro, migrationStats, voicePicks, gcupdates, officialNews } = sections;
+  const {
+    issueNumber,
+    intro,
+    migrationStats,
+    voicePicks,
+    gcupdates,
+    officialNews,
+    authorName,
+    authorTitle,
+    authorStyle,
+    authorSignatureHtml,
+  } = sections;
 
   const migrationBlock = migrationStats
     ? `
@@ -71,6 +87,23 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     </div>`
     )
     .join("");
+
+  // 著者ブロック生成
+  const authorBlockHtml = (() => {
+    if (authorSignatureHtml) {
+      return authorSignatureHtml;
+    }
+    const name = authorName ?? "GCInsight編集部";
+    const title = authorTitle ?? "元JTC自治体担当 × 外資IT営業 × 政策ウォッチャー × 地方在住";
+    const style = authorStyle ?? "部外者がズバッと正論で指摘する";
+    return `<div style="margin-top:32px;padding-top:24px;border-top:2px solid #111;display:flex;align-items:flex-start;gap:16px;">
+  <div>
+    <div style="font-size:14px;font-weight:700;color:#111;">${escapeHtml(name)}</div>
+    <div style="font-size:12px;color:#6b7280;margin-top:2px;">${escapeHtml(title)}</div>
+    <div style="font-size:13px;color:#374151;margin-top:8px;line-height:1.6;">${escapeHtml(style)}</div>
+  </div>
+</div>`;
+  })();
 
   const officialNewsHtml = officialNews
     .map(
@@ -137,6 +170,9 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4F0; 公式情報</div>
       ${officialNewsHtml}
     </div>` : ""}
+
+    <!-- 著者ブロック -->
+    ${authorBlockHtml}
 
   </div>
 
