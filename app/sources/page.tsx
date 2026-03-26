@@ -173,7 +173,7 @@ export default function SourcesPage() {
                   </td>
                   <td className="py-2 px-3 text-center">
                     {source.updateCycle === "reference" ? (
-                      <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                      <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 whitespace-nowrap">
                         公表時点
                       </span>
                     ) : isVeryStale ? (

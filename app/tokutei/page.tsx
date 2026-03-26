@@ -90,7 +90,7 @@ export default function TokuteiPage() {
         <div style={{ color: "#1e40af" }}>
           <p className="font-bold text-sm mb-1">標準化とガバクラ移行は別の工程です</p>
           <p className="text-xs leading-relaxed">
-            手続き進捗率は「ガバクラへの移行進捗」（令和8年1月推計）。標準化とガバクラ移行は別工程のため、認定は業務システム単位で自治体全体の手続き進捗率とは連動しません。
+            認定は業務システム単位のため、自治体全体の手続き進捗率とは連動しません。
           </p>
         </div>
       </div>

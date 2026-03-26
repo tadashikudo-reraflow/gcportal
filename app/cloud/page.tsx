@@ -392,6 +392,63 @@ export default async function CloudPage() {
         </div>
       </div>
 
+      {/* ベンダー×クラウド マトリクス */}
+      {totalVendors > 0 && (
+        <div className="card p-5">
+          <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            ベンダー × クラウド マトリクス
+            <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
+              どのベンダーがどのクラウドを使っているか
+            </span>
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">ベンダー</th>
+                  {CLOUD_ORDER.map((ck) => (
+                    <th key={ck} className="text-center py-2 px-2 text-xs font-bold" style={{ color: CLOUD_CONFIG[ck].color }}>
+                      {ck === "Sakura" ? "さくら" : ck}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(() => {
+                  // Collect all unique vendors across clouds
+                  const vendorMap = new Map<string, { name: string; clouds: Set<string>; count: number }>();
+                  for (const [cloud, entries] of Object.entries(cloudVendors)) {
+                    for (const { vendor, packages: pkgs } of entries) {
+                      if (!vendorMap.has(vendor.id)) {
+                        vendorMap.set(vendor.id, { name: vendor.short_name ?? vendor.name, clouds: new Set(), count: vendor.municipality_count ?? 0 });
+                      }
+                      vendorMap.get(vendor.id)!.clouds.add(cloud);
+                    }
+                  }
+                  return Array.from(vendorMap.entries())
+                    .sort((a, b) => b[1].count - a[1].count)
+                    .map(([id, { name, clouds }]) => (
+                      <tr key={id} className="border-b border-gray-50 hover:bg-gray-50">
+                        <td className="py-1.5 px-3 text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>{name}</td>
+                        {CLOUD_ORDER.map((ck) => (
+                          <td key={ck} className="py-1.5 px-2 text-center">
+                            {clouds.has(ck) ? (
+                              <span className="inline-block w-5 h-5 rounded-full text-white text-xs font-bold leading-5"
+                                style={{ backgroundColor: CLOUD_CONFIG[ck].color }}>✓</span>
+                            ) : (
+                              <span className="text-gray-200">—</span>
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ));
+                })()}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       {/* ② ガバクラ インフラシェア実態（ドーナツ + バー） */}
       <div className="card p-5">
         <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>

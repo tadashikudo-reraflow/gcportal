@@ -12,6 +12,8 @@ import CostSimulator from "./CostSimulator";
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
 // ※ コストレンジは独自調査・参考値。実際の契約条件・規模により大幅に異なる場合があります。
+// ⚠️ データ整合性: cloud フィールドは Supabase vendors.cloud_platform を正とする。
+//    gc-rag-refresh Phase 2 Step 8 で定期照合。不一致時はDB側を優先して修正すること。
 const VENDOR_COST_ESTIMATE: Record<string, {
   ratioMin: number; ratioMax: number; ratioTypical: number;
   mark: string; markColor: string; cloud: string; note: string;

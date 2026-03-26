@@ -69,8 +69,8 @@ export default function BusinessesPage() {
       <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
         <span style={{ color: "#dc2626", fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠</span>
         <p className="text-xs leading-relaxed" style={{ color: "#991b1b" }}>
-          <strong>手続き進捗率は移行完了を意味しません。</strong>
-          予算要求・ベンダー選定などの準備ステップ（全40段階）が含まれます。全20業務の移行が完了した自治体は <strong>{data.summary.completed_count} / {data.summary.total.toLocaleString()}（{((data.summary.completed_count / data.summary.total) * 100).toFixed(1)}%）</strong> です。
+          <strong>手続き進捗率は移行完了ではありません。</strong>
+          準備工程を含むため、全20業務完了は <strong>{data.summary.completed_count} / {data.summary.total.toLocaleString()}（{((data.summary.completed_count / data.summary.total) * 100).toFixed(1)}%）</strong> にとどまります。
         </p>
       </div>
 
