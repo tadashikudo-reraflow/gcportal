@@ -11,23 +11,19 @@ function getSupabase() {
 }
 
 async function checkAuth(req: NextRequest): Promise<boolean> {
-  // 1. JWT cookie（管理画面ブラウザ）
   const cookieToken = req.cookies.get("admin_token")?.value;
   if (cookieToken) {
     const { verifyAdminToken } = await import("@/lib/auth");
     const payload = await verifyAdminToken(cookieToken);
     if (payload) return true;
   }
-
   const authHeader = req.headers.get("authorization");
-  // 2. Basic auth（レガシー・後方互換）
   if (authHeader?.startsWith("Basic ")) {
     const encoded = authHeader.slice(6);
     const decoded = Buffer.from(encoded, "base64").toString("utf-8");
     const [, password] = decoded.split(":");
     if (password === process.env.ADMIN_PASSWORD) return true;
   }
-  // 3. Bearer token (Claude / 外部API)
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
     if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
@@ -35,45 +31,95 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
-const defaultVoicePicks = [
-  {
-    source: "x" as const,
-    author: "（Claudeが収集・挿入）",
-    text: "X投稿ピックアップはClaude実行時に挿入されます",
-    url: "#",
-  },
-  {
-    source: "note" as const,
-    author: "（Claudeが収集・挿入）",
-    text: "note記事ピックアップはClaude実行時に挿入されます",
-    url: "#",
-  },
-];
+// ----- note.com API 検索 -----
+interface NoteArticle {
+  title: string;
+  author: string;
+  url: string;
+  likeCount: number;
+  publishedAt: string;
+}
 
-const defaultOfficialNews = [
-  {
-    title: "（Claudeが収集・挿入）",
-    summary: "公式ニュースはClaude実行時に挿入されます",
-    url: "#",
-    source: "デジタル庁",
-  },
-];
+async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
+  const results: NoteArticle[] = [];
+  for (const kw of keywords.slice(0, 3)) {
+    try {
+      const res = await fetch(
+        `https://note.com/api/v3/searches?q=${encodeURIComponent(kw)}&size=5&sort=new&context=note`,
+        {
+          headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)" },
+          signal: AbortSignal.timeout(8000),
+        }
+      );
+      if (!res.ok) continue;
+      const json = await res.json();
+      const notes = json?.data?.notes?.contents ?? [];
+      for (const n of notes) {
+        // 無料記事を優先（有料は can_read=false）
+        if (n.price > 0 && !n.can_read) continue;
+        results.push({
+          title: n.name ?? "",
+          author: n.user?.nickname ?? n.user?.urlname ?? "unknown",
+          url: `https://note.com/${n.user?.urlname}/n/${n.key}`,
+          likeCount: n.like_count ?? 0,
+          publishedAt: n.publish_at ?? "",
+        });
+      }
+    } catch {
+      // 個別キーワードの失敗はスキップ
+    }
+  }
+  // 重複排除（URL）→ like数でソート → 上位5件
+  const seen = new Set<string>();
+  return results
+    .filter((r) => {
+      if (seen.has(r.url)) return false;
+      seen.add(r.url);
+      return true;
+    })
+    .sort((a, b) => b.likeCount - a.likeCount)
+    .slice(0, 5);
+}
 
 // POST /api/newsletter/generate — ニュースレター下書き自動生成
+// body（任意）: { voicePicks?: [...], intro?: string }
+// → voicePicksを直接渡せばClaude収集分を使用、なければnote自動収集
 export async function POST(req: NextRequest) {
   if (!(await checkAuth(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // リクエストbody（任意）
+  let bodyData: {
+    voicePicks?: Array<{ source: "x" | "note"; author: string; text: string; url: string }>;
+    intro?: string;
+    officialNews?: Array<{ title: string; summary: string; url: string; source: string }>;
+  } = {};
+  try {
+    bodyData = await req.json();
+  } catch {
+    // bodyなしでも動作
+  }
+
   const supabase = getSupabase();
 
-  // 1. issue number: campaignsテーブルの件数+1
+  // 1. newsletter_config取得
+  const { data: config } = await supabase
+    .from("newsletter_config")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  const xKeywords = config?.x_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"];
+  const noteKeywords = config?.note_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"];
+
+  // 2. issue number
   const { count: campaignCount } = await supabase
     .from("campaigns")
     .select("*", { count: "exact", head: true });
   const issueNumber = (campaignCount ?? 0) + 1;
 
-  // 2. 移行率データを取得（migration_snapshotsテーブルがなければスキップ）
+  // 3. 移行率データ
   let migrationStats: { rate: string; completed: string; total: string } | undefined;
   try {
     const { data: snapshots } = await supabase
@@ -81,7 +127,6 @@ export async function POST(req: NextRequest) {
       .select("migration_rate, completed_count, total_count")
       .order("snapshot_date", { ascending: false })
       .limit(1);
-
     if (snapshots && snapshots.length > 0) {
       const snap = snapshots[0];
       migrationStats = {
@@ -90,11 +135,9 @@ export async function POST(req: NextRequest) {
         total: `${snap.total_count ?? 0}団体`,
       };
     }
-  } catch {
-    // テーブルが存在しない場合はスキップ
-  }
+  } catch { /* スキップ */ }
 
-  // 3. Supabaseから最新スナップショットの更新履歴を取得（gcupdates）
+  // 4. GCInsightアップデート（スナップショット履歴）
   let gcupdates: Array<{ date: string; title: string; detail: string }> = [];
   try {
     const { data: snaps } = await supabase
@@ -102,7 +145,6 @@ export async function POST(req: NextRequest) {
       .select("snapshot_date, migration_rate, completed_count")
       .order("snapshot_date", { ascending: false })
       .limit(3);
-
     if (snaps && snaps.length > 0) {
       gcupdates = snaps.map((s) => ({
         date: s.snapshot_date?.slice(0, 10) ?? "",
@@ -110,80 +152,83 @@ export async function POST(req: NextRequest) {
         detail: `移行率 ${s.migration_rate ?? 0}% / 完了 ${s.completed_count ?? 0}団体`,
       }));
     }
-  } catch {
-    // テーブルが存在しない場合はスキップ
-  }
+  } catch { /* スキップ */ }
 
-  // 4. デジタル庁公式サイトのニュースをfetch（失敗してもスキップ）
-  let newsItems = defaultOfficialNews;
-  try {
-    const res = await fetch("https://www.digital.go.jp/news/", {
-      signal: AbortSignal.timeout(5000),
+  // 5. note.com記事を自動収集（bodyでvoicePicksが渡されていなければ）
+  let voicePicks = bodyData.voicePicks ?? [];
+  let noteArticles: NoteArticle[] = [];
+  if (voicePicks.length === 0) {
+    noteArticles = await searchNote(noteKeywords);
+    voicePicks = noteArticles.map((a) => ({
+      source: "note" as const,
+      author: a.author,
+      text: a.title,
+      url: a.url,
+    }));
+    // X投稿はCLIからしか取れないのでプレースホルダー
+    voicePicks.unshift({
+      source: "x" as const,
+      author: "（Claudeが xactions CLI で収集・挿入）",
+      text: "X投稿はClaude実行時にxactions CLIで収集し、PATCHで差し込んでください",
+      url: "#",
     });
-    if (res.ok) {
-      // HTMLから簡易的にニュースタイトルを抽出（正規表現）
-      const html = await res.text();
-      const matches = [...html.matchAll(/<a[^>]+href="([^"]*\/news\/[^"]+)"[^>]*>([^<]{10,})<\/a>/gi)];
-      const parsed = matches.slice(0, 3).map((m) => ({
-        title: m[2].trim(),
-        summary: "詳細はリンク先でご確認ください",
-        url: m[1].startsWith("http") ? m[1] : `https://www.digital.go.jp${m[1]}`,
-        source: "デジタル庁",
-      }));
-      if (parsed.length > 0) {
-        newsItems = parsed;
-      }
-    }
-  } catch {
-    // fetch失敗時はデフォルト値を使用
   }
 
-  // 5. newsletter_config取得
-  const { data: config } = await supabase
-    .from("newsletter_config")
-    .select("*")
-    .eq("id", 1)
-    .single();
+  // 6. デジタル庁公式ニュース
+  let officialNews = bodyData.officialNews ?? [];
+  if (officialNews.length === 0) {
+    try {
+      const res = await fetch("https://www.digital.go.jp/news/", {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (res.ok) {
+        const html = await res.text();
+        const matches = [...html.matchAll(/<a[^>]+href="([^"]*\/news\/[^"]+)"[^>]*>([^<]{10,})<\/a>/gi)];
+        officialNews = matches.slice(0, 3).map((m) => ({
+          title: m[2].trim(),
+          summary: "詳細はリンク先でご確認ください",
+          url: m[1].startsWith("http") ? m[1] : `https://www.digital.go.jp${m[1]}`,
+          source: "デジタル庁",
+        }));
+      }
+    } catch { /* スキップ */ }
+  }
 
-  // Claude向けシステムプロンプト生成
+  // 7. system_prompt生成
   const systemPrompt = config
-    ? `
-あなたは「${config.author_name}」として以下のスタイルでニュースレターを執筆します。
+    ? `あなたは「${config.author_name}」としてニュースレターを執筆します。
 
-【著者プロフィール】
-肩書き: ${config.author_title}
-執筆スタイル: ${config.author_style}
+【著者】${config.author_title}
+【スタイル】${config.author_style}
+【想定読者】${config.reader_persona}
+【トーン】${config.reader_tone}
+【関心トピック】${config.reader_topics}
 
-【読者ペルソナ】
-想定読者: ${config.reader_persona}
-トーン: ${config.reader_tone}
-関心トピック: ${config.reader_topics}
-
-【収集キーワード】
-X: ${config.x_keywords}
-note: ${config.note_keywords}
-`
+イントロは上記のペルソナで書いてください。現場感のある一人称で、読者に語りかけるように。`
     : "";
 
-  // 6. HTMLを生成
+  // 8. イントロ
+  const intro = bodyData.intro ?? "今週のガバメントクラウド動向をお届けします。現場で何が起きているのか、部外者の目線でズバッと斬ります。";
+
+  // 9. HTML生成
   const now = new Date();
   const dateLabel = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
   const subject = `GCInsight週次レポート #${issueNumber} — ${dateLabel}号`;
 
   const html = renderNewsletterHtml({
     issueNumber,
-    intro: `今週のガバメントクラウド動向をお届けします。`,
-    voicePicks: defaultVoicePicks,
+    intro,
+    voicePicks,
     migrationStats,
     gcupdates,
-    officialNews: newsItems,
+    officialNews,
     authorName: config?.author_name,
     authorTitle: config?.author_title,
     authorStyle: config?.author_style,
     authorSignatureHtml: config?.author_signature_html,
   });
 
-  // 7. campaignsテーブルに下書きとして保存
+  // 10. 下書き保存
   const { data: campaign, error: insertError } = await supabase
     .from("campaigns")
     .insert({
@@ -200,14 +245,19 @@ note: ${config.note_keywords}
   }
 
   const campaignId: number = campaign.id;
-  const previewUrl = `/admin/newsletter/compose?id=${campaignId}`;
 
   return NextResponse.json({
     campaign_id: campaignId,
     subject,
-    preview_url: previewUrl,
+    preview_url: `/admin/newsletter/compose?id=${campaignId}`,
     system_prompt: systemPrompt,
-    x_keywords: config?.x_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"],
-    note_keywords: config?.note_keywords?.split(",").map((k: string) => k.trim()) ?? ["ガバメントクラウド"],
+    x_keywords: xKeywords,
+    note_keywords: noteKeywords,
+    collected: {
+      note_articles: noteArticles.length,
+      official_news: officialNews.length,
+      voice_picks: voicePicks.length,
+      gcupdates: gcupdates.length,
+    },
   });
 }
