@@ -522,7 +522,7 @@ export function getSourcesForPage(pageId: string): DataSource[] {
 const FRESHNESS_THRESHOLDS: Record<UpdateCycle, { stale: number; veryStale: number }> = {
   monthly:   { stale: 45,  veryStale: 75 },
   quarterly: { stale: 120, veryStale: 180 },
-  reference: { stale: 365, veryStale: 730 },  // 白書・調査等の単発公表物
+  reference: { stale: 730, veryStale: 1095 }, // 白書・調査等の単発公表物（2-3年は「最新」扱い）
   adhoc:     { stale: 90,  veryStale: 180 },
 };
 
