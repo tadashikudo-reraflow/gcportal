@@ -10,7 +10,8 @@ function getSupabase() {
 }
 
 function generateUnsubscribeToken(leadId: number): string {
-  const secret = process.env.CRON_SECRET ?? "fallback-secret";
+  const secret = process.env.CRON_SECRET;
+  if (!secret) throw new Error("CRON_SECRET is required for unsubscribe token verification");
   return crypto.createHmac("sha256", secret).update(String(leadId)).digest("hex");
 }
 

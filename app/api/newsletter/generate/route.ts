@@ -5,8 +5,7 @@ import { renderNewsletterHtml } from "@/lib/email-template";
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
@@ -318,6 +317,15 @@ export async function POST(req: NextRequest) {
 
   const campaignId: number = campaign.id;
 
+  // 収集結果の警告生成
+  const warnings: string[] = [];
+  if (officialNews.length === 0) {
+    warnings.push("公式ニュースの取得に失敗しました。デジタル庁サイトの構造が変更された可能性があります。手動で公式情報を追加してください。");
+  }
+  if (xTweets.length === 0 && noteArticles.length === 0 && !bodyData.voicePicks?.length) {
+    warnings.push("X・noteともに情報収集できませんでした。voicePicksセクションはフォールバック内容になっています。");
+  }
+
   return NextResponse.json({
     campaign_id: campaignId,
     subject,
@@ -332,5 +340,6 @@ export async function POST(req: NextRequest) {
       voice_picks: voicePicks.length,
       gcupdates: gcupdates.length,
     },
+    ...(warnings.length > 0 && { warnings }),
   });
 }

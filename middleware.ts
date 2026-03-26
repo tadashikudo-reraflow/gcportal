@@ -10,17 +10,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url), 301);
   }
 
-  // /api/scrape/* と /api/schedule/*（POST系）を保護（CRON_SECRET or JWT）
-  if (pathname.startsWith("/api/scrape") ||
-      (pathname.startsWith("/api/schedule") && request.method !== "GET")) {
+  // /api/scrape/*（POST系）を保護（CRON_SECRET or JWT or Bearer）
+  // /api/schedule は route.ts 内で独自認証するためmiddlewareからは除外
+  if (pathname.startsWith("/api/scrape")) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
     const cronSecret = request.headers.get("x-cron-secret");
     const expectedCron = process.env.CRON_SECRET;
+    const authHeader = request.headers.get("authorization");
 
     const isAuthed = token && (await verifyAdminToken(token));
     const isCron = cronSecret && expectedCron && cronSecret === expectedCron;
+    const isBearer = authHeader?.startsWith("Bearer ") &&
+      authHeader.slice(7) === process.env.GCINSIGHT_ADMIN_KEY;
 
-    if (!isAuthed && !isCron) {
+    if (!isAuthed && !isCron && !isBearer) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     return NextResponse.next();
@@ -41,5 +44,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/tracker", "/prefectures", "/admin/:path*", "/api/scrape/:path*", "/api/schedule/:path*"],
+  matcher: ["/tracker", "/prefectures", "/admin/:path*", "/api/scrape/:path*"],
 };

@@ -1,7 +1,7 @@
 /**
  * e-Gov パブコメ RSS 差分チェッカー
  *
- * Vercel Cronから呼び出し、新規案件を検出→scrape-pipelineに投入
+ * /api/scrape/process から呼び出し、新規案件を検出→scrape-pipelineに投入
  * Playwrightは不要（RSSはfetch+XMLパースのみ）
  */
 
@@ -146,7 +146,7 @@ async function fetchDetailPdfs(
 }
 
 // ---------------------------------------------------------------------------
-// Public API (called from Vercel Cron)
+// Public API (called from /api/scrape/process)
 // ---------------------------------------------------------------------------
 
 /**

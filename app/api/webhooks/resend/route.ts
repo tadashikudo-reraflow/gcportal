@@ -5,8 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
@@ -66,7 +65,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid body" }, { status: 400 });
     }
   } else {
-    // RESEND_WEBHOOK_SECRETが未設定の場合は検証スキップ（開発環境用）
+    // 本番環境ではRESEND_WEBHOOK_SECRETの設定を強く推奨
+    console.warn("[webhook] RESEND_WEBHOOK_SECRET is not set — signature verification skipped");
     body = await req.json().catch(() => null);
     if (!body) {
       return NextResponse.json({ error: "Invalid body" }, { status: 400 });

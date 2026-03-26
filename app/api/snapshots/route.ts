@@ -8,12 +8,12 @@ import { join } from "path";
 /**
  * GET /api/snapshots
  * - 通常: 時系列スナップショット一覧を返す（公開）
- * - Vercel Cron 呼び出し時: Authorization: Bearer <CRON_SECRET> ヘッダーを検知し、
+ * - 外部スクリプト呼び出し時: Authorization: Bearer <CRON_SECRET> ヘッダーを検知し、
  *   standardization.json から月次スナップショットを保存してから一覧を返す。
  */
 export async function GET(req: NextRequest) {
   try {
-    // Vercel Cron は GET + Authorization: Bearer <CRON_SECRET> を送る
+    // 外部スクリプトからは GET + Authorization: Bearer <CRON_SECRET> を送る
     const authHeader = req.headers.get("authorization");
     const expectedCron = process.env.CRON_SECRET;
     const isCron =

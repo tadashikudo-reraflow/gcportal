@@ -5,7 +5,7 @@
  * 記事本文をfetch → テキスト抽出 → RAG ingest
  * 添付PDF/Excelも検出してingest
  *
- * Vercel Cron（/api/scrape/process）から呼び出し
+ * /api/scrape/process から呼び出し
  */
 
 import type { DocumentCategory } from "./rag";

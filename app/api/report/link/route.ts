@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 /**
  * GET /api/report/link?email=xxx
  *
- * Beehiiv Welcome Email から叩かれるエンドポイント。
+ * リード登録後のメールから叩かれるエンドポイント。
  * メールアドレスが leads テーブルに存在する場合、
  * Supabase Storage から 48h Signed URL を生成してリダイレクトする。
  */

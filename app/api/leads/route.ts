@@ -186,7 +186,7 @@ async function generateDownloadUrl(): Promise<string | null> {
 /**
  * POST /api/leads — リード（メアド+所属）を保存
  *
- * 保存後、設定に応じて Slack / メール / Beehiiv に並列通知する。
+ * 保存後、設定に応じて Slack / メール / PDF配信メール（sendPdfEmail）に並列通知する。
  * いずれかの通知が失敗してもリード保存は成功扱い。
  */
 export async function POST(req: NextRequest) {

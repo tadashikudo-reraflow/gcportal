@@ -5,7 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 const BASE_URL = "https://gcinsight.jp";
 
 function generateUnsubscribeToken(leadId: number): string {
-  const secret = process.env.CRON_SECRET ?? "fallback-secret";
+  const secret = process.env.CRON_SECRET;
+  if (!secret) throw new Error("CRON_SECRET is required for unsubscribe token generation");
   return crypto.createHmac("sha256", secret).update(String(leadId)).digest("hex");
 }
 
@@ -25,7 +26,7 @@ function addUnsubscribeFooter(html: string, leadId: number): string {
 
   const footer = `${noteCta}<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
   <p>配信停止は<a href="${unsubscribeUrl}" style="color:#6b7280;">こちら</a>からお願いします。</p>
-  <p>© 2026 GCInsight | 〒100-0000 東京都</p>
+  <p>© 2026 GCInsight | <a href="https://reraflow.com/contact/" style="color:#6b7280;">お問い合わせ</a></p>
 </div>`;
   if (html.includes("</body>")) {
     return html.replace("</body>", `${footer}</body>`);
@@ -39,8 +40,7 @@ const BATCH_SIZE = 100;
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 

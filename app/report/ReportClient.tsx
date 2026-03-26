@@ -62,7 +62,7 @@ export default function ReportClient() {
         return;
       }
 
-      // 2. PDFリンクはBeehiiv Welcome Emailで送信 → サンクス画面に誘導
+      // 2. PDFリンクは sendPdfEmail でユーザーに直接送信 → サンクス画面に誘導
       setShowThanks(true);
     } catch {
       setError("処理に失敗しました。もう一度お試しください。");

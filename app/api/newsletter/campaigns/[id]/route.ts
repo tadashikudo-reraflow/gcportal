@@ -4,8 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
@@ -68,6 +67,34 @@ export async function PATCH(
   }
 
   return NextResponse.json(data);
+}
+
+// DELETE /api/newsletter/campaigns/[id] — 削除
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!await checkAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const campaignId = parseInt(id, 10);
+  if (isNaN(campaignId)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from("campaigns")
+    .delete()
+    .eq("id", campaignId);
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return new NextResponse(null, { status: 204 });
 }
 
 // POST /api/newsletter/campaigns/[id] — 複製
