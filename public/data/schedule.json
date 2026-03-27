@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-22",
+  "last_updated": "2026-03-27",
   "annual_schedule": [
     {
       "quarter": "Q1（2026年4〜6月）",
@@ -125,21 +125,23 @@
     },
     {
       "date": "2026-03-23",
-      "status": "upcoming",
+      "status": "done",
       "title": "医療保険者等向け中間サーバーのオン資黒丸表示問題対応",
       "org": "厚生労働省",
       "url": "https://www.mhlw.go.jp/"
     },
     {
       "date": "2026-03-24",
-      "status": "upcoming",
-      "title": "第16次地方分権一括法案（閣議決定）",
-      "org": "閣議",
-      "note": "日程未確定"
+      "status": "done",
+      "title": "システム標準化基準 官報告示（省令3本・告示11本・号外第65号）",
+      "org": "デジタル庁・総務省",
+      "important": true,
+      "url": "https://www.kanpo.go.jp/20260324/20260324.fullcontents.html",
+      "note": "令和8年4月1日施行"
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "2026年度ガバクラ契約先決定",
       "org": "デジタル庁",
       "note": "3月下旬予定",
@@ -147,7 +149,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "インフラモダン化実践ガイドの公開",
       "org": "デジタル庁",
       "note": "3月下旬予定",
@@ -155,7 +157,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "アプリケーションモダン化実践ガイドの公開",
       "org": "デジタル庁",
       "note": "3月下旬予定",
@@ -163,7 +165,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "Gビズポータル版リリース",
       "org": "デジタル庁",
       "note": "3月下旬予定",
@@ -171,7 +173,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "2026年度ガバクラ契約",
       "org": "デジタル庁",
       "note": "3月下旬予定",
@@ -179,7 +181,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "標準化基準令公布",
       "org": "制度所管省庁・デジタル庁",
       "note": "3月下旬予定",
@@ -187,7 +189,7 @@
     },
     {
       "date": "2026-03-25",
-      "status": "upcoming",
+      "status": "done",
       "title": "暫定予算成立",
       "org": "国会",
       "note": "3月下旬予定"

@@ -153,10 +153,19 @@ export default function RisksPage() {
             <p className="text-base font-extrabold" style={{ color: "#b91c1c" }}>
               2026/3/31
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限まで</p>
-            <p className="text-xs tabular-nums font-semibold" style={{ color: "#b91c1c" }}>
-              {Math.max(0, Math.ceil((new Date("2026-03-31").getTime() - Date.now()) / 86400000))}日
-            </p>
+            {Date.now() >= new Date("2026-03-31").getTime() ? (
+              <>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限</p>
+                <p className="text-xs font-semibold" style={{ color: "#b91c1c" }}>期限到達済み</p>
+              </>
+            ) : (
+              <>
+                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限まで</p>
+                <p className="text-xs tabular-nums font-semibold" style={{ color: "#b91c1c" }}>
+                  {Math.ceil((new Date("2026-03-31").getTime() - Date.now()) / 86400000)}日
+                </p>
+              </>
+            )}
           </div>
         </div>
 

@@ -83,7 +83,7 @@ export default function ReportClient() {
               </p>
             )}
             <p className="text-blue-300 text-sm font-medium tracking-widest mb-2 uppercase">
-              2025年度末（2026-03-31）移行目標時期の全実態
+              2026年3月31日 移行目標期限・実績レポート
             </p>
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
               1,741自治体の<br />リアルな進捗データ
