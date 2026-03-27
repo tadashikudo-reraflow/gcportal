@@ -57,7 +57,7 @@ export default async function ArticlesPage() {
           <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>記事準備中です</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {articles.map((article) => (
             <Link key={article.slug} href={`/articles/${article.slug}`}
               className="article-card group">
@@ -70,7 +70,7 @@ export default async function ArticlesPage() {
               ) : (
                 <ArticlePlaceholder title={article.title} />
               )}
-              <div className="p-5 flex flex-col gap-3 flex-1">
+              <div className="p-6 flex flex-col gap-3 flex-1">
                 <h2 className="text-base font-bold leading-snug group-hover:underline"
                   style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
                 {article.description && (

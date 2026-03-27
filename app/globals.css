@@ -726,15 +726,15 @@ body {
   display: flex;
   flex-direction: column;
   background: #FFFFFF;
-  border: none;
-  border-radius: 12px;
+  border: 1px solid #E8EDF4;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s, transform 0.15s;
 }
 .article-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
 }
 
 /* ==========================================================
