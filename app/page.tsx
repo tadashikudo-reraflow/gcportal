@@ -278,78 +278,58 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* ========== CTA セクション（行動喚起） ========== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* 1枚目: インパクト数字付き（大きめ、2列ぶち抜き） */}
-        <Link href="/risks" className="cta-card sm:col-span-2 sm:flex-row sm:items-center" style={{ flexDirection: "row", gap: "1.5rem" }}>
-          <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth: 80 }}>
-            <span className="tabular-nums font-black" style={{ fontSize: 36, color: "#B91C1C", lineHeight: 1 }}>
-              {riskMunis.length}
+      {/* ========== 次に調べる（回遊CTA） ========== */}
+      <div>
+        <p className="text-xs font-semibold mb-3" style={{ color: "var(--color-text-muted)" }}>次に調べる</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <Link href="/risks" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}>
+              {riskMunis.length}件
             </span>
-            <span className="text-xs font-semibold mt-1" style={{ color: "#B91C1C" }}>自治体</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="cta-card-title">遅延リスク自治体</span>
-            <span className="cta-card-desc">進捗率50%未満を地域や人口帯で確認</span>
-            <span className="cta-card-link">
-              一覧を見る
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+            <span className="explore-card-title">遅延リスク自治体</span>
+            <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
+          </Link>
+
+          <Link href="/businesses" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#DBEAFE", color: "#1D4ED8" }}>
+              20業務
             </span>
-          </div>
-        </Link>
+            <span className="explore-card-title">業務別の進捗</span>
+            <span className="explore-card-desc">住民記録・国民年金など業務ごとの移行状況を確認</span>
+          </Link>
 
-        {/* 2枚目: 標準カード（アイコン+テキスト） */}
-        <Link href="/costs" className="cta-card">
-          <div className="cta-card-icon" style={{ backgroundColor: "#FEF3C7" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#92400E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23" />
-              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-            </svg>
-          </div>
-          <span className="cta-card-title">コスト分析</span>
-          <span className="cta-card-desc">平均{COST_CONSTANTS.avgCostIncrease}倍の要因を比較</span>
-          <span className="cta-card-link">
-            コスト分析を見る
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-          </span>
-        </Link>
+          <Link href="/benchmark" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}>
+              比較
+            </span>
+            <span className="explore-card-title">自治体を比較</span>
+            <span className="explore-card-desc">人口帯・都道府県で類似団体の進捗をベンチマーク</span>
+          </Link>
 
-        {/* 3枚目: テキスト主体（アイコンなし、背景色付き） */}
-        <Link
-          href="/report?from=home_cta"
-          className="cta-card"
-          style={{ backgroundColor: "#eff6ff", border: "1px solid #bfdbfe" }}
-        >
-          <span className="cta-card-title" style={{ color: "#1E40AF" }}>
-            全体レポート（PDF）
-          </span>
-          <span className="cta-card-desc">全国サマリーを報告資料向けに整理</span>
-          <span className="cta-card-link">
-            無料ダウンロード
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </span>
-        </Link>
+          <Link href="/costs" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}>
+              {COST_CONSTANTS.avgCostIncrease}倍
+            </span>
+            <span className="explore-card-title">コスト増の要因</span>
+            <span className="explore-card-desc">ベンダー別コスト比較と高騰の背景を分析</span>
+          </Link>
 
-        <Link
-          href="/cost-reduction"
-          className="cta-card"
-          style={{ backgroundColor: "#fff7ed", border: "1px solid #fdba74" }}
-        >
-          <span className="cta-card-title" style={{ color: "#9a3412" }}>
-            コスト削減特設
-          </span>
-          <span className="cta-card-desc">移行済み最適化と未移行見直しを整理</span>
-          <span className="cta-card-link" style={{ color: "#c2410c" }}>
-            特設ページを見る
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </span>
-        </Link>
+          <Link href="/packages" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#F3E8FF", color: "#6B21A8" }}>
+              パッケージ
+            </span>
+            <span className="explore-card-title">導入パッケージ</span>
+            <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
+          </Link>
+
+          <Link href="/report?from=home_cta" className="explore-card" style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" }}>
+            <span className="explore-card-badge" style={{ backgroundColor: "#BFDBFE", color: "#1E40AF" }}>
+              無料PDF
+            </span>
+            <span className="explore-card-title" style={{ color: "#1E40AF" }}>全体レポート</span>
+            <span className="explore-card-desc">全国サマリーを報告資料向けにダウンロード</span>
+          </Link>
+        </div>
       </div>
 
       {/* 出典・データソース */}

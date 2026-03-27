@@ -659,6 +659,44 @@ body {
   gap: 0.25rem;
 }
 
+/* ========== Explore Cards (回遊CTA) ========== */
+.explore-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1rem 1.125rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+.explore-card:hover {
+  box-shadow: 0 4px 16px rgba(23, 28, 31, 0.08);
+  transform: translateY(-2px);
+  border-color: var(--color-brand-primary);
+}
+.explore-card-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.125rem 0.5rem;
+  border-radius: 99px;
+  align-self: flex-start;
+  letter-spacing: 0.01em;
+}
+.explore-card-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-top: 0.25rem;
+}
+.explore-card-desc {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
 /* ==========================================================
    記事カード — VisasQ風（ボーダーなし + ホバー影 + 白背景）
    ========================================================== */
