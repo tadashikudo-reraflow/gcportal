@@ -621,6 +621,12 @@ export default async function CostsPage() {
               {vendors.map((vendor) => {
                 const shortName = vendor.short_name ?? vendor.name;
                 const evalData = vendorEvaluations[shortName];
+                // DBのcloud_platformをフォールバックとして使用
+                const cloudLabel = evalData?.cloud ?? vendor.cloud_platform ?? null;
+                const cloudConfirmed = evalData?.confirmed ?? (vendor.cloud_platform != null);
+                const CLOUD_COLORS: Record<string, string> = {
+                  AWS: "#FF9900", OCI: "#F80000", Azure: "#0078D4", GCP: "#4285F4",
+                };
                 return (
                   <tr
                     key={vendor.id}
@@ -633,34 +639,29 @@ export default async function CostsPage() {
                       )}
                     </td>
                     <td className="py-3 px-3 text-xs">
-                      {evalData?.cloud ? (
-                        <span className="font-medium" style={{
-                          color: evalData.cloud === "AWS" ? "#FF9900" : evalData.cloud === "OCI" ? "#F80000" : evalData.cloud === "Azure" ? "#0078D4" : evalData.cloud === "GCP" ? "#4285F4" : "#6b7280"
-                        }}>
-                          {evalData.cloud}
-                          {evalData.confirmed && <span className="ml-1 text-green-600">&#10003;</span>}
+                      {cloudLabel ? (
+                        <span className="font-medium" style={{ color: CLOUD_COLORS[cloudLabel] ?? "#6b7280" }}>
+                          {cloudLabel}
+                          {cloudConfirmed && <span className="ml-1 text-green-600">&#10003;</span>}
                         </span>
                       ) : (
-                        <span className="text-gray-400">調査中</span>
+                        <span className="text-gray-400">—</span>
                       )}
                     </td>
                     <td className="py-3 px-3 text-center">
                       {evalData ? (
-                        <span
-                          className="text-xl font-bold"
-                          style={{ color: evalData.markColor }}
-                        >
+                        <span className="text-xl font-bold" style={{ color: evalData.markColor }}>
                           {evalData.mark}
                         </span>
                       ) : (
-                        <span className="text-gray-400">調査中</span>
+                        <span className="text-gray-400">—</span>
                       )}
                     </td>
                     <td className="py-3 px-3 text-xs text-gray-600">
-                      {evalData?.label ?? "調査中"}
+                      {evalData?.label ?? <span className="text-gray-400">—</span>}
                     </td>
                     <td className="py-3 px-3 text-xs text-gray-500">
-                      {evalData?.detail ?? "調査中"}
+                      {evalData?.detail ?? <span className="text-gray-400">—</span>}
                     </td>
                   </tr>
                 );
