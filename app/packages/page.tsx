@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Vendor, Package, Municipality, MunicipalityPackageRow } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
@@ -106,6 +107,7 @@ export default async function PackagesPage() {
 
       <SourceAttribution sourceIds={PAGE_SOURCES.packages} pageId="packages" />
 
+      <PageNavCards exclude="/packages" />
       <RelatedArticles cluster={CLUSTERS.vendor} />
     </div>
   );

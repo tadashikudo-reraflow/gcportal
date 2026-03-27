@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
@@ -709,6 +710,7 @@ export default async function CloudPage() {
         description="クラウド比較だけでなく、進捗、コスト、遅延構造までまとめた無料レポートを受け取れます。"
       />
 
+      <PageNavCards exclude="/cloud" />
       <RelatedArticles cluster={CLUSTERS.tech} />
     </div>
   );

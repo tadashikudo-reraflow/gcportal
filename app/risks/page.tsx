@@ -4,6 +4,7 @@ import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality } from "@/lib/types";
 import RiskFilter from "./RiskFilter";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
 import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
@@ -345,6 +346,7 @@ export default function RisksPage() {
       <FreshnessBanner dataMonth={summary.data_month} pageLabel="遅延リスク" />
       <SourceAttribution sourceIds={PAGE_SOURCES.risks} pageId="risks" />
 
+      <PageNavCards exclude="/risks" />
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );

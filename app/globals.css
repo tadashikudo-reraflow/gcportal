@@ -659,6 +659,28 @@ body {
   gap: 0.25rem;
 }
 
+/* ========== Page Nav Cards (ページ間回遊) ========== */
+.page-nav-cards {
+  padding: 1.5rem 0 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+.page-nav-cards-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+.page-nav-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 768px) {
+  .page-nav-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ========== Explore Cards (回遊CTA) ========== */
 .explore-card {
   background: #ffffff;

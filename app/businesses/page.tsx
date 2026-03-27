@@ -4,6 +4,7 @@ import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality, BusinessSummary } from "@/lib/types";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
 
 // 特定移行自治体のSetを構築
@@ -215,6 +216,7 @@ export default function BusinessesPage() {
         })}
       </div>
 
+      <PageNavCards exclude="/businesses" />
       <RelatedArticles cluster={CLUSTERS.business} />
     </div>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
@@ -1062,6 +1063,7 @@ export default async function CostsPage() {
         </div>
       )}
 
+      <PageNavCards exclude="/costs" />
       <RelatedArticles cluster={CLUSTERS.cost} />
     </div>
   );

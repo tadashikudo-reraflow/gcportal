@@ -4,6 +4,7 @@ import standardData from "@/public/data/standardization.json";
 import TokuteiFilter from "./TokuteiFilter";
 import Link from "next/link";
 import RelatedArticles from "@/components/RelatedArticles";
+import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import SourceAttribution from "@/components/SourceAttribution";
@@ -282,6 +283,7 @@ export default function TokuteiPage() {
       <FreshnessBanner dataMonth={(tokuteiData as { updated_at: string }).updated_at.slice(0, 7)} pageLabel="特定移行" />
       <SourceAttribution sourceIds={PAGE_SOURCES.tokutei} pageId="tokutei" />
 
+      <PageNavCards exclude="/tokutei" />
       <RelatedArticles cluster={CLUSTERS.tokutei} />
     </div>
   );
