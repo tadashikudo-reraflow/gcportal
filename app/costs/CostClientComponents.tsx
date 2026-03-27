@@ -95,11 +95,11 @@ export function ExpandableMuniRow({
                 <table className="w-full">
                   <tbody>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">クラウド利用料（IaaS）</td>
+                      <td className="py-1 text-gray-500">クラウド利用料</td>
                       <td className="py-1 text-right font-medium text-gray-700">約25〜35%</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-1 text-gray-500">ソフトウェア借料（SaaS/ライセンス）</td>
+                      <td className="py-1 text-gray-500">ソフトウェア利用料</td>
                       <td className="py-1 text-right font-medium text-gray-700">約30〜40%</td>
                     </tr>
                     <tr className="border-b border-gray-100">

@@ -27,7 +27,7 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   RKKCS: {
     ratioMin: 1.0, ratioMax: 1.5, ratioTypical: 1.2,
     mark: "◎", markColor: "#007a3d", cloud: "OCI",
-    note: "OCI基盤。シンプルな料金体系・円建て課金・コスト効率に優れる。Egress 10TB/月無料・OCPU課金で利用料自体が安価。札幌市は2025年4月にOCIで32業務移行を発表。【出典: RKKCS公式・日本オラクル ※一部参考値】",
+    note: "OCI（Oracle Cloud）基盤。円建て課金でコスト効率に優れる。データ転送料が月10TBまで無料で利用料が安価。札幌市は2025年4月にOCIで32業務移行を発表。【出典: RKKCS公式・日本オラクル ※一部参考値】",
   },
   富士通: {
     ratioMin: 1.5, ratioMax: 3.0, ratioTypical: 2.0,
@@ -127,7 +127,7 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
   },
   RKKCS: {
     label: "コスト効率◎",
-    detail: "OCI採用。シンプルな料金体系・円建て課金・コスト効率に優れる。Egress無料枠大・OCPU課金で利用料自体が安価。札幌市が2025年4月に32業務のOCI移行を発表（RKKCS公式・日本オラクル）",
+    detail: "OCI（Oracle Cloud）採用。円建て課金でコスト効率に優れる。データ転送料が月10TBまで無料で利用料が安価。札幌市が2025年4月に32業務のOCI移行を発表（RKKCS公式・日本オラクル）",
     mark: "◎", markColor: "#007a3d", cloud: "OCI", confirmed: true,
   },
   日立: {
@@ -156,8 +156,8 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
     mark: "○", markColor: "#1d6fa4", cloud: "OCI", confirmed: true,
   },
   JIP: {
-    label: "AWS＋自社IaaS○",
-    detail: "WizLIFEはAWS対応。自社IaaS「Jip-Base」（自治体専用）も提供（JIP公式）",
+    label: "AWS＋自社クラウド○",
+    detail: "WizLIFEはAWS対応。自社クラウド「Jip-Base」（自治体専用）も提供（JIP公式）",
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
   "行政S": {
@@ -167,7 +167,7 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
   },
   "京都GIS": {
     label: "接続基盤（AWS基本）",
-    detail: "京都GC接続サービス（2024/7〜）。AWS Direct Connect基本。OCI/Azure/GCPもサポート。接続基盤提供",
+    detail: "京都GC接続サービス（2024/7〜）。AWSへの専用回線接続が基本。OCI/Azure/GCPもサポート。接続基盤提供",
     mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
   },
 };
@@ -181,17 +181,17 @@ const CLOUD_COMPARISON = [
     cloud: "AWS",
     color: "#FF9900",
     index: 100,
-    basis: "基準値。EC2 RI + RDS + S3 + Egress月100GB + サポート込み。",
+    basis: "基準値。仮想サーバ・データベース・ストレージ・データ転送（月100GB）・サポート込み。",
     strengths: "サービス数最多。ガバメントクラウド第一号認定。採用実績が最大。",
-    weaknesses: "Egressコストが高い。従量課金が複雑でRI/SP最適化が必要。",
+    weaknesses: "データ転送コストが高い。従量課金の体系が複雑で最適化に専門知識が必要。",
     govCloudNote: "ガバメントクラウド最多採用。東京・大阪リージョン利用。",
   },
   {
     cloud: "GCP",
     color: "#4285F4",
     index: 85,
-    basis: "Compute Engine CUD + Cloud SQL + GCS。Sustained Use Discount自動適用。",
-    strengths: "BigQuery等のデータ分析基盤。Sustained Use Discount自動適用。Egress料金がAWSより安価。",
+    basis: "仮想サーバ・データベース・ストレージ。長期利用割引が自動適用。",
+    strengths: "データ分析基盤（BigQuery等）が充実。長期利用割引が自動適用。データ転送料がAWSより安価。",
     weaknesses: "ガバメントクラウドでの採用実績が限定的。",
     govCloudNote: "ガバメントクラウド認定済。採用実績は限定的。",
   },
@@ -199,7 +199,7 @@ const CLOUD_COMPARISON = [
     cloud: "Azure",
     color: "#0078D4",
     index: 95,
-    basis: "VM RI + Azure SQL + Blob Storage。Microsoft EA契約割引反映前。",
+    basis: "仮想サーバ・データベース・ストレージ。Microsoft企業契約割引反映前。",
     strengths: "Microsoft 365・Active Directoryとの親和性。行政機関での導入実績。",
     weaknesses: "リージョン数がAWSより少ない。ライセンス体系が複雑。",
     govCloudNote: "日立等一部ベンダーが検証済。M365連携で選定される場合あり。",
@@ -208,8 +208,8 @@ const CLOUD_COMPARISON = [
     cloud: "OCI",
     color: "#F80000",
     index: 55,
-    basis: "Compute OCPU + Autonomous DB。Egress月10TB無料。円建て課金。",
-    strengths: "Egress無料枠が大きい。円建て課金で為替リスクなし。Oracle DB利用時のTCOが低い。ネットワーク性能も高水準。",
+    basis: "仮想サーバ・自律型データベース。データ転送料が月10TBまで無料。円建て課金。",
+    strengths: "データ転送料の無料枠が大きい。円建て課金で為替リスクなし。Oracle DB利用時のコストが低い。ネットワーク性能も高水準。",
     weaknesses: "サービスラインナップがAWS/Azureより限定的。Oracle DB以外では優位性が薄い。",
     govCloudNote: "RKKCS・GCC等が採用。札幌市が2025年4月に32業務のOCI移行を発表。",
   },
@@ -217,9 +217,9 @@ const CLOUD_COMPARISON = [
     cloud: "さくらのクラウド",
     color: "#FF8C9E",
     index: 80,
-    basis: "専有サーバ + RDB + オブジェクトストレージ。転送量課金なし（閉域網内）。",
-    strengths: "国産・データ主権確保。転送量課金なし。専有型で物理的な分離が可能。",
-    weaknesses: "マネージドサービスが限定的。大規模ワークロードの実績が少ない。",
+    basis: "専有サーバ・データベース・ストレージ。閉域網内のデータ転送料なし。",
+    strengths: "国産・データを国内で完結。転送量課金なし。専有型で物理的な分離が可能。",
+    weaknesses: "提供サービスが限定的。大規模システムでの採用実績が少ない。",
     govCloudNote: "ガバメントクラウド認定済。国内完結を重視する自治体が選定。",
   },
 ];

@@ -74,7 +74,7 @@ const VENDOR_WEBSITES: Record<string, string> = {
 // クラウド別コスト比較
 const COST_COMPARE = [
   {
-    item: "コンピュート（4vCPU / 16GB）",
+    item: "処理能力（4コア / メモリ16GB）",
     unit: "USD/月",
     aws: 180, azure: 170, gcp: 160, oci: 56, sakura: null,
     note: "OCI E4.Flex vs AWS m6i.xlarge 相当",
@@ -92,10 +92,10 @@ const COST_COMPARE = [
     note: "OCI: 月10TBまで無料",
   },
   {
-    item: "TCO 総合推定比",
+    item: "総費用の目安",
     unit: "AWS=100",
     aws: 100, azure: 95, gcp: 90, oci: 55, sakura: 70,
-    note: "Oracle TCO白書・ガバクラTCO検証。参考値。",
+    note: "Oracle公式調査・デジタル庁検証資料より。参考値。",
   },
 ];
 
@@ -526,7 +526,7 @@ export default async function CloudPage() {
       <div className="card p-5">
         <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
           クラウド別コスト比較
-          <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ典型ワークロード</span>
+          <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ標準システム規模での比較</span>
         </h2>
         <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
           各社公式料金表ベースの参考値。実費は構成で変動します。
@@ -535,7 +535,7 @@ export default async function CloudPage() {
         {/* TCO指数バーチャート（ビジュアル） */}
         <div className="mb-5 rounded-xl p-4" style={{ backgroundColor: "#f8fafc" }}>
           <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-            TCO総合推定比（AWS=100）
+            総費用の目安（AWS=100基準）
           </p>
           <div className="space-y-3">
             {CLOUD_ORDER.map((cloudKey) => {
@@ -559,7 +559,7 @@ export default async function CloudPage() {
             })}
           </div>
           <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-            Oracle TCO白書・ガバクラTCO検証。参考値。
+            Oracle公式調査・デジタル庁検証資料より。参考値。
           </p>
         </div>
 
