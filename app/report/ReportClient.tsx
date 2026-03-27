@@ -76,39 +76,33 @@ export default function ReportClient() {
       {/* フォームセクション */}
       {!showThanks && (
         <div className="text-center">
-          <div className="bg-gradient-to-br from-[#002D72] to-[#001440] text-white rounded-2xl p-8 md:p-12 mb-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 md:p-10 mb-8 text-left shadow-sm">
             {sourceLabel && (
-              <p className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold mb-4">
+              <p className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-4">
                 {sourceLabel}をご覧の方向け
               </p>
             )}
-            <p className="text-blue-300 text-sm font-medium tracking-widest mb-2 uppercase">
+            <p className="text-xs font-medium text-gray-400 mb-2 tracking-wider uppercase">
               2026年3月31日 移行目標期限・実績レポート
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
               1,741自治体の<br />リアルな進捗データ
             </h1>
-            <p className="text-blue-200 text-lg mb-6">
-              標準化対象34,592システムの進捗・コスト・遅延構造を完全解説。
-              社内報告・議会答弁・ベンダー交渉にそのまま使える約20,000字の調査レポート。
+            <p className="text-gray-500 text-base mb-8 max-w-xl">
+              標準化対象34,592システムの進捗・コスト・遅延構造を完全解説。社内報告・議会答弁・ベンダー交渉にそのまま使える約20,000字の調査レポート。
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-2xl font-bold">38.4%</div>
-                <div className="text-sm text-blue-200">移行完了率</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-2xl font-bold">935団体</div>
-                <div className="text-sm text-blue-200">遅延・延長認定</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-2xl font-bold">2.3x</div>
-                <div className="text-sm text-blue-200">コスト増加（推計）</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="text-2xl font-bold">8章</div>
-                <div className="text-sm text-blue-200">完全解説</div>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-2">
+              {[
+                { num: "38.4%", label: "移行完了率" },
+                { num: "935団体", label: "遅延・延長認定" },
+                { num: "2.3x", label: "コスト増加（推計）" },
+                { num: "8章", label: "完全解説" },
+              ].map((s) => (
+                <div key={s.label} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div className="text-2xl font-black text-gray-900">{s.num}</div>
+                  <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+                </div>
+              ))}
             </div>
           </div>
 
