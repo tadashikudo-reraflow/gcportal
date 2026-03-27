@@ -28,6 +28,8 @@ import textwrap
 import requests
 from pathlib import Path
 from datetime import datetime
+from PIL import Image
+from io import BytesIO
 
 # ── 設定 ──────────────────────────────────────────────────────────
 SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co"
@@ -44,7 +46,8 @@ PUBLIC_IMGS    = GCPORTAL_DIR / "public" / "images" / "articles"
 PUBLIC_X_IMGS  = GCPORTAL_DIR / "public" / "images" / "x-articles"
 OUT_DIR        = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ19" / "x_articles"
 
-XAI_KEY = os.environ.get("XAI_API_KEY", "")
+XAI_KEY     = os.environ.get("XAI_API_KEY", "")
+GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "AIzaSyA_HCYVxwI2KJhoX590wEiKw6Ytv31TtEI")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
@@ -226,139 +229,86 @@ def render_blocks_to_png(blocks, slug, tmp_dir: Path):
 
     return [p for p in png_paths if Path(p).exists()]
 
-# ── カバー画像生成（Grok + HTML テンプレート + Playwright）────────────
+# ── カバー画像生成（Gemini直接生成）────────────────────────────────
 
-def _grok_prompt_from_article(article):
-    """記事タイトル・タグからGrok画像生成プロンプトを生成"""
-    title = article["title"].split("｜")[0].strip()
-    tags = article.get("tags") or []
-    tag_str = ", ".join(tags[:3])
+# X Articles推奨サイズ: 1200×675 (16:9)
+X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 X Articles推奨比率
+SEO_COVER_W, SEO_COVER_H = 2400, 1260  # GCInsight SEO記事OGP
+
+def _build_prompt(title, context, aspect):
+    """比率別プロンプト生成。aspect='5:2'(X記事) or '16:9'(SEO)"""
+    if aspect == "5:2":
+        layout = "Very wide banner: width is 2.5× the height (5:2). Title top-center, illustration fills bottom area horizontally."
+    else:
+        layout = "Landscape 16:9 format. Title top-center, illustration fills lower two-thirds."
     return (
-        f"Isometric illustration for Japanese government cloud article about '{title}', "
-        f"themes: {tag_str}, Japan National Diet Building connected to cloud servers, "
-        "deep blue and sky blue tones, clean vector style, no text, minimalist modern design"
+        f"Create an infographic illustration for a Japanese government cloud (ガバメントクラウド) article. "
+        f"{layout} "
+        f"TITLE: render this exact Japanese text once at the top, large bold dark navy font, do NOT repeat or truncate: 「{title}」 "
+        f"ILLUSTRATION (isometric 3D style): visually represent the article topic. {context}. "
+        f"Choose from: Japanese municipal buildings, cloud servers, documents/checklists, security shields, "
+        f"network connections, dashboards, officials/people, bar charts, gear icons — pick what fits the topic. "
+        f"Add short Japanese labels on key elements. "
+        f"STYLE: White background, deep navy (#1a3a5c) and sky blue (#4a90d9), professional infographic, no borders."
     )
 
-def _gen_grok_image(prompt, save_path):
-    """xAI REST API で画像生成 → save_path に保存"""
-    from PIL import Image
-    from io import BytesIO
-    import base64
 
-    r = requests.post(
-        "https://api.x.ai/v1/images/generations",
-        headers={"Authorization": f"Bearer {XAI_KEY}", "Content-Type": "application/json"},
-        json={"model": "grok-imagine-image", "prompt": prompt, "n": 1, "response_format": "b64_json"},
-        timeout=120,
+def _gemini_generate(client, types, prompt):
+    """Gemini呼び出し → PIL Imageを返す"""
+    from google.genai import types as gtypes
+    response = client.models.generate_content(
+        model="gemini-3.1-flash-image-preview",
+        contents=prompt,
+        config=gtypes.GenerateContentConfig(response_modalities=["IMAGE", "TEXT"]),
     )
-    r.raise_for_status()
-    b64 = r.json()["data"][0]["b64_json"]
-    img = Image.open(BytesIO(base64.b64decode(b64)))
-    img.save(save_path)
-    return img.size
-
-def _render_cover_html(article, illust_b64, out_path):
-    """左テキスト＋右イラストのHTMLテンプレートをPlaywrightで1500×600レンダリング"""
-    import asyncio
-    from playwright.async_api import async_playwright
-
-    title_parts = article["title"].split("｜")
-    title = title_parts[0].strip()
-    subtitle = title_parts[1].strip() if len(title_parts) > 1 else ""
-    tags = article.get("tags") or []
-    tag = tags[0] if tags else "ガバメントクラウド"
-
-    html = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8">
-<style>
-* {{ margin:0; padding:0; box-sizing:border-box; }}
-body {{ width:1500px; height:600px; background:#EEF4FB;
-       font-family:"Hiragino Sans","ヒラギノ角ゴシック",sans-serif; overflow:hidden; position:relative; }}
-.grid {{ position:absolute; inset:0;
-  background-image: linear-gradient(rgba(30,90,180,0.08) 1px,transparent 1px),
-                    linear-gradient(90deg,rgba(30,90,180,0.08) 1px,transparent 1px);
-  background-size:40px 40px; }}
-.container {{ position:relative; display:flex; align-items:center; height:100%; padding:60px 0 60px 80px; }}
-.text-area {{ flex:0 0 620px; display:flex; flex-direction:column; gap:20px; z-index:2; }}
-.label {{ font-size:22px; font-weight:600; color:#1E5AB4; letter-spacing:0.05em; }}
-.title {{ font-size:52px; font-weight:800; color:#0D1F3C; line-height:1.25; letter-spacing:-0.01em;
-          word-break:keep-all; overflow-wrap:break-word; }}
-.subtitle {{ font-size:20px; font-weight:400; color:#4A6FA5; line-height:1.6; }}
-.tag {{ display:inline-block; background:#1E5AB4; color:white; font-size:16px;
-        font-weight:600; padding:6px 16px; border-radius:4px; }}
-.illust-area {{ flex:1; height:100%; position:relative; }}
-.illust-area img {{ height:560px; width:auto; object-fit:contain;
-                   position:absolute; right:-10px; bottom:0;
-                   filter:drop-shadow(0 8px 24px rgba(30,90,180,0.15)); }}
-</style></head>
-<body>
-<div class="grid"></div>
-<div class="container">
-  <div class="text-area">
-    <span class="label">GCInsight コラム</span>
-    <h1 class="title">{title}</h1>
-    {"<p class='subtitle'>" + subtitle + "</p>" if subtitle else ""}
-    <span class="tag"># {tag}</span>
-  </div>
-  <div class="illust-area">
-    <img src="data:image/png;base64,{illust_b64}">
-  </div>
-</div>
-</body></html>"""
-
-    html_file = Path("/tmp/cover_render.html")
-    html_file.write_text(html)
-
-    async def _render():
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            ctx = await browser.new_context(viewport={"width": 1500, "height": 600})
-            page = await ctx.new_page()
-            await page.goto("http://localhost:9876/cover_render.html")
-            await page.wait_for_timeout(500)
-            await page.screenshot(path=str(out_path), clip={"x": 0, "y": 0, "width": 1500, "height": 600})
-            await browser.close()
-
-    asyncio.run(_render())
+    for part in response.candidates[0].content.parts:
+        if part.inline_data:
+            return Image.open(BytesIO(part.inline_data.data))
+    raise ValueError("画像データなし")
 
 
 def generate_cover_image(article):
-    """Grok画像生成 → HTMLテンプレート合成 → Playwright → x-articles/id{N}/cover.png"""
-    import base64
+    """Gemini 2回呼び出し → X記事用(1500×600,5:2) + SEO用(2400×1260,16:9) を別々に生成"""
+    from google import genai
+    from google.genai import types
+
     slug = article["slug"]
     article_id = article["id"]
+    title = article["title"].split("｜")[0].strip()
+    tags = article.get("tags") or []
+    summary = article.get("meta_description") or ""
+    context = f"Summary: {summary}" if summary else f"Tags: {', '.join(tags[:3])}"
 
     x_img_dir = PUBLIC_X_IMGS / f"id{article_id}"
     x_img_dir.mkdir(parents=True, exist_ok=True)
     cover_path = x_img_dir / "cover.png"
+    seo_cover  = PUBLIC_IMGS / f"{slug}.png"
 
-    if cover_path.exists():
-        print(f"🖼  カバー画像: 既存を流用 (x-articles/id{article_id}/cover.png)")
+    if cover_path.exists() and seo_cover.exists():
+        print(f"🖼  カバー画像: 既存を流用 (id{article_id} + {slug}.png)")
         return f"id{article_id}/cover.png"
 
-    print(f"🖼  カバー画像生成 (Grok+HTML): id{article_id} {slug}")
+    client = genai.Client(api_key=GEMINI_KEY)
+    print(f"🖼  カバー画像生成 (Gemini×2): id{article_id} {slug}")
 
-    # Step1: Grok画像生成
-    illust_path = Path(f"/tmp/grok_illust_id{article_id}.png")
-    prompt = _grok_prompt_from_article(article)
     try:
-        size = _gen_grok_image(prompt, str(illust_path))
-        print(f"  ✅ Grokイラスト生成: {size}")
-    except Exception as e:
-        print(f"  ⚠️  Grok生成失敗: {e} → OGP画像をフォールバック")
-        ogp = PUBLIC_IMGS / f"{slug}.png"
-        return f"articles/{slug}.png" if ogp.exists() else None
+        # ① X記事用: 5:2比率で生成 → 1500×600にリサイズ
+        if not cover_path.exists():
+            img_x = _gemini_generate(client, types, _build_prompt(title, context, "5:2"))
+            img_x = img_x.resize((X_ARTICLE_W, X_ARTICLE_H), Image.LANCZOS)
+            img_x.save(cover_path, "PNG", optimize=True)
+            print(f"  ✅ X記事カバー: {X_ARTICLE_W}×{X_ARTICLE_H}px")
 
-    # Step2: Base64変換
-    with open(illust_path, "rb") as f:
-        b64 = base64.b64encode(f.read()).decode()
+        # ② SEO OGP用: 16:9比率で生成 → 2400×1260にリサイズ
+        if not seo_cover.exists():
+            PUBLIC_IMGS.mkdir(parents=True, exist_ok=True)
+            img_seo = _gemini_generate(client, types, _build_prompt(title, context, "16:9"))
+            img_seo = img_seo.resize((SEO_COVER_W, SEO_COVER_H), Image.LANCZOS)
+            img_seo.save(seo_cover, "PNG", optimize=True)
+            print(f"  ✅ SEO OGPカバー: {SEO_COVER_W}×{SEO_COVER_H}px")
 
-    # Step3: HTML合成 → Playwright レンダリング
-    try:
-        _render_cover_html(article, b64, cover_path)
-        print(f"  ✅ カバー保存: x-articles/id{article_id}/cover.png")
     except Exception as e:
-        print(f"  ⚠️  Playwright失敗: {e}")
+        print(f"  ⚠️  Gemini生成失敗: {e}")
         return None
 
     return f"id{article_id}/cover.png"

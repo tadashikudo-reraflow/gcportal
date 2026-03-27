@@ -51,7 +51,7 @@ function buildHTML(article, opts = {}) {
   const mainTitle = parts[0].trim();
   const subTitle = parts.length > 1 ? parts[1].trim() : "";
 
-  const fontSize = 48;
+  const fontSize = 58;
 
   const W = opts?.xArticle ? 1500 : 1200;
   const H = opts?.xArticle ? 600  : 630;

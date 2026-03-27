@@ -215,9 +215,9 @@ function BusinessGroup({
             onClick={() => setShowAll(!showAll)}
             className="mt-2 w-full py-2 text-sm font-medium rounded-lg transition-colors"
             style={{
-              color: "#002D72",
-              backgroundColor: "#002D7208",
-              border: "1px solid #002D7220",
+              color: "var(--color-brand-primary)",
+              backgroundColor: "color-mix(in srgb, var(--color-brand-primary) 3%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--color-brand-primary) 12%, transparent)",
             }}
           >
             {showAll

@@ -139,8 +139,8 @@ def mark_paste_ready(article_id):
     resp.raise_for_status()
 
 
-def update_kw_planner(slug, posted_date_str):
-    """KWプランナーの X Article投稿日 列を更新"""
+def update_kw_planner(slug, posted_date_str=None):
+    """KWプランナーの X Article 列を '作成済み' に更新"""
     if not os.path.exists(KW_PLANNER_PATH):
         print(f"⚠️  KWプランナーが見つかりません: {KW_PLANNER_PATH}")
         return
@@ -148,22 +148,21 @@ def update_kw_planner(slug, posted_date_str):
     wb = openpyxl.load_workbook(KW_PLANNER_PATH)
     ws = wb["KWリスト"]
 
-    # ヘッダー行からX Article投稿日の列番号を取得
     headers = [cell.value for cell in ws[1]]
     try:
-        x_col = headers.index("X Article投稿日") + 1
+        x_col = headers.index("X Article") + 1
         memo_col = headers.index("メモ") + 1
     except ValueError:
-        print("⚠️  X Article投稿日 列が見つかりません")
+        print("⚠️  X Article 列が見つかりません")
         return
 
     updated = False
     for row in ws.iter_rows(min_row=2):
         memo = str(row[memo_col - 1].value or "")
         if f"slug:{slug}" in memo or slug in memo:
-            row[x_col - 1].value = posted_date_str
+            row[x_col - 1].value = "作成済み"
             updated = True
-            print(f"  KWプランナー更新: 行{row[0].row} slug={slug} → {posted_date_str}")
+            print(f"  KWプランナー更新: 行{row[0].row} slug={slug} → 作成済み")
             break
 
     if not updated:

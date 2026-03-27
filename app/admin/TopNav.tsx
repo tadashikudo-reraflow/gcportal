@@ -66,7 +66,7 @@ export default function TopNav() {
               width: 28,
               height: 28,
               borderRadius: 6,
-              backgroundColor: "#002D72",
+              backgroundColor: "var(--color-brand-primary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -82,7 +82,7 @@ export default function TopNav() {
             style={{
               fontWeight: 700,
               fontSize: 15,
-              color: "#111111",
+              color: "var(--color-text-primary)",
               letterSpacing: "-0.01em",
             }}
           >
@@ -112,9 +112,9 @@ export default function TopNav() {
                   alignItems: "center",
                   fontSize: 14,
                   fontWeight: active ? 600 : 400,
-                  color: active ? "#111111" : "#6b7280",
+                  color: active ? "var(--color-text-primary)" : "#6b7280",
                   textDecoration: "none",
-                  borderBottom: active ? "2px solid #111111" : "2px solid transparent",
+                  borderBottom: active ? "2px solid var(--color-text-primary)" : "2px solid transparent",
                   transition: "color 0.15s",
                 }}
               >
@@ -129,7 +129,7 @@ export default function TopNav() {
           <Link
             href="/admin/newsletter/compose"
             style={{
-              backgroundColor: "#111111",
+              backgroundColor: "var(--color-text-primary)",
               color: "#ffffff",
               fontSize: 13,
               fontWeight: 600,

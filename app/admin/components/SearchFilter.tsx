@@ -66,7 +66,7 @@ export default function SearchFilter({ articles }: { articles: Article[] }) {
         <Link
           href="/admin/articles/new"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold"
-          style={{ backgroundColor: "var(--color-brand-primary)", color: "#002D72" }}
+          style={{ backgroundColor: "var(--color-brand-primary)", color: "var(--color-brand-primary)" }}
         >
           + 新規記事
         </Link>

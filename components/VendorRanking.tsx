@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Vendor } from "@/lib/supabase";
 
-const NAVY = "#002D72";
+const NAVY = "#00338D";
 const INITIAL_COUNT = 10;
 
 // クラウドバッジの色設定

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { Municipality, MunicipalityPackageRow, Vendor, Package } from "@/lib/supabase";
 
-const NAVY = "#002D72";
+const NAVY = "#00338D";
 
 // クラウドバッジの色設定（BusinessPackageList と統一）
 function getCloudBadgeStyle(

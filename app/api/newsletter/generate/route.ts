@@ -256,7 +256,7 @@ export async function POST(req: NextRequest) {
   // 6. デジタル庁公式ニュース
   let officialNews = bodyData.officialNews ?? [];
 
-  // RAG経由のニュース記事を公式情報にマージ
+  // RAG経由のニュース記事を公式情報にマージ（bodyで渡された分）
   if (bodyData.ragNews && bodyData.ragNews.length > 0) {
     officialNews = [
       ...bodyData.ragNews.map(r => ({
@@ -268,6 +268,7 @@ export async function POST(req: NextRequest) {
       ...officialNews,
     ];
   }
+
   if (officialNews.length === 0) {
     try {
       const res = await fetch("https://www.digital.go.jp/news/", {
