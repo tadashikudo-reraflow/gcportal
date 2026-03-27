@@ -322,7 +322,7 @@ export default async function CostsPage() {
       city: info.city,
       prefecture: info.prefecture,
       primaryVendor,
-      cloud: getMainCloud(info.cloudCounts, est?.cloud ?? "調査中"),
+      cloud: est?.cloud ?? getMainCloud(info.cloudCounts, "調査中"),
       ratioTypical: est?.ratioTypical ?? 1.5,
       ratioMin: est?.ratioMin ?? 1.0,
       ratioMax: est?.ratioMax ?? 2.5,
