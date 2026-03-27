@@ -264,15 +264,6 @@ export default function DashboardPage() {
       {/* 日本地図ヒートマップ */}
       <JapanMap prefectures={prefectures} />
 
-      {/* ========== 都道府県別一覧テーブル ========== */}
-      <div className="card p-4 sm:p-6">
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          都道府県別
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>手続き進捗率の低い順</span>
-        </h2>
-        <PrefectureRanking prefectures={prefectures} tokuteiByPref={tokuteiByPref} />
-      </div>
-
       {/* ========== 初見者向け「特定移行」ガイド ========== */}
       <div className="rounded-xl px-5 py-3 flex items-center gap-3" style={{ backgroundColor: "#f0f5ff" }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0" aria-hidden="true">
@@ -285,64 +276,6 @@ export default function DashboardPage() {
             詳しくは特定移行ページへ →
           </Link>
         </p>
-      </div>
-
-      {/* ========== 遅延リスク自治体TOP20 ========== */}
-      <div className="card p-6">
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          遅延リスク TOP20
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>手続き進捗率50%未満・特定移行除く（全{riskMunis.length}件）</span>
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">順位</th>
-                <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
-                <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
-                <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">進捗率</th>
-                <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">ステータス</th>
-              </tr>
-            </thead>
-            <tbody>
-              {top20Risk.map((muni, i) => {
-                const rate = muni.overall_rate ?? 0;
-                return (
-                  <tr
-                    key={`${muni.prefecture}-${muni.city}`}
-                    className="border-b border-gray-50 hover:bg-red-50 transition-colors"
-                  >
-                    <td className="py-2.5 px-2 text-xs text-gray-400">{i + 1}</td>
-                    <td className="py-2.5 px-2 text-gray-600 text-xs whitespace-nowrap">{muni.prefecture}</td>
-                    <td className="py-2.5 px-2 font-medium text-gray-800 truncate max-w-[120px]">{muni.city}</td>
-                    <td className="py-2.5 px-2 text-right">
-                      <span className="font-bold text-sm" style={{ color: getRateColor(rate) }}>
-                        {formatRate(rate)}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-2">
-                      <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                        危機
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
-            全 {riskMunis.length} 件中 TOP20 を表示
-          </p>
-          <Link
-            href="/risks"
-            className="text-xs font-medium hover:underline"
-            style={{ color: "#003087" }}
-          >
-            全件表示 →
-          </Link>
-        </div>
       </div>
 
       {/* ========== CTA セクション（行動喚起） ========== */}

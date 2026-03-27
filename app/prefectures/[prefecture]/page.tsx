@@ -167,38 +167,9 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
             .map((m) => m.business_rates[biz])
             .filter((r): r is number => r !== null && r !== undefined);
           const avg = rates.length > 0 ? rates.reduce((a, b) => a + b, 0) / rates.length : 0;
-          const status = getBusinessHealth(avg);
-          return { biz, index: i + 1, avg, status };
+          return { biz, index: i + 1, avg };
         });
-        const cfg = HEALTH_CONFIG;
-        return (
-          <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-gray-800">業務別ヘルス</h2>
-              <div className="flex items-center gap-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />安定</span>
-                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-600" />注意</span>
-                <span className="flex items-center gap-1.5"><span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />危機</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-10 gap-3">
-              {bizHealthMap.map((item) => {
-                const c = cfg[item.status];
-                return (
-                  <div
-                    key={item.biz}
-                    className={`rounded-xl border-2 ${c.border} bg-gray-50 p-3 flex flex-col items-center gap-1.5 text-center`}
-                    title={`${item.biz}: ${formatRate(item.avg)}（${c.label}）`}
-                  >
-                    <span className="text-[10px] text-gray-400 font-medium">{item.index}</span>
-                    <span className={`inline-block w-3 h-3 rounded-full ${c.dot}`} />
-                    <span className="text-[11px] text-gray-700 font-medium leading-tight">{item.biz.length > 5 ? item.biz.slice(0, 4) + "…" : item.biz}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
+        return null;
       })()}
 
       {/* 市区町村一覧 */}
@@ -220,9 +191,11 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
                 <summary className="flex items-center gap-3 py-2.5 px-4 cursor-pointer hover:bg-gray-50 transition-colors list-none [&::-webkit-details-marker]:hidden">
                   <span className="text-xs text-gray-400 group-open:rotate-90 transition-transform">▶</span>
                   <span className="font-medium text-gray-800 text-sm min-w-[80px]">{muni.city}</span>
-                  {isTokutei && (
-                    <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-700">認定</span>
-                  )}
+                  <span className="w-10 flex-shrink-0">
+                    {isTokutei && (
+                      <span className="inline-block px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-700">認定</span>
+                    )}
+                  </span>
                   <div className="flex-1 flex items-center gap-2 max-w-[240px]">
                     <div className="flex-1 bg-gray-100 rounded-full h-3.5 overflow-hidden">
                       <div
