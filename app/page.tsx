@@ -8,7 +8,6 @@ import HeroSection from "@/components/HeroSection";
 import JapanMap from "@/components/JapanMap";
 import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
-import GlossaryTooltip from "@/components/GlossaryTooltip";
 import ThreeMetricsWidget from "@/components/ThreeMetricsWidget";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
@@ -128,62 +127,7 @@ export default function DashboardPage() {
         dataMonth={summary.data_month}
       />
 
-      {/* データ鮮度バナー */}
-      <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
-
-      {/* ========== 5段階ステータスKPIカード ========== */}
-      <div>
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          移行ステータス
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <StatusKpiCard count={completeCount} total={TOTAL} label="完了" sub="100%完了" color="#378445" cls="kpi-card kpi-card-complete" />
-          <StatusKpiCard count={ontrackCount}  total={TOTAL} label="順調" sub="75%以上"  color="#1D4ED8" cls="kpi-card kpi-card-ontrack"  />
-          <StatusKpiCard count={atriskCount}   total={TOTAL} label="要注意" sub="50〜75%" color="#F59E0B" cls="kpi-card kpi-card-atrisk"   />
-          <StatusKpiCard count={criticalCount} total={TOTAL} label="危機"   sub="50%未満" color="#B91C1C" cls="kpi-card kpi-card-critical" />
-          <Link href="/tokutei" className="kpi-card kpi-card-tokutei block" style={{ textDecoration: "none" }}>
-            <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color: "#475569", margin: 0, lineHeight: 1 }}>
-              {TOKUTEI_OFFICIAL.toLocaleString()}
-            </p>
-            <p style={{ fontSize: 12, fontWeight: 700, color: "#475569", marginTop: 6 }}>
-              <GlossaryTooltip term="特定移行認定">特定移行</GlossaryTooltip>
-            </p>
-            <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
-              認定団体（うち市区町村{TOKUTEI_MUNI_COUNT}） →
-            </p>
-          </Link>
-        </div>
-      </div>
-
-      {/* ステータス分布バー */}
-      <div className="card px-5 py-3">
-        <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>
-          全 {TOTAL.toLocaleString()} 自治体のステータス分布
-        </p>
-        <div className="flex rounded-full overflow-hidden h-6">
-          <div style={{ width: `${(completeCount / TOTAL) * 100}%`, backgroundColor: "#378445" }} title={`完了: ${completeCount}`} />
-          <div style={{ width: `${(ontrackCount / TOTAL) * 100}%`, backgroundColor: "#1D4ED8" }} title={`順調: ${ontrackCount}`} />
-          <div style={{ width: `${(atriskCount / TOTAL) * 100}%`, backgroundColor: "#F59E0B" }} title={`要注意: ${atriskCount}`} />
-          <div style={{ width: `${(criticalCount / TOTAL) * 100}%`, backgroundColor: "#b91c1c" }} title={`危機: ${criticalCount}`} />
-          <div style={{ width: `${(TOKUTEI_MUNI_COUNT / TOTAL) * 100}%`, backgroundColor: "#64748B" }} title={`特定移行: ${TOKUTEI_MUNI_COUNT}`} />
-        </div>
-        <div className="flex flex-wrap gap-3 mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
-          {[
-            { label: "完了（全業務）", color: "#378445", count: completeCount },
-            { label: "順調", color: "#1D4ED8", count: ontrackCount },
-            { label: "要注意", color: "#F59E0B", count: atriskCount },
-            { label: "危機", color: "#b91c1c", count: criticalCount },
-            { label: "特定移行", color: "#64748B", count: TOKUTEI_MUNI_COUNT },
-          ].map((s) => (
-            <span key={s.label} className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm inline-block" style={{ backgroundColor: s.color }} />
-              {s.label}: {s.count.toLocaleString()}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* ========== 3指標比較ウィジェット ========== */}
+      {/* ========== 3指標比較ウィジェット（ヒーロー直下） ========== */}
       <ThreeMetricsWidget
         completeRate={completeCount / TOTAL}
         systemRate={migrationStats.completion_rate}
@@ -193,6 +137,58 @@ export default function DashboardPage() {
         completedSystems={migrationStats.completed_systems}
         totalSystems={migrationStats.total_systems}
       />
+
+      {/* データ鮮度バナー */}
+      <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
+
+      {/* ========== ステータス分布バー（統合版） ========== */}
+      <div className="status-bar-card">
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+            全 {TOTAL.toLocaleString()} 自治体の移行ステータス
+          </h2>
+          <Link href="/tokutei" className="text-xs font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
+            特定移行とは？ →
+          </Link>
+        </div>
+        <div className="flex rounded-xl overflow-hidden" style={{ height: 32 }}>
+          {[
+            { label: "完了", count: completeCount, color: "#378445" },
+            { label: "順調", count: ontrackCount, color: "#1D4ED8" },
+            { label: "要注意", count: atriskCount, color: "#F59E0B" },
+            { label: "危機", count: criticalCount, color: "#b91c1c" },
+            { label: "特定移行", count: TOKUTEI_OFFICIAL, color: "#64748B" },
+          ].map((s) => (
+            <div
+              key={s.label}
+              style={{ width: `${(s.count / TOTAL) * 100}%`, backgroundColor: s.color }}
+              title={`${s.label}: ${s.count.toLocaleString()}`}
+            />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3">
+          {[
+            { label: "完了", count: completeCount, color: "#378445", sub: "全20業務100%" },
+            { label: "順調", count: ontrackCount, color: "#1D4ED8", sub: "75%以上" },
+            { label: "要注意", count: atriskCount, color: "#F59E0B", sub: "50〜75%" },
+            { label: "危機", count: criticalCount, color: "#b91c1c", sub: "50%未満" },
+            { label: "特定移行", count: TOKUTEI_OFFICIAL, color: "#64748B", sub: "期限延長" },
+          ].map((s) => (
+            <div key={s.label} className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-sm inline-block flex-shrink-0" style={{ backgroundColor: s.color }} />
+              <span className="text-sm font-semibold tabular-nums" style={{ color: s.color }}>
+                {s.count.toLocaleString()}
+              </span>
+              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                {s.label}
+              </span>
+              <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                {s.sub}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ========== 進捗率の注釈バナー ========== */}
       <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
@@ -429,18 +425,3 @@ export default function DashboardPage() {
   );
 }
 
-function StatusKpiCard({ count, total, label, sub, color, cls }: {
-  count: number; total: number; label: string; sub: string; color: string; cls: string;
-}) {
-  return (
-    <div className={cls}>
-      <p className="tabular-nums" style={{ fontSize: 32, fontWeight: 800, color, margin: 0, lineHeight: 1 }}>
-        {count.toLocaleString()}
-      </p>
-      <p style={{ fontSize: 12, fontWeight: 700, color, marginTop: 6 }}>{label}</p>
-      <p style={{ fontSize: 11, color: "var(--color-text-muted)", marginTop: 2 }}>
-        ({((count / total) * 100).toFixed(1)}%) {sub}
-      </p>
-    </div>
-  );
-}

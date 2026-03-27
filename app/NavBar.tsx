@@ -38,15 +38,9 @@ const NAV_GROUPS = [
       { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
     ],
   },
-  {
-    label: "インサイト",
-    short: "記事",
-    children: [
-      { href: "/articles", label: "コラム・解説記事", desc: "移行のヒントと用語解説" },
-      { href: "/report",   label: "無料レポート（PDF）", desc: "全体サマリーをダウンロード" },
-      { href: "/sources",  label: "データソース・出典", desc: "参照元の一覧" },
-    ],
-  },
+  { label: "コラム", short: "コラム", href: "/articles" },
+  { label: "レポート", short: "PDF", href: "/report" },
+  { label: "データ", short: "出典", href: "/sources" },
 ] as const;
 
 type NavGroup = (typeof NAV_GROUPS)[number];
@@ -118,7 +112,7 @@ export default function NavBar() {
     : null;
 
   return (
-    <nav style={{ backgroundColor: "var(--color-gov-nav)" }} ref={navRef}>
+    <nav style={{ backgroundColor: "var(--color-surface-container-low)" }} ref={navRef}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 relative" ref={innerRef}>
         {/* スクロール可能なボタン列 */}
         <div className="flex items-center gap-0 overflow-x-auto scrollbar-none nav-scroll-snap">
