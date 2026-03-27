@@ -427,7 +427,6 @@ body {
 .hero-inner {
   position: relative;
   padding: 2.5rem 3rem;
-  max-width: 720px;
 }
 @media (max-width: 640px) {
   .hero-inner {
@@ -461,7 +460,6 @@ body {
   color: var(--color-text-secondary);
   line-height: 1.7;
   margin-bottom: 1.5rem;
-  max-width: 560px;
 }
 .hero-sub strong {
   color: var(--color-text-primary);
