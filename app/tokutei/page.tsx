@@ -206,44 +206,60 @@ export default function TokuteiPage() {
           8,956システム / 935団体（令和7年12月末時点）
         </p>
 
-        {/* 割合バー */}
-        <div className="flex rounded-lg overflow-hidden h-8 text-xs font-bold mb-4">
-          {[
-            { label: "SEリソース不足 95.3%", pct: 95.3, color: "#b91c1c", textColor: "#fff" },
-            { label: "撤退", pct: 2.1, color: "#94a3b8", textColor: "#fff" },
-            { label: "個別", pct: 2.1, color: "#cbd5e1", textColor: "#475569" },
-            { label: "", pct: 0.5, color: "#e2e8f0", textColor: "#475569" },
-          ].map((s) => (
-            <div
-              key={s.label + s.pct}
-              className="flex items-center justify-center text-[10px] whitespace-nowrap overflow-hidden"
-              style={{ width: `${Math.max(s.pct, 2)}%`, backgroundColor: s.color, color: s.textColor }}
-            >
-              {s.pct > 5 ? s.label : ""}
-            </div>
-          ))}
-        </div>
+        {(() => {
+          const items = [
+            { label: "SEリソース不足", pct: 95.3, color: "#b91c1c", systems: 8539, orgs: 907 },
+            { label: "ベンダー撤退",   pct: 2.1,  color: "#94a3b8", systems: 184,  orgs: 97  },
+            { label: "個別開発",       pct: 2.1,  color: "#cbd5e1", systems: 189,  orgs: 26  },
+            { label: "メインフレーム", pct: 0.5,  color: "#e2e8f0", systems: 44,   orgs: 7   },
+          ];
+          const r = 45;
+          const circ = 2 * Math.PI * r;
+          let cum = 0;
+          return (
+            <div className="flex flex-col sm:flex-row items-center gap-8">
+              {/* ドーナツグラフ */}
+              <svg width="140" height="140" viewBox="0 0 120 120" className="flex-shrink-0">
+                <circle cx="60" cy="60" r={r} fill="none" stroke="#f1f5f9" strokeWidth="18" />
+                {items.map((item) => {
+                  const dash = (item.pct / 100) * circ;
+                  const offset = circ - cum;
+                  cum += dash;
+                  return (
+                    <circle
+                      key={item.label}
+                      cx="60" cy="60" r={r}
+                      fill="none"
+                      stroke={item.color}
+                      strokeWidth="18"
+                      strokeDasharray={`${dash} ${circ}`}
+                      strokeDashoffset={offset}
+                      style={{ transform: "rotate(-90deg)", transformOrigin: "60px 60px" }}
+                    />
+                  );
+                })}
+                <text x="60" y="53" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#b91c1c">95.3%</text>
+                <text x="60" y="67" textAnchor="middle" fontSize="8" fill="#475569">SEリソース不足</text>
+              </svg>
 
-        {/* リスト形式 */}
-        <div className="space-y-1">
-          {[
-            { desc: "SEリソース不足", systems: 8539, orgs: 907, pct: 95.3, highlight: true },
-            { desc: "ベンダー撤退", systems: 184, orgs: 97, pct: 2.1, highlight: false },
-            { desc: "個別開発", systems: 189, orgs: 26, pct: 2.1, highlight: false },
-            { desc: "メインフレーム", systems: 44, orgs: 7, pct: 0.5, highlight: false },
-          ].map((r) => (
-            <div key={r.desc} className="flex items-center gap-3 py-2 px-3 rounded-md hover:bg-gray-50 text-sm">
-              <span className={`font-semibold w-36 flex-shrink-0 ${r.highlight ? "text-gray-900" : "text-gray-500"}`}>{r.desc}</span>
-              <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${r.pct}%`, backgroundColor: r.highlight ? "#b91c1c" : "#94a3b8" }} />
+              {/* 凡例リスト */}
+              <div className="flex-1 space-y-2.5">
+                {items.map((item) => (
+                  <div key={item.label} className="flex items-center gap-2.5 text-sm">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} />
+                    <span className={`w-28 flex-shrink-0 ${item.pct > 5 ? "font-semibold text-gray-900" : "text-gray-500"}`}>
+                      {item.label}
+                    </span>
+                    <span className="tabular-nums font-bold w-10 flex-shrink-0" style={{ color: item.pct > 5 ? item.color : "#94a3b8" }}>
+                      {item.pct}%
+                    </span>
+                    <span className="text-xs text-gray-400">{item.orgs}団体</span>
+                  </div>
+                ))}
               </div>
-              <span className="tabular-nums font-bold w-10 text-right flex-shrink-0" style={{ color: r.highlight ? "#b91c1c" : "#94a3b8" }}>{r.pct}%</span>
-              <span className="tabular-nums text-xs text-gray-400 w-28 flex-shrink-0 text-right">
-                {r.systems.toLocaleString()}システム / {r.orgs}団体
-              </span>
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </div>
 
       {/* 都道府県別集計（ヒートマップ） */}
