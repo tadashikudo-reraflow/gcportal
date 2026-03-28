@@ -97,13 +97,16 @@ def get_all_unready():
     return r.json()
 
 
-def mark_paste_ready(article_id):
-    """x_paste_ready フラグをセット"""
+def mark_paste_ready(article_id, cover_image_url=None):
+    """x_paste_ready フラグをセット＋cover_image URLを更新"""
+    payload = {"x_paste_ready": True}
+    if cover_image_url:
+        payload["cover_image"] = cover_image_url
     r = requests.patch(
         f"{SUPABASE_URL}/rest/v1/articles",
         headers={**HEADERS, "Content-Type": "application/json", "Prefer": "return=minimal"},
         params={"id": f"eq.{article_id}"},
-        json={"x_paste_ready": True},
+        json=payload,
     )
     r.raise_for_status()
 
@@ -463,10 +466,13 @@ def process_article(article, no_push=False, open_browser=True):
     paste_path.write_text(paste_html, encoding="utf-8")
     print(f"📋 ペーストHTML生成: {paste_path}")
 
-    # Supabase x_paste_ready フラグをセット
+    # Supabase x_paste_ready フラグをセット＋cover_image URL更新
     try:
-        mark_paste_ready(article["id"])
+        cover_image_url = f"{SITE_URL}/images/x-articles/{cover_fname}" if cover_fname else None
+        mark_paste_ready(article["id"], cover_image_url)
         print(f"  ✅ Supabase x_paste_ready=true 更新済み")
+        if cover_image_url:
+            print(f"  ✅ Supabase cover_image={cover_image_url} 更新済み")
     except Exception as e:
         print(f"  ⚠️  Supabase更新失敗（カラム未作成の可能性）: {e}")
 
