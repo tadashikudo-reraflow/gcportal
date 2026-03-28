@@ -103,6 +103,50 @@ export async function POST(req: NextRequest) {
 }
 
 /**
+ * PATCH /api/articles — 公開状態のみ更新（content上書き防止）
+ *
+ * Headers: Authorization: Bearer <ADMIN_PASSWORD>
+ * Body JSON: { slug: string, is_published: boolean }
+ */
+export async function PATCH(req: NextRequest) {
+  const auth = req.headers.get("authorization");
+  const expected = process.env.ADMIN_PASSWORD;
+  if (!expected || auth !== `Bearer ${expected}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { slug, is_published } = await req.json();
+  if (!slug || typeof is_published !== "boolean") {
+    return NextResponse.json({ error: "slug and is_published are required" }, { status: 400 });
+  }
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabase
+    .from("articles")
+    .update({ is_published, updated_at: new Date().toISOString() })
+    .eq("slug", slug)
+    .select("id, slug, is_published")
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  revalidatePath(`/articles/${slug}`);
+  revalidatePath("/articles");
+
+  return NextResponse.json({
+    ok: true,
+    article: data,
+    message: is_published ? `記事「${slug}」を公開しました` : `記事「${slug}」を下書きに戻しました`,
+  });
+}
+
+/**
  * GET /api/articles — 公開記事一覧（外部連携用）
  */
 export async function GET() {
