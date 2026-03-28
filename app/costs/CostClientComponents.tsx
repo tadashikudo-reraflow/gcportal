@@ -204,12 +204,51 @@ export function VendorGroup({ vendorName, cloud, mark, markColor, note, children
   );
 }
 
-// --- 展開可能なコスト変化カード ---
+// --- 静的ベンダーカード（展開なし） ---
+type VendorCardProps = {
+  vendorName: string;
+  cloud: string;
+  mark: string;
+  markColor: string;
+  label: string;
+  detail: string;
+};
+
+export function VendorCard({ vendorName, cloud, mark, markColor, label, detail }: VendorCardProps) {
+  const cloudColor =
+    cloud === "AWS" ? "#FF9900"
+    : cloud === "OCI" ? "#F80000"
+    : cloud === "Azure" ? "#0078D4"
+    : cloud === "GCP" ? "#4285F4"
+    : "#6b7280";
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <span className="text-lg font-bold w-6 text-center" style={{ color: markColor }}>{mark}</span>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold text-gray-800">{vendorName}</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ color: cloudColor, backgroundColor: cloudColor + "15" }}>
+              {cloud}
+            </span>
+            <span className="text-xs text-gray-500">{label}</span>
+          </div>
+          {detail && <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{detail}</p>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- 静的コスト変化行（展開なし） ---
 type CostCardProps = {
   scope: string;
   changeRatio: number;
   vendorName: string;
   notes: string | null;
+  sourceUrl: string | null;
+  reportedYear: number | null;
   barWidth: number;
   barColor: string;
   label: string;
@@ -219,102 +258,55 @@ type CostCardProps = {
 
 export function ExpandableCostCard({
   scope,
-  changeRatio,
   vendorName,
   notes,
+  sourceUrl,
+  reportedYear,
   barWidth,
   barColor,
   label,
   isReduction,
-  pctChange,
 }: CostCardProps) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <div
-      className="rounded-lg border p-4 cursor-pointer transition-all"
-      style={{
-        borderColor: isReduction ? "#bbf7d0" : "#fecaca",
-        backgroundColor: isReduction ? "#f0fdf4" : changeRatio >= 3 ? "#fff1f2" : "#fff5f5",
-      }}
-      onClick={() => setOpen(!open)}
-    >
-      <div className="flex items-center justify-between mb-2 gap-3">
-        <div className="flex items-center gap-2 min-w-0 overflow-hidden">
-          {isReduction ? (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-600 text-white flex-shrink-0">
-              ✓ 削減事例
-            </span>
-          ) : (
-            <span
-              className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold flex-shrink-0"
-              style={{ backgroundColor: barColor + "20", color: barColor }}
-            >
-              ▲ コスト増
-            </span>
-          )}
-          <span className="text-xs text-gray-500 flex-shrink-0 truncate max-w-[8rem]">{scope}</span>
-          {vendorName !== "—" && (
-            <span className="text-xs text-gray-400 truncate min-w-0">{vendorName}</span>
-          )}
-          <span className="text-xs text-gray-300 ml-auto flex-shrink-0">{open ? "▲" : "▼"}</span>
-        </div>
-        <span className="text-2xl font-extrabold flex-shrink-0 tabular-nums whitespace-nowrap" style={{ color: barColor }}>
-          {label}
-        </span>
-      </div>
-      {/* バー */}
-      <div className="relative h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#e5e7eb" }}>
-        <div
-          className="absolute top-0 bottom-0 w-0.5 z-10"
-          style={{ left: "16.7%", backgroundColor: "#9ca3af" }}
-        />
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${barWidth}%`, backgroundColor: barColor }}
-        />
-        <span
-          className="absolute right-2 top-0 bottom-0 flex items-center text-xs font-bold text-white tabular-nums"
-          style={{ mixBlendMode: "difference" }}
-        >
-          {pctChange.toFixed(0)}%{isReduction ? "↓" : "↑"}
-        </span>
-      </div>
-      {notes && (
-        <p className="text-xs mt-2 font-medium" style={{ color: "var(--color-text-secondary)" }}>
-          {notes}
-        </p>
-      )}
-      {open && (
-        <div className="mt-3 pt-3 border-t border-gray-200/60">
-          <p className="text-xs font-semibold text-gray-600 mb-2">コスト構成（典型比率）</p>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
-            <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">クラウド利用料</p>
-              <p className="font-medium text-gray-600">25〜35%</p>
-            </div>
-            <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">SW借料</p>
-              <p className="font-medium text-gray-600">30〜40%</p>
-            </div>
-            <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">回線費</p>
-              <p className="font-medium text-gray-600">10〜15%</p>
-            </div>
-            <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">移行・構築費</p>
-              <p className="font-medium text-gray-600">10〜20%</p>
-            </div>
-            <div className="bg-white/80 rounded p-2 border border-gray-100">
-              <p className="text-gray-400">保守・運用</p>
-              <p className="font-medium text-gray-600">10〜15%</p>
-            </div>
-          </div>
-          <p className="text-gray-400 mt-1" style={{ fontSize: "9px" }}>
-            出典: デジタル庁先行事業TCO検証・中核市市長会調査より典型構成比
+    <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors align-top">
+      <td className="py-3 px-3 whitespace-nowrap pt-3.5">
+        {isReduction ? (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-green-100 text-green-700">
+            ✓ 削減
+          </span>
+        ) : (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold" style={{ backgroundColor: barColor + "18", color: barColor }}>
+            ▲ 増加
+          </span>
+        )}
+      </td>
+      <td className="py-3 px-3 text-xs text-gray-700">
+        <p className="font-medium leading-tight">{scope}</p>
+        {notes && <p className="text-gray-500 text-[11px] mt-0.5 leading-snug">{notes}</p>}
+        {vendorName !== "—" && <p className="text-gray-400 text-[11px] mt-0.5">{vendorName}</p>}
+        {(sourceUrl || reportedYear) && (
+          <p className="text-[10px] text-gray-400 mt-1">
+            出典:{" "}
+            {sourceUrl ? (
+              <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-500">
+                {reportedYear ?? "公式資料"}
+              </a>
+            ) : (
+              reportedYear
+            )}
           </p>
+        )}
+      </td>
+      <td className="py-3 px-3 text-right whitespace-nowrap pt-3.5">
+        <span className="text-base font-extrabold tabular-nums" style={{ color: barColor }}>{label}</span>
+      </td>
+      <td className="py-3 px-3 w-32 hidden sm:table-cell pt-3.5">
+        <div className="relative h-3 rounded-full overflow-hidden bg-gray-200">
+          <div className="absolute top-0 bottom-0 w-px bg-gray-400 z-10" style={{ left: "16.7%" }} />
+          <div className="h-full rounded-full" style={{ width: `${barWidth}%`, backgroundColor: barColor }} />
         </div>
-      )}
-    </div>
+      </td>
+    </tr>
   );
 }
+

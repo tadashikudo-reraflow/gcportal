@@ -225,231 +225,6 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* ① クラウド別ベンダー・パッケージ一覧（メイン） */}
-      <div>
-        <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
-          クラウド別 対応ベンダー一覧
-        </h2>
-
-        <div className="space-y-5">
-          {CLOUD_ORDER.map((cloudKey) => {
-            const cfg = CLOUD_CONFIG[cloudKey];
-            const entries = cloudVendors[cloudKey] ?? [];
-            const pkgCount = entries.reduce((s, e) => s + e.packages.length, 0);
-
-            return (
-              <div
-                key={cloudKey}
-                className="rounded-xl overflow-hidden"
-                style={{ border: `2px solid ${cfg.color}30` }}
-              >
-                {/* クラウドヘッダー */}
-                <div
-                  className="px-4 py-3 flex items-center justify-between"
-                  style={{ backgroundColor: cfg.bgColor, borderBottom: `2px solid ${cfg.color}30` }}
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="text-base font-extrabold"
-                      style={{ color: cfg.color }}
-                    >
-                      {cloudKey}
-                    </span>
-                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      {cfg.label}
-                    </span>
-                    {cloudKey === "Sakura" && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                        style={{ backgroundColor: "#e2004b20", color: "#e2004b" }}>国産</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
-                    <span>{cfg.certYear}年認定</span>
-                    <span>インフラ {cfg.infraPct}</span>
-                    {entries.length > 0 && (
-                      <span
-                        className="px-2 py-0.5 rounded-full font-semibold"
-                        style={{ backgroundColor: cfg.color + "20", color: cfg.color }}
-                      >
-                        {entries.length}社 / {pkgCount}パッケージ
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* ベンダー一覧 */}
-                {entries.length === 0 ? (
-                  <div className="px-4 py-5 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
-                    登録済みデータなし
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {entries.map(({ vendor, packages: pkgs }) => {
-                      const displayName = vendor.short_name ?? vendor.name;
-                      return (
-                        <details key={vendor.id} className="group">
-                          <summary
-                            className="flex items-center justify-between px-4 py-3.5 cursor-pointer select-none hover:bg-gray-50 list-none"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              {/* ベンダー名 */}
-                              <span className="font-semibold text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
-                                {displayName}
-                              </span>
-                              {vendor.short_name && (
-                                <span className="text-xs hidden sm:inline truncate" style={{ color: "var(--color-text-muted)" }}>
-                                  {vendor.name}
-                                </span>
-                              )}
-                              {/* マルチテナント */}
-                              {vendor.multitenancy && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
-                              )}
-                              {/* 移行予定 / 未確認バッジ */}
-                              {!vendor.cloud_confirmed && vendor.cloud_platform && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #d97706" }}>移行予定</span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 flex-shrink-0 ml-2">
-                              {/* 自治体数 */}
-                              {vendor.municipality_count != null && (
-                                <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-                                  {vendor.municipality_count.toLocaleString()}自治体
-                                </span>
-                              )}
-                              {/* PKG数バッジ */}
-                              {pkgs.length > 0 && (
-                                <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
-                                  {pkgs.length} パッケージ
-                                </span>
-                              )}
-                              {/* 展開矢印 */}
-                              <span className="text-gray-400 text-xs transition-transform group-open:rotate-90">▶</span>
-                            </div>
-                          </summary>
-
-                          {/* パッケージ一覧 + notes（展開時） */}
-                          <div
-                            className="px-4 pb-4 pt-1"
-                            style={{ backgroundColor: cfg.bgColor + "80" }}
-                          >
-                            {pkgs.length > 0 && (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
-                                {pkgs.map((pkg, i) => (
-                                  <div
-                                    key={i}
-                                    className="flex items-start gap-2 text-sm rounded-lg px-3 py-2"
-                                    style={{ backgroundColor: "white", border: `1px solid ${cfg.color}20` }}
-                                  >
-                                    <span
-                                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
-                                      style={{ backgroundColor: cfg.color }}
-                                    />
-                                    <div className="min-w-0">
-                                      <p className="font-medium text-sm leading-snug" style={{ color: "var(--color-text-primary)" }}>
-                                        {pkg.package_name}
-                                      </p>
-                                      {pkg.business && (
-                                        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                                          {pkg.business}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {/* 公式サイト + notes / 出典 */}
-                            <div className="flex flex-wrap items-start gap-3 mt-1">
-                              {VENDOR_WEBSITES[vendor.id] && (
-                                <a
-                                  href={VENDOR_WEBSITES[vendor.id]}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}
-                                >
-                                  公式サイト ↗
-                                </a>
-                              )}
-                              {vendor.notes && (
-                                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
-                                  <NotesWithLinks notes={vendor.notes} />
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </details>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ベンダー×クラウド マトリクス */}
-      {totalVendors > 0 && (
-        <div className="card p-5">
-          <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-            ベンダー × クラウド マトリクス
-            <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
-              どのベンダーがどのクラウドを使っているか
-            </span>
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">ベンダー</th>
-                  {CLOUD_ORDER.map((ck) => (
-                    <th key={ck} className="text-center py-2 px-2 text-xs font-bold" style={{ color: CLOUD_CONFIG[ck].color }}>
-                      {ck === "Sakura" ? "さくら" : ck}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {(() => {
-                  // Collect all unique vendors across clouds
-                  const vendorMap = new Map<string, { name: string; clouds: Set<string>; count: number }>();
-                  for (const [cloud, entries] of Object.entries(cloudVendors)) {
-                    for (const { vendor, packages: pkgs } of entries) {
-                      if (!vendorMap.has(vendor.id)) {
-                        vendorMap.set(vendor.id, { name: vendor.short_name ?? vendor.name, clouds: new Set(), count: vendor.municipality_count ?? 0 });
-                      }
-                      vendorMap.get(vendor.id)!.clouds.add(cloud);
-                    }
-                  }
-                  return Array.from(vendorMap.entries())
-                    .sort((a, b) => b[1].count - a[1].count)
-                    .map(([id, { name, clouds }]) => (
-                      <tr key={id} className="border-b border-gray-50 hover:bg-gray-50">
-                        <td className="py-1.5 px-3 text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>{name}</td>
-                        {CLOUD_ORDER.map((ck) => (
-                          <td key={ck} className="py-1.5 px-2 text-center">
-                            {clouds.has(ck) ? (
-                              <span className="inline-block w-5 h-5 rounded-full text-white text-xs font-bold leading-5"
-                                style={{ backgroundColor: CLOUD_CONFIG[ck].color }}>✓</span>
-                            ) : (
-                              <span className="text-gray-200">—</span>
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ));
-                })()}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {/* ② ガバクラ インフラシェア実態（ドーナツ + バー） */}
       <div className="card p-5">
         <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
@@ -656,6 +431,253 @@ export default async function CloudPage() {
               {id} 料金計算ツール ↗
             </a>
           ))}
+        </div>
+      </div>
+
+      {/* ① クラウド別ベンダー・パッケージ一覧（メイン） */}
+      <div>
+        <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
+          クラウド別 対応ベンダー一覧
+        </h2>
+
+        <div className="space-y-5">
+          {CLOUD_ORDER.map((cloudKey) => {
+            const cfg = CLOUD_CONFIG[cloudKey];
+            const entries = cloudVendors[cloudKey] ?? [];
+            const pkgCount = entries.reduce((s, e) => s + e.packages.length, 0);
+
+            return (
+              <div
+                key={cloudKey}
+                className="rounded-xl overflow-hidden"
+                style={{ border: `2px solid ${cfg.color}30` }}
+              >
+                {/* クラウドヘッダー */}
+                <div
+                  className="px-4 py-3 flex items-center justify-between"
+                  style={{ backgroundColor: cfg.bgColor, borderBottom: `2px solid ${cfg.color}30` }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="text-base font-extrabold"
+                      style={{ color: cfg.color }}
+                    >
+                      {cloudKey}
+                    </span>
+                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                      {cfg.label}
+                    </span>
+                    {cloudKey === "Sakura" && (
+                      <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
+                        style={{ backgroundColor: "#e2004b20", color: "#e2004b" }}>国産</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                    <span>{cfg.certYear}年認定</span>
+                    <span>インフラ {cfg.infraPct}</span>
+                    {entries.length > 0 && (
+                      <span
+                        className="px-2 py-0.5 rounded-full font-semibold"
+                        style={{ backgroundColor: cfg.color + "20", color: cfg.color }}
+                      >
+                        {entries.length}社 / {pkgCount}パッケージ
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* ベンダー一覧 */}
+                {entries.length === 0 ? (
+                  <div className="px-4 py-5 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
+                    登録済みデータなし
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {entries.slice(0, 5).map(({ vendor, packages: pkgs }) => {
+                      const displayName = vendor.short_name ?? vendor.name;
+                      return (
+                        <details key={vendor.id} className="group">
+                          <summary
+                            className="flex items-center justify-between px-4 py-3.5 cursor-pointer select-none hover:bg-gray-50 list-none"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              {/* ベンダー名 */}
+                              <span className="font-semibold text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
+                                {displayName}
+                              </span>
+                              {vendor.short_name && (
+                                <span className="text-xs hidden sm:inline truncate" style={{ color: "var(--color-text-muted)" }}>
+                                  {vendor.name}
+                                </span>
+                              )}
+                              {/* マルチテナント */}
+                              {vendor.multitenancy && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                  style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
+                              )}
+                              {/* 移行予定 / 未確認バッジ */}
+                              {!vendor.cloud_confirmed && vendor.cloud_platform && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                  style={{ backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #d97706" }}>移行予定</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                              {/* 自治体数 */}
+                              {vendor.municipality_count != null && (
+                                <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
+                                  {vendor.municipality_count.toLocaleString()}自治体
+                                </span>
+                              )}
+                              {/* PKG数バッジ */}
+                              {pkgs.length > 0 && (
+                                <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
+                                  {pkgs.length} パッケージ
+                                </span>
+                              )}
+                              {/* 展開矢印 */}
+                              <span className="text-gray-400 text-xs transition-transform group-open:rotate-90">▶</span>
+                            </div>
+                          </summary>
+
+                          {/* パッケージ一覧 + notes（展開時） */}
+                          <div
+                            className="px-4 pb-4 pt-1"
+                            style={{ backgroundColor: cfg.bgColor + "80" }}
+                          >
+                            {pkgs.length > 0 && (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
+                                {pkgs.map((pkg, i) => (
+                                  <div
+                                    key={i}
+                                    className="flex items-start gap-2 text-sm rounded-lg px-3 py-2"
+                                    style={{ backgroundColor: "white", border: `1px solid ${cfg.color}20` }}
+                                  >
+                                    <span
+                                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
+                                      style={{ backgroundColor: cfg.color }}
+                                    />
+                                    <div className="min-w-0">
+                                      <p className="font-medium text-sm leading-snug" style={{ color: "var(--color-text-primary)" }}>
+                                        {pkg.package_name}
+                                      </p>
+                                      {pkg.business && (
+                                        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                                          {pkg.business}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {/* 公式サイト + notes / 出典 */}
+                            <div className="flex flex-wrap items-start gap-3 mt-1">
+                              {VENDOR_WEBSITES[vendor.id] && (
+                                <a
+                                  href={VENDOR_WEBSITES[vendor.id]}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}
+                                >
+                                  公式サイト ↗
+                                </a>
+                              )}
+                              {vendor.notes && (
+                                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
+                                  <NotesWithLinks notes={vendor.notes} />
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </details>
+                      );
+                    })}
+                    {entries.length > 5 && (
+                      <details className="group">
+                        <summary className="flex items-center justify-center px-4 py-2.5 cursor-pointer select-none hover:bg-gray-50 list-none text-xs font-semibold gap-1" style={{ color: cfg.color }}>
+                          <span className="group-open:hidden">他 {entries.length - 5}社を表示 ▼</span>
+                          <span className="hidden group-open:inline">閉じる ▲</span>
+                        </summary>
+                        <div className="divide-y divide-gray-100">
+                          {entries.slice(5).map(({ vendor, packages: pkgs }) => {
+                            const displayName = vendor.short_name ?? vendor.name;
+                            return (
+                              <details key={vendor.id} className="group/inner">
+                                <summary
+                                  className="flex items-center justify-between px-4 py-3.5 cursor-pointer select-none hover:bg-gray-50 list-none"
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <span className="font-semibold text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
+                                      {displayName}
+                                    </span>
+                                    {vendor.short_name && (
+                                      <span className="text-xs hidden sm:inline truncate" style={{ color: "var(--color-text-muted)" }}>
+                                        {vendor.name}
+                                      </span>
+                                    )}
+                                    {vendor.multitenancy && (
+                                      <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
+                                        style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                                    {vendor.municipality_count != null && (
+                                      <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
+                                        {vendor.municipality_count.toLocaleString()}自治体
+                                      </span>
+                                    )}
+                                    {pkgs.length > 0 && (
+                                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                                        style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
+                                        {pkgs.length} パッケージ
+                                      </span>
+                                    )}
+                                    <span className="text-gray-400 text-xs transition-transform group-open/inner:rotate-90">▶</span>
+                                  </div>
+                                </summary>
+                                <div className="px-4 pb-4 pt-1" style={{ backgroundColor: cfg.bgColor + "80" }}>
+                                  {pkgs.length > 0 && (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
+                                      {pkgs.map((pkg, i) => (
+                                        <div key={i} className="flex items-start gap-2 text-sm rounded-lg px-3 py-2"
+                                          style={{ backgroundColor: "white", border: `1px solid ${cfg.color}20` }}>
+                                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: cfg.color }} />
+                                          <div className="min-w-0">
+                                            <p className="font-medium text-sm leading-snug" style={{ color: "var(--color-text-primary)" }}>{pkg.package_name}</p>
+                                            {pkg.business && <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{pkg.business}</p>}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  <div className="flex flex-wrap items-start gap-3 mt-1">
+                                    {VENDOR_WEBSITES[vendor.id] && (
+                                      <a href={VENDOR_WEBSITES[vendor.id]} target="_blank" rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
+                                        style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}>
+                                        公式サイト ↗
+                                      </a>
+                                    )}
+                                    {vendor.notes && (
+                                      <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
+                                        <NotesWithLinks notes={vendor.notes} />
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </details>
+                            );
+                          })}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 

@@ -7,8 +7,7 @@ import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
-import { ExpandableCostCard, ExpandableMuniRow, VendorGroup } from "./CostClientComponents";
-import CostSimulator from "./CostSimulator";
+import { ExpandableCostCard, VendorCard } from "./CostClientComponents";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -172,57 +171,6 @@ const vendorEvaluations: Record<string, { label: string; detail: string; mark: s
   },
 };
 
-// クラウド別コスト比較データ（AWS=100 基準）
-// 算出根拠: 各クラウドの公式料金表（2025年時点）で標準化20業務想定ワークロード
-// （vCPU 4-8、メモリ16-32GB、ストレージ500GB-1TB、DB: RDB中規模）のTCOを比較。
-// Egress料金・サポート費用・ライセンス費用を含む月額総額の相対比。
-const CLOUD_COMPARISON = [
-  {
-    cloud: "AWS",
-    color: "#FF9900",
-    index: 100,
-    basis: "基準値。仮想サーバ・データベース・ストレージ・データ転送（月100GB）・サポート込み。",
-    strengths: "サービス数最多。ガバメントクラウド第一号認定。採用実績が最大。",
-    weaknesses: "データ転送コストが高い。従量課金の体系が複雑で最適化に専門知識が必要。",
-    govCloudNote: "ガバメントクラウド最多採用。東京・大阪リージョン利用。",
-  },
-  {
-    cloud: "GCP",
-    color: "#4285F4",
-    index: 85,
-    basis: "仮想サーバ・データベース・ストレージ。長期利用割引が自動適用。",
-    strengths: "データ分析基盤（BigQuery等）が充実。長期利用割引が自動適用。データ転送料がAWSより安価。",
-    weaknesses: "ガバメントクラウドでの採用実績が限定的。",
-    govCloudNote: "ガバメントクラウド認定済。採用実績は限定的。",
-  },
-  {
-    cloud: "Azure",
-    color: "#0078D4",
-    index: 95,
-    basis: "仮想サーバ・データベース・ストレージ。Microsoft企業契約割引反映前。",
-    strengths: "Microsoft 365・Active Directoryとの親和性。行政機関での導入実績。",
-    weaknesses: "リージョン数がAWSより少ない。ライセンス体系が複雑。",
-    govCloudNote: "日立等一部ベンダーが検証済。M365連携で選定される場合あり。",
-  },
-  {
-    cloud: "OCI",
-    color: "#F80000",
-    index: 55,
-    basis: "仮想サーバ・自律型データベース。データ転送料が月10TBまで無料。円建て課金。",
-    strengths: "データ転送料の無料枠が大きい。円建て課金で為替リスクなし。Oracle DB利用時のコストが低い。ネットワーク性能も高水準。",
-    weaknesses: "サービスラインナップがAWS/Azureより限定的。Oracle DB以外では優位性が薄い。",
-    govCloudNote: "RKKCS・GCC等が採用。札幌市が2025年4月に32業務のOCI移行を発表。",
-  },
-  {
-    cloud: "さくらのクラウド",
-    color: "#FF8C9E",
-    index: 80,
-    basis: "専有サーバ・データベース・ストレージ。閉域網内のデータ転送料なし。",
-    strengths: "国産・データを国内で完結。転送量課金なし。専有型で物理的な分離が可能。",
-    weaknesses: "提供サービスが限定的。大規模システムでの採用実績が少ない。",
-    govCloudNote: "ガバメントクラウド認定済。国内完結を重視する自治体が選定。",
-  },
-];
 
 export default async function CostsPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -371,480 +319,57 @@ export default async function CostsPage() {
         </p>
       </div>
 
-      {/* ⑦ コストギャップ — 水平バー比較 */}
-      <div className="card p-6">
-        <h2 className="text-lg font-bold mb-1" style={{ color: "var(--color-gov-primary)" }}>
+      {/* ⑦ コストギャップ */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-gov-primary)" }}>
           目標と実態のギャップ
         </h2>
-        <p className="text-sm mb-2" style={{ color: "var(--color-text-secondary)" }}>
-          当初「30%削減」の目標に対し、実態は平均+{avgPct}%の増加
-        </p>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          ※ +{avgPct}%は複数調査をもとにした参考値です。2.3倍・5.7倍の事例はデジタル庁2025年6月資料で確認できます。
-        </p>
 
-        {/* 水平バー比較 */}
-        <div className="space-y-5">
-          {/* 当初目標 */}
-          <div>
-            <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>当初目標</span>
-              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#10B981" }}>−30%</span>
-            </div>
-            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
-              <div className="h-3 rounded-full" style={{ width: "70%", backgroundColor: "#10B981", opacity: 0.7 }} />
-            </div>
-          </div>
-
-          {/* 実態平均 */}
-          <div>
-            <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>実態平均</span>
-              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#EF4444" }}>+{avgPct}%</span>
-            </div>
-            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
-              <div className="h-3 rounded-full" style={{ width: `${Math.min(100, 50 + avgPct / 10)}%`, backgroundColor: "#EF4444", opacity: 0.7 }} />
-            </div>
-          </div>
-
-          {/* 最悪事例 */}
-          <div>
-            <div className="flex items-baseline justify-between mb-1.5">
-              <span className="text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>最悪事例（中核市）</span>
-              <span className="text-2xl font-extrabold tabular-nums" style={{ color: "#991B1B" }}>+{worstPct}%</span>
-            </div>
-            <div className="h-3 rounded-full" style={{ backgroundColor: "#F1F5F9" }}>
-              <div className="h-3 rounded-full" style={{ width: "100%", backgroundColor: "#EF4444", opacity: 0.4 }} />
-            </div>
-          </div>
-        </div>
-
-        {/* 乖離注記 */}
-        <p className="text-xs mt-5 pt-4" style={{ color: "var(--color-text-muted)", borderTop: "1px solid var(--color-border)" }}>
-          目標と実態には約{avgPct + 30}ポイントの乖離があり、運用費と回線費の増加が重く出ています。
-        </p>
-      </div>
-
-      {/* 数値ハイライトバナー */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="card p-5 text-center">
-          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>中核市 平均</p>
-          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#EF4444" }}>2.3<span className="text-lg">倍</span></p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>移行前コスト比</p>
-        </div>
-        <div className="card p-5 text-center">
-          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>最大事例</p>
-          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#7f1d1d" }}>5.7<span className="text-lg">倍</span></p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>一部中核市で確認</p>
-        </div>
-        <div className="card p-5 text-center">
-          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-muted)" }}>東京都</p>
-          <p className="text-4xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>1.6<span className="text-lg">倍</span></p>
-          <p className="text-xs mt-1" style={{ color: "var(--color-text-secondary)" }}>+178億円/年（東京都調査・2025年6月発表）</p>
-        </div>
-      </div>
-
-      {/* コスト増の構造的原因 */}
-      <div className="card p-6">
-        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
-          コスト増の構造的原因
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* ガバメントクラウド利用料 */}
-          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#fef3c7" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800 mb-1">ガバメントクラウド利用料</p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  新たに発生する利用料。小規模団体ほど割高になりやすい費目です。
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-                    影響大
-                  </span>
-                  <span className="text-xs text-gray-400">全自治体共通</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ソフトウェア借料 */}
-          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#f1f5f9" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800 mb-1">ソフトウェア借料</p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  利用料やライセンス料が増えやすく、追加機能費も乗りやすい項目です。
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
-                    影響中〜大
-                  </span>
-                  <span className="text-xs text-gray-400">ベンダー依存</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ネットワーク費用 */}
-          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#dbeafe" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="2" y1="12" x2="22" y2="12" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800 mb-1">ネットワーク費用</p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  接続回線や閉域網の費用が新たに発生しやすい領域です。
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                    影響中
-                  </span>
-                  <span className="text-xs text-gray-400">インフラ依存</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* SE単価高騰 */}
-          <div className="rounded-lg border border-gray-200 p-4 bg-white hover:shadow-md transition-shadow">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: "#fce7f3" }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#db2777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-gray-800 mb-1">SE単価高騰</p>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  全国同時移行で人材が逼迫し、期限が近いほど単価が上がりやすい状況です。
-                </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">
-                    影響中〜大
-                  </span>
-                  <span className="text-xs text-gray-400">市場構造</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* コストシミュレーター */}
-      <CostSimulator />
-
-      {/* ⑧ コスト変化実績（展開可能カード） */}
-      <div className="card p-6">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          コスト変化実績
-        </h2>
-        <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
-          移行前を基準に増減率で表示。カードを開くと内訳を確認できます。
-          <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
-        </p>
-
-        {costs.length === 0 ? (
-          <p className="text-sm text-gray-400">データがありません。</p>
-        ) : (
-          <div className="space-y-3">
-            {costs.map((cost) => {
-              const isReduction = cost.change_ratio < 1.0;
-              const pctChange = Math.abs((cost.change_ratio - 1) * 100);
-              const barColor = isReduction ? "#007a3d" : cost.change_ratio >= 3.0 ? "#7f1d1d" : cost.change_ratio >= 1.5 ? "#EF4444" : "#d97706";
-              const barWidth = getBarWidth(cost.change_ratio);
-              const label = getRatioLabel(cost.change_ratio);
-              const vendorName = cost.vendors?.short_name ?? cost.vendors?.name ?? "—";
-
-              return (
-                <ExpandableCostCard
-                  key={cost.id}
-                  scope={scopeToJapanese(cost.scope)}
-                  changeRatio={cost.change_ratio}
-                  vendorName={vendorName}
-                  notes={cost.notes}
-                  barWidth={barWidth}
-                  barColor={barColor}
-                  label={label}
-                  isReduction={isReduction}
-                  pctChange={pctChange}
-                />
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-green-600" />削減（−%）</div>
-          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-red-600" />増加（+%）</div>
-          <span className="text-gray-400">縦線 = 変化なし基準（0%）</span>
-        </div>
-      </div>
-
-      {/* ベンダー別評価テーブル */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4">
-          ベンダー別コスト評価
-        </h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">ベンダー</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">クラウド</th>
-                <th className="text-center py-2 px-3 text-xs text-gray-500 font-medium">評価</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">評価観点</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">詳細</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vendors.map((vendor) => {
-                const shortName = vendor.short_name ?? vendor.name;
-                const evalData = vendorEvaluations[shortName];
-                // DBのcloud_platformをフォールバックとして使用
-                const cloudLabel = evalData?.cloud ?? vendor.cloud_platform ?? null;
-                const cloudConfirmed = evalData?.confirmed ?? (vendor.cloud_platform != null);
-                const CLOUD_COLORS: Record<string, string> = {
-                  AWS: "#FF9900", OCI: "#F80000", Azure: "#0078D4", GCP: "#4285F4",
-                };
+        {/* ブレットチャート — 左端=0、目標ライン縦点線 */}
+        {(() => {
+          const MAX = 5.7;
+          const TARGET_RATIO = (1.0 / MAX) * 100; // 移行前基準（100）位置(%)
+          const rows = [
+            { label: "当初目標", mult: 0.7, color: "#10B981", pct: "−30%" },
+            { label: "実態平均", mult: 2.3, color: "#EF4444", pct: `+${avgPct}%` },
+            { label: "最悪事例", mult: 5.7, color: "#7f1d1d", pct: `+${worstPct}%` },
+          ];
+          return (
+            <div className="mt-3 space-y-4">
+              {rows.map((row) => {
+                const barW = (row.mult / MAX) * 100;
                 return (
-                  <tr
-                    key={vendor.id}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="py-3 px-3">
-                      <p className="font-semibold text-gray-800">{shortName}</p>
-                      {vendor.short_name && (
-                        <p className="text-xs text-gray-400">{vendor.name}</p>
-                      )}
-                    </td>
-                    <td className="py-3 px-3 text-xs">
-                      {cloudLabel ? (
-                        <span className="font-medium" style={{ color: CLOUD_COLORS[cloudLabel] ?? "#6b7280" }}>
-                          {cloudLabel}
-                          {cloudConfirmed && <span className="ml-1 text-green-600">&#10003;</span>}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      {evalData ? (
-                        <span className="text-xl font-bold" style={{ color: evalData.markColor }}>
-                          {evalData.mark}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-3 text-xs text-gray-600">
-                      {evalData?.label ?? <span className="text-gray-400">—</span>}
-                    </td>
-                    <td className="py-3 px-3 text-xs text-gray-500">
-                      {evalData?.detail ?? <span className="text-gray-400">—</span>}
-                    </td>
-                  </tr>
+                  <div key={row.label} className="flex items-center gap-3">
+                    <span className="w-20 flex-shrink-0 text-xs font-medium text-gray-600 text-right">{row.label}</span>
+                    <div className="relative flex-1 h-7">
+                      {/* 背景トラック */}
+                      <div className="absolute inset-0 bg-gray-100 rounded" />
+                      {/* バー */}
+                      <div
+                        className="absolute left-0 top-0 h-full rounded"
+                        style={{ width: `${barW}%`, backgroundColor: row.color, opacity: 0.85 }}
+                      />
+                      {/* 目標ライン（overflow外に伸ばす） */}
+                      <div
+                        className="absolute"
+                        style={{ left: `${TARGET_RATIO}%`, top: "-6px", bottom: "-6px", borderLeft: "2px dashed #1f2937", zIndex: 10 }}
+                      />
+                    </div>
+                    <div className="w-32 flex-shrink-0 flex items-baseline gap-1">
+                      <span className="text-base font-extrabold tabular-nums" style={{ color: row.color }}>{row.pct}</span>
+                      <span className="text-[11px] text-gray-400">({row.mult}×)</span>
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* ⑧ クラウド別コスト比較（AWS=100基準） */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-1">
-          クラウド別コスト比較
-          <span className="text-xs font-normal text-gray-400 ml-1">AWSを100とした相対指数</span>
-        </h2>
-        <p className="text-xs text-gray-400 mb-4">
-          標準化20業務を想定した参考比較です。値が低いほど低コストです。
-        </p>
-
-        {/* モバイル: カード型レイアウト */}
-        <div className="md:hidden space-y-3">
-          {CLOUD_COMPARISON.map((row) => {
-            const isBaseline = row.cloud === "AWS";
-            return (
-              <div
-                key={row.cloud}
-                className={`rounded-lg border p-4 ${isBaseline ? "border-amber-200 bg-amber-50/30" : "border-gray-200"}`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: row.color }}
-                    />
-                    <span className="font-semibold text-gray-800">{row.cloud}</span>
-                    {isBaseline && (
-                      <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">基準</span>
-                    )}
-                  </div>
-                  <span className="text-2xl font-extrabold tabular-nums" style={{ color: row.color }}>
-                    {row.index}
-                  </span>
-                </div>
-                <div className="relative h-4 rounded-full overflow-hidden bg-gray-100 mb-3">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${row.index}%`, backgroundColor: row.color, opacity: 0.7 }}
-                  />
-                </div>
-                <dl className="space-y-1.5 text-xs">
-                  <div>
-                    <dt className="font-medium text-gray-500">強み</dt>
-                    <dd className="text-gray-700 mt-0.5">{row.strengths}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-medium text-gray-500">課題</dt>
-                    <dd className="text-gray-600 mt-0.5">{row.weaknesses}</dd>
-                  </div>
-                  <div>
-                    <dt className="font-medium text-gray-500">ガバクラ動向</dt>
-                    <dd className="text-gray-600 mt-0.5">{row.govCloudNote}</dd>
-                  </div>
-                </dl>
+              <div className="flex items-center gap-2 pl-[92px] pt-1">
+                <div style={{ borderLeft: "2px dashed #374151", height: "14px", marginRight: "4px" }} />
+                <span className="text-[11px] text-gray-500">移行前コスト基準（= 100）</span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* デスクトップ: テーブルレイアウト */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">クラウド</th>
-                <th className="text-center py-3 px-3 text-xs text-gray-500 font-medium w-28">
-                  コスト指数
-                  <br />
-                  <span className="text-gray-400 font-normal">（AWS=100）</span>
-                </th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium" style={{ minWidth: 120 }}>指数バー</th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">強み</th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">課題</th>
-                <th className="text-left py-3 px-3 text-xs text-gray-500 font-medium">ガバクラ動向</th>
-              </tr>
-            </thead>
-            <tbody>
-              {CLOUD_COMPARISON.map((row) => {
-                const isBaseline = row.cloud === "AWS";
-                return (
-                  <tr
-                    key={row.cloud}
-                    className={`border-b border-gray-50 hover:bg-gray-50 transition-colors ${isBaseline ? "bg-amber-50/30" : ""}`}
-                  >
-                    <td className="py-3 px-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0"
-                          style={{ backgroundColor: row.color }}
-                        />
-                        <span className="font-semibold text-gray-800">{row.cloud}</span>
-                        {isBaseline && (
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">基準</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <span className="text-2xl font-extrabold tabular-nums" style={{ color: row.color }}>
-                        {row.index}
-                      </span>
-                    </td>
-                    <td className="py-3 px-3">
-                      <div className="relative h-5 rounded-full overflow-hidden bg-gray-100">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{ width: `${row.index}%`, backgroundColor: row.color, opacity: 0.7 }}
-                        />
-                        {isBaseline && (
-                          <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-gray-400" style={{ left: "100%" }} />
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-xs text-gray-600 max-w-[200px]">{row.strengths}</td>
-                    <td className="py-3 px-3 text-xs text-gray-500 max-w-[200px]">{row.weaknesses}</td>
-                    <td className="py-3 px-3 text-xs text-gray-500 max-w-[200px]">{row.govCloudNote}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-gray-100">
-          <p className="text-xs text-gray-400">
-            ※ AWS=100の相対値。割引適用前の参考値。実際のコストは契約条件により変動。
-          </p>
-        </div>
-      </div>
-
-      {/* デジタル庁コスト管理ガイド */}
-      <div className="bg-blue-50 rounded-lg border border-blue-200 px-6 py-4">
-        <h3 className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          デジタル庁コスト管理・FinOps動向
-        </h3>
-        <ul className="space-y-1.5 text-xs text-blue-700">
-          <li className="flex items-start gap-1.5">
-            <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">運用経費見積チェックリスト</span>: 費用漏れを防ぐ確認項目が公開済み。</span>
-          </li>
-          <li className="flex items-start gap-1.5">
-            <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">FinOpsガイド策定中</span>: 運用最適化の標準化が進められています。</span>
-          </li>
-          <li className="flex items-start gap-1.5">
-            <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">東京都+178億円/年</span>: コスト超過が全国規模の政策課題になっています。</span>
-          </li>
-        </ul>
-
-        <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">特設: 移行済み最適化と未移行見直し</p>
-            <p className="text-xs text-slate-600">運用最適化と基盤再選定を分けて整理しています。</p>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Link
-              href="/cost-reduction"
-              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
-            >
-              コスト削減特設を見る
-            </Link>
-            <Link
-              href="/report?from=costs"
-              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
-            >
-              無料レポートを受け取る
-            </Link>
-          </div>
-        </div>
+              <p className="text-[11px] text-gray-400 pl-[92px]">出典: デジタル庁・中核市市長会調査</p>
+            </div>
+          );
+        })()}
       </div>
 
       {/* コスト内訳（増加・減少項目） */}
@@ -865,19 +390,20 @@ export default async function CostsPage() {
             </h3>
             <div className="space-y-2.5">
               {[
-                { name: "ソフトウェア借料・保守費", desc: "標準準拠パッケージのASP利用料・ライセンス。最大の増加項目", impact: "大" },
-                { name: "ガバクラ利用料", desc: "計算資源、保存、通信の費用。為替影響も受けやすい", impact: "大" },
-                { name: "システム運用作業費", desc: "クラウド対応や要員確保で単価が上がりやすい", impact: "中" },
-                { name: "ガバクラ接続回線費", desc: "接続回線や冗長化で増えやすい新規コスト", impact: "中" },
-                { name: "ガバナンス・セキュリティ費", desc: "監査や設定管理に伴う追加費用", impact: "小" },
+                { name: "クラウド利用料", desc: "計算資源・ストレージ費用。為替・物価上昇の影響を受けやすい" },
+                { name: "クラウド接続回線費", desc: "閉域網・冗長回線の新設。既存回線費に上積みされる新規コスト" },
+                { name: "クラウド運用費", desc: "クラウド対応要員確保・教育・賃上げで単価が上がりやすい" },
+                { name: "ガバナンス・セキュリティ費", desc: "監査・設定管理・インシデント対応に伴う追加費用" },
+                { name: "ソフトウェア借料・保守費", desc: "ミドルウェア・DBライセンス等、クラウド未最適化のまま移行した場合に増加", note: true },
               ].map((item) => (
                 <div key={item.name} className="flex items-start gap-2">
-                  <span className={`flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold ${
-                    item.impact === "大" ? "bg-red-200 text-red-800" : item.impact === "中" ? "bg-orange-200 text-orange-800" : "bg-yellow-200 text-yellow-800"
-                  }`}>{item.impact}</span>
+                  <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">↑</span>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">{item.name}</p>
                     <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
+                    {"note" in item && item.note && (
+                      <p className="text-[10px] text-orange-500 mt-0.5">※ 標準化パッケージ（ASP）自体の費用は移行前と大きく変わらないケースが多い</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -894,9 +420,10 @@ export default async function CostsPage() {
               {[
                 { name: "ハードウェア借料・保守費", desc: "共同利用基盤への移行で削減しやすい項目" },
                 { name: "データセンター利用費", desc: "自前設備の縮小で削減しやすい項目" },
+                { name: "システム運用費", desc: "標準化・共同利用化で運用の一部を委託できるため削減余地あり" },
               ].map((item) => (
                 <div key={item.name} className="flex items-start gap-2">
-                  <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-green-200 text-green-800">減</span>
+                  <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-green-100 text-green-700">↓</span>
                   <div>
                     <p className="text-xs font-semibold text-gray-800">{item.name}</p>
                     <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
@@ -964,6 +491,143 @@ export default async function CostsPage() {
         </div>
       </div>
 
+      {/* ⑧ コスト変化実績（展開可能カード） */}
+      <div className="card p-6">
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+          コスト変化実績
+        </h2>
+        <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
+          移行前を基準に増減率・出典を整理しています。
+          <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
+        </p>
+
+        {costs.length === 0 ? (
+          <p className="text-sm text-gray-400">データがありません。</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-gray-100">
+                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-medium w-16"></th>
+                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-medium">対象・出典</th>
+                  <th className="text-right py-2 px-3 text-xs text-gray-400 font-medium">変化率</th>
+                  <th className="py-2 px-3 text-xs text-gray-400 font-medium w-32 hidden sm:table-cell"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {costs.map((cost) => {
+                  const isReduction = cost.change_ratio < 1.0;
+                  const pctChange = Math.abs((cost.change_ratio - 1) * 100);
+                  const barColor = isReduction ? "#007a3d" : cost.change_ratio >= 3.0 ? "#7f1d1d" : cost.change_ratio >= 1.5 ? "#EF4444" : "#d97706";
+                  const barWidth = getBarWidth(cost.change_ratio);
+                  const label = getRatioLabel(cost.change_ratio);
+                  const vendorName = cost.vendors?.short_name ?? cost.vendors?.name ?? "—";
+
+                  return (
+                    <ExpandableCostCard
+                      key={cost.id}
+                      scope={scopeToJapanese(cost.scope)}
+                      changeRatio={cost.change_ratio}
+                      vendorName={vendorName}
+                      notes={cost.notes}
+                      sourceUrl={cost.source_url}
+                      reportedYear={cost.reported_year}
+                      barWidth={barWidth}
+                      barColor={barColor}
+                      label={label}
+                      isReduction={isReduction}
+                      pctChange={pctChange}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-4 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-green-600" />削減（−%）</div>
+          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-red-600" />増加（+%）</div>
+          <span className="text-gray-400">縦線 = 変化なし基準（0%）</span>
+        </div>
+      </div>
+
+      {/* ベンダー別コスト評価（カード表示） */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        <h2 className="text-base font-bold text-gray-800 mb-4">
+          ベンダー別コスト評価
+        </h2>
+        <div className="space-y-2">
+          {vendors
+            .slice()
+            .sort((a, b) => (b.municipality_count ?? 0) - (a.municipality_count ?? 0))
+            .filter((v) => !["NTT西日本", "京都GIS", "SBS情報S", "北日本CS"].includes(v.short_name ?? v.name))
+            .slice(0, 5)
+            .map((vendor) => {
+              const shortName = vendor.short_name ?? vendor.name;
+              const evalData = vendorEvaluations[shortName];
+              return (
+                <VendorCard
+                  key={shortName}
+                  vendorName={shortName}
+                  cloud={evalData?.cloud ?? vendor.cloud_platform ?? "—"}
+                  mark={evalData?.mark ?? "—"}
+                  markColor={evalData?.markColor ?? "#9ca3af"}
+                  label={evalData?.label ?? ""}
+                  detail={evalData?.detail ?? ""}
+                />
+              );
+            })}
+        </div>
+      </div>
+
+      {/* デジタル庁コスト管理ガイド */}
+      <div className="bg-blue-50 rounded-lg border border-blue-200 px-6 py-4">
+        <h3 className="text-xs font-bold text-blue-800 mb-2 flex items-center gap-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          デジタル庁コスト管理・FinOps動向
+        </h3>
+        <ul className="space-y-1.5 text-xs text-blue-700">
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">運用経費見積チェックリスト</span>: 費用漏れを防ぐ確認項目が公開済み。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">FinOpsガイド策定中</span>: 運用最適化の標準化が進められています。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">東京都+178億円/年</span>: コスト超過が全国規模の政策課題になっています。</span>
+          </li>
+        </ul>
+
+        <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-800">特設: 移行済み最適化と未移行見直し</p>
+            <p className="text-xs text-slate-600">運用最適化と基盤再選定を分けて整理しています。</p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Link
+              href="/cost-reduction"
+              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+            >
+              コスト削減特設を見る
+            </Link>
+            <Link
+              href="/report?from=costs"
+              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
+            >
+              無料レポートを受け取る
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* 注記 */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
         <p className="text-xs text-gray-400">
@@ -991,78 +655,6 @@ export default async function CostsPage() {
         description="ベンダー別の見方だけでなく、進捗や遅延構造まで含めて無料レポートで確認できます。"
       />
 
-      {/* ⑧ 自治体別コスト影響推定（ベンダー別グループ） */}
-      {muniEstimates.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-          <h2 className="text-base font-bold text-gray-800 mb-1">
-            自治体別コスト影響推定
-            <span className="text-xs font-normal text-gray-400 ml-1">（全{muniEstimates.length}件・ベンダー別）</span>
-          </h2>
-          <p className="text-xs text-gray-400 mb-4">
-            ベンダー別のコスト変化レンジを当てた参考推定です。各行を開くと詳細を確認できます。
-          </p>
-
-          <div className="space-y-3">
-            {sortedVendorNames.map((vendorName) => {
-              const items = vendorGroups[vendorName];
-              const est = VENDOR_COST_ESTIMATE[vendorName];
-              return (
-                <VendorGroup
-                  key={vendorName}
-                  vendorName={vendorName}
-                  cloud={getGroupCloudLabel(items, est?.cloud ?? "調査中")}
-                  mark={est?.mark ?? "—"}
-                  markColor={est?.markColor ?? "#9ca3af"}
-                  note={est?.note ?? ""}
-                  count={items.length}
-                >
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-gray-200 bg-gray-50">
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">#</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">都道府県</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">市区町村</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主ベンダー</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">主なクラウド</th>
-                          <th className="text-right py-2 px-2 text-xs text-gray-500 font-medium">推定増加率</th>
-                          <th className="text-left py-2 px-2 text-xs text-gray-500 font-medium">増加レンジ</th>
-                          <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium">評価</th>
-                          <th className="text-center py-2 px-2 text-xs text-gray-500 font-medium w-8"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map((item, i) => (
-                          <ExpandableMuniRow
-                            key={item.municipality_id}
-                            index={i + 1}
-                            city={item.city}
-                            prefecture={item.prefecture}
-                            primaryVendor={item.primaryVendor}
-                            cloud={item.cloud}
-                            ratioTypical={item.ratioTypical}
-                            ratioMin={item.ratioMin}
-                            ratioMax={item.ratioMax}
-                            mark={item.mark}
-                            markColor={item.markColor}
-                            vendorNote={est?.note ?? ""}
-                          />
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </VendorGroup>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">
-              &#9888; 推定値（参考）。実際のコストは契約・規模により異なります。出典: デジタル庁TCO検証・中核市市長会調査等。
-            </p>
-          </div>
-        </div>
-      )}
 
       <PageNavCards exclude="/costs" />
       <RelatedArticles cluster={CLUSTERS.cost} />

@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
   // 静的アセット・データファイルの長期キャッシュ（本番のみ）
   // dev環境でimmutableを設定するとTurbopackのHMR後もブラウザが古いチャンクを返し続ける
   async headers() {
-    if (!isProd) return [];
+    if (!isProd) return [
+      {
+        source: '/(.*)',
+        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+      },
+    ];
     return [
       {
         source: "/images/:path*",
