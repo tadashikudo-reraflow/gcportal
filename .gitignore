@@ -9,6 +9,7 @@ etl/shichoson_progress.xlsx
 .env.*
 !.env.example
 .vercel
+supabase/
 
 # ETL RAWデータ（大容量・ローカル保持のみ）
 etl/data/
