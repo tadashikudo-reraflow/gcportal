@@ -172,132 +172,109 @@ export default function RisksPage() {
           </div>
         </div>
 
-        {/* 危機レベル分布 */}
-        {rows.length > 0 && (
-          <div>
-            <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>
-              危機レベル分布（手続き進捗率別）
-            </p>
-            <div className="flex rounded-lg overflow-hidden h-7 text-xs font-bold">
-              {dist.critical > 0 && (
+        {/* 50%未満の内訳バー（遅延リスク + 特定移行認定） */}
+        {(() => {
+          const total50 = riskMunicipalities.length + tokuteiOverlapCount;
+          const riskPct = total50 > 0 ? (riskMunicipalities.length / total50) * 100 : 0;
+          const tokuteiPct = total50 > 0 ? (tokuteiOverlapCount / total50) * 100 : 0;
+          return (
+            <div>
+              <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>
+                手続き進捗率 50%未満の自治体（計 {total50}）
+              </p>
+              <div className="flex rounded-lg overflow-hidden h-8 text-xs font-bold">
                 <div
                   className="flex items-center justify-center text-white"
-                  style={{ width: `${(dist.critical / rows.length) * 100}%`, backgroundColor: "#b91c1c" }}
-                  title={`危険: ${dist.critical}件`}
+                  style={{ width: `${riskPct}%`, backgroundColor: "#b91c1c" }}
+                  title={`遅延リスク: ${riskMunicipalities.length}自治体`}
                 >
-                  {dist.critical}件
+                  遅延リスク {riskMunicipalities.length}
                 </div>
-              )}
-              {dist.danger > 0 && (
-                <div
-                  className="flex items-center justify-center text-white"
-                  style={{ width: `${(dist.danger / rows.length) * 100}%`, backgroundColor: "#d97706" }}
-                  title={`警戒: ${dist.danger}件`}
-                >
-                  {dist.danger}件
-                </div>
-              )}
-              {dist.warning > 0 && (
                 <div
                   className="flex items-center justify-center"
-                  style={{ width: `${(dist.warning / rows.length) * 100}%`, backgroundColor: "#fef3c7", color: "#92400e" }}
-                  title={`注意: ${dist.warning}件`}
+                  style={{ width: `${tokuteiPct}%`, backgroundColor: "#94a3b8", color: "#fff" }}
+                  title={`特定移行認定: ${tokuteiOverlapCount}自治体`}
                 >
-                  {dist.warning}件
+                  特定移行認定 {tokuteiOverlapCount}
                 </div>
-              )}
-            </div>
-            <div className="flex gap-4 mt-1.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
-              <span><span className="inline-block w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: "#b91c1c" }} />危険 &lt;10%</span>
-              <span><span className="inline-block w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: "#d97706" }} />警戒 10-25%</span>
-              <span><span className="inline-block w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: "#fef3c7", border: "1px solid #d97706" }} />注意 25-50%</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* 移行目標超過のリスク */}
-      <div className="card p-5">
-        <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-          移行目標期限を超過した場合の想定リスク
-        </h2>
-        <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>
-          以下は編集部が法令・公式資料をもとに整理した想定リスクです。標準化法の「努力義務」規定に基づく解釈であり、法的判断は各自治体の顧問弁護士・総務省へご確認ください。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
-        </p>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          ※ 罰則規定はなく、目標期限は法的強制力のない努力目標です。
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {[
-            {
-              label: "財政",
-              title: "補助金・財政支援の喪失",
-              desc: "補助金対象外となり、移行費用が全額自治体負担になる可能性。",
-              severity: "高",
-            },
-            {
-              label: "法務",
-              title: "法的・行政的リスク",
-              desc: "総務省・デジタル庁から個別ヒアリングや計画再提出を求められる可能性。",
-              severity: "中",
-            },
-            {
-              label: "保守",
-              title: "旧システムの保守リスク",
-              desc: "旧システムのサポート縮小が加速し、パッチ停止でセキュリティリスクが増大。",
-              severity: "高",
-            },
-            {
-              label: "連携",
-              title: "自治体間連携からの孤立",
-              desc: "標準化前提の自治体間連携サービスに参加できず、住民サービスに格差が発生。",
-              severity: "中",
-            },
-            {
-              label: "費用",
-              title: "コスト増大の悪循環",
-              desc: "旧システム保守費＋クラウド利用料の二重負担。遅延するほど移行コストも増大。",
-              severity: "高",
-            },
-            {
-              label: "評判",
-              title: "説明責任・評判リスク",
-              desc: "議会・住民への説明責任が発生。報道対象となり移住・企業誘致の評判にも影響。",
-              severity: "低",
-            },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-lg p-3 flex items-start gap-3"
-              style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
-            >
-              <span className="text-xs font-bold px-2 py-1 rounded-md flex-shrink-0" style={{ backgroundColor: "#fecaca", color: "#991b1b" }}>{item.label}</span>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
-                    {item.title}
-                  </p>
-                  <span
-                    className="text-[10px] px-1.5 py-0.5 rounded font-semibold flex-shrink-0"
-                    style={{
-                      backgroundColor: item.severity === "高" ? "#dc2626" : item.severity === "中" ? "#d97706" : "#6b7280",
-                      color: "#fff",
-                    }}
-                  >
-                    影響度: {item.severity}
-                  </span>
-                </div>
-                <p className="text-xs leading-relaxed" style={{ color: "#7f1d1d" }}>
-                  {item.desc}
-                </p>
+              </div>
+              <div className="flex gap-4 mt-1.5 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                <span><span className="inline-block w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: "#b91c1c" }} />遅延リスク（期限超過懸念）</span>
+                <span><span className="inline-block w-2 h-2 rounded-sm mr-1" style={{ backgroundColor: "#94a3b8" }} />特定移行認定（延長対象）</span>
               </div>
             </div>
-          ))}
-        </div>
-        <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-          ※ 編集部の解釈に基づく想定リスクです。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
-        </p>
+          );
+        })()}
       </div>
+
+      {/* 移行目標超過のリスク（折りたたみ） */}
+      <details className="card p-5">
+        <summary className="text-base font-bold cursor-pointer list-none flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="text-gray-400 text-xs">▶</span>
+          移行目標期限を超過した場合の想定リスク
+        </summary>
+        <div className="mt-3">
+          <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>
+            以下は編集部が法令・公式資料をもとに整理した想定リスクです。標準化法の「努力義務」規定に基づく解釈であり、法的判断は各自治体の顧問弁護士・総務省へご確認ください。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
+          </p>
+          <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+            ※ 罰則規定はなく、目標期限は法的強制力のない努力目標です。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              {
+                label: "財政",
+                title: "補助金・財政支援の喪失",
+                desc: "補助金対象外となり、移行費用が全額自治体負担になる可能性。",
+              },
+              {
+                label: "法務",
+                title: "法的・行政的リスク",
+                desc: "総務省・デジタル庁から個別ヒアリングや計画再提出を求められる可能性。",
+              },
+              {
+                label: "保守",
+                title: "旧システムの保守リスク",
+                desc: "旧システムのサポート縮小が加速し、パッチ停止でセキュリティリスクが増大。",
+              },
+              {
+                label: "連携",
+                title: "自治体間連携からの孤立",
+                desc: "標準化前提の自治体間連携サービスに参加できず、住民サービスに格差が発生。",
+              },
+              {
+                label: "費用",
+                title: "コスト増大の悪循環",
+                desc: "旧システム保守費＋クラウド利用料の二重負担。遅延するほど移行コストも増大。",
+              },
+              {
+                label: "評判",
+                title: "説明責任・評判リスク",
+                desc: "議会・住民への説明責任が発生。報道対象となり移住・企業誘致の評判にも影響。",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-lg p-3 flex items-start gap-3"
+                style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
+              >
+                <span className="text-xs font-bold px-2 py-1 rounded-md flex-shrink-0" style={{ backgroundColor: "#fecaca", color: "#991b1b" }}>{item.label}</span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold mb-1" style={{ color: "#991b1b" }}>
+                    {item.title}
+                  </p>
+                  <p className="text-xs leading-relaxed" style={{ color: "#7f1d1d" }}>
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+            ※ 編集部の解釈に基づく想定リスクです。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
+          </p>
+        </div>
+      </details>
 
       {/* テーブル（フィルター付き Client Component） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
