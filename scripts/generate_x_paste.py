@@ -236,7 +236,8 @@ def render_blocks_to_png(blocks, slug, tmp_dir: Path):
 
 # X Articles推奨サイズ: 1200×675 (16:9)
 X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 X Articles推奨比率
-SEO_COVER_W, SEO_COVER_H = 2400, 1260  # GCInsight SEO記事OGP
+SEO_COVER_W, SEO_COVER_H = 2400, 1350  # GCInsight SEO記事OGP（真の16:9）
+assert SEO_COVER_H == int(SEO_COVER_W * 9 / 16), f"SEO cover must be 16:9: {SEO_COVER_W}×{SEO_COVER_H}"
 
 def _build_prompt(title, context, aspect):
     """比率別プロンプト生成。aspect='5:2'(X記事) or '16:9'(SEO)"""
