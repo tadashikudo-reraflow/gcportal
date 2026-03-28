@@ -47,7 +47,7 @@ PUBLIC_X_IMGS  = GCPORTAL_DIR / "public" / "images" / "x-articles"
 OUT_DIR        = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ19" / "x_articles"
 
 XAI_KEY     = os.environ.get("XAI_API_KEY", "")
-GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "AIzaSyA_HCYVxwI2KJhoX590wEiKw6Ytv31TtEI")
+GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "***REDACTED_GEMINI_KEY***")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,
