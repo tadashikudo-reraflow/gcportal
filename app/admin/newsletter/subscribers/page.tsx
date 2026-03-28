@@ -472,7 +472,7 @@ export default function SubscribersPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "32px 1fr 160px 120px 100px 60px",
+              gridTemplateColumns: "32px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
               gap: 16,
               padding: "8px 0 8px",
               borderBottom: "1px solid #e5e7eb",
@@ -498,7 +498,7 @@ export default function SubscribersPage() {
               key={lead.id}
               style={{
                 display: "grid",
-                gridTemplateColumns: "32px 1fr 160px 120px 100px 60px",
+                gridTemplateColumns: "32px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
                 gap: 16,
                 padding: "14px 0",
                 borderBottom: "1px solid #f3f4f6",
@@ -512,7 +512,7 @@ export default function SubscribersPage() {
                 onChange={() => toggleOne(lead.id)}
                 style={{ cursor: "pointer" }}
               />
-              <p style={{ fontSize: 14, color: "#111111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
+              <p style={{ fontSize: 14, color: "#111111", wordBreak: "break-all", margin: 0 }}>
                 {lead.email}
               </p>
               <p style={{ fontSize: 13, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
