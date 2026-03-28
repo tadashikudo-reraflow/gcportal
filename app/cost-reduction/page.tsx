@@ -4,6 +4,7 @@ import ReportLeadCta from "@/components/ReportLeadCta";
 import SourceAttribution from "@/components/SourceAttribution";
 import { COST_CONSTANTS } from "@/lib/constants";
 import { PAGE_SOURCES } from "@/lib/sources";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const detailLinks = [
   {
@@ -41,6 +42,7 @@ export default function CostReductionPage() {
 
   return (
     <div className="space-y-8">
+      <Breadcrumb items={[{ label: "コスト削減の現実解" }]} />
       <section
         className="rounded-2xl border px-6 py-7"
         style={{ borderColor: "#fecaca", backgroundColor: "#fff7ed" }}

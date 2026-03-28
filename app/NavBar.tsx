@@ -15,7 +15,6 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
-      { href: "/businesses", label: "業務別の進捗を見る", desc: "20業務ごとの進捗率" },
       { href: "/benchmark",  label: "自治体同士を比較する", desc: "人口帯・地域別の比較" },
       { href: "/timeline",   label: "スケジュールを確認", desc: "移行タイムライン" },
     ],

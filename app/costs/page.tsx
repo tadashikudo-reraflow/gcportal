@@ -8,6 +8,7 @@ import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { ExpandableCostCard, VendorCard } from "./CostClientComponents";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
@@ -311,7 +312,8 @@ export default async function CostsPage() {
 
   return (
     <div className="space-y-6">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "コスト効果分析" }]} />
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">コスト効果分析</h1>
         <p className="page-subtitle">

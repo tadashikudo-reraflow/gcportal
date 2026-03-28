@@ -6,6 +6,7 @@ import { Municipality, BusinessSummary } from "@/lib/types";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // 特定移行自治体のSetを構築
 const tokuteiSet = new Set(
@@ -53,7 +54,8 @@ export default function BusinessesPage() {
 
   return (
     <div className="space-y-6">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "業務別の進捗" }]} />
       <div className="border-b border-gray-200 pb-4">
         <h1 className="page-title">業務別 標準化進捗</h1>
         <p className="page-subtitle">

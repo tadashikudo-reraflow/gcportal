@@ -6,6 +6,7 @@ import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ISR: インフラシェアデータは静的だが念のため1日キャッシュ
 export const revalidate = 86400;
@@ -195,7 +196,8 @@ export default async function CloudPage() {
 
   return (
     <div className="space-y-8">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "クラウド基盤分析" }]} />
       <div className="pb-2">
         <h1 className="page-title">クラウド基盤分析</h1>
         <p className="page-subtitle">

@@ -11,6 +11,7 @@ import {
   type ConfidenceLevel,
   type SourceCategory,
 } from "@/lib/sources";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "データソース・方法論 | ガバメントクラウド移行状況ダッシュボード",
@@ -62,7 +63,8 @@ export default function SourcesPage() {
 
   return (
     <div className="space-y-8">
-      {/* ヘッダー */}
+      {/* パンくず + ヘッダー */}
+      <Breadcrumb items={[{ label: "データソース・方法論" }]} />
       <div className="pb-2">
         <h1 className="page-title">データソース・方法論</h1>
         <p className="page-subtitle">

@@ -9,6 +9,7 @@ import { CLUSTERS } from "@/lib/clusters";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "特定移行支援システム認定 自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
@@ -71,7 +72,8 @@ export default function TokuteiPage() {
 
   return (
     <div className="space-y-6">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "特定移行" }]} />
       <div className="pb-2">
         <h1 className="page-title">特定移行支援システム認定 自治体一覧</h1>
         <p className="page-subtitle">

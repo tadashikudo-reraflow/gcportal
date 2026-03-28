@@ -10,6 +10,7 @@ import Link from "next/link";
 import FreshnessBanner from "@/components/FreshnessBanner";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title:
@@ -100,7 +101,8 @@ export default function RisksPage() {
 
   return (
     <div className="space-y-6">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "遅延リスク自治体" }]} />
       <div className="pb-2">
         <h1 className="page-title">遅延リスク 自治体一覧</h1>
         <p className="page-subtitle">

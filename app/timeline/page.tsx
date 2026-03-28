@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import scheduleData from "@/public/data/schedule.json";
 import ScheduleClient from "./ScheduleClient";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title:
@@ -45,6 +46,7 @@ export default function SchedulePage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "スケジュール" }]} />
       <div>
         <h1 className="page-title">ガバクラ関連スケジュール</h1>
         <p className="page-subtitle">

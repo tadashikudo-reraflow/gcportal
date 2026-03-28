@@ -7,6 +7,7 @@ import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
 import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ISR: DB更新後60秒以内に自動反映（公開直後の表示崩れを最小化）
 export const revalidate = 60;
@@ -90,13 +91,7 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
-      <nav className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
-        <Link href="/" className="hover:underline">TOP</Link>
-        <span>/</span>
-        <Link href="/articles" className="hover:underline">コラム・解説</Link>
-        <span>/</span>
-        <span className="truncate" style={{ color: "var(--color-text-secondary)" }}>{article.title}</span>
-      </nav>
+      <Breadcrumb items={[{ label: "コラム・解説", href: "/articles" }, { label: article.title }]} />
 
       {article.coverImage && (
         <div className="card overflow-hidden">

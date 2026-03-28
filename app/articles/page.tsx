@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllArticles } from "@/lib/articles";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const revalidate = 3600;
 
@@ -47,6 +48,7 @@ export default async function ArticlesPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "コラム・解説記事" }]} />
       <div className="pb-2">
         <h1 className="page-title">コラム・解説記事</h1>
         <p className="page-subtitle">ガバメントクラウド・自治体標準化に関する実務情報・解説</p>

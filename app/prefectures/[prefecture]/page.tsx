@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality } from "@/lib/types";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // SSG: 47都道府県分の静的パラメータを生成
 // Next.jsが自動でURLエンコードするため、ここでは生の日本語文字列を返す
@@ -129,14 +130,7 @@ export default async function PrefectureDetailPage({ params }: PageProps) {
       {/* ヘッダー */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Link
-              href="/prefectures"
-              className="text-sm text-blue-600 hover:underline"
-            >
-              ← 都道府県一覧に戻る
-            </Link>
-          </div>
+          <Breadcrumb items={[{ label: prefectureName }]} />
           <h1 className="page-title">
             {prefectureName} の標準化進捗
           </h1>

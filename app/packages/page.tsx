@@ -8,6 +8,7 @@ import { PAGE_SOURCES } from "@/lib/sources";
 import VendorRanking from "@/components/VendorRanking";
 import BusinessPackageList from "@/components/BusinessPackageList";
 import MunicipalitySearch from "@/components/MunicipalitySearch";
+import Breadcrumb from "@/components/Breadcrumb";
 
 // ISR: デジタル庁データは日次更新のため1時間キャッシュで十分
 export const revalidate = 3600;
@@ -85,7 +86,8 @@ export default async function PackagesPage() {
 
   return (
     <div className="space-y-6">
-      {/* ページヘッダー */}
+      {/* パンくず + ページヘッダー */}
+      <Breadcrumb items={[{ label: "パッケージ・ベンダー" }]} />
       <div className="pb-4">
         <h1 className="page-title">パッケージ・ベンダー一覧</h1>
         <p className="page-subtitle">

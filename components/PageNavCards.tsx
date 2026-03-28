@@ -10,13 +10,6 @@ type NavCard = {
 
 const ALL_CARDS: NavCard[] = [
   {
-    href: "/businesses",
-    badge: "20業務",
-    badgeStyle: { backgroundColor: "#DBEAFE", color: "#1D4ED8" },
-    title: "業務別の進捗",
-    desc: "住民記録・国民年金など業務ごとの移行率を確認",
-  },
-  {
     href: "/benchmark",
     badge: "比較",
     badgeStyle: { backgroundColor: "#D1FAE5", color: "#065F46" },

@@ -3,6 +3,7 @@ import data from "@/public/data/standardization.json";
 import populationBands from "@/public/data/population_bands.json";
 import { Municipality, PrefectureSummary, StandardizationData } from "@/lib/types";
 import BenchmarkClient from "./BenchmarkClient";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
   title: "自治体ベンチマーク比較｜人口帯別・都道府県別の進捗ランキング | ガバメントクラウド移行状況ダッシュボード",
@@ -112,6 +113,7 @@ export default function BenchmarkPage() {
 
   return (
     <div className="space-y-6">
+      <Breadcrumb items={[{ label: "自治体ベンチマーク比較" }]} />
       <div>
         <h1 className="page-title">自治体ベンチマーク比較</h1>
         <p className="page-subtitle">
