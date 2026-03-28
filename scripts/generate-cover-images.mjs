@@ -16,9 +16,7 @@ import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co";
-const SUPABASE_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ??
-  "***REDACTED_SUPABASE_SERVICE_ROLE***";
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 
 const OUT_DIR_OGP = resolve(import.meta.dirname, "../public/images/articles");
 const OUT_DIR_X   = `${process.env.GDRIVE_WORKSPACE}/contents/PJ19/x_articles`;

@@ -5,9 +5,9 @@ out/
 etl/shikucho_progress.xlsx
 etl/shichoson_progress.xlsx
 *.xlsm
-.env.local
-.env.vercel
-.env*.local
+.env
+.env.*
+!.env.example
 .vercel
 
 # ETL RAWデータ（大容量・ローカル保持のみ）

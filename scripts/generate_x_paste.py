@@ -33,10 +33,7 @@ from io import BytesIO
 
 # ── 設定 ──────────────────────────────────────────────────────────
 SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co"
-SUPABASE_KEY = os.environ.get(
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "***REDACTED_SUPABASE_SERVICE_ROLE***",
-)
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SITE_URL = "https://gcinsight.jp"
 PDF_URL  = "https://gcinsight.jp/report?from=nav"
 
@@ -47,7 +44,7 @@ PUBLIC_X_IMGS  = GCPORTAL_DIR / "public" / "images" / "x-articles"
 OUT_DIR        = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ19" / "x_articles"
 
 XAI_KEY     = os.environ.get("XAI_API_KEY", "")
-GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "***REDACTED_GEMINI_KEY***")
+GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "")
 
 HEADERS = {
     "apikey": SUPABASE_KEY,

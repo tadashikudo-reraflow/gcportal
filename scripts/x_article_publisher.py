@@ -21,10 +21,7 @@ from markdownify import markdownify as md
 
 # ── 設定 ──
 SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co"
-SUPABASE_SERVICE_KEY = os.environ.get(
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "***REDACTED_SUPABASE_SERVICE_ROLE***"
-)
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SITE_URL = "https://gcinsight.jp"
 PDF_URL = "https://gcinsight.jp/report?from=nav"
 KW_PLANNER_PATH = os.path.expandvars(
