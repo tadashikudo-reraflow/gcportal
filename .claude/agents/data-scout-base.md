@@ -111,15 +111,38 @@ def exists(mid: int, pkg_id: int) -> bool:
     })
     return bool(rows)
 
-def insert(mid: int, pkg_id: int, confidence: str, source: str, note: str = '') -> bool:
-    """レコード挿入"""
-    result = api('POST', '/municipality_packages', data={
+STANDARD_20 = {
+    '住民記録', '選挙人名簿管理', '固定資産税', '個人住民税', '法人住民税',
+    '軽自動車税', '就学', '国民年金', '国民健康保険', '後期高齢者医療',
+    '介護保険', '障害者福祉', '生活保護', '健康管理', '児童手当',
+    '児童扶養手当', '子ども・子育て支援', '戸籍', '戸籍附票', '印鑑登録',
+}
+BUSINESS_ALIAS = {
+    '住民基本台帳': '住民記録', '住基': '住民記録',
+    '戸籍総合': '戸籍', '戸籍情報': '戸籍',
+    '国保': '国民健康保険', '後期高齢': '後期高齢者医療',
+    '子育て支援': '子ども・子育て支援',
+}
+
+def normalize_business(name: str | None) -> str | None:
+    """業務名を標準20業務名に正規化。該当なしはNone"""
+    if not name:
+        return None
+    if name in STANDARD_20:
+        return name
+    return BUSINESS_ALIAS.get(name)
+
+def insert(mid: int, pkg_id: int, confidence: str, source: str, note: str = '', business: str = None) -> bool:
+    """レコード挿入（businessは自動正規化される）"""
+    data = {
         'municipality_id': mid,
         'package_id': pkg_id,
         'confidence': confidence,
         'source': source,
-        'note': note
-    })
+        'note': note,
+        'business': normalize_business(business),
+    }
+    result = api('POST', '/municipality_packages', data=data)
     return result is not None
 
 # --- メイン処理テンプレート ---

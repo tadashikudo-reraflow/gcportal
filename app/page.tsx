@@ -9,8 +9,10 @@ import JapanMap from "@/components/JapanMap";
 import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
 import ThreeMetricsWidget from "@/components/ThreeMetricsWidget";
+import BusinessCards from "@/components/BusinessCards";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
+import { Municipality } from "@/lib/types";
 
 export const metadata: Metadata = {
   title:
@@ -31,13 +33,6 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
-};
-
-type StandardMunicipality = {
-  prefecture: string;
-  city: string;
-  overall_rate: number;
-  business_rates: Record<string, number>;
 };
 
 // 5段階ステータス
@@ -69,7 +64,7 @@ function calcRemainingDays(deadline: string): number {
 
 export default function DashboardPage() {
   const { summary, prefectures, businesses, risk_municipalities } = data;
-  const allMunis = (data as { municipalities: StandardMunicipality[] }).municipalities;
+  const allMunis = (data as { municipalities: Municipality[] }).municipalities;
 
   // 特定移行認定Set
   const tokuteiSet = new Set<string>(
@@ -96,7 +91,7 @@ export default function DashboardPage() {
   for (const m of allMunis) {
     const isTokutei = tokuteiSet.has(`${m.prefecture}/${m.city}`);
     if (isTokutei) continue;
-    const s = getStatus(m.overall_rate, false);
+    const s = getStatus(m.overall_rate ?? 0, false);
     if (s === "complete") completeCount++;
     else if (s === "ontrack") ontrackCount++;
     else if (s === "atrisk") atriskCount++;
@@ -114,6 +109,7 @@ export default function DashboardPage() {
 
   // 業務別: 完了率降順
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
+
 
   return (
     <div className="space-y-6">
@@ -200,66 +196,10 @@ export default function DashboardPage() {
       </div>
 
       {/* ========== 業務別 手続き進捗率 ========== */}
-      <div className="card p-6">
-        <h2
-          className="text-sm font-bold mb-3"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          業務別 手続き進捗率
-          <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>進捗率降順</span>
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
-          {sortedBusinesses.map((biz) => {
-            const pct = biz.avg_rate * 100;
-            const barColor = getRateColor(biz.avg_rate);
-            return (
-              <div
-                key={biz.business}
-                className="bg-white rounded-xl p-3 flex flex-col gap-2"
-                style={{ border: "1px solid #E5E7EB" }}
-              >
-                <p
-                  className="text-xs leading-snug"
-                  style={{ color: "var(--color-text-secondary)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
-                  title={biz.business}
-                >
-                  {biz.business}
-                </p>
-                <p
-                  className="tabular-nums font-black leading-none"
-                  style={{ fontSize: 20, color: barColor }}
-                >
-                  {pct.toFixed(1)}%
-                </p>
-                <div className="rounded-full overflow-hidden" style={{ height: 8, backgroundColor: "#e5e7eb" }}>
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${pct}%`, backgroundColor: barColor }}
-                  />
-                </div>
-                <p className="text-[10px] leading-tight" style={{ color: "#94a3b8" }}>
-                  完了 <span style={{ color: "#16a34a", fontWeight: 700 }}>{biz.completed}</span>
-                  {" / "}未完了 <span style={{ color: "#ef4444", fontWeight: 700 }}>{TOTAL - biz.completed}</span>
-                </p>
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
-          <span className="text-xs text-gray-500">凡例:</span>
-          {[
-            { label: "90%+", color: "#378445" },
-            { label: "70-89%", color: "#1D4ED8" },
-            { label: "50-69%", color: "#F59E0B" },
-            { label: "<50%", color: "#b91c1c" },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: item.color }} />
-              <span className="text-xs text-gray-500">{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <BusinessCards
+        businesses={sortedBusinesses}
+        total={TOTAL}
+      />
 
       {/* 日本地図ヒートマップ */}
       <JapanMap prefectures={prefectures} />
@@ -288,14 +228,6 @@ export default function DashboardPage() {
             </span>
             <span className="explore-card-title">遅延リスク自治体</span>
             <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
-          </Link>
-
-          <Link href="/businesses" className="explore-card">
-            <span className="explore-card-badge" style={{ backgroundColor: "#DBEAFE", color: "#1D4ED8" }}>
-              20業務
-            </span>
-            <span className="explore-card-title">業務別の進捗</span>
-            <span className="explore-card-desc">住民記録・国民年金など業務ごとの移行状況を確認</span>
           </Link>
 
           <Link href="/benchmark" className="explore-card">
