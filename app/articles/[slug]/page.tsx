@@ -94,10 +94,10 @@ export default async function ArticlePage({ params }: Props) {
       <Breadcrumb items={[{ label: "コラム・解説", href: "/articles" }, { label: article.title }]} />
 
       {article.coverImage && (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden bg-[#eaf2fb]">
           {/* fetchpriority=high: LCPヒーロー画像をブラウザに最優先プリロードさせる */}
           <img src={article.coverImage} alt={article.title}
-            className="w-full aspect-[16/9] object-cover"
+            className="w-full aspect-[16/9] object-contain"
             fetchPriority="high"
             decoding="async"
             width={1200} height={675} />
