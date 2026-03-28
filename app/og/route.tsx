@@ -162,9 +162,13 @@ export async function GET(req: NextRequest) {
                       ? "リスク分析"
                       : type === "prefecture"
                         ? "都道府県別"
-                        : type === "article"
-                          ? "記事"
-                          : type}
+                        : type === "municipality"
+                          ? "自治体別 標準化進捗"
+                          : type === "business"
+                            ? "業務別 完了率"
+                            : type === "article"
+                              ? "記事"
+                              : type}
                 </span>
               </div>
             )}

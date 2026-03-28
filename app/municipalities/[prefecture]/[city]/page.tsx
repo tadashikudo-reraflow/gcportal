@@ -13,9 +13,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { prefecture, city } = await params;
   const pref = decodeURIComponent(prefecture);
   const cityName = decodeURIComponent(city);
+  const municipalities = data.municipalities as Municipality[];
+  const muni = municipalities.find((m) => m.prefecture === pref && m.city === cityName);
+  const rate = muni?.overall_rate as number | null | undefined;
+  const rateParam = rate != null ? `&rate=${(rate * 100).toFixed(1)}` : "";
+  const ogUrl = `https://gcinsight.jp/og?title=${encodeURIComponent(`${pref} ${cityName}`)}&subtitle=${encodeURIComponent("自治体別 標準化進捗")}&type=municipality${rateParam}`;
   return {
     title: `${pref} ${cityName} | 自治体別 標準化進捗 | GC Insight`,
     description: `${pref}${cityName}のガバメントクラウド移行状況。20業務の手続き進捗率・採用ベンダー・クラウド基盤を一覧表示。`,
+    openGraph: {
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [ogUrl],
+    },
   };
 }
 
@@ -113,6 +125,12 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   })).sort((a, b) => (a.rate ?? 999) - (b.rate ?? 999));
 
   const overallRate = muni.overall_rate as number | null;
+
+  // 同県の他自治体（進捗率降順、最大6件）
+  const samePrefCities = municipalities
+    .filter((m) => m.prefecture === prefName && m.city !== cityName)
+    .sort((a, b) => ((b.overall_rate as number) ?? 0) - ((a.overall_rate as number) ?? 0))
+    .slice(0, 6);
 
   // Supabaseから採用ベンダー情報取得
   const { data: muniRecord } = await supabase
@@ -307,6 +325,41 @@ export default async function MunicipalityDetailPage({ params }: Props) {
           </table>
         </div>
       </div>
+      {/* 同県の他自治体 */}
+      {samePrefCities.length > 0 && (
+        <div className="card p-5">
+          <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            {prefName}の他の自治体
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {samePrefCities.map((m) => {
+              const r = m.overall_rate as number | null;
+              const color = r == null ? "#94a3b8" : r >= 1.0 ? "#378445" : r >= 0.75 ? "#1D4ED8" : r >= 0.5 ? "#d97706" : "#b91c1c";
+              return (
+                <a
+                  key={m.city}
+                  href={`/municipalities/${encodeURIComponent(prefName)}/${encodeURIComponent(m.city)}`}
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-gray-200 hover:border-gray-400 transition-colors"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  {m.city}
+                  {r != null && (
+                    <span className="font-bold tabular-nums" style={{ color }}>
+                      {(r * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </a>
+              );
+            })}
+            <a
+              href={`/prefectures/${encodeURIComponent(prefName)}`}
+              className="inline-flex items-center text-xs px-3 py-1.5 rounded-full border border-dashed border-gray-300 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {prefName}一覧 →
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

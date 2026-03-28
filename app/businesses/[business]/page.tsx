@@ -19,10 +19,21 @@ type Props = { params: Promise<{ business: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { business } = await params;
   const businessName = decodeURIComponent(business);
+  const biz = (data.businesses as BusinessSummary[]).find((b) => b.business === businessName);
+  const avgRate = biz?.avg_rate;
+  const rateParam = avgRate != null ? `&rate=${(avgRate * 100).toFixed(1)}` : "";
+  const ogUrl = `https://gcinsight.jp/og?title=${encodeURIComponent(businessName)}&subtitle=${encodeURIComponent("業務別 自治体進捗一覧")}&type=business${rateParam}`;
   return {
     title: `${businessName} 自治体別進捗一覧 | GC Insight`,
     description: `${businessName}のガバメントクラウド移行 手続き進捗率を全国自治体別に一覧表示。遅延自治体・危機レベルを可視化。`,
     alternates: { canonical: `/businesses/${encodeURIComponent(businessName)}` },
+    openGraph: {
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [ogUrl],
+    },
   };
 }
 
