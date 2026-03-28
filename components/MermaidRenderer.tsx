@@ -13,8 +13,8 @@ mermaid.initialize({
   securityLevel: "loose",
   flowchart: {
     padding: 16,
-    nodeSpacing: 60,
-    rankSpacing: 80,
+    nodeSpacing: 40,
+    rankSpacing: 60,
     useMaxWidth: true,
   },
 });
