@@ -34,8 +34,8 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
 /** coverImage がない場合のプレースホルダー */
 function ArticlePlaceholder({ title }: { title: string }) {
   return (
-    <div className="w-full aspect-[16/9] flex items-center justify-center"
-      style={{ background: "linear-gradient(135deg, #002D72 0%, #0066FF 100%)" }}>
+    <div className="w-full flex items-center justify-center"
+      style={{ aspectRatio: "5/2", background: "linear-gradient(135deg, #002D72 0%, #0066FF 100%)" }}>
       <span className="text-white text-sm font-bold px-6 text-center leading-snug opacity-80">
         {title.length > 30 ? title.slice(0, 30) + "…" : title}
       </span>
@@ -64,9 +64,9 @@ export default async function ArticlesPage() {
             <Link key={article.slug} href={`/articles/${article.slug}`}
               className="article-card group">
               {article.coverImage ? (
-                <div className="w-full overflow-hidden bg-[#EEF4FB] aspect-[16/9]">
+                <div className="w-full overflow-hidden bg-[#EEF4FB]" style={{ aspectRatio: "5/2" }}>
                   <img src={article.coverImage} alt={article.title}
-                    className={`w-full h-full group-hover:scale-105 transition-transform duration-300 ${article.coverImage.includes('/x-articles/') ? 'object-cover' : 'object-contain'}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy" decoding="async" />
                 </div>
               ) : (
