@@ -13,7 +13,7 @@ export default function AdminLayout({
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#ffffff" }}>
       <TopNav />
-      <main style={{ maxWidth: 720, margin: "0 auto", padding: "48px 16px" }}>
+      <main style={{ maxWidth: 900, margin: "0 auto", padding: "48px 32px" }}>
         {children}
       </main>
     </div>

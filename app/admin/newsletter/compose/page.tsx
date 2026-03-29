@@ -139,8 +139,8 @@ function ComposeForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [sendTarget, setSendTarget] = useState<"all" | "segment">("all");
   const [editorReady, setEditorReady] = useState(false);
+  const [initialHtml, setInitialHtml] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const initialHtmlRef = useRef<string>("");
 
   const editor = useEditor({
     extensions: [
@@ -180,7 +180,7 @@ function ComposeForm() {
             let html = data.body_html;
             const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
             if (bodyMatch) html = bodyMatch[1];
-            initialHtmlRef.current = html;
+            setInitialHtml(html);
           }
         }
       })
@@ -188,12 +188,12 @@ function ComposeForm() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId]);
 
-  // editorが準備できてからinitialHtmlをセット
+  // editorとinitialHtmlが両方揃ったらコンテンツをセット
   useEffect(() => {
-    if (editorReady && editor && initialHtmlRef.current) {
-      editor.commands.setContent(initialHtmlRef.current);
+    if (editorReady && editor && initialHtml) {
+      editor.commands.setContent(initialHtml);
     }
-  }, [editorReady, editor]);
+  }, [editorReady, editor, initialHtml]);
 
   const getBodyHtml = () => editor?.getHTML() ?? "";
 
