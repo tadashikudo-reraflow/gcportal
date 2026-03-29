@@ -64,52 +64,53 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           1. HERO — 痛みを突く（Attention）
       ================================================================ */}
-      <section className="bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 text-white pt-16 pb-20 px-4">
+      <section className="text-white pt-16 pb-20 px-4" style={{ background: "linear-gradient(135deg, #00205F 0%, #00338D 60%, #002670 100%)" }}>
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <div className="inline-block text-xs font-semibold tracking-widest uppercase bg-white/10 px-3 py-1 rounded-full">
             FinOps — ガバクラコスト最適化
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">
             移行したのに、<br />
-            <span className="text-yellow-300">なぜコストが上がるのか？</span>
+            <span style={{ color: "#F5B500" }}>なぜコストが上がるのか？</span>
           </h1>
-          <p className="text-blue-100 text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed" style={{ color: "#c8d8f0" }}>
             全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
             今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
           </p>
           <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href="/report?from=finops_hero"
-              className="inline-flex items-center justify-center gap-2 bg-yellow-400 text-blue-950 font-bold px-8 py-4 rounded-xl hover:bg-yellow-300 transition-colors text-sm shadow-lg"
+              className="inline-flex items-center justify-center gap-2 font-bold px-8 py-4 rounded-xl transition-colors text-sm shadow-lg"
+              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
             >
               📄 無料PDFを受け取る（メールのみ）
             </a>
           </div>
-          <p className="text-xs text-blue-300">スパムなし・いつでも配信解除できます</p>
+          <p className="text-xs" style={{ color: "#94b4d8" }}>スパムなし・いつでも配信解除できます</p>
         </div>
       </section>
 
       {/* ================================================================
           2. 衝撃の数字（Interest — 自分事化）
       ================================================================ */}
-      <section className="bg-gray-950 text-white py-12 px-4">
+      <section className="py-12 px-4 text-white" style={{ backgroundColor: "#171C1F" }}>
         <div className="max-w-4xl mx-auto">
           <p className="text-center text-sm text-gray-400 mb-8">
             出典: 中核市市長会調査（2025年1月）・デジタル庁先行事業TCO検証
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-gray-800 rounded-2xl overflow-hidden">
             {[
-              { num: `${COST_CONSTANTS.avgCostIncrease}倍`, label: "移行後の平均コスト増加", color: "text-red-400" },
-              { num: `${COST_CONSTANTS.maxCostIncrease}倍`, label: "最大で増加した事例あり", color: "text-orange-400" },
-              { num: "935団体", label: "期限延長を余儀なくされた自治体", color: "text-yellow-400" },
+              { num: `${COST_CONSTANTS.avgCostIncrease}倍`, label: "移行後の平均コスト増加", color: "#EF4444" },
+              { num: `${COST_CONSTANTS.maxCostIncrease}倍`, label: "最大で増加した事例あり", color: "#F97316" },
+              { num: "935団体", label: "期限延長を余儀なくされた自治体", color: "#F5B500" },
             ].map((item) => (
               <div key={item.label} className="bg-gray-900 px-6 py-8 text-center space-y-2">
-                <div className={`text-5xl font-extrabold ${item.color}`}>{item.num}</div>
+                <div className="text-5xl font-extrabold" style={{ color: item.color }}>{item.num}</div>
                 <div className="text-sm text-gray-400 leading-snug">{item.label}</div>
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-500 mt-6">
+          <p className="text-center text-sm mt-6" style={{ color: "#94A3B8" }}>
             「移行すれば安くなる」という前提が、データでは崩れています。
           </p>
         </div>
@@ -247,13 +248,13 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           6. PDF CTA（Action — メイン転換点）
       ================================================================ */}
-      <section className="py-16 px-4 bg-blue-700">
+      <section className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
         <div className="max-w-2xl mx-auto text-center space-y-6 text-white">
-          <p className="text-xs font-bold tracking-widest uppercase text-blue-200">無料レポート（PDF）</p>
+          <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#94b4d8" }}>無料レポート（PDF）</p>
           <h2 className="text-2xl md:text-3xl font-bold">
             コスト増の構造と<br />打ち手チェックリストをPDFで
           </h2>
-          <p className="text-blue-100 text-sm leading-relaxed max-w-lg mx-auto">
+          <p className="text-sm leading-relaxed max-w-lg mx-auto" style={{ color: "#c8d8f0" }}>
             全国1,741自治体の進捗・コスト・遅延構造をまとめた無料PDFです。
             庁内説明・事業者との協議材料にそのまま使えます。
           </p>
@@ -265,11 +266,12 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
           <div className="pt-2">
             <a
               href="/report?from=finops_pdf"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-800 font-bold px-10 py-4 rounded-xl hover:bg-blue-50 transition-colors text-base shadow-lg"
+              className="inline-flex items-center justify-center gap-2 font-bold px-10 py-4 rounded-xl transition-colors text-base shadow-lg"
+              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
             >
               📄 無料でPDFを受け取る
             </a>
-            <p className="mt-3 text-xs text-blue-200">メールアドレスとご所属のみ・スパムなし</p>
+            <p className="mt-3 text-xs" style={{ color: "#94b4d8" }}>メールアドレスとご所属のみ・スパムなし</p>
           </div>
         </div>
       </section>
@@ -348,12 +350,12 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           9. 最終 CTA（メール入力）
       ================================================================ */}
-      <section className="py-20 px-4 bg-gray-950 text-white">
+      <section className="py-20 px-4 text-white" style={{ backgroundColor: "#00205F" }}>
         <div className="max-w-xl mx-auto text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold">
             あなたの自治体は<br />コスト適正か確認する
           </h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed" style={{ color: "#94b4d8" }}>
             同規模自治体との比較レポートを無料でお届けします。
             庁内向けの説明資料としてもそのまま活用できます。
           </p>
@@ -367,12 +369,13 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             />
             <button
               type="submit"
-              className="bg-yellow-400 text-gray-950 font-bold px-6 py-3 rounded-lg hover:bg-yellow-300 transition-colors whitespace-nowrap text-sm"
+              className="font-bold px-6 py-3 rounded-lg transition-colors whitespace-nowrap text-sm"
+              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
             >
               無料で受け取る
             </button>
           </form>
-          <p className="text-xs text-gray-600">スパムなし・いつでも配信解除できます</p>
+          <p className="text-xs" style={{ color: "#6B7280" }}>スパムなし・いつでも配信解除できます</p>
         </div>
       </section>
 
