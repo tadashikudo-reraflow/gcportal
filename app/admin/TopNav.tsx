@@ -31,7 +31,7 @@ export default function TopNav() {
   return (
     <header
       style={{
-        height: 56,
+        height: 48,
         backgroundColor: "#ffffff",
         borderBottom: "1px solid #e5e7eb",
         position: "sticky",
@@ -41,9 +41,9 @@ export default function TopNav() {
     >
       <div
         style={{
-          maxWidth: 960,
+          maxWidth: 1200,
           margin: "0 auto",
-          padding: "0 24px",
+          padding: "0 20px",
           height: "100%",
           display: "flex",
           alignItems: "center",
@@ -58,7 +58,7 @@ export default function TopNav() {
             alignItems: "center",
             gap: 8,
             textDecoration: "none",
-            marginRight: 32,
+            marginRight: 20,
             flexShrink: 0,
           }}
         >
@@ -107,16 +107,17 @@ export default function TopNav() {
                 key={item.href}
                 href={item.href}
                 style={{
-                  padding: "0 16px",
-                  height: 56,
+                  padding: "0 12px",
+                  height: 48,
                   display: "flex",
                   alignItems: "center",
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: active ? 600 : 400,
                   color: active ? "var(--color-text-primary)" : "#6b7280",
                   textDecoration: "none",
                   borderBottom: active ? "2px solid var(--color-text-primary)" : "2px solid transparent",
                   transition: "color 0.15s",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {item.label}
