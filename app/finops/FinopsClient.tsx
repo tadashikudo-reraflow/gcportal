@@ -117,6 +117,41 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
         </div>
       </section>
 
+      {/* ===== FinOps とは ===== */}
+      <section className="py-14 px-4 bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-start gap-8">
+            <div className="md:w-1/3 space-y-2">
+              <div className="text-xs font-semibold text-teal-700 uppercase tracking-widest">FinOps とは</div>
+              <h2 className="text-xl font-bold text-gray-900">クラウド支出を<br />「見える化→最適化」する手法</h2>
+            </div>
+            <div className="md:w-2/3 space-y-4 text-sm text-gray-700 leading-relaxed">
+              <p>
+                <strong>FinOps（Financial Operations）</strong>は、クラウドの利用コストを継続的に可視化・分析・最適化するプラクティスです。
+                デジタル庁も2024年に「FinOpsガイド 1.0版」を策定し、ガバメントクラウドの運用標準として位置付けています。
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { step: "1. 見える化", body: "タグ整備・コストダッシュボードでリソース別の支出を把握する" },
+                  { step: "2. 最適化", body: "サイズ見直し・停止ルール・ストレージ階層化など運用改善を実施する" },
+                  { step: "3. 継続改善", body: "月次レビューで効果を測定し、予算策定・次年度契約に反映する" },
+                ].map((item) => (
+                  <div key={item.step} className="bg-teal-50 border border-teal-100 rounded-lg p-4 space-y-1">
+                    <div className="text-xs font-bold text-teal-700">{item.step}</div>
+                    <p className="text-xs text-gray-700 leading-relaxed">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                ただし FinOps は<strong>移行後の運用最適化</strong>に効く手法です。
+                移行前の基盤選定ミスや回線費・競争不足による構造問題は、FinOps だけでは解決できません。
+                このページでは両方の打ち手を整理しています。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== コストの実態 ===== */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
