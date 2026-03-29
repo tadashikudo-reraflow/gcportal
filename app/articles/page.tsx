@@ -66,7 +66,7 @@ export default async function ArticlesPage() {
               {article.coverImage ? (
                 <div className="w-full overflow-hidden bg-[#EEF4FB] aspect-[16/9]">
                   <img src={article.coverImage} alt={article.title}
-                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    className={`w-full h-full group-hover:scale-105 transition-transform duration-300 ${article.coverImage.includes('/x-articles/') ? 'object-cover' : 'object-contain'}`}
                     loading="lazy" decoding="async" />
                 </div>
               ) : (
