@@ -472,7 +472,7 @@ export default async function CostsPage() {
           </table>
         </div>
         <p className="text-[11px] text-gray-400 mt-2">
-          ※ 小規模団体ほど固定費の影響が重くなりやすい傾向があります。
+          ※ 小規模団体ほど固定費の影響が重くなりやすい傾向があります。特に通信回線費は団体規模で格差が大きく、先行事業検証では笠置町（人口約1,200人）で経常収支比率+62.7pt、神石高原町で+13.3ptの影響が報告されています。
         </p>
 
         {/* 公式資料リンク */}
@@ -642,7 +642,7 @@ export default async function CostsPage() {
       {/* 注記 */}
       <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
         <p className="text-xs text-gray-400">
-          ※ コスト比率は移行前=1.0基準。判明分のみ集計。
+          ※ コスト比率は移行前=1.0基準。判明分のみ集計。全国町村会は2025年4月25日付で「移行前比数倍の増加見込み」として国に財政支援の拡充を要望しています。
         </p>
       </div>
 
