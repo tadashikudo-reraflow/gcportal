@@ -176,7 +176,11 @@ function ComposeForm() {
         if (data && !("error" in data)) {
           setSubject(data.subject);
           if (data.body_html) {
-            initialHtmlRef.current = data.body_html;
+            // 完全なHTMLドキュメントの場合は <body> 内のみ抽出
+            let html = data.body_html;
+            const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+            if (bodyMatch) html = bodyMatch[1];
+            initialHtmlRef.current = html;
           }
         }
       })
