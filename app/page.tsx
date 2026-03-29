@@ -246,6 +246,14 @@ export default function DashboardPage() {
             <span className="explore-card-desc">ベンダー別コスト比較と高騰の背景を分析</span>
           </Link>
 
+          <Link href="/finops" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#CCFBF1", color: "#0f766e" }}>
+              FinOps
+            </span>
+            <span className="explore-card-title">コスト最適化</span>
+            <span className="explore-card-desc">同規模自治体との比較でコスト適正水準を確認</span>
+          </Link>
+
           <Link href="/packages" className="explore-card">
             <span className="explore-card-badge" style={{ backgroundColor: "#F3E8FF", color: "#6B21A8" }}>
               パッケージ

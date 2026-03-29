@@ -8,6 +8,11 @@ import Breadcrumb from "@/components/Breadcrumb";
 
 const detailLinks = [
   {
+    href: "/finops",
+    title: "FinOps コスト最適化ハブ",
+    body: "コスト適正水準の確認・同規模自治体との比較・無料診断レポートを提供しています。",
+  },
+  {
     href: "/costs",
     title: "ベンダー別コスト分析",
     body: "自治体ごとの採用状況とコスト増の傾向を確認できます。",
