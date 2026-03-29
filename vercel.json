@@ -12,5 +12,10 @@
       "permanent": true
     }
   ],
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/ux-report",
+      "schedule": "0 0 * * 1"
+    }
+  ]
 }
