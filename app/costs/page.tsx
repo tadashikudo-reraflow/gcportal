@@ -392,20 +392,21 @@ export default async function CostsPage() {
             </h3>
             <div className="space-y-2.5">
               {[
-                { name: "クラウド利用料", desc: "計算資源・ストレージ費用。為替・物価上昇の影響を受けやすい" },
-                { name: "クラウド接続回線費", desc: "閉域網・冗長回線の新設。既存回線費に上積みされる新規コスト" },
-                { name: "クラウド運用費", desc: "クラウド対応要員確保・教育・賃上げで単価が上がりやすい" },
-                { name: "ガバナンス・セキュリティ費", desc: "監査・設定管理・インシデント対応に伴う追加費用" },
-                { name: "ソフトウェア借料・保守費", desc: "ミドルウェア・DBライセンス等、クラウド未最適化のまま移行した場合に増加", note: true },
+                { name: "ガバクラ接続回線費", desc: "閉域網・冗長回線の新設。既存回線費に上積みされる完全な新規コスト", tag: "構造的要因" },
+                { name: "二重基盤運用費", desc: "移行期間中のオンプレ＋クラウド並行稼働。固定費が二重にかかる", tag: "構造的要因" },
+                { name: "クラウド利用料（未最適化）", desc: "リフト＆シフト型移行でオンプレ構成をそのまま載せた場合に増加", tag: "構造的要因" },
+                { name: "クラウド人材・スキル向上費", desc: "クラウド対応要員の確保・教育・資格取得。賃上げで単価が上がりやすい", tag: "機能強化要因" },
+                { name: "料金柔軟性の低下", desc: "為替変動・CSP値上げへの対応手段が限定的。円安局面で直撃する", tag: "外部要因" },
+                { name: "標準仕様書改定対応", desc: "仕様変更のたびにシステム改修が発生。改定頻度が高いほどコスト増", tag: "外部要因" },
               ].map((item) => (
                 <div key={item.name} className="flex items-start gap-2">
                   <span className="flex-shrink-0 mt-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-red-100 text-red-700">↑</span>
                   <div>
-                    <p className="text-xs font-semibold text-gray-800">{item.name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-semibold text-gray-800">{item.name}</p>
+                      <span className="px-1 py-0.5 rounded text-[8px] font-medium bg-gray-100 text-gray-500">{item.tag}</span>
+                    </div>
                     <p className="text-[11px] text-gray-500 leading-tight">{item.desc}</p>
-                    {"note" in item && item.note && (
-                      <p className="text-[10px] text-orange-500 mt-0.5">※ 標準化パッケージ（ASP）自体の費用は移行前と大きく変わらないケースが多い</p>
-                    )}
                   </div>
                 </div>
               ))}
@@ -594,11 +595,19 @@ export default async function CostsPage() {
         <ul className="space-y-1.5 text-xs text-blue-700">
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">運用経費見積チェックリスト</span>: 費用漏れを防ぐ確認項目が公開済み。</span>
+            <span><span className="font-semibold">FinOpsガイド 1.0版 策定済み</span>: クラウド運用最適化の標準手法が公開。リザーブドインスタンス・右サイジング等を体系化。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>
-            <span><span className="font-semibold">FinOpsガイド策定中</span>: 運用最適化の標準化が進められています。</span>
+            <span><span className="font-semibold">見積精査支援</span>: 330自治体中33団体（約10%）が利用。運用経費見積チェックリストも公開済み。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">クラウド利用料割引交渉</span>: デジタル庁がCSP各社（AWS・Azure・GCP・OCI）と割引交渉を実施中。</span>
+          </li>
+          <li className="flex items-start gap-1.5">
+            <span className="flex-shrink-0 mt-0.5">•</span>
+            <span><span className="font-semibold">公共SaaS推進</span>: 個別構築からSaaS共同利用への移行を費用削減策として推進。</span>
           </li>
           <li className="flex items-start gap-1.5">
             <span className="flex-shrink-0 mt-0.5">•</span>

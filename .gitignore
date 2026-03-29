@@ -16,3 +16,4 @@ etl/data/
 etl/rs_cache/
 tsconfig.tsbuildinfo
 next-env.d.ts
+.claude/launch.json
