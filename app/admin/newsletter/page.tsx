@@ -60,8 +60,87 @@ async function getData() {
   };
 }
 
+function CampaignRow({ c }: { c: Campaign }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 0",
+        borderBottom: "1px solid #f3f4f6",
+      }}
+    >
+      {/* 左: 件名 + 日付 */}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <p style={{
+          fontSize: 15,
+          color: "#111111",
+          fontWeight: 500,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          margin: 0,
+        }}>
+          {c.subject}
+        </p>
+        <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 2 }}>
+          {c.sent_at
+            ? `送信: ${new Date(c.sent_at).toLocaleString("ja-JP", {
+                year: "numeric", month: "2-digit", day: "2-digit",
+                hour: "2-digit", minute: "2-digit",
+              })}`
+            : `作成: ${new Date(c.created_at).toLocaleDateString("ja-JP")}`}
+        </p>
+      </div>
+
+      {/* 右: 統計 + アクション */}
+      <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0, marginLeft: 24 }}>
+        {c.status === "sent" && (
+          <>
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.open_count}</p>
+              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>開封</p>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.click_count}</p>
+              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>クリック</p>
+            </div>
+          </>
+        )}
+        <DuplicateButton campaignId={c.id} />
+        {c.status === "sent" ? (
+          <Link
+            href={`/admin/newsletter/${c.id}`}
+            style={{ fontSize: 13, color: "#6b7280" }}
+          >
+            詳細
+          </Link>
+        ) : (
+          <Link
+            href={`/admin/newsletter/compose?id=${c.id}`}
+            style={{
+              fontSize: 13,
+              color: "#fff",
+              backgroundColor: "#111111",
+              padding: "5px 12px",
+              borderRadius: 6,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            編集・送信
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default async function NewsletterPage() {
   const { subscriberCount, campaigns } = await getData();
+  const drafts = campaigns.filter((c) => c.status !== "sent");
+  const sent = campaigns.filter((c) => c.status === "sent");
 
   return (
     <div>
@@ -72,7 +151,7 @@ export default async function NewsletterPage() {
             ニュースレター
           </h1>
           <p style={{ marginTop: 8, fontSize: 14, color: "#6b7280" }}>
-            {subscriberCount} 人の購読者
+            購読者 {subscriberCount} 人
           </p>
         </div>
         <Link
@@ -87,108 +166,58 @@ export default async function NewsletterPage() {
             textDecoration: "none",
           }}
         >
-          作成する
+          + 新規作成
         </Link>
       </div>
 
-      {/* キャンペーン一覧 */}
-      {campaigns.length === 0 ? (
-        <div style={{ padding: "64px 0", textAlign: "center", borderTop: "1px solid #f3f4f6" }}>
-          <p style={{ fontSize: 14, color: "#9ca3af", marginBottom: 16 }}>
-            まだキャンペーンがありません
+      {/* 下書きセクション */}
+      <section style={{ marginBottom: 48 }}>
+        <h2 style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: "#6b7280",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          marginBottom: 4,
+          paddingBottom: 8,
+          borderBottom: "2px solid #111111",
+        }}>
+          下書き ({drafts.length})
+        </h2>
+        {drafts.length === 0 ? (
+          <p style={{ fontSize: 14, color: "#9ca3af", padding: "24px 0" }}>
+            下書きはありません。
+            <Link href="/admin/newsletter/compose" style={{ color: "#111111", marginLeft: 8 }}>
+              新規作成 →
+            </Link>
           </p>
-          <Link
-            href="/admin/newsletter/compose"
-            style={{ fontSize: 13, color: "#111111" }}
-          >
-            最初のキャンペーンを作成する &rarr;
-          </Link>
-        </div>
-      ) : (
-        <div>
-          {campaigns.map((c) => (
-            <div
-              key={c.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "16px 0",
-                borderBottom: "1px solid #f3f4f6",
-                cursor: "default",
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "#f9f9f9"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent"; }}
-            >
-              {/* 左: ステータス + 件名 + 日付 */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-                <span
-                  style={{
-                    fontSize: 12,
-                    padding: "2px 8px",
-                    borderRadius: 4,
-                    fontWeight: 500,
-                    flexShrink: 0,
-                    ...(c.status === "sent"
-                      ? { backgroundColor: "#f0fdf4", color: "#16a34a" }
-                      : { backgroundColor: "#fef9ec", color: "#d97706" }),
-                  }}
-                >
-                  {c.status === "sent" ? "送信済み" : "下書き"}
-                </span>
-                <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: 15, color: "#111111", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", margin: 0 }}>
-                    {c.subject}
-                  </p>
-                  <p style={{ fontSize: 13, color: "#9ca3af", marginTop: 2 }}>
-                    {c.sent_at
-                      ? new Date(c.sent_at).toLocaleString("ja-JP", {
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
-                      : `作成: ${new Date(c.created_at).toLocaleDateString("ja-JP")}`}
-                  </p>
-                </div>
-              </div>
+        ) : (
+          drafts.map((c) => <CampaignRow key={c.id} c={c} />)
+        )}
+      </section>
 
-              {/* 右: 統計 + アクション */}
-              <div style={{ display: "flex", alignItems: "center", gap: 24, flexShrink: 0, marginLeft: 24 }}>
-                {c.status === "sent" && (
-                  <>
-                    <div style={{ textAlign: "right" }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.open_count}</p>
-                      <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>開封</p>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.click_count}</p>
-                      <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>クリック</p>
-                    </div>
-                  </>
-                )}
-                <DuplicateButton campaignId={c.id} />
-                {c.status === "sent" ? (
-                  <Link
-                    href={`/admin/newsletter/${c.id}`}
-                    style={{ fontSize: 13, color: "#111111" }}
-                  >
-                    詳細
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/admin/newsletter/compose?id=${c.id}`}
-                    style={{ fontSize: 13, color: "#111111", fontWeight: 600 }}
-                  >
-                    編集
-                  </Link>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* 送信済みセクション */}
+      <section>
+        <h2 style={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: "#6b7280",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          marginBottom: 4,
+          paddingBottom: 8,
+          borderBottom: "1px solid #e5e7eb",
+        }}>
+          送信済み ({sent.length})
+        </h2>
+        {sent.length === 0 ? (
+          <p style={{ fontSize: 14, color: "#9ca3af", padding: "24px 0" }}>
+            まだ送信済みキャンペーンはありません。
+          </p>
+        ) : (
+          sent.map((c) => <CampaignRow key={c.id} c={c} />)
+        )}
+      </section>
     </div>
   );
 }
