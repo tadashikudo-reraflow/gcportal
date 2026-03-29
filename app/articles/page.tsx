@@ -64,10 +64,10 @@ export default async function ArticlesPage() {
             <Link key={article.slug} href={`/articles/${article.slug}`}
               className="article-card group">
               {article.coverImage ? (
-                <div className="w-full aspect-[16/9] overflow-hidden">
+                <div className="w-full aspect-[5/2] overflow-hidden bg-[#EEF4FB]">
                   <img src={article.coverImage} alt={article.title}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy" decoding="async" width={640} height={360} />
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy" decoding="async" width={1500} height={600} />
                 </div>
               ) : (
                 <ArticlePlaceholder title={article.title} />
