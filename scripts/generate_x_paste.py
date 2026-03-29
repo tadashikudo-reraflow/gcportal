@@ -4,8 +4,8 @@ GCInsight → X Articles ペースト用HTML生成スクリプト
 
 1. Supabaseから記事HTMLを取得
 2. mermaid/tableブロックをPlaywright(680px)でPNG化
-3. カバー画像を generate-cover-images.mjs --x-article で生成
-4. 全PNG を gcportal/public/images/articles/ にコピー → git push → Vercelデプロイ
+3. カバー画像(5:2, 1500×600)をGeminiで1枚生成（サイト表示・X投稿兼用）
+4. 全PNG を gcportal/public/images/x-articles/ にコピー → git push → Vercelデプロイ
 5. article_paste.html 生成（img src=https://gcinsight.jp/...）
 6. Chromeで自動オープン → Cmd+A → Cmd+C → X Articlesに貼るだけ
 
@@ -231,20 +231,13 @@ def render_blocks_to_png(blocks, slug, tmp_dir: Path):
 
 # ── カバー画像生成（Gemini直接生成）────────────────────────────────
 
-# X Articles推奨サイズ: 1200×675 (16:9)
-X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 X Articles推奨比率
-SEO_COVER_W, SEO_COVER_H = 2400, 1350  # GCInsight SEO記事OGP（真の16:9）
-assert SEO_COVER_H == int(SEO_COVER_W * 9 / 16), f"SEO cover must be 16:9: {SEO_COVER_W}×{SEO_COVER_H}"
+X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 — サイト表示・X投稿の両方で使用
 
-def _build_prompt(title, context, aspect):
-    """比率別プロンプト生成。aspect='5:2'(X記事) or '16:9'(SEO)"""
-    if aspect == "5:2":
-        layout = "Very wide banner: width is 2.5× the height (5:2). Title top-center, illustration fills bottom area horizontally."
-    else:
-        layout = "Landscape 16:9 format. Title top-center, illustration fills lower two-thirds."
+def _build_prompt(title, context):
+    """5:2カバー画像プロンプト生成"""
     return (
         f"Create an infographic illustration for a Japanese government cloud (ガバメントクラウド) article. "
-        f"{layout} "
+        f"Very wide banner: width is 2.5× the height (5:2). Title top-center, illustration fills bottom area horizontally. "
         f"TITLE: render this exact Japanese text once at the top, large bold dark navy font, do NOT repeat or truncate: 「{title}」 "
         f"ILLUSTRATION (isometric 3D style): visually represent the article topic. {context}. "
         f"Choose from: Japanese municipal buildings, cloud servers, documents/checklists, security shields, "
@@ -269,11 +262,10 @@ def _gemini_generate(client, types, prompt):
 
 
 def generate_cover_image(article):
-    """Gemini 2回呼び出し → X記事用(1500×600,5:2) + SEO用(2400×1260,16:9) を別々に生成"""
+    """Gemini 1回呼び出し → 5:2カバー画像（サイト表示・X投稿の両方で使用）"""
     from google import genai
     from google.genai import types
 
-    slug = article["slug"]
     article_id = article["id"]
     title = article["title"].split("｜")[0].strip()
     tags = article.get("tags") or []
@@ -283,31 +275,19 @@ def generate_cover_image(article):
     x_img_dir = PUBLIC_X_IMGS / f"id{article_id}"
     x_img_dir.mkdir(parents=True, exist_ok=True)
     cover_path = x_img_dir / "cover.png"
-    seo_cover  = PUBLIC_IMGS / f"{slug}.png"
 
-    if cover_path.exists() and seo_cover.exists():
-        print(f"🖼  カバー画像: 既存を流用 (id{article_id} + {slug}.png)")
+    if cover_path.exists():
+        print(f"🖼  カバー画像: 既存を流用 (id{article_id})")
         return f"id{article_id}/cover.png"
 
     client = genai.Client(api_key=GEMINI_KEY)
-    print(f"🖼  カバー画像生成 (Gemini×2): id{article_id} {slug}")
+    print(f"🖼  カバー画像生成 (Gemini×1): id{article_id}")
 
     try:
-        # ① X記事用: 5:2比率で生成 → 1500×600にリサイズ
-        if not cover_path.exists():
-            img_x = _gemini_generate(client, types, _build_prompt(title, context, "5:2"))
-            img_x = img_x.resize((X_ARTICLE_W, X_ARTICLE_H), Image.LANCZOS)
-            img_x.save(cover_path, "PNG", optimize=True)
-            print(f"  ✅ X記事カバー: {X_ARTICLE_W}×{X_ARTICLE_H}px")
-
-        # ② SEO OGP用: 16:9比率で生成 → 2400×1260にリサイズ
-        if not seo_cover.exists():
-            PUBLIC_IMGS.mkdir(parents=True, exist_ok=True)
-            img_seo = _gemini_generate(client, types, _build_prompt(title, context, "16:9"))
-            img_seo = img_seo.resize((SEO_COVER_W, SEO_COVER_H), Image.LANCZOS)
-            img_seo.save(seo_cover, "PNG", optimize=True)
-            print(f"  ✅ SEO OGPカバー: {SEO_COVER_W}×{SEO_COVER_H}px")
-
+        img = _gemini_generate(client, types, _build_prompt(title, context))
+        img = img.resize((X_ARTICLE_W, X_ARTICLE_H), Image.LANCZOS)
+        img.save(cover_path, "PNG", optimize=True)
+        print(f"  ✅ カバー画像: {X_ARTICLE_W}×{X_ARTICLE_H}px (5:2)")
     except Exception as e:
         print(f"  ⚠️  Gemini生成失敗: {e}")
         return None
