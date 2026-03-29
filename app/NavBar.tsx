@@ -35,6 +35,7 @@ const NAV_GROUPS = [
       { href: "/costs",    label: "コスト増の要因を分析", desc: "ベンダー別コスト比較" },
       { href: "/cost-reduction", label: "コスト削減の現実解", desc: "移行済み最適化と未移行見直し" },
       { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
+      { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・適正水準の確認" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
