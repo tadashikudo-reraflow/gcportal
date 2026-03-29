@@ -66,13 +66,14 @@ CTA_HTML = """
 def get_article(article_id=None):
     params = {
         "select": "id,slug,title,content,content_format,cover_image,tags",
-        "is_published": "eq.true",
         "order": "id.asc",
         "limit": 1,
     }
     if article_id:
         params["id"] = f"eq.{article_id}"
+        # IDが指定された場合は公開状態を問わず取得（下書きでもカバー画像を生成可能）
     else:
+        params["is_published"] = "eq.true"
         params["x_paste_ready"] = "eq.false"
 
     r = requests.get(f"{SUPABASE_URL}/rest/v1/articles", headers=HEADERS, params=params)
