@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { COST_CONSTANTS } from "@/lib/constants";
+import type { ArticleMeta } from "@/lib/articles";
 
 // ------------------------------------------------------------
 // ベンダー別コストレンジ（CostSimulator の COST_TABLE から抜粋）
@@ -103,7 +104,7 @@ const CLOUD_SUMMARY = [
   },
 ];
 
-export default function FinopsClient() {
+export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) {
   const [email, setEmail] = useState("");
 
   function handleCtaSubmit(e: React.FormEvent) {
@@ -287,27 +288,38 @@ export default function FinopsClient() {
         </div>
       </section>
 
-      {/* ===== Section 4: 関連記事（プレースホルダー）===== */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">
-            FinOps 関連記事
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="bg-gray-100 border border-gray-200 rounded-xl p-6 space-y-3"
-              >
-                <div className="h-4 w-16 bg-gray-300 rounded animate-pulse" />
-                <div className="h-5 w-full bg-gray-300 rounded animate-pulse" />
-                <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
-                <p className="text-xs text-gray-400 pt-2">記事準備中</p>
-              </div>
-            ))}
+      {/* ===== Section 4: 関連記事 ===== */}
+      {articles.length > 0 && (
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-8">
+              FinOps 関連記事
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {articles.map((article) => (
+                <Link
+                  key={article.slug}
+                  href={`/articles/${article.slug}`}
+                  className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 hover:shadow-md transition-shadow block"
+                >
+                  <div className="flex flex-wrap gap-1">
+                    {article.tags.slice(0, 2).map((tag) => (
+                      <span key={tag} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2">
+                    {article.title}
+                  </p>
+                  <p className="text-xs text-gray-500 line-clamp-2">{article.description}</p>
+                  <p className="text-xs text-gray-400">{article.date}</p>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ===== Section 5: CTA バナー ===== */}
       <section className="py-20 px-4 bg-gradient-to-br from-blue-800 to-blue-900 text-white">

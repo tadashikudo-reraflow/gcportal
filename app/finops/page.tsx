@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import FinopsClient from "./FinopsClient";
 import FinopsLoading from "./loading";
+import { getArticlesByTags, type ArticleMeta } from "@/lib/articles";
 
 export const revalidate = 86400;
 
@@ -25,10 +26,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/finops" },
 };
 
-export default function FinopsPage() {
+export default async function FinopsPage() {
+  const finopsArticles = await getArticlesByTags(["FinOps"]);
   return (
     <Suspense fallback={<FinopsLoading />}>
-      <FinopsClient />
+      <FinopsClient articles={finopsArticles.slice(0, 3)} />
     </Suspense>
   );
 }
