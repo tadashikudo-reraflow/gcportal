@@ -39,8 +39,9 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
-      { source: "/adoption", destination: "/packages", permanent: true },
-      { source: "/compare",  destination: "/benchmark", permanent: true },
+      { source: "/adoption",       destination: "/packages", permanent: true },
+      { source: "/compare",        destination: "/benchmark", permanent: true },
+      { source: "/cost-reduction", destination: "/finops",   permanent: true },
     ];
   },
 };
