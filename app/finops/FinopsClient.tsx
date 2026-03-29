@@ -93,24 +93,24 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           2. 衝撃の数字（Interest — 自分事化）
       ================================================================ */}
-      <section className="py-12 px-4 text-white" style={{ backgroundColor: "#171C1F" }}>
+      <section className="py-12 px-4" style={{ backgroundColor: "#E4E9ED" }}>
         <div className="max-w-4xl mx-auto">
-          <p className="text-center text-sm text-gray-400 mb-8">
+          <p className="text-center text-sm mb-8" style={{ color: "#6B7280" }}>
             出典: 中核市市長会調査（2025年1月）・デジタル庁先行事業TCO検証
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-gray-800 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { num: `${COST_CONSTANTS.avgCostIncrease}倍`, label: "移行後の平均コスト増加", color: "#EF4444" },
-              { num: `${COST_CONSTANTS.maxCostIncrease}倍`, label: "最大で増加した事例あり", color: "#F97316" },
-              { num: "935団体", label: "期限延長を余儀なくされた自治体", color: "#F5B500" },
+              { num: `${COST_CONSTANTS.avgCostIncrease}倍`, label: "移行後の平均コスト増加", color: "#DC2626", bg: "#FEF2F2", border: "#FECACA" },
+              { num: `${COST_CONSTANTS.maxCostIncrease}倍`, label: "最大で増加した事例あり", color: "#EA580C", bg: "#FFF7ED", border: "#FED7AA" },
+              { num: "935団体", label: "期限延長を余儀なくされた自治体", color: "#00338D", bg: "#EFF6FF", border: "#BFDBFE" },
             ].map((item) => (
-              <div key={item.label} className="bg-gray-900 px-6 py-8 text-center space-y-2">
+              <div key={item.label} className="px-6 py-8 text-center space-y-2 rounded-2xl border" style={{ backgroundColor: item.bg, borderColor: item.border }}>
                 <div className="text-5xl font-extrabold" style={{ color: item.color }}>{item.num}</div>
-                <div className="text-sm text-gray-400 leading-snug">{item.label}</div>
+                <div className="text-sm font-medium" style={{ color: "#444652" }}>{item.label}</div>
               </div>
             ))}
           </div>
-          <p className="text-center text-sm mt-6" style={{ color: "#94A3B8" }}>
+          <p className="text-center text-sm mt-6" style={{ color: "#6B7280" }}>
             「移行すれば安くなる」という前提が、データでは崩れています。
           </p>
         </div>
