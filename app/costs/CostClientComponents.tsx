@@ -205,6 +205,13 @@ export function VendorGroup({ vendorName, cloud, mark, markColor, note, children
 }
 
 // --- 静的ベンダーカード（展開なし） ---
+type CostFactor = {
+  label: string;  // 項目名
+  value: string;  // 表示値
+  highlight?: boolean; // trueで青テキスト（有利な事実）
+  caution?: boolean;   // trueでオレンジテキスト（注意事実）
+};
+
 type VendorCardProps = {
   vendorName: string;
   cloud: string;
@@ -212,9 +219,11 @@ type VendorCardProps = {
   markColor: string;
   label: string;
   detail: string;
+  costTags?: string[];
+  costFactors?: CostFactor[]; // コスト因子ミニグリッド
 };
 
-export function VendorCard({ vendorName, cloud, mark, markColor, label, detail }: VendorCardProps) {
+export function VendorCard({ vendorName, cloud, detail, costFactors }: VendorCardProps) {
   const cloudColor =
     cloud === "AWS" ? "#FF9900"
     : cloud === "OCI" ? "#F80000"
@@ -224,18 +233,36 @@ export function VendorCard({ vendorName, cloud, mark, markColor, label, detail }
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <span className="text-lg font-bold w-6 text-center" style={{ color: markColor }}>{mark}</span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-gray-800">{vendorName}</span>
-            <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ color: cloudColor, backgroundColor: cloudColor + "15" }}>
-              {cloud}
-            </span>
-            <span className="text-xs text-gray-500">{label}</span>
-          </div>
-          {detail && <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{detail}</p>}
+      <div className="px-4 py-3 space-y-2">
+        {/* ヘッダー行 */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-semibold text-gray-800">{vendorName}</span>
+          <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ color: cloudColor, backgroundColor: cloudColor + "15" }}>
+            {cloud}
+          </span>
         </div>
+
+        {/* コスト因子グリッド */}
+        {costFactors && costFactors.length > 0 && (
+          <div className="grid gap-px rounded overflow-hidden border border-gray-100" style={{ gridTemplateColumns: `repeat(${costFactors.length}, 1fr)` }}>
+            {costFactors.map((f) => (
+              <div key={f.label} className="bg-gray-50 px-2 py-1.5 text-center">
+                <p className="text-[10px] text-gray-400 leading-none mb-0.5">{f.label}</p>
+                <p
+                  className="text-xs font-semibold leading-tight"
+                  style={{
+                    color: f.highlight ? "#0369a1" : f.caution ? "#c2410c" : "#374151",
+                  }}
+                >
+                  {f.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 補足テキスト */}
+        {detail && <p className="text-xs text-gray-500 leading-relaxed">{detail}</p>}
       </div>
     </div>
   );

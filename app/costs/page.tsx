@@ -108,67 +108,120 @@ function toPercent(ratio: number): string {
   return `+${((ratio - 1) * 100).toFixed(0)}%`;
 }
 
-// ベンダー別評価（出典: Grok調査 + 公式プレスリリース・自治体資料）
-const vendorEvaluations: Record<string, { label: string; detail: string; mark: string; markColor: string; cloud: string; confirmed: boolean }> = {
+// ベンダー別評価（出典: 公式プレスリリース・自治体資料・デジタル庁報告書）
+// costFactors: 課金通貨・転送料・移行実績の3軸を事実値で表示
+const vendorEvaluations: Record<string, {
+  label: string; detail: string; mark: string; markColor: string; cloud: string; confirmed: boolean;
+  costTags?: string[];
+  costFactors?: { label: string; value: string; highlight?: boolean; caution?: boolean }[];
+}> = {
   TKC: {
-    label: "コスト効率◎",
-    detail: "マルチテナント共同利用 → 規模の経済によるコスト低減",
-    mark: "◎", markColor: "#007a3d", cloud: "AWS", confirmed: true,
+    label: "", detail: "マルチテナント共同利用モデルで複数自治体が同一基盤を利用（TKC公式）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "提供モデル", value: "共同利用", highlight: true },
+    ],
   },
   NEC: {
-    label: "コスト管理○",
-    detail: "住民・税務系はAWS主軸。GPRIME行政経営のみOCI（NEC公式 2024/10）",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "住民・税務系はAWS主軸。GPRIME行政経営のみOCI対応（NEC公式 2024/10）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   富士通: {
-    label: "コスト増リスク△",
-    detail: "MICJET on AWS。大規模カスタマイズ・移行遅延で追加費用リスクあり",
-    mark: "△", markColor: "#d97706", cloud: "AWS", confirmed: true,
+    label: "", detail: "MICJET on AWS。複数自治体で移行遅延が報告されており追加費用事例あり（総務省ヒアリング等）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "複数報告", caution: true },
+    ],
   },
   RKKCS: {
-    label: "コスト効率◎",
-    detail: "OCI（Oracle Cloud）採用。円建て課金でコスト効率に優れる。データ転送料が月10TBまで無料で利用料が安価。札幌市が2025年4月に32業務のOCI移行を発表（RKKCS公式・日本オラクル）",
-    mark: "◎", markColor: "#007a3d", cloud: "OCI", confirmed: true,
+    label: "", detail: "OCI採用。円建て課金・データ転送料月10TBまで無料（日本オラクル公式）。札幌市が2025年4月に32業務OCI移行を発表（RKKCS・日本オラクル共同プレスリリース）",
+    mark: "", markColor: "", cloud: "OCI", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "円建て", highlight: true },
+      { label: "転送料無料枠", value: "月10TBまで", highlight: true },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   日立: {
-    label: "AWS全業務対応○",
-    detail: "ADWORLD全20業務AWS対応確認済。Azure主要8業務も検証済（日立システムズ 2024/8プレスリリース）",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "ADWORLD全20業務AWS対応確認済。Azure主要8業務も検証済（日立システムズ 2024/8プレスリリース）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   アイネス: {
-    label: "AWS実績○",
-    detail: "倉敷市・町田市等でAWS稼働。WebRings福祉総合システム標準化対応済",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "倉敷市・町田市等でAWS稼働実績。WebRings福祉総合システム標準化対応済（アイネス公式）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   Gcom: {
-    label: "AWS標準○",
-    detail: "Acrocity/GRAP等をAWS基盤で提供。ガバメントクラウド対応推進中（公式採用情報）",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "Acrocity/GRAP等をAWS基盤で提供。ガバメントクラウド対応を推進中（Gcom公式採用情報）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   電算: {
-    label: "AWS採用◎",
-    detail: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。甲信越・北海道中心（北海道芽室町等2026年2月稼働予定）",
-    mark: "◎", markColor: "#007a3d", cloud: "AWS", confirmed: true,
+    label: "", detail: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。北海道芽室町等2026年2月稼働予定（電算公式プレスリリース）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   GCC: {
-    label: "OCI採用○",
-    detail: "e-SUITE v2 for Government CloudをOCI基盤で提供。富岡市等本稼働（日本オラクル共同プレスリリース）",
-    mark: "○", markColor: "#1d6fa4", cloud: "OCI", confirmed: true,
+    label: "", detail: "e-SUITE v2 for Government CloudをOCI基盤で提供。富岡市等本稼働（日本オラクル共同プレスリリース）",
+    mark: "", markColor: "", cloud: "OCI", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "円建て", highlight: true },
+      { label: "転送料無料枠", value: "月10TBまで", highlight: true },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   JIP: {
-    label: "AWS＋自社クラウド○",
-    detail: "WizLIFEはAWS対応。自社クラウド「Jip-Base」（自治体専用）も提供（JIP公式）",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "WizLIFEはAWS対応。自社クラウド「Jip-Base」（自治体専用）も提供（JIP公式）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   "行政S": {
-    label: "AWS検証済○",
-    detail: "デジタル庁令和5年度検証事業でAWS上検証実施（2024/9報告）。共同利用・マルチベンダー連携対応",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "デジタル庁令和5年度検証事業でAWS上検証実施（2024/9報告）。共同利用・マルチベンダー連携対応",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "移行遅延", value: "報告なし" },
+    ],
   },
   "京都GIS": {
-    label: "接続基盤（AWS基本）",
-    detail: "京都GC接続サービス（2024/7〜）。AWSへの専用回線接続が基本。OCI/Azure/GCPもサポート。接続基盤提供",
-    mark: "○", markColor: "#1d6fa4", cloud: "AWS", confirmed: true,
+    label: "", detail: "京都GC接続サービス（2024/7〜）。AWSへの専用回線接続が基本。OCI/Azure/GCPもサポート（京都GIS公式）",
+    mark: "", markColor: "", cloud: "AWS", confirmed: true,
+    costFactors: [
+      { label: "課金通貨", value: "ドル建て" },
+      { label: "転送料無料枠", value: "なし" },
+      { label: "提供モデル", value: "接続基盤" },
+    ],
   },
 };
 
@@ -555,10 +608,10 @@ export default async function CostsPage() {
         </div>
       </div>
 
-      {/* ベンダー別コスト評価（カード表示） */}
+      {/* ベンダー別コスト因子（カード表示） */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <h2 className="text-base font-bold text-gray-800 mb-4">
-          ベンダー別コスト評価
+          ベンダー別コスト因子
         </h2>
         <div className="space-y-2">
           {vendors
@@ -574,10 +627,12 @@ export default async function CostsPage() {
                   key={shortName}
                   vendorName={shortName}
                   cloud={evalData?.cloud ?? vendor.cloud_platform ?? "—"}
-                  mark={evalData?.mark ?? "—"}
-                  markColor={evalData?.markColor ?? "#9ca3af"}
+                  mark={evalData?.mark ?? ""}
+                  markColor={evalData?.markColor ?? ""}
                   label={evalData?.label ?? ""}
                   detail={evalData?.detail ?? ""}
+                  costTags={evalData?.costTags}
+                  costFactors={evalData?.costFactors}
                 />
               );
             })}

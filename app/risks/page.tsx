@@ -208,9 +208,8 @@ export default function RisksPage() {
       </div>
 
       {/* 移行目標超過のリスク（折りたたみ） */}
-      <details className="card p-5">
-        <summary className="text-base font-bold cursor-pointer list-none flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-          <span className="text-gray-400 text-xs">▶</span>
+      <details className="card p-5" open>
+        <summary className="text-base font-bold list-none flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
           移行目標期限を超過した場合の想定リスク
         </summary>
         <div className="mt-3">

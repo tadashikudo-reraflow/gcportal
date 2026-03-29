@@ -3,8 +3,10 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import NavBar from "./NavBar";
+import { useUXTracker } from "@/hooks/useUXTracker";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
+  useUXTracker();
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   const isEmbed = pathname.startsWith("/embed");

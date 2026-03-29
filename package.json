@@ -22,6 +22,7 @@
     "@tiptap/react": "^3.20.4",
     "@tiptap/starter-kit": "^3.20.4",
     "gray-matter": "^4.0.3",
+    "heatmap.js": "^2.0.5",
     "jose": "^6.2.2",
     "jspdf": "^4.2.1",
     "marked": "^17.0.4",

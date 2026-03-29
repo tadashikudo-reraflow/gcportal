@@ -6,7 +6,7 @@
  *
  * ⚠️  DEPRECATED for batch ingestion (ADR 2026-03-24)
  * -------------------------------------------------------
- * RAGデータ投入は Oracle 23ai (`~/workspace/pj/digital-go-jp-rag/`) に一本化済み。
+ * RAGデータ投入は PostgreSQL + pgvector (`~/workspace/pj/digital-go-jp-rag/`) に一本化済み。
  * `ingestDocument` / `ingestChunk` はスクリプト・バッチから呼ばない。
  * このファイルの用途: サイト検索UI・API Route (`/api/rag/*`) のみ。
  * 新規データソース追加 → `digital-go-jp-rag/02x_ingest_*.py` を作成すること。
