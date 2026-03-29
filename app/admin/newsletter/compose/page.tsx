@@ -170,14 +170,13 @@ function ComposeForm() {
     const id = parseInt(editId, 10);
     if (isNaN(id)) return;
     ensurePass();
-    fetch(`/api/newsletter/campaigns`, { headers: { Authorization: getAuth() }, credentials: "include" })
+    fetch(`/api/newsletter/campaigns/${id}`, { headers: { Authorization: getAuth() }, credentials: "include" })
       .then((r) => r.json())
-      .then((list: Array<{ id: number; subject: string; body_html?: string }>) => {
-        const found = list.find((c) => c.id === id);
-        if (found) {
-          setSubject(found.subject);
-          if (found.body_html) {
-            initialHtmlRef.current = found.body_html;
+      .then((data: { id: number; subject: string; body_html?: string }) => {
+        if (data && !("error" in data)) {
+          setSubject(data.subject);
+          if (data.body_html) {
+            initialHtmlRef.current = data.body_html;
           }
         }
       })

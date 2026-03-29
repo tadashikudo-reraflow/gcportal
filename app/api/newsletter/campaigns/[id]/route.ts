@@ -33,6 +33,35 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
+// GET /api/newsletter/campaigns/[id] — 単一取得（compose画面用）
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!await checkAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const campaignId = parseInt(id, 10);
+  if (isNaN(campaignId)) {
+    return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+  }
+
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("campaigns")
+    .select("id, subject, status, body_html, sent_at, created_at")
+    .eq("id", campaignId)
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
+}
+
 // PATCH /api/newsletter/campaigns/[id] — 更新
 export async function PATCH(
   req: NextRequest,
