@@ -12,12 +12,13 @@ const supabaseAdmin = createClient(
 const PAGES = [
   { label: "トップ（/）", value: "/" },
   { label: "コスト分析（/costs）", value: "/costs" },
+  { label: "FinOps・PDF申込（/finops）", value: "/finops" },
   { label: "リスクマップ（/risks）", value: "/risks" },
   { label: "パッケージ（/packages）", value: "/packages" },
   { label: "タイムライン（/timeline）", value: "/timeline" },
   { label: "ベンチマーク（/benchmark）", value: "/benchmark" },
   { label: "特定移行認定（/tokutei）", value: "/tokutei" },
-  { label: "レポート申込（/report）", value: "/report" },
+  { label: "クラウド基盤（/cloud）", value: "/cloud" },
 ];
 
 const PERIODS = [
