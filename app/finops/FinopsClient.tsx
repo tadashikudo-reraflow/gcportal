@@ -75,7 +75,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
           </h1>
           <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed" style={{ color: "#c8d8f0" }}>
             全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
-            今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
+            FinOpsだけでは10%止まり——3割削減への3つの階段を無料PDFで解説します。
           </p>
           <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
             <a
@@ -249,21 +249,70 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
           6. PDF CTA（Action — メイン転換点）
       ================================================================ */}
       <section className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
-        <div className="max-w-2xl mx-auto text-center space-y-6 text-white">
-          <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#94b4d8" }}>無料レポート（PDF）</p>
-          <h2 className="text-2xl md:text-3xl font-bold">
-            コスト増の構造と<br />打ち手チェックリストをPDFで
-          </h2>
-          <p className="text-sm leading-relaxed max-w-lg mx-auto" style={{ color: "#c8d8f0" }}>
-            全国1,741自治体の進捗・コスト・遅延構造をまとめた無料PDFです。
-            庁内説明・事業者との協議材料にそのまま使えます。
-          </p>
-          <div className="flex flex-wrap justify-center gap-3 text-xs">
-            {["全国進捗サマリー", "ベンダー別コスト比較", "打ち手チェックリスト", "社内共有OK"].map((t) => (
-              <span key={t} className="bg-white/10 border border-white/20 text-white rounded-full px-3 py-1">{t}</span>
+        <div className="max-w-3xl mx-auto space-y-10 text-white">
+          {/* ヘッダー */}
+          <div className="text-center space-y-4">
+            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#94b4d8" }}>無料レポート（PDF）2026年版</p>
+            <h2 className="text-2xl md:text-3xl font-bold leading-snug">
+              FinOpsだけでは10%止まり。<br />
+              <span style={{ color: "#F5B500" }}>3割削減への3つの階段</span>
+            </h2>
+            <p className="text-sm leading-relaxed max-w-xl mx-auto" style={{ color: "#c8d8f0" }}>
+              全国1,741自治体のデータをもとに、コスト増の構造的原因と段階的な打ち手を整理した実務レポートです。庁内説明・事業者との協議材料にそのまま使えます。
+            </p>
+          </div>
+
+          {/* 3ステップ アジェンダ */}
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                step: "Step 1",
+                chapter: "第3章",
+                title: "FinOps——まずできることから",
+                effect: "削減効果：約10%",
+                desc: "見える化・リサイジング・自動停止。今年度内に着手できる低リスクの第一歩。",
+                checks: ["未使用リソース棚卸し", "過剰スペック見直し", "夜間・休日の自動停止"],
+              },
+              {
+                step: "Step 2",
+                chapter: "第4章",
+                title: "基盤変更と共同利用——構造を変える",
+                effect: "Step1と合わせて約30%",
+                desc: "OCI等への移行、または近隣自治体との共同利用でコスト構造そのものを転換。",
+                checks: ["CSP別コスト試算（5基盤比較）", "共同利用の前提条件", "規模別の現実的なゴール"],
+              },
+              {
+                step: "Step 3",
+                chapter: "終章",
+                title: "SaaS化——2031年を見据えて",
+                effect: "さらなる削減の可能性",
+                desc: "業務プロセスをSaaSに合わせて変える決断。今から準備できる3つのアクション。",
+                checks: ["独自カスタマイズの棚卸し", "業務プロセスの可視化", "帳票様式の統一計画"],
+              },
+            ].map(({ step, chapter, title, effect, desc, checks }) => (
+              <div key={step} className="rounded-xl p-5 space-y-3" style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: "#F5B500", color: "#00205F" }}>{step}</span>
+                  <span className="text-xs" style={{ color: "#94b4d8" }}>{chapter}</span>
+                </div>
+                <div>
+                  <p className="font-bold text-sm leading-snug">{title}</p>
+                  <p className="text-xs mt-1 font-semibold" style={{ color: "#F5B500" }}>{effect}</p>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: "#c8d8f0" }}>{desc}</p>
+                <ul className="space-y-1">
+                  {checks.map((c) => (
+                    <li key={c} className="text-xs flex items-start gap-1.5" style={{ color: "#c8d8f0" }}>
+                      <span className="mt-0.5 shrink-0" style={{ color: "#F5B500" }}>☑</span>{c}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
-          <div className="pt-2">
+
+          {/* CTA */}
+          <div className="text-center space-y-3">
             <a
               href="/report?from=finops_pdf"
               className="inline-flex items-center justify-center gap-2 font-bold px-10 py-4 rounded-xl transition-colors text-base shadow-lg"
@@ -271,7 +320,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             >
               📄 無料でPDFを受け取る
             </a>
-            <p className="mt-3 text-xs" style={{ color: "#94b4d8" }}>メールアドレスとご所属のみ・スパムなし</p>
+            <p className="text-xs" style={{ color: "#94b4d8" }}>メールアドレスとご所属のみ・スパムなし・社内共有OK</p>
           </div>
         </div>
       </section>
