@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getArticleBySlug, getAllArticles } from "@/lib/articles";
 import { getClusterForTags } from "@/lib/clusters";
@@ -96,10 +97,10 @@ export default async function ArticlePage({ params }: Props) {
       {article.coverImage && (
         <div className="card overflow-hidden">
           {/* fetchpriority=high: LCPヒーロー画像をブラウザに最優先プリロードさせる */}
-          <img src={article.coverImage} alt={article.title}
+          <Image src={article.coverImage} alt={article.title}
+            width={1200} height={630}
             className="w-full h-auto"
-            fetchPriority="high"
-            decoding="async" />
+            priority />
         </div>
       )}
 

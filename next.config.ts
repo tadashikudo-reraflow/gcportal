@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   // X-Powered-By ヘッダー削除（不要な情報露出防止）
   poweredByHeader: false,
 
+  // next/image で外部画像（Supabase Storage）を許可
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "**.supabase.co" },
+      { protocol: "https", hostname: "**.supabase.in" },
+    ],
+  },
+
   // 静的アセット・データファイルの長期キャッシュ（本番のみ）
   // dev環境でimmutableを設定するとTurbopackのHMR後もブラウザが古いチャンクを返し続ける
   async headers() {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { getAllArticles } from "@/lib/articles";
 import Breadcrumb from "@/components/Breadcrumb";
 
@@ -65,9 +66,9 @@ export default async function ArticlesPage() {
               className="article-card group">
               {article.coverImage ? (
                 <div className="w-full overflow-hidden bg-[#EEF4FB]" style={{ aspectRatio: "5/2" }}>
-                  <img src={article.coverImage} alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy" decoding="async" />
+                  <Image src={article.coverImage} alt={article.title}
+                    width={600} height={240}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
               ) : (
                 <ArticlePlaceholder title={article.title} />
