@@ -39,6 +39,7 @@ const NAV_GROUPS = [
   },
   { label: "コラム", short: "コラム", href: "/articles" },
   { label: "ソース・出典", short: "出典", href: "/sources" },
+  { label: "無料レポート", short: "レポート", href: "/finops" },
 ] as const;
 
 type NavGroup = (typeof NAV_GROUPS)[number];
