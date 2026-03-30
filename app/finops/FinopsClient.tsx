@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { COST_CONSTANTS } from "@/lib/constants";
 import type { ArticleMeta } from "@/lib/articles";
@@ -50,15 +49,6 @@ function formatManYen(v: number): string {
 // ===================================================================
 
 export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) {
-  const [email, setEmail] = useState("");
-
-  function handleCtaSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const params = new URLSearchParams({ from: "finops" });
-    if (email) params.set("email", email);
-    window.location.href = `/report?${params.toString()}`;
-  }
-
   return (
     <main className="min-h-screen" style={{ background: "var(--color-surface)" }}>
 
@@ -354,37 +344,6 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
         </section>
       )}
 
-      {/* ================================================================
-          9. 最終 CTA（メール入力）
-      ================================================================ */}
-      <section className="py-20 px-4 text-white" style={{ backgroundColor: "#00205F" }}>
-        <div className="max-w-xl mx-auto text-center space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold">
-            あなたの自治体は<br />コスト適正か確認する
-          </h2>
-          <p className="text-sm leading-relaxed" style={{ color: "#94b4d8" }}>
-            同規模自治体との比較レポートを無料でお届けします。
-            庁内向けの説明資料としてもそのまま活用できます。
-          </p>
-          <form onSubmit={handleCtaSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.jp"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
-            />
-            <button
-              type="submit"
-              className="font-bold px-6 py-3 rounded-lg transition-colors whitespace-nowrap text-sm"
-              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
-            >
-              無料で受け取る
-            </button>
-          </form>
-          <p className="text-xs" style={{ color: "#6B7280" }}>スパムなし・いつでも配信解除できます</p>
-        </div>
-      </section>
 
     </main>
   );
