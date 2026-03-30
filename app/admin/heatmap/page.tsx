@@ -1,13 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-// service_role キーが必要（admin専用）
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 const PAGES = [
   { label: "トップ（/）", value: "/" },
@@ -41,6 +34,16 @@ type ClickPoint = {
   value: number;
 };
 
+type UxEvent = {
+  event_type: string;
+  x_ratio: number | null;
+  y_ratio: number | null;
+  scroll_depth: number | null;
+  dwell_ms: number | null;
+  is_mobile: boolean;
+  session_id: string;
+};
+
 export default function HeatmapPage() {
   const [selectedPage, setSelectedPage] = useState("/");
   const [selectedPeriod, setSelectedPeriod] = useState(7);
@@ -57,16 +60,16 @@ export default function HeatmapPage() {
 
   async function fetchData() {
     setLoading(true);
-    const since = new Date();
-    since.setDate(since.getDate() - selectedPeriod);
 
-    const { data, error } = await supabaseAdmin
-      .from("ux_events")
-      .select("event_type, x_ratio, y_ratio, scroll_depth, dwell_ms, is_mobile, session_id")
-      .eq("page", selectedPage)
-      .gte("created_at", since.toISOString());
-
-    if (error || !data) {
+    const res = await fetch(
+      `/api/admin/heatmap?page=${encodeURIComponent(selectedPage)}&days=${selectedPeriod}`
+    );
+    if (!res.ok) {
+      setLoading(false);
+      return;
+    }
+    const { data }: { data: UxEvent[] } = await res.json();
+    if (!data) {
       setLoading(false);
       return;
     }
