@@ -59,7 +59,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen" style={{ background: "var(--color-surface)" }}>
 
       {/* ================================================================
           1. HERO — 痛みを突く（Attention）
@@ -93,7 +93,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           2. 衝撃の数字（Interest — 自分事化）
       ================================================================ */}
-      <section className="py-12 px-4" style={{ backgroundColor: "#E4E9ED" }}>
+      <section className="py-12 px-4" style={{ backgroundColor: "#F0F4F8" }}>
         <div className="max-w-4xl mx-auto">
           <p className="text-center text-sm mb-8" style={{ color: "#6B7280" }}>
             出典: 中核市市長会調査（2025年1月）・デジタル庁先行事業TCO検証
@@ -119,13 +119,13 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           3. 問題の本質（Interest — 共感・原因の明示）
       ================================================================ */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="text-center space-y-3">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            <h2 className="text-2xl md:text-3xl font-bold" style={{ color: "var(--color-text-primary)" }}>
               コストが下がらない、3つの構造的原因
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
               運用最適化（FinOps）だけでは追いつかないケースがあります
             </p>
           </div>
@@ -147,11 +147,11 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
                 body: "ベンダーロックインと一律要件のまま進むと、再選定の機会が失われ、残存システムでも高コストが再生産されます。",
               },
             ].map((item) => (
-              <div key={item.no} className="flex gap-5 p-5 rounded-xl border border-gray-100 bg-gray-50">
-                <div className="text-3xl font-extrabold text-gray-200 leading-none shrink-0 pt-1">{item.no}</div>
+              <div key={item.no} className="flex gap-5 p-5 rounded-xl" style={{ border: "1px solid var(--color-border)", backgroundColor: "#F6FAFE" }}>
+                <div className="text-3xl font-extrabold leading-none shrink-0 pt-1" style={{ color: "var(--color-border-strong)" }}>{item.no}</div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{item.body}</p>
+                  <h3 className="font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>{item.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
                 </div>
               </div>
             ))}
@@ -162,14 +162,14 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           4. FinOps とは（解決策の提示）
       ================================================================ */}
-      <section className="py-16 px-4 bg-teal-50 border-y border-teal-100">
+      <section className="py-16 px-4" style={{ backgroundColor: "#F0F4F8", borderTop: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)" }}>
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="space-y-3">
-            <div className="text-xs font-bold text-teal-700 uppercase tracking-widest">FinOps とは</div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <div className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--color-brand-primary)" }}>FinOps とは</div>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>
               クラウド支出を「見える化→最適化→継続改善」する仕組み
             </h2>
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
               FinOps（Financial Operations）は、クラウドコストを継続的に可視化・分析・最適化するプラクティスです。
               デジタル庁も2024年に「FinOpsガイド 1.0版」を策定し、ガバメントクラウドの運用標準として位置付けています。
             </p>
@@ -180,14 +180,14 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
               { step: "STEP 2", title: "最適化",   body: "サイズ見直し・停止ルール・ストレージ階層化で無駄を削る" },
               { step: "STEP 3", title: "継続改善", body: "月次レビューで効果を測定し、翌年度の予算・契約に反映する" },
             ].map((item) => (
-              <div key={item.step} className="bg-white border border-teal-100 rounded-xl p-5 space-y-2 shadow-sm">
-                <div className="text-xs font-bold text-teal-600">{item.step}</div>
-                <div className="font-bold text-gray-900">{item.title}</div>
-                <p className="text-xs text-gray-600 leading-relaxed">{item.body}</p>
+              <div key={item.step} className="rounded-xl p-5 space-y-2 shadow-sm" style={{ backgroundColor: "#FFFFFF", border: "1px solid var(--color-border)" }}>
+                <div className="text-xs font-bold" style={{ color: "var(--color-brand-primary)" }}>{item.step}</div>
+                <div className="font-bold" style={{ color: "var(--color-text-primary)" }}>{item.title}</div>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
               </div>
             ))}
           </div>
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800 leading-relaxed">
+          <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B", color: "#92400E" }}>
             ⚠️ <strong>FinOps は「移行後の運用最適化」に効く手法です。</strong>
             移行前の基盤選定ミスや回線費の構造問題は、FinOps だけでは解決できません。
             このページでは、<strong>移行済み・未移行それぞれの打ち手</strong>を整理しています。
@@ -198,19 +198,19 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           5. 具体的な打ち手（Desire — 行動可能感）
       ================================================================ */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4" style={{ backgroundColor: "#FFFFFF" }}>
         <div className="max-w-3xl mx-auto space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">今すぐ着手できる、2つの打ち手</h2>
-            <p className="text-sm text-gray-500">移行状況に合わせて、やるべきことが変わります</p>
+            <h2 className="text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>今すぐ着手できる、2つの打ち手</h2>
+            <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>移行状況に合わせて、やるべきことが変わります</p>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
-            <div className="border-2 border-blue-200 rounded-2xl p-6 space-y-4 bg-blue-50">
-              <div className="inline-block text-xs font-bold bg-blue-600 text-white px-3 py-1 rounded-full">
+            <div className="rounded-2xl p-6 space-y-4" style={{ border: "2px solid #BFDBFE", backgroundColor: "#EFF6FF" }}>
+              <div className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full" style={{ backgroundColor: "var(--color-brand-primary)" }}>
                 移行済みシステム
               </div>
-              <h3 className="text-lg font-bold text-blue-900">運用最適化（FinOps）</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <h3 className="text-lg font-bold" style={{ color: "var(--color-brand-secondary)" }}>運用最適化（FinOps）</h3>
+              <ul className="space-y-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 {[
                   "サイズ見直し・停止ルール・タグ整備",
                   "ストレージ階層化・保存期間ポリシー",
@@ -218,17 +218,17 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
                   "月次コストレビューの仕組み化",
                 ].map((t) => (
                   <li key={t} className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-0.5 shrink-0">✓</span>{t}
+                    <span className="mt-0.5 shrink-0" style={{ color: "var(--color-brand-primary)" }}>✓</span>{t}
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="border-2 border-green-200 rounded-2xl p-6 space-y-4 bg-green-50">
-              <div className="inline-block text-xs font-bold bg-green-600 text-white px-3 py-1 rounded-full">
+            <div className="rounded-2xl p-6 space-y-4" style={{ border: "2px solid #BBF7D0", backgroundColor: "#F0FDF4" }}>
+              <div className="inline-block text-xs font-bold text-white px-3 py-1 rounded-full" style={{ backgroundColor: "#16A34A" }}>
                 未移行システム
               </div>
-              <h3 className="text-lg font-bold text-green-900">基盤再選定</h3>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <h3 className="text-lg font-bold" style={{ color: "#14532D" }}>基盤再選定</h3>
+              <ul className="space-y-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
                 {[
                   "ベンダー・クラウド基盤の再選定を協議",
                   "回線設計と外部連携の前提を見直す",
@@ -236,7 +236,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
                   "同規模自治体のコスト実績と比較",
                 ].map((t) => (
                   <li key={t} className="flex items-start gap-2">
-                    <span className="text-green-500 mt-0.5 shrink-0">✓</span>{t}
+                    <span className="mt-0.5 shrink-0" style={{ color: "#16A34A" }}>✓</span>{t}
                   </li>
                 ))}
               </ul>
@@ -328,30 +328,30 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           7. コスト試算表（根拠・信頼醸成）
       ================================================================ */}
-      <section id="cost-table" className="py-16 px-4 bg-gray-50">
+      <section id="cost-table" className="py-16 px-4" style={{ backgroundColor: "#F0F4F8" }}>
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="text-center space-y-2">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">人口帯 × ベンダー別 推定コストレンジ</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="text-xl md:text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>人口帯 × ベンダー別 推定コストレンジ</h2>
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
               年額・万円単位。先行事業TCO検証・中核市市長会調査から概算（参考値）。実際の契約条件により異なります。
             </p>
           </div>
-          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-xl shadow-sm" style={{ border: "1px solid var(--color-border)", backgroundColor: "#FFFFFF" }}>
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-100 border-b border-gray-200">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-700 w-28">人口帯</th>
+                <tr style={{ backgroundColor: "#E4E9ED", borderBottom: "1px solid var(--color-border)" }}>
+                  <th className="text-left px-4 py-3 font-semibold w-28" style={{ color: "var(--color-text-secondary)" }}>人口帯</th>
                   {["TKC", "RKKCS", "富士通", "NEC"].map((v) => (
-                    <th key={v} className="text-center px-4 py-3 font-semibold text-gray-700">{v}</th>
+                    <th key={v} className="text-center px-4 py-3 font-semibold" style={{ color: "var(--color-text-secondary)" }}>{v}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {FINOPS_COST_TABLE.map((row, i) => (
-                  <tr key={row.popLabel} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-4 py-3 font-medium text-gray-700 whitespace-nowrap">{row.popLabel}</td>
+                  <tr key={row.popLabel} style={{ backgroundColor: i % 2 === 0 ? "#FFFFFF" : "#F6FAFE" }}>
+                    <td className="px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>{row.popLabel}</td>
                     {row.vendors.map((v) => (
-                      <td key={v.name} className="px-4 py-3 text-center text-gray-600 whitespace-nowrap text-xs">
+                      <td key={v.name} className="px-4 py-3 text-center whitespace-nowrap text-xs" style={{ color: "var(--color-text-secondary)" }}>
                         {formatManYen(v.afterMin)}〜{formatManYen(v.afterMax)}
                       </td>
                     ))}
@@ -361,8 +361,8 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             </table>
           </div>
           <div className="flex justify-end gap-4 text-sm">
-            <Link href="/costs" className="text-blue-600 hover:text-blue-800 font-medium">ベンダー別コスト詳細 →</Link>
-            <Link href="/cloud" className="text-blue-600 hover:text-blue-800 font-medium">クラウド基盤比較 →</Link>
+            <Link href="/costs" className="font-medium" style={{ color: "var(--color-brand-primary)" }}>ベンダー別コスト詳細 →</Link>
+            <Link href="/cloud" className="font-medium" style={{ color: "var(--color-brand-primary)" }}>クラウド基盤比較 →</Link>
           </div>
         </div>
       </section>
@@ -371,24 +371,25 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
           8. 関連記事（信頼醸成）
       ================================================================ */}
       {articles.length > 0 && (
-        <section className="py-16 px-4 bg-white">
+        <section className="py-16 px-4" style={{ backgroundColor: "#FFFFFF" }}>
           <div className="max-w-4xl mx-auto space-y-8">
-            <h2 className="text-xl font-bold text-gray-900">FinOps 関連コラム</h2>
+            <h2 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>FinOps 関連コラム</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {articles.map((article) => (
                 <Link
                   key={article.slug}
                   href={`/articles/${article.slug}`}
-                  className="border border-gray-100 rounded-xl p-5 space-y-3 hover:shadow-md hover:border-gray-200 transition-all block bg-gray-50"
+                  className="rounded-xl p-5 space-y-3 hover:shadow-md transition-all block"
+                  style={{ border: "1px solid var(--color-border)", backgroundColor: "#F6FAFE" }}
                 >
                   <div className="flex flex-wrap gap-1">
                     {article.tags.slice(0, 2).map((tag) => (
-                      <span key={tag} className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full">{tag}</span>
+                      <span key={tag} className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#EFF6FF", color: "var(--color-brand-primary)" }}>{tag}</span>
                     ))}
                   </div>
-                  <p className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2">{article.title}</p>
-                  <p className="text-xs text-gray-500 line-clamp-2">{article.description}</p>
-                  <p className="text-xs text-gray-400">{article.date}</p>
+                  <p className="font-semibold text-sm leading-snug line-clamp-2" style={{ color: "var(--color-text-primary)" }}>{article.title}</p>
+                  <p className="text-xs line-clamp-2" style={{ color: "var(--color-text-muted)" }}>{article.description}</p>
+                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{article.date}</p>
                 </Link>
               ))}
             </div>
