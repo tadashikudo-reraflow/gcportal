@@ -29,10 +29,10 @@ export default function HeroSection({
         <p className="hero-eyebrow">
           {formattedMonth}時点 · 総務省・デジタル庁公表データ
         </p>
-        <h2 className="hero-headline">
+        <h1 className="hero-headline">
           全国{totalMunicipalities.toLocaleString()}自治体の<br />
           <span className="hero-headline-accent">ガバクラ移行</span>を可視化
-        </h2>
+        </h1>
         <p className="hero-sub">
           全20業務完了はわずか<strong>{completeCount}団体（{completePct}%）</strong>。
           業務別・自治体別に進捗とリスクを追跡。

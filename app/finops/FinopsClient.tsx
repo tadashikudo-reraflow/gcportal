@@ -242,6 +242,9 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
                   </li>
                 ))}
               </ul>
+              <a href="/cloud" className="inline-flex items-center gap-1 text-xs font-semibold" style={{ color: "#16A34A" }}>
+                クラウド基盤比較を見る →
+              </a>
             </div>
           </div>
         </div>
