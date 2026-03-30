@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
   // キャンペーンのステータスを更新
   await supabase
     .from("campaigns")
-    .update({ status: "sent", sent_at: new Date().toISOString() })
+    .update({ status: "sent", sent_at: new Date().toISOString(), sent_count: totalSent })
     .eq("id", campaign_id);
 
   return NextResponse.json({ success: true, sent: totalSent, failed: totalFailed });

@@ -19,6 +19,7 @@ type Campaign = {
   status: string;
   sent_at: string | null;
   created_at: string;
+  sent_count: number;
   open_count: number;
   click_count: number;
 };
@@ -31,7 +32,7 @@ async function getData() {
       supabase.from("leads").select("*", { count: "exact", head: true }),
       supabase
         .from("campaigns")
-        .select("id, subject, status, sent_at, created_at")
+        .select("id, subject, status, sent_at, created_at, sent_count")
         .order("created_at", { ascending: false }),
       supabase
         .from("email_events")
@@ -50,6 +51,7 @@ async function getData() {
 
   const campaignList: Campaign[] = (campaigns ?? []).map((c) => ({
     ...c,
+    sent_count: c.sent_count ?? 0,
     open_count: openMap[c.id] ?? 0,
     click_count: clickMap[c.id] ?? 0,
   }));
@@ -99,8 +101,14 @@ function CampaignRow({ c }: { c: Campaign }) {
         {c.status === "sent" && (
           <>
             <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.sent_count}</p>
+              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>送信</p>
+            </div>
+            <div style={{ textAlign: "right" }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.open_count}</p>
-              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>開封</p>
+              <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>
+                開封 {c.sent_count > 0 ? `(${Math.round(c.open_count / c.sent_count * 100)}%)` : ""}
+              </p>
             </div>
             <div style={{ textAlign: "right" }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.click_count}</p>
