@@ -359,22 +359,12 @@ export async function POST(req: NextRequest) {
     ];
   }
 
+  // officialNews が空ならnewsItemsから公式情報（デジタル庁）を流用
   if (officialNews.length === 0) {
-    try {
-      const res = await fetch("https://www.digital.go.jp/news/", {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (res.ok) {
-        const html = await res.text();
-        const matches = [...html.matchAll(/<a[^>]+href="([^"]*\/news\/[^"]+)"[^>]*>([^<]{10,})<\/a>/gi)];
-        officialNews = matches.slice(0, 3).map((m) => ({
-          title: m[2].trim(),
-          summary: "詳細はリンク先でご確認ください",
-          url: m[1].startsWith("http") ? m[1] : `https://www.digital.go.jp${m[1]}`,
-          source: "デジタル庁",
-        }));
-      }
-    } catch { /* スキップ */ }
+    officialNews = newsItems
+      .filter(n => n.source === "デジタル庁")
+      .slice(0, 3)
+      .map(n => ({ title: n.title, summary: n.summary, url: n.url, source: n.source }));
   }
 
   // 7. system_prompt生成
