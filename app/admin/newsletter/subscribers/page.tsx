@@ -33,6 +33,7 @@ export default function SubscribersPage() {
   const [showImport, setShowImport] = useState(false);
   const [importCsv, setImportCsv] = useState("");
   const [importing, setImporting] = useState(false);
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
 
   const getAuth = () => {
     const pass = sessionStorage.getItem("admin_pass") ?? "";
@@ -472,20 +473,22 @@ export default function SubscribersPage() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "32px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
+              gridTemplateColumns: "40px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
               gap: 16,
-              padding: "8px 0 8px",
+              padding: "8px 8px 8px",
               borderBottom: "1px solid #e5e7eb",
               fontSize: 12,
               fontWeight: 600,
               color: "#9ca3af",
+              alignItems: "center",
             }}
           >
             <input
               type="checkbox"
               checked={allSelected}
-              onChange={toggleAll}
-              style={{ cursor: "pointer" }}
+              onClick={toggleAll}
+              onChange={() => {/* onChange はブラウザ警告防止のため保持 */}}
+              style={{ cursor: "pointer", width: 16, height: 16 }}
             />
             <span>メールアドレス</span>
             <span>所属</span>
@@ -493,42 +496,54 @@ export default function SubscribersPage() {
             <span>登録日</span>
             <span>状態</span>
           </div>
-          {filtered.map((lead) => (
-            <div
-              key={lead.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "32px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
-                gap: 16,
-                padding: "14px 0",
-                borderBottom: "1px solid #f3f4f6",
-                alignItems: "center",
-                opacity: lead.unsubscribed ? 0.6 : 1,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(lead.id)}
-                onChange={() => toggleOne(lead.id)}
-                style={{ cursor: "pointer" }}
-              />
-              <p style={{ fontSize: 14, color: "#111111", wordBreak: "break-all", margin: 0 }}>
-                {lead.email}
-              </p>
-              <p style={{ fontSize: 13, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {ORG_LABELS[lead.organization_type] ?? lead.organization_type ?? "不明"}
-              </p>
-              <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
-                {lead.source || "—"}
-              </p>
-              <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
-                {new Date(lead.created_at).toLocaleDateString("ja-JP")}
-              </p>
-              <p style={{ fontSize: 11, color: lead.unsubscribed ? "#ef4444" : "#10b981", margin: 0 }}>
-                {lead.unsubscribed ? "解除済" : "購読中"}
-              </p>
-            </div>
-          ))}
+          {filtered.map((lead) => {
+            const isSelected = selected.has(lead.id);
+            const isHovered = hoveredId === lead.id;
+            return (
+              <div
+                key={lead.id}
+                onClick={() => toggleOne(lead.id)}
+                onMouseEnter={() => setHoveredId(lead.id)}
+                onMouseLeave={() => setHoveredId(null)}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "40px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
+                  gap: 16,
+                  padding: "14px 8px",
+                  borderBottom: "1px solid #f3f4f6",
+                  alignItems: "center",
+                  opacity: lead.unsubscribed ? 0.6 : 1,
+                  cursor: "pointer",
+                  backgroundColor: isSelected ? "#eff6ff" : isHovered ? "#f9fafb" : "transparent",
+                  borderRadius: 6,
+                  transition: "background-color 0.1s",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onClick={(e) => e.stopPropagation()}
+                  onChange={() => toggleOne(lead.id)}
+                  style={{ cursor: "pointer", width: 16, height: 16 }}
+                />
+                <p style={{ fontSize: 14, color: "#111111", wordBreak: "break-all", margin: 0 }}>
+                  {lead.email}
+                </p>
+                <p style={{ fontSize: 13, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {ORG_LABELS[lead.organization_type] ?? lead.organization_type ?? "不明"}
+                </p>
+                <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
+                  {lead.source || "—"}
+                </p>
+                <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
+                  {new Date(lead.created_at).toLocaleDateString("ja-JP")}
+                </p>
+                <p style={{ fontSize: 11, color: lead.unsubscribed ? "#ef4444" : "#10b981", margin: 0 }}>
+                  {lead.unsubscribed ? "解除済" : "購読中"}
+                </p>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
