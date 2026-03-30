@@ -93,7 +93,7 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
       <button
         onClick={handleSubmit}
         disabled={!canSubmit}
-        className="w-full font-bold py-3 rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="w-full font-bold py-3 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         style={{ backgroundColor: "#F5B500", color: "#00205F" }}
       >
         {loading ? "準備中..." : "📄 無料でPDFを受け取る"}
