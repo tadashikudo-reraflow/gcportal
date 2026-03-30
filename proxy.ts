@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 統合済みページ → ダッシュボードへリダイレクト
@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // /api/scrape/*（POST系）を保護（CRON_SECRET or JWT or Bearer）
-  // /api/schedule は route.ts 内で独自認証するためmiddlewareからは除外
+  // /api/schedule は route.ts 内で独自認証するためproxyからは除外
   if (pathname.startsWith("/api/scrape")) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
     const cronSecret = request.headers.get("x-cron-secret");

@@ -18,7 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL,                    lastModified: now, changeFrequency: "daily",   priority: 1.0 },
-    // /prefectures は middleware で / へ301リダイレクトされるため除外
+    // /prefectures は proxy で / へ301リダイレクトされるため除外
     { url: `${BASE_URL}/businesses`,    lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
     { url: `${BASE_URL}/risks`,         lastModified: now, changeFrequency: "daily",   priority: 0.9 },
     { url: `${BASE_URL}/tokutei`,       lastModified: now, changeFrequency: "weekly",  priority: 0.9 },
