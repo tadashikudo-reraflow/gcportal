@@ -297,6 +297,10 @@ export default async function CloudPage() {
         <div className="mt-3 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ backgroundColor: "#fff8ed", color: "#92400e" }}>
           ※ インフラ層のシステム数。ベンダー一覧はアプリ層のため別指標。
         </div>
+        <div className="mt-2 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ backgroundColor: "#fff0f5", border: "1px solid #e2004b30", color: "#9f1239" }}>
+          <span className="font-semibold" style={{ color: "#e2004b" }}>さくらのクラウド:</span>{" "}
+          2026年3月27日、全技術要件達成・本番環境提供開始（国内クラウド初）
+        </div>
       </div>
 
       {/* ③ クラウド別コスト比較 */}
@@ -470,8 +474,12 @@ export default async function CloudPage() {
                       {cfg.label}
                     </span>
                     {cloudKey === "Sakura" && (
-                      <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                        style={{ backgroundColor: "#e2004b20", color: "#e2004b" }}>国産</span>
+                      <>
+                        <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
+                          style={{ backgroundColor: "#e2004b20", color: "#e2004b" }}>国産</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
+                          style={{ backgroundColor: "#dcfce7", color: "#15803d" }}>本番提供中</span>
+                      </>
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -733,6 +741,85 @@ export default async function CloudPage() {
         title="基盤比較の背景をPDFでまとめて確認"
         description="クラウド比較だけでなく、進捗、コスト、遅延構造までまとめた無料レポートを受け取れます。"
       />
+
+      {/* マルチCSP間通信の検証結果 */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+          マルチCSP間通信の検証結果
+        </h2>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          令和6年度検証事業で実施されたCSP間接続の検証結果（2026年3月27日公開）
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-gray-200">
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">接続パターン</th>
+                <th className="text-center py-2 px-3 text-xs text-gray-500 font-medium">検証結果</th>
+                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">手法</th>
+                <th className="text-left py-2 px-3 text-xs text-gray-400 font-normal hidden md:table-cell">備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  pattern: "AWS ↔ Azure",
+                  result: "✅ 成功",
+                  method: "Transit Gateway + Site-to-Site VPN",
+                  note: "NECネクサソリューションズが検証",
+                  success: true,
+                },
+                {
+                  pattern: "AWS ↔ OCI",
+                  result: "✅ 成功",
+                  method: "サイト間VPN接続",
+                  note: "アイネス、日本コンピューターが検証",
+                  success: true,
+                },
+                {
+                  pattern: "AWS ↔ AWS（異アカウント）",
+                  result: "✅ 成功",
+                  method: "VPCピアリング / Transit Gateway",
+                  note: "共同利用方式の基本パターン",
+                  success: true,
+                },
+                {
+                  pattern: "GMCN（政府共通ネットワーク）",
+                  result: "🔄 実証中",
+                  method: "専用線接続",
+                  note: "本番環境での検証を継続中",
+                  success: false,
+                },
+              ].map((row) => (
+                <tr key={row.pattern} className="border-b border-gray-100">
+                  <td className="py-2.5 px-3 text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
+                    {row.pattern}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                      style={
+                        row.success
+                          ? { backgroundColor: "#dcfce7", color: "#15803d" }
+                          : { backgroundColor: "#dbeafe", color: "#1d4ed8" }
+                      }
+                    >
+                      {row.result}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                    {row.method}
+                  </td>
+                  <td className="py-2.5 px-3 text-xs text-gray-400 hidden md:table-cell">{row.note}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
+          出典: 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書
+        </p>
+      </div>
 
       <PageNavCards exclude="/cloud" />
       <RelatedArticles cluster={CLUSTERS.tech} />
