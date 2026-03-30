@@ -432,99 +432,242 @@ export default async function CostsPage() {
       <div className="card p-5">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-sm font-bold" style={{ color: "var(--color-gov-primary)" }}>
-            検証8団体のコスト増減
+            R6検証事業 — 8団体のコスト詳細
           </h2>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">R6検証事業</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">2026年3月27日公開</span>
         </div>
-        <p className="text-[11px] mb-4" style={{ color: "var(--color-text-muted)" }}>
-          デジ庁が条件を揃えた理論試算でも全体+8%増。現場の見積もり（中核市市長会: 平均2.3倍）とのギャップが実態
+        <p className="text-[11px] mb-2" style={{ color: "var(--color-text-muted)" }}>
+          現行システムを同規模で継続（コストA）vs ガバメントクラウドへリフト＋推奨構成＋共同利用按分（コストB）の<strong>5年間ランニングコスト</strong>比較。8団体合計で<strong className="text-red-600">+8.0%増</strong>（+3.97億円）。
         </p>
 
-        {/* 理論 vs 現実 — 2カード */}
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          <div className="rounded-lg border-2 border-blue-200 bg-blue-50/60 p-3 text-center">
-            <p className="text-[10px] font-medium text-blue-500 mb-0.5">デジ庁 理論試算</p>
-            <p className="text-2xl font-black text-blue-700">+8.0<span className="text-base">%</span></p>
-            <p className="text-[10px] text-blue-400 mt-0.5">推奨構成・共同利用按分適用</p>
+        {/* コストA/Bの説明 */}
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="rounded-md bg-gray-50 border border-gray-200 p-2.5">
+            <p className="text-[10px] font-bold text-gray-600 mb-0.5">コストA（比較基準）</p>
+            <p className="text-[10px] text-gray-500 leading-relaxed">現行システムを同規模で入れ替え・継続利用した場合の5年間運用経費</p>
           </div>
-          <div className="rounded-lg border-2 border-red-200 bg-red-50/60 p-3 text-center">
-            <p className="text-[10px] font-medium text-red-500 mb-0.5">現場の見積もり実態</p>
-            <p className="text-2xl font-black text-red-600">2.3<span className="text-base">倍</span></p>
-            <p className="text-[10px] text-red-400 mt-0.5">中核市市長会調査・ベンダー見積</p>
+          <div className="rounded-md bg-blue-50 border border-blue-200 p-2.5">
+            <p className="text-[10px] font-bold text-blue-700 mb-0.5">コストB（移行後）</p>
+            <p className="text-[10px] text-blue-600 leading-relaxed">ガバクラへリフトし推奨構成＋共同利用按分を採用した場合の5年間運用経費</p>
           </div>
         </div>
 
-        {/* 8団体バーチャート */}
-        <div className="space-y-2">
+        {/* 人口規模別テーブル */}
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full text-[11px] border-collapse">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="text-left py-2 px-2 font-semibold text-gray-600 border-b border-gray-200">団体</th>
+                <th className="text-center py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">人口</th>
+                <th className="text-center py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">現行環境</th>
+                <th className="text-center py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">CSP</th>
+                <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">コストA</th>
+                <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">コストB</th>
+                <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">差額</th>
+                <th className="text-right py-2 px-2 font-semibold text-gray-600 border-b border-gray-200">増減率</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* 指定都市 */}
+              <tr className="border-b border-gray-100 bg-blue-50/30">
+                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 指定都市</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">神戸市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">149万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-gray-100 text-gray-600">DC単独</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">9.94億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">11.73億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.79億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+18.0%</td>
+              </tr>
+              {/* 中核市 */}
+              <tr className="border-b border-gray-100 bg-blue-50/30">
+                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 中核市（20万人以上）</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">せとうち3市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">47-51万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-purple-100 text-purple-700">自治体クラウド</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">6.27億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">7.88億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.60億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+25.6%</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">盛岡市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">28万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-gray-100 text-gray-600">DC単独</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">11.71億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.10億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-green-600">-1.60億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-green-600">-13.7%</td>
+              </tr>
+              {/* 一般市 */}
+              <tr className="border-b border-gray-100 bg-blue-50/30">
+                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 一般市（5-20万人）</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">佐倉市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">16.5万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-gray-100 text-gray-600">DC単独</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.69億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.38億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-green-600">-0.31億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-green-600">-2.9%</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">宇和島市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">6.5万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-yellow-100 text-yellow-700">DCハード共用</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span>+<span className="px-1 py-0.5 rounded text-[9px] bg-red-100 text-red-700">OCI</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">4.07億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">5.19億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.12億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+27.5%</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">須坂市</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">4.8万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-yellow-100 text-yellow-700">DCハード共用</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">4.87億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">5.10億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+0.23億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-gray-600">+4.6%</td>
+              </tr>
+              {/* 町村 */}
+              <tr className="border-b border-gray-100 bg-blue-50/30">
+                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 町村（5万人未満）</td>
+              </tr>
+              <tr className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-1.5 px-2 font-medium text-gray-800">美里町・川島町</td>
+                <td className="py-1.5 px-1.5 text-center text-gray-600">1-1.8万</td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-purple-100 text-purple-700">自治体クラウド</span></td>
+                <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">2.25億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">3.39億</td>
+                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.14億</td>
+                <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+51.0%</td>
+              </tr>
+              {/* 合計 */}
+              <tr className="bg-gray-100 font-bold">
+                <td className="py-2 px-2 text-gray-800">合計（7団体）</td>
+                <td className="py-2 px-1.5 text-center text-gray-600" colSpan={3}></td>
+                <td className="py-2 px-1.5 text-right tabular-nums text-gray-800">49.80億</td>
+                <td className="py-2 px-1.5 text-right tabular-nums text-gray-800">53.77億</td>
+                <td className="py-2 px-1.5 text-right tabular-nums text-red-700">+3.97億</td>
+                <td className="py-2 px-2 text-right tabular-nums text-red-700">+8.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* 経費項目別の増減パターン — 代表3団体 */}
+        <h3 className="text-xs font-bold text-gray-700 mb-2">経費項目別の増減（代表団体）</h3>
+        <div className="grid md:grid-cols-3 gap-3 mb-4">
           {[
-            { name: "盛岡市", pop: "28万", env: "DC単独", pct: -13.7, costA: "11.71億", costB: "10.10億" },
-            { name: "佐倉市", pop: "16.5万", env: "DC単独", pct: -2.9, costA: "10.69億", costB: "10.38億" },
-            { name: "須坂市", pop: "4.8万", env: "DCハード共用", pct: 4.6, costA: "4.87億", costB: "5.10億" },
-            { name: "神戸市", pop: "149万", env: "DC単独", pct: 18.0, costA: "9.94億", costB: "11.73億" },
-            { name: "せとうち3市", pop: "47-51万", env: "自治体クラウド", pct: 25.6, costA: "6.27億", costB: "7.88億" },
-            { name: "宇和島市", pop: "6.5万", env: "DCハード共用", pct: 27.5, costA: "4.07億", costB: "5.19億" },
-            { name: "美里町・川島町", pop: "1-1.8万", env: "自治体クラウド", pct: 51.0, costA: "2.25億", costB: "3.39億" },
-          ].map((m) => {
-            const isNeg = m.pct < 0;
-            const absW = Math.min(Math.abs(m.pct) / 55 * 100, 100);
-            const barColor = isNeg ? "#10B981" : m.pct >= 25 ? "#EF4444" : m.pct >= 10 ? "#F59E0B" : "#6B7280";
-            return (
-              <div key={m.name} className="group">
-                <div className="flex items-center gap-2">
-                  <div className="w-[88px] flex-shrink-0 text-right">
-                    <span className="text-[11px] font-medium text-gray-700">{m.name}</span>
-                  </div>
-                  <div className="flex-1 relative h-5">
-                    <div className="absolute inset-0 bg-gray-100 rounded" />
-                    <div
-                      className="absolute top-0 h-full rounded transition-all"
-                      style={{
-                        left: isNeg ? `${50 - absW / 2}%` : "50%",
-                        width: `${absW / 2}%`,
-                        backgroundColor: barColor,
-                        opacity: 0.8,
-                      }}
-                    />
-                    {/* 中央ゼロライン */}
-                    <div className="absolute top-0 bottom-0" style={{ left: "50%", borderLeft: "1.5px dashed #9CA3AF" }} />
-                  </div>
-                  <div className="w-16 flex-shrink-0 text-right">
-                    <span className="text-xs font-bold tabular-nums" style={{ color: barColor }}>
-                      {isNeg ? `${m.pct}%` : `+${m.pct}%`}
-                    </span>
-                  </div>
-                </div>
-                {/* ホバー詳細 */}
-                <div className="hidden group-hover:flex items-center gap-3 pl-[96px] mt-0.5 mb-1">
-                  <span className="text-[10px] text-gray-400">{m.pop}人</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">{m.env}</span>
-                  <span className="text-[10px] text-gray-400">{m.costA} → {m.costB}（5年）</span>
-                </div>
+            {
+              name: "盛岡市",
+              result: "-13.7%",
+              resultColor: "text-green-700",
+              bgColor: "bg-green-50/50",
+              borderColor: "border-green-200",
+              items: [
+                { label: "HW借料", value: "-100%", color: "text-green-600" },
+                { label: "HW保守費", value: "-100%", color: "text-green-600" },
+                { label: "DC利用費", value: "-100%", color: "text-green-600" },
+                { label: "クラウド利用経費", value: "純増", color: "text-red-500" },
+              ],
+              note: "DC単独→全面ガバクラ移行でHW/DC費全廃。クラウド経費増を上回る削減",
+            },
+            {
+              name: "神戸市",
+              result: "+18.0%",
+              resultColor: "text-red-700",
+              bgColor: "bg-red-50/50",
+              borderColor: "border-red-200",
+              items: [
+                { label: "HW借料", value: "-96%（-2.15億）", color: "text-green-600" },
+                { label: "SW借料", value: "-72%（-2.61億）", color: "text-green-600" },
+                { label: "通信回線費", value: "+0.86億（純増）", color: "text-red-500" },
+                { label: "クラウド利用経費", value: "+3.41億（純増）", color: "text-red-500" },
+              ],
+              note: "HW/SW削減はあるが通信回線＋クラウド利用経費の純増が上回る",
+            },
+            {
+              name: "せとうち3市",
+              result: "+25.6%",
+              resultColor: "text-red-700",
+              bgColor: "bg-red-50/50",
+              borderColor: "border-red-200",
+              items: [
+                { label: "HW借料", value: "-100%", color: "text-green-600" },
+                { label: "SW借料", value: "-43%", color: "text-green-600" },
+                { label: "通信回線費", value: "+176%", color: "text-red-500" },
+                { label: "クラウド利用経費", value: "+117%", color: "text-red-500" },
+              ],
+              note: "自治体クラウドで元々安価に共用していた分、ガバクラ移行での削減幅が小さい",
+            },
+          ].map((d) => (
+            <div key={d.name} className={`rounded-lg border ${d.borderColor} ${d.bgColor} p-3`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-gray-800">{d.name}</span>
+                <span className={`text-sm font-black ${d.resultColor}`}>{d.result}</span>
               </div>
-            );
-          })}
+              <div className="space-y-1">
+                {d.items.map((item) => (
+                  <div key={item.label} className="flex justify-between">
+                    <span className="text-[10px] text-gray-600">{item.label}</span>
+                    <span className={`text-[10px] font-semibold ${item.color}`}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[9px] text-gray-400 mt-2 leading-tight">{d.note}</p>
+            </div>
+          ))}
         </div>
 
-        {/* 凡例 + 出典 */}
-        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "#10B981" }} />
-              <span className="text-[10px] text-gray-500">コスト減</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "#F59E0B" }} />
-              <span className="text-[10px] text-gray-500">微増</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: "#EF4444" }} />
-              <span className="text-[10px] text-gray-500">大幅増</span>
-            </div>
+        {/* ギャップの理由 — なぜ+8%と2.3倍がこんなに違うのか */}
+        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 mb-3">
+          <h3 className="text-xs font-bold text-amber-800 mb-2 flex items-center gap-1.5">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-amber-500"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            なぜ+8%と2.3倍で大きく違うのか？
+          </h3>
+          <div className="space-y-2.5">
+            {[
+              {
+                title: "測定対象が違う",
+                desc: "+8%はデジ庁が条件を統制した8団体のコストA対B比較（推奨構成・按分適用済み）。2.3倍は中核市市長会が各市に調査した「ベンダーから来た見積もり額」で、最適化前のそのままの金額",
+              },
+              {
+                title: "単位が違う",
+                desc: "+8%は「増減率」。2.3倍は「倍率」で+130%に相当。そもそも数字の性質が異なる",
+              },
+              {
+                title: "母集団が違う",
+                desc: "+8%は先行事業8団体の加重平均。2.3倍は全国62中核市への調査結果（回答市の平均）",
+              },
+              {
+                title: "条件統制の有無",
+                desc: "デジ庁試算は推奨構成・共同利用按分・通信回線見直し等を適用した「最適化後の理論値」。ベンダー見積もりはこれらの対策を含まない「現状のまま移行した場合の金額」",
+              },
+            ].map((r) => (
+              <div key={r.title}>
+                <p className="text-[11px] font-semibold text-amber-900">{r.title}</p>
+                <p className="text-[10px] text-amber-700 leading-relaxed">{r.desc}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-[10px] text-gray-400">コストA（現行継続）vs コストB（ガバクラ+推奨構成）の5年間ランニングコスト比較</p>
         </div>
-        <p className="text-[10px] text-gray-400 mt-1">
-          出典: デジタル庁「令和6年度 ガバメントクラウド早期移行団体検証事業 報告書」2026年3月27日 ※ホバーで詳細表示
+
+        {/* 出典 */}
+        <p className="text-[10px] text-gray-400">
+          出典: デジタル庁「令和6年度 ガバメントクラウド早期移行団体検証事業 報告書」（2026年3月27日公開）/「同 基礎資料」/ 中核市市長会「ガバメントクラウド移行に関するアンケート調査」
         </p>
       </div>
 
