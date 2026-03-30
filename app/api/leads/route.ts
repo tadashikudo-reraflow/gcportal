@@ -230,12 +230,8 @@ export async function POST(req: NextRequest) {
 
     const effectiveSource = source || "report";
 
-    const isReportLead =
-      effectiveSource === "report" || effectiveSource.startsWith("report:");
-
-    // PDF配信メール: レポート導線からの登録時のみユーザーに直接送信
-    const downloadUrl =
-      isReportLead ? await generateDownloadUrl() : null;
+    // PDF配信メール: 全登録者に送信（finopsフォーム統合済みのため条件不要）
+    const downloadUrl = await generateDownloadUrl();
 
     // 通知: Slack / 管理者メール / Telegram（並列実行）
     await Promise.allSettled([
