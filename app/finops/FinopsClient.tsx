@@ -70,12 +70,12 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             FinOps — ガバクラコスト最適化
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">
-            移行したのに、<br />
-            <span style={{ color: "#F5B500" }}>なぜコストが上がるのか？</span>
+            FinOpsだけでは10%止まり。<br />
+            <span style={{ color: "#F5B500" }}>3割削減への3つの階段</span>
           </h1>
           <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed" style={{ color: "#c8d8f0" }}>
             全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
-            FinOpsだけでは10%止まり——3割削減への3つの階段を無料PDFで解説します。
+            今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
           </p>
           <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
             <a
