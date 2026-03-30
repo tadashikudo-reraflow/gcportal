@@ -64,29 +64,31 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           1. HERO — 痛みを突く（Attention）
       ================================================================ */}
-      <section className="text-white pt-16 pb-20 px-4" style={{ background: "linear-gradient(135deg, #00205F 0%, #00338D 60%, #002670 100%)" }}>
-        <div className="max-w-3xl mx-auto text-center space-y-5">
-          <div className="inline-block text-xs font-semibold tracking-widest uppercase bg-white/10 px-3 py-1 rounded-full">
-            FinOps — ガバクラコスト最適化
+      <section className="px-4 pt-6 pb-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="rounded-2xl px-8 py-10 space-y-5" style={{ backgroundColor: "#FFFFFF", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", border: "1px solid var(--color-border)" }}>
+            <p className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>
+              FinOps — ガバクラコスト最適化
+            </p>
+            <h1 className="text-3xl md:text-4xl font-extrabold leading-tight tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+              FinOpsだけでは10%止まり。<br />
+              <span style={{ color: "var(--color-brand-primary)" }}>3割削減への3つの階段</span>
+            </h1>
+            <p className="text-base md:text-lg max-w-xl leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
+              今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href="/report?from=finops_hero"
+                className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm"
+                style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)" }}
+              >
+                📄 無料PDFを受け取る（メールのみ）
+              </a>
+            </div>
+            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>スパムなし・いつでも配信解除できます</p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">
-            FinOpsだけでは10%止まり。<br />
-            <span style={{ color: "#F5B500" }}>3割削減への3つの階段</span>
-          </h1>
-          <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed" style={{ color: "#c8d8f0" }}>
-            全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
-            今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
-          </p>
-          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="/report?from=finops_hero"
-              className="inline-flex items-center justify-center gap-2 font-bold px-8 py-4 rounded-xl transition-colors text-sm shadow-lg"
-              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
-            >
-              📄 無料PDFを受け取る（メールのみ）
-            </a>
-          </div>
-          <p className="text-xs" style={{ color: "#94b4d8" }}>スパムなし・いつでも配信解除できます</p>
         </div>
       </section>
 
