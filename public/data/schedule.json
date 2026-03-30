@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-03-27",
+  "last_updated": "2026-03-31",
   "annual_schedule": [
     {
       "quarter": "Q1（2026年4〜6月）",
@@ -44,6 +44,14 @@
     }
   ],
   "recent_schedule": [
+    {
+      "date": "2026-02-24",
+      "status": "done",
+      "title": "令和8年度ガバメントクラウド検証事業 第一回公募開始",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
     {
       "date": "2026-03-04",
       "status": "done",
@@ -207,6 +215,30 @@
       "title": "デジタル基盤改革支援補助金交付の決定",
       "org": "J-LIS",
       "url": "https://www.j-lis.go.jp/"
+    },
+    {
+      "date": "2026-03-27",
+      "status": "upcoming",
+      "title": "令和6年度 共同利用方式検証事業 成果報告書公開（20社参画）",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-27",
+      "status": "upcoming",
+      "title": "さくらのクラウド 全技術要件達成・本番環境提供開始（国内初）",
+      "org": "デジタル庁・さくらインターネット",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
+    },
+    {
+      "date": "2026-03-30",
+      "status": "upcoming",
+      "title": "適合確認試験 最新合格（日本システムブレーンズ「こあらDX」等）",
+      "org": "デジタル庁",
+      "important": true,
+      "url": "https://www.digital.go.jp/policies/gov_cloud"
     },
     {
       "date": "2026-03-31",
