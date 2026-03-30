@@ -463,14 +463,13 @@ export default async function CostsPage() {
                 <th className="text-center py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">CSP</th>
                 <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">コストA</th>
                 <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">コストB</th>
-                <th className="text-right py-2 px-1.5 font-semibold text-gray-600 border-b border-gray-200">差額</th>
                 <th className="text-right py-2 px-2 font-semibold text-gray-600 border-b border-gray-200">増減率</th>
               </tr>
             </thead>
             <tbody>
               {/* 指定都市 */}
               <tr className="border-b border-gray-100 bg-blue-50/30">
-                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 指定都市</td>
+                <td colSpan={7} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 指定都市</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-1.5 px-2 font-medium text-gray-800">神戸市</td>
@@ -479,12 +478,11 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">9.94億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">11.73億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.79億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+18.0%</td>
               </tr>
               {/* 中核市 */}
               <tr className="border-b border-gray-100 bg-blue-50/30">
-                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 中核市（20万人以上）</td>
+                <td colSpan={7} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 中核市（20万人以上）</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-1.5 px-2 font-medium text-gray-800">せとうち3市</td>
@@ -493,7 +491,6 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">6.27億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">7.88億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.60億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+25.6%</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
@@ -503,12 +500,11 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">11.71億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.10億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-green-600">-1.60億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-green-600">-13.7%</td>
               </tr>
               {/* 一般市 */}
               <tr className="border-b border-gray-100 bg-blue-50/30">
-                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 一般市（5-20万人）</td>
+                <td colSpan={7} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 一般市（5-20万人）</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-1.5 px-2 font-medium text-gray-800">佐倉市</td>
@@ -517,7 +513,6 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.69億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">10.38億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-green-600">-0.31億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-green-600">-2.9%</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
@@ -527,7 +522,6 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span>+<span className="px-1 py-0.5 rounded text-[9px] bg-red-100 text-red-700">OCI</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">4.07億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">5.19億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.12億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+27.5%</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
@@ -537,12 +531,11 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">4.87億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">5.10億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+0.23億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-gray-600">+4.6%</td>
               </tr>
               {/* 町村 */}
               <tr className="border-b border-gray-100 bg-blue-50/30">
-                <td colSpan={8} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 町村（5万人未満）</td>
+                <td colSpan={7} className="py-1.5 px-2 text-[10px] font-bold text-blue-700">▼ 町村（5万人未満）</td>
               </tr>
               <tr className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-1.5 px-2 font-medium text-gray-800">美里町・川島町</td>
@@ -551,7 +544,6 @@ export default async function CostsPage() {
                 <td className="py-1.5 px-1.5 text-center"><span className="px-1 py-0.5 rounded text-[9px] bg-orange-100 text-orange-700">AWS</span></td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">2.25億</td>
                 <td className="py-1.5 px-1.5 text-right tabular-nums text-gray-600">3.39億</td>
-                <td className="py-1.5 px-1.5 text-right tabular-nums text-red-600">+1.14億</td>
                 <td className="py-1.5 px-2 text-right font-bold tabular-nums text-red-600">+51.0%</td>
               </tr>
               {/* 合計 */}
@@ -560,7 +552,6 @@ export default async function CostsPage() {
                 <td className="py-2 px-1.5 text-center text-gray-600" colSpan={3}></td>
                 <td className="py-2 px-1.5 text-right tabular-nums text-gray-800">49.80億</td>
                 <td className="py-2 px-1.5 text-right tabular-nums text-gray-800">53.77億</td>
-                <td className="py-2 px-1.5 text-right tabular-nums text-red-700">+3.97億</td>
                 <td className="py-2 px-2 text-right tabular-nums text-red-700">+8.0%</td>
               </tr>
             </tbody>
@@ -733,44 +724,11 @@ export default async function CostsPage() {
             </div>
             <div className="mt-3 pt-3 border-t border-green-200">
               <p className="text-[11px] text-green-700 font-medium">
-                ※ 増加項目の方が多く、先行8地域中5地域で移行後コスト増が確認されています。
+                ※ R6検証事業では8団体中6団体でコスト増。削減できたのはDC単独利用の盛岡市（-13.7%）と佐倉市（-2.9%）のみ。
               </p>
             </div>
           </div>
         </div>
-
-        {/* 人口規模別コスト目安 */}
-        <h3 className="text-sm font-bold text-gray-700 mb-2">人口規模別コスト変化の目安</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">自治体規模</th>
-                <th className="text-right py-2 px-3 font-medium text-gray-600 border-b">移行前（年間）</th>
-                <th className="text-center py-2 px-3 font-medium text-gray-600 border-b">移行後変化</th>
-                <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">出典</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { scale: "小規模町村（〜1万人）", before: "数千万〜1億円", change: "3〜5倍以上", color: "text-red-600", source: "先行事業検証" },
-                { scale: "中小市（5〜10万人）", before: "1〜2億円", change: "2〜4倍", color: "text-red-600", source: "富山県14市町村" },
-                { scale: "中核市（20〜50万人）", before: "平均3.4億円", change: "平均2.3倍", color: "text-orange-600", source: "中核市市長会" },
-                { scale: "政令市・大都市", before: "数十億円規模", change: "1.5〜1.7倍", color: "text-yellow-600", source: "東京都調査" },
-              ].map((row) => (
-                <tr key={row.scale} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-2 px-3 font-medium text-gray-800">{row.scale}</td>
-                  <td className="py-2 px-3 text-right text-gray-600">{row.before}</td>
-                  <td className={`py-2 px-3 text-center font-bold ${row.color}`}>{row.change}</td>
-                  <td className="py-2 px-3 text-gray-400">{row.source}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="text-[11px] text-gray-400 mt-2">
-          ※ 小規模団体ほど固定費の影響が重くなりやすい傾向があります。特に通信回線費は団体規模で格差が大きく、先行事業検証では笠置町（人口約1,200人）で経常収支比率+62.7pt、神石高原町で+13.3ptの影響が報告されています。
-        </p>
 
         {/* 費用按分方式の比較 */}
         <div className="mt-6 card p-5">
