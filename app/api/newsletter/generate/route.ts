@@ -246,6 +246,22 @@ export async function POST(req: NextRequest) {
 
   const supabase = getSupabase();
 
+  // 0. 同日重複防止ガード
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const { data: existingDrafts } = await supabase
+    .from("campaigns")
+    .select("id, subject")
+    .eq("status", "draft")
+    .gte("created_at", todayStart.toISOString())
+    .limit(1);
+  if (existingDrafts && existingDrafts.length > 0) {
+    return NextResponse.json(
+      { error: "今日の下書きが既に存在します", existing: existingDrafts[0] },
+      { status: 409 }
+    );
+  }
+
   // 1. newsletter_config取得
   const { data: config } = await supabase
     .from("newsletter_config")
