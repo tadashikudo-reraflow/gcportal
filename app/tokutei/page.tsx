@@ -223,7 +223,7 @@ export default function TokuteiPage() {
                 <circle cx="60" cy="60" r={r} fill="none" stroke="#f1f5f9" strokeWidth="18" />
                 {items.map((item) => {
                   const dash = (item.pct / 100) * circ;
-                  const offset = circ - cum;
+                  const offset = -cum;
                   cum += dash;
                   return (
                     <circle
