@@ -145,7 +145,7 @@ export default function ReportClient() {
           {/* CTAフォーム */}
           <div className="bg-gray-50 border rounded-xl p-6">
             <h3 className="text-lg font-bold mb-4">
-              無料レポートを受け取る（PDF・約20,000字）
+              無料PDFを受け取る（約20,000字）
             </h3>
             <div className="max-w-md mx-auto space-y-4">
               <input

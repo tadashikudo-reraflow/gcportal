@@ -695,7 +695,7 @@ export default async function CostsPage() {
               className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
               style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
             >
-              無料レポートを受け取る
+              無料PDFを受け取る
             </Link>
           </div>
         </div>
