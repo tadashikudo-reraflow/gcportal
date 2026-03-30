@@ -12,6 +12,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
 // 出典: デジタル庁先行事業TCO検証・中核市市長会調査・総務省地方財政調査
+// + 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書（2026年3月27日公開）
 // ※ コストレンジは独自調査・参考値。実際の契約条件・規模により大幅に異なる場合があります。
 // ⚠️ データ整合性: cloud フィールドは Supabase vendors.cloud_platform を正とする。
 //    gc-rag-refresh Phase 2 Step 8 で定期照合。不一致時はDB側を優先して修正すること。
@@ -52,7 +53,7 @@ const VENDOR_COST_ESTIMATE: Record<string, {
   日立: {
     ratioMin: 1.3, ratioMax: 2.2, ratioTypical: 1.6,
     mark: "○", markColor: "#1d6fa4", cloud: "AWS",
-    note: "ADWORLD全20業務AWS対応。大規模自治体向け。【出典: 日立システムズ（2024/8） ※コストレンジは独自調査・参考値】",
+    note: "ADWORLD全20業務AWS対応。大規模自治体向け。※令和6年度ベンダー検証事業には不参加。【出典: 日立システムズ（2024/8） ※コストレンジは独自調査・参考値】",
   },
 };
 
@@ -528,6 +529,143 @@ export default async function CostsPage() {
           ※ 小規模団体ほど固定費の影響が重くなりやすい傾向があります。特に通信回線費は団体規模で格差が大きく、先行事業検証では笠置町（人口約1,200人）で経常収支比率+62.7pt、神石高原町で+13.3ptの影響が報告されています。
         </p>
 
+        {/* 費用按分方式の比較 */}
+        <div className="mt-6 card p-5">
+          <h3 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+            費用按分方式の比較
+          </h3>
+          <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
+            令和6年度検証事業（20社参画）で検証された共同利用方式における費用按分の4手法比較
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">按分方式</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">メリット</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">デメリット</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">採用例</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { method: "カスタムスコア按分", merit: "自治体規模に応じた公平な負担", demerit: "スコア設計の合意形成が必要", example: "TKC（人口:業務 7:3）、内田洋行" },
+                  { method: "利用状況按分", merit: "実利用に基づく合理的配分", demerit: "測定が複雑・運用負荷高", example: "一部ベンダーで検討中" },
+                  { method: "均等按分", merit: "算定がシンプル", demerit: "小規模自治体に割高", example: "小規模共同利用で採用" },
+                  { method: "他環境コスト按分", merit: "既存比率を流用でき導入容易", demerit: "ガバクラ固有の費用構造を反映しにくい", example: "移行過渡期に採用" },
+                ].map((row) => (
+                  <tr key={row.method} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-2 px-3 font-medium text-gray-800">{row.method}</td>
+                    <td className="py-2 px-3 text-gray-600">{row.merit}</td>
+                    <td className="py-2 px-3 text-gray-600">{row.demerit}</td>
+                    <td className="py-2 px-3 text-gray-500">{row.example}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-2">
+            出典: 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書 p.9
+          </p>
+        </div>
+
+        {/* R6検証事業 参画ベンダー一覧 */}
+        <div className="mt-4 card p-5">
+          <h3 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+            R6検証事業 参画ベンダー一覧（20社）
+          </h3>
+          <div className="overflow-x-auto mt-3">
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">ベンダー</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">CSP</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 border-b">主な検証内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { vendor: "TKC", csp: "AWS", content: "共同利用・費用按分（カスタムスコア）" },
+                  { vendor: "NEC", csp: "AWS", content: "深掘検証・サーバーレス・IaC" },
+                  { vendor: "富士通", csp: "AWS", content: "共同利用・マルチベンダー連携" },
+                  { vendor: "アイネス", csp: "AWS", content: "マルチCSP間VPN（AWS↔OCI）" },
+                  { vendor: "Gcom", csp: "AWS", content: "共同利用・業務横断" },
+                  { vendor: "JIP", csp: "AWS", content: "共同利用基盤" },
+                  { vendor: "内田洋行", csp: "AWS", content: "費用按分（カスタムスコア）" },
+                  { vendor: "NECネクサソリューションズ", csp: "AWS/Azure", content: "マルチCSP間VPN（AWS↔Azure）" },
+                  { vendor: "SCC", csp: "AWS", content: "環境構築・運用検証" },
+                  { vendor: "AGS", csp: "AWS", content: "環境構築・運用検証" },
+                  { vendor: "RKKCS", csp: "OCI", content: "共同利用・OCI環境" },
+                  { vendor: "GCC", csp: "OCI", content: "OCI環境構築" },
+                  { vendor: "電算", csp: "GCP", content: "GCP環境・共同利用" },
+                  { vendor: "日本コンピューター", csp: "AWS/OCI", content: "マルチCSP間VPN（AWS↔OCI）" },
+                  { vendor: "両備システムズ", csp: "AWS", content: "環境構築" },
+                  { vendor: "シンク", csp: "AWS", content: "マルチベンダー連携" },
+                  { vendor: "RKKコンピューターサービス", csp: "OCI", content: "深掘検証" },
+                  { vendor: "HARP", csp: "AWS", content: "北海道共同利用" },
+                  { vendor: "さくらインターネット", csp: "さくら", content: "新規CSP環境構築（国内初）" },
+                  { vendor: "NTTデータ", csp: "AWS", content: "サーバーレス深掘検証" },
+                ].map((row) => {
+                  const cspColor =
+                    row.csp === "AWS" ? "#FF9900"
+                    : row.csp === "OCI" ? "#F80000"
+                    : row.csp === "GCP" ? "#4285F4"
+                    : row.csp === "AWS/Azure" ? "#0078D4"
+                    : row.csp === "AWS/OCI" ? "#FF9900"
+                    : "#6b7280";
+                  return (
+                    <tr key={row.vendor} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-2 px-3 font-medium text-gray-800">{row.vendor}</td>
+                      <td className="py-2 px-3">
+                        <span className="text-xs font-medium" style={{ color: cspColor }}>{row.csp}</span>
+                      </td>
+                      <td className="py-2 px-3 text-gray-600">{row.content}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-2">
+            日立は令和6年度検証事業に不参加。令和5年度にはAWS環境で参画。
+          </p>
+          <p className="text-[11px] text-gray-400 mt-0.5">
+            出典: デジタル庁「令和6年度 共同利用方式検証事業 成果報告書」2026年3月27日
+          </p>
+        </div>
+
+        {/* クラウド最適化の知見 */}
+        <div className="mt-4 card p-5">
+          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            ガバメントクラウド コスト最適化の知見（R6検証事業）
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[
+              {
+                title: "サーバーレス化",
+                body: "Lambda/Fargate等のサーバーレスサービスにより、EC2比でコスト優位性を確認。特にバッチ処理で効果大",
+              },
+              {
+                title: "IaC構築効率化",
+                body: "Terraform/CloudFormation等でインフラをコード管理。構築工数を大幅削減し、環境複製も容易に",
+              },
+              {
+                title: "マネージドサービス活用",
+                body: "RDS/Aurora等のマネージドDBにより運用負荷とコストを最適化。パッチ適用・バックアップの自動化",
+              },
+              {
+                title: "FinOpsダッシュボード",
+                body: "コスト可視化ダッシュボードで日次モニタリング。予算超過の早期検知と最適化サイクルの確立",
+              },
+            ].map((card) => (
+              <div key={card.title} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>{card.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>{card.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* 公式資料リンク */}
         <div className="mt-4 pt-3 border-t border-gray-200">
           <p className="text-[11px] font-semibold text-gray-500 mb-2">公式資料</p>
@@ -536,6 +674,8 @@ export default async function CostsPage() {
               { label: "運用経費対策（デジタル庁）", url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/c58162cb-92e5-4a43-9ad5-095b7c45100c/dc96d895/20250613_policies_local_governments_doc_02.pdf" },
               { label: "内閣官房WT資料", url: "https://www.cas.go.jp/jp/seisaku/digital_gyozaikaikaku/kyotsuwt3/siryou6.pdf" },
               { label: "投資対効果検証（2022年）", url: "https://www.digital.go.jp/assets/contents/node/information/field_ref_resources/8c953d48-271d-467e-8e4c-f7baa8ec018b/4912aad2/20220914_news_local_governments_outline_03.pdf" },
+              { label: "R6検証事業報告書（本紙）", url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/92d70acb-8407-4f60-8b45-363d9a2d358d/c71cd4d5/20260327_policies_local_governments_government-cloud-vendor-verification_01.pdf" },
+              { label: "R6検証事業報告書（基礎資料）", url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/92d70acb-8407-4f60-8b45-363d9a2d358d/88ea1822/20260327_policies_local_governments_government-cloud-vendor-verification_03.pdf" },
             ].map((link) => (
               <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded border border-gray-200 text-blue-600 hover:bg-blue-50 transition-colors">
