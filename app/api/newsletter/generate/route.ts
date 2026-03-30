@@ -86,30 +86,24 @@ async function fetchNewsItems(): Promise<NewsItem[]> {
     }
   } catch { /* スキップ */ }
 
-  // デジタル庁 ニュース（HTML直接パース - 複数セレクタ試行）
+  // デジタル庁 RSS（/rss/news.xml）
+  const digitalKeywords = ["ガバメント", "自治体", "標準化", "クラウド", "マイナ", "ガバクラ", "DX", "デジタル基盤"];
   try {
-    const res = await fetch("https://www.digital.go.jp/news/", {
+    const res = await fetch("https://www.digital.go.jp/rss/news.xml", {
       signal: AbortSignal.timeout(6000),
-      headers: { "User-Agent": "Mozilla/5.0" },
+      headers: { "User-Agent": "GCInsight-Newsletter/1.0" },
     });
     if (res.ok) {
-      const html = await res.text();
-      // 複数パターンで試行
-      const patterns = [
-        /<a[^>]+href="(\/news\/[^"?#]+)"[^>]*>\s*<[^>]+>\s*([^<]{10,})\s*<\/[^>]+>/gi,
-        /<a[^>]+href="(\/news\/[^"?#]+)"[^>]*>([^<]{15,})<\/a>/gi,
-        /href="(\/news\/[a-zA-Z0-9_-]+)"[^>]*>[\s\S]{0,100}?<h\d[^>]*>([^<]{10,})<\/h\d>/gi,
-      ];
-      for (const pattern of patterns) {
-        const matches = [...html.matchAll(pattern)].slice(0, 5);
-        for (const m of matches) {
-          const url = `https://www.digital.go.jp${m[1]}`;
-          const title = m[2].replace(/\s+/g, " ").trim();
-          if (title && !results.find(r => r.url === url)) {
-            results.push({ title, summary: "デジタル庁からの公式情報です", url, source: "デジタル庁" });
-          }
+      const xml = await res.text();
+      const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 30);
+      for (const item of items) {
+        const body = item[1];
+        const title = body.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1]?.trim() ?? "";
+        const url = body.match(/<link>(https?:[^<]+)<\/link>/)?.[1]?.trim() ?? "";
+        const date = body.match(/<pubDate>([^<]+)<\/pubDate>/)?.[1]?.slice(0, 16).trim() ?? "";
+        if (title && url && digitalKeywords.some(kw => title.includes(kw))) {
+          results.push({ title, summary: "デジタル庁からの公式情報です", url, source: "デジタル庁", date });
         }
-        if (results.filter(r => r.source === "デジタル庁").length > 0) break;
       }
     }
   } catch { /* スキップ */ }
