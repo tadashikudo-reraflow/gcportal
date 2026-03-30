@@ -12,6 +12,16 @@ const NAV_GROUPS = [
     href: "/",
   },
   {
+    label: "コスト",
+    short: "コスト",
+    children: [
+      { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
+      { href: "/costs",    label: "コスト増の要因を分析", desc: "ベンダー別コスト比較" },
+      { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
+      { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・無料PDF診断" },
+    ],
+  },
+  {
     label: "調べる",
     short: "調べる",
     children: [
@@ -27,18 +37,7 @@ const NAV_GROUPS = [
       { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "935団体の認定状況" },
     ],
   },
-  {
-    label: "コスト",
-    short: "コスト",
-    children: [
-      { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
-      { href: "/costs",    label: "コスト増の要因を分析", desc: "ベンダー別コスト比較" },
-      { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
-      { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・無料PDF診断" },
-    ],
-  },
   { label: "コラム", short: "コラム", href: "/articles" },
-  { label: "レポート", short: "PDF", href: "/report" },
   { label: "ソース・出典", short: "出典", href: "/sources" },
 ] as const;
 
