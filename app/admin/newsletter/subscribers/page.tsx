@@ -213,6 +213,23 @@ export default function SubscribersPage() {
 
   return (
     <div>
+      <style>{`
+        .sub-table-row {
+          display: grid;
+          grid-template-columns: 40px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px;
+          gap: 16px;
+        }
+        @media (max-width: 768px) {
+          .sub-table-row {
+            grid-template-columns: 40px 1fr 60px;
+          }
+          .sub-col-org,
+          .sub-col-source,
+          .sub-col-date {
+            display: none;
+          }
+        }
+      `}</style>
       {/* CSVインポートモーダル */}
       {showImport && (
         <div
@@ -289,9 +306,9 @@ export default function SubscribersPage() {
       )}
 
       {/* ヘッダー */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111111", margin: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111111", margin: 0 }}>
             購読者
           </h1>
           <p style={{ marginTop: 8, fontSize: 14, color: "#6b7280" }}>
@@ -299,7 +316,7 @@ export default function SubscribersPage() {
             {search && ` / 絞り込み: ${filtered.length} 件`}
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <button
             onClick={() => setShowImport(true)}
             style={{
@@ -339,7 +356,7 @@ export default function SubscribersPage() {
               border: "1px solid #e5e7eb",
               borderRadius: 8,
               outline: "none",
-              width: 240,
+              width: "clamp(160px, 100%, 240px)",
               color: "#374151",
             }}
           />
@@ -471,10 +488,8 @@ export default function SubscribersPage() {
         <div>
           {/* テーブルヘッダー */}
           <div
+            className="sub-table-row"
             style={{
-              display: "grid",
-              gridTemplateColumns: "40px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
-              gap: 16,
               padding: "8px 8px 8px",
               borderBottom: "1px solid #e5e7eb",
               fontSize: 12,
@@ -491,9 +506,9 @@ export default function SubscribersPage() {
               style={{ cursor: "pointer", width: 16, height: 16 }}
             />
             <span>メールアドレス</span>
-            <span>所属</span>
-            <span>ソース</span>
-            <span>登録日</span>
+            <span className="sub-col-org">所属</span>
+            <span className="sub-col-source">ソース</span>
+            <span className="sub-col-date">登録日</span>
             <span>状態</span>
           </div>
           {filtered.map((lead) => {
@@ -505,10 +520,8 @@ export default function SubscribersPage() {
                 onClick={() => toggleOne(lead.id)}
                 onMouseEnter={() => setHoveredId(lead.id)}
                 onMouseLeave={() => setHoveredId(null)}
+                className="sub-table-row"
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "40px minmax(200px, 2fr) minmax(100px, 1fr) 120px 100px 60px",
-                  gap: 16,
                   padding: "14px 8px",
                   borderBottom: "1px solid #f3f4f6",
                   alignItems: "center",
@@ -529,13 +542,13 @@ export default function SubscribersPage() {
                 <p style={{ fontSize: 14, color: "#111111", wordBreak: "break-all", margin: 0 }}>
                   {lead.email}
                 </p>
-                <p style={{ fontSize: 13, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <p className="sub-col-org" style={{ fontSize: 13, color: "#6b7280", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {ORG_LABELS[lead.organization_type] ?? lead.organization_type ?? "不明"}
                 </p>
-                <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
+                <p className="sub-col-source" style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
                   {lead.source || "—"}
                 </p>
-                <p style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
+                <p className="sub-col-date" style={{ fontSize: 13, color: "#9ca3af", margin: 0 }}>
                   {new Date(lead.created_at).toLocaleDateString("ja-JP")}
                 </p>
                 <p style={{ fontSize: 11, color: lead.unsubscribed ? "#ef4444" : "#10b981", margin: 0 }}>

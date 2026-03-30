@@ -52,7 +52,7 @@ export default async function AdminPage() {
     <div>
       {/* 挨拶 */}
       <div style={{ marginBottom: 48 }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111111", margin: 0 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111111", margin: 0 }}>
           ダッシュボード
         </h1>
         <p style={{ marginTop: 8, fontSize: 14, color: "#6b7280" }}>
@@ -61,7 +61,7 @@ export default async function AdminPage() {
       </div>
 
       {/* KPI 3列 */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 0, marginBottom: 48, borderTop: "1px solid #f3f4f6" }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 0, marginBottom: 48, borderTop: "1px solid #f3f4f6" }}>
         {[
           { label: "購読者数", value: totalLeads, unit: "人", href: "/admin/newsletter/subscribers" },
           { label: "配信数", value: sentCampaigns, unit: "回", href: null },
@@ -76,7 +76,7 @@ export default async function AdminPage() {
             }}
           >
             <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 8 }}>{kpi.label}</p>
-            <p style={{ fontSize: 36, fontWeight: 700, color: "#111111", lineHeight: 1 }}>
+            <p style={{ fontSize: 32, fontWeight: 700, color: "#111111", lineHeight: 1 }}>
               {kpi.value}
               <span style={{ fontSize: 16, fontWeight: 400, marginLeft: 4, color: "#6b7280" }}>{kpi.unit}</span>
             </p>

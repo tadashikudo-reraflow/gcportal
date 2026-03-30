@@ -99,7 +99,7 @@ function CampaignRow({ c }: { c: Campaign }) {
       {/* 右: 統計 + アクション */}
       <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0, marginLeft: 24 }}>
         {c.status === "sent" && (
-          <>
+          <div className="hidden sm:flex" style={{ gap: 20 }}>
             <div style={{ textAlign: "right" }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.sent_count}</p>
               <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>送信</p>
@@ -114,7 +114,7 @@ function CampaignRow({ c }: { c: Campaign }) {
               <p style={{ fontSize: 14, fontWeight: 600, color: "#111111", margin: 0 }}>{c.click_count}</p>
               <p style={{ fontSize: 12, color: "#9ca3af", margin: 0 }}>クリック</p>
             </div>
-          </>
+          </div>
         )}
         <DuplicateButton campaignId={c.id} />
         {c.status === "sent" ? (
@@ -155,7 +155,7 @@ export default async function NewsletterPage() {
       {/* ヘッダー */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40 }}>
         <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "#111111", margin: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111111", margin: 0 }}>
             ニュースレター
           </h1>
           <p style={{ marginTop: 8, fontSize: 14, color: "#6b7280" }}>
