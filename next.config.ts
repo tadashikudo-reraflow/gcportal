@@ -51,6 +51,7 @@ const nextConfig: NextConfig = {
       { source: "/adoption",       destination: "/packages", permanent: true },
       { source: "/compare",        destination: "/benchmark", permanent: true },
       { source: "/cost-reduction", destination: "/finops",   permanent: true },
+      { source: "/report",         destination: "/finops",   permanent: false },
     ];
   },
 };

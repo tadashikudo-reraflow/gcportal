@@ -13,7 +13,7 @@ export default function ReportLeadCta({
   description = "全国1,741自治体の進捗、コスト、遅延構造を1本に整理したPDFです。メールアドレスとご所属の入力で受け取れます。",
   compact = false,
 }: Props) {
-  const reportHref = `/report?from=${encodeURIComponent(source)}`;
+  const reportHref = `/finops#pdf`;
 
   if (compact) {
     return (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { COST_CONSTANTS } from "@/lib/constants";
 import type { ArticleMeta } from "@/lib/articles";
+import PdfLeadForm from "@/components/PdfLeadForm";
 
 const FINOPS_COST_TABLE: {
   popLabel: string;
@@ -80,7 +81,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="/report?from=finops_hero"
+                href="/finops#pdf"
                 className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm"
                 style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)" }}
               >
@@ -253,7 +254,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           6. PDF CTA（Action — メイン転換点）
       ================================================================ */}
-      <section className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
+      <section id="pdf" className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
         <div className="max-w-3xl mx-auto space-y-10 text-white">
           {/* ヘッダー */}
           <div className="text-center space-y-4">
@@ -316,16 +317,9 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="text-center space-y-3">
-            <a
-              href="/report?from=finops_pdf"
-              className="inline-flex items-center justify-center gap-2 font-bold px-10 py-4 rounded-xl transition-colors text-base shadow-lg"
-              style={{ backgroundColor: "#F5B500", color: "#00205F" }}
-            >
-              📄 無料でPDFを受け取る
-            </a>
-            <p className="text-xs" style={{ color: "#94b4d8" }}>メールアドレスとご所属のみ・スパムなし・社内共有OK</p>
+          {/* インラインフォーム */}
+          <div className="max-w-md mx-auto">
+            <PdfLeadForm source="finops_pdf" />
           </div>
         </div>
       </section>

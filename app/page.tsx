@@ -262,7 +262,7 @@ export default function DashboardPage() {
             <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
           </Link>
 
-          <Link href="/report?from=home_cta" className="explore-card" style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" }}>
+          <Link href="/finops#pdf" className="explore-card" style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" }}>
             <span className="explore-card-badge" style={{ backgroundColor: "#BFDBFE", color: "#1E40AF" }}>
               無料PDF
             </span>

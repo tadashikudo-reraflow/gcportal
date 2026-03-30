@@ -691,7 +691,7 @@ export default async function CostsPage() {
               コスト削減特設を見る
             </Link>
             <Link
-              href="/report?from=costs"
+              href="/finops#pdf"
               className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
               style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
             >

@@ -42,7 +42,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </Link>
 
             <Link
-              href="/report?from=header"
+              href="/finops#pdf"
               className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold no-underline"
               style={{ backgroundColor: "transparent", color: "#00338D", border: "2px solid #00338D" }}
             >
@@ -76,7 +76,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href="/report?from=footer"
+                href="/finops#pdf"
                 className="btn-cta text-xs"
                 style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
               >
