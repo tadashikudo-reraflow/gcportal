@@ -48,59 +48,67 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
 
   if (showThanks) {
     return (
-      <div className="text-center rounded-2xl p-8" style={{ backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)" }}>
+      <div className="text-center rounded-2xl p-8 bg-white">
         <div className="text-4xl mb-3">✉️</div>
-        <p className="font-bold text-lg mb-2">登録ありがとうございます</p>
-        <p className="text-sm" style={{ color: "#c8d8f0" }}>
-          <strong style={{ color: "#fff" }}>{email}</strong> 宛にPDFリンクをお送りしました。<br />
-          <span className="text-xs">リンクの有効期限は48時間です。</span>
+        <p className="font-bold text-lg mb-2" style={{ color: "#00338D" }}>登録ありがとうございます</p>
+        <p className="text-sm text-gray-600">
+          <strong className="text-gray-900">{email}</strong> 宛にPDFリンクをお送りしました。<br />
+          <span className="text-xs text-gray-500">リンクの有効期限は48時間です。</span>
         </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl p-6 space-y-4" style={{ backgroundColor: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.2)" }}>
-      <p className="text-sm font-semibold text-center">メールアドレスとご所属のみ・スパムなし・社内共有OK</p>
-      <input
-        type="email"
-        placeholder="メールアドレス"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg outline-none text-gray-900"
-        style={{ border: "1px solid rgba(255,255,255,0.3)" }}
-      />
-      <select
-        value={orgType}
-        onChange={(e) => setOrgType(e.target.value)}
-        className="w-full px-4 py-3 rounded-lg outline-none text-gray-900"
-      >
-        <option value="">ご所属を選択してください</option>
-        {ORG_OPTIONS.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-      <label className="flex items-start gap-2 text-xs cursor-pointer" style={{ color: "#c8d8f0" }}>
+    <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
+      <div className="px-6 pt-5 pb-2 text-center" style={{ borderBottom: "1px solid #E5E7EB" }}>
+        <p className="text-sm font-semibold" style={{ color: "#00338D" }}>
+          📄 無料PDFを受け取る
+        </p>
+        <p className="text-xs text-gray-400 mt-0.5">メールアドレスとご所属のみ・スパムなし・社内共有OK</p>
+      </div>
+      <div className="px-6 py-5 space-y-3">
         <input
-          type="checkbox"
-          checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-0.5 shrink-0"
+          type="email"
+          placeholder="メールアドレス"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none text-gray-900"
+          style={{ border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
         />
-        <span>レポートのダウンロードおよびメール配信に同意します。いつでも解除できます。</span>
-      </label>
-      {error && <p className="text-red-300 text-sm">{error}</p>}
-      <button
-        onClick={handleSubmit}
-        disabled={!canSubmit}
-        className="w-full font-bold py-3 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{ backgroundColor: "#F5B500", color: "#00205F" }}
-      >
-        {loading ? "準備中..." : "📄 無料でPDFを受け取る"}
-      </button>
-      <p className="text-xs text-center" style={{ color: "#94b4d8" }}>
-        ※ご入力情報はレポート配信のみに使用します。第三者への提供はいたしません。
-      </p>
+        <select
+          value={orgType}
+          onChange={(e) => setOrgType(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg text-sm outline-none text-gray-700"
+          style={{ border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
+        >
+          <option value="">ご所属を選択してください</option>
+          {ORG_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <label className="flex items-start gap-2 text-xs text-gray-500 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 shrink-0 accent-blue-600"
+          />
+          <span>レポートのダウンロードおよびメール配信に同意します。いつでも解除できます。</span>
+        </label>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="w-full font-bold py-3 rounded-xl transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ backgroundColor: "#00338D", color: "#FFFFFF" }}
+        >
+          {loading ? "準備中..." : "無料でPDFを受け取る →"}
+        </button>
+        <p className="text-xs text-center text-gray-400">
+          ※ご入力情報はレポート配信のみに使用します。第三者への提供はいたしません。
+        </p>
+      </div>
     </div>
   );
 }
