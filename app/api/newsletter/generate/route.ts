@@ -30,6 +30,99 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
+// ----- ニュース記事収集（複数ソース） -----
+interface NewsItem {
+  title: string;
+  summary: string;
+  url: string;
+  source: string;
+  date?: string;
+}
+
+async function fetchNewsItems(): Promise<NewsItem[]> {
+  const results: NewsItem[] = [];
+
+  // Publickey RSS
+  try {
+    const res = await fetch("https://www.publickey1.jp/atom.xml", {
+      signal: AbortSignal.timeout(6000),
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+    if (res.ok) {
+      const xml = await res.text();
+      const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].slice(0, 10);
+      for (const e of entries) {
+        const body = e[1];
+        const title = body.match(/<title[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1]?.trim() ?? "";
+        const url = body.match(/<link[^>]+href="([^"]+)"/)?.[1] ?? "";
+        const summary = body.match(/<summary[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/summary>/)?.[1]
+          ?.replace(/<[^>]+>/g, "").trim().slice(0, 120) ?? "";
+        const date = body.match(/<updated>([\d-]+)/)?.[1] ?? "";
+        if (title && url && (title.includes("ガバメント") || title.includes("自治体") || title.includes("標準化") || title.includes("デジタル庁"))) {
+          results.push({ title, summary: summary || "詳細はリンク先でご確認ください", url, source: "Publickey", date });
+        }
+      }
+    }
+  } catch { /* スキップ */ }
+
+  // 総務省 自治体デジタル化 RSS
+  try {
+    const res = await fetch("https://www.soumu.go.jp/rss/index.xml", {
+      signal: AbortSignal.timeout(6000),
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+    if (res.ok) {
+      const xml = await res.text();
+      const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].slice(0, 20);
+      for (const item of items) {
+        const body = item[1];
+        const title = body.match(/<title>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/title>/)?.[1]?.trim() ?? "";
+        const url = body.match(/<link>(https?:[^<]+)<\/link>/)?.[1]?.trim() ?? "";
+        const date = body.match(/<pubDate>([^<]+)<\/pubDate>/)?.[1]?.slice(0, 16).trim() ?? "";
+        if (title && url && (title.includes("自治体") || title.includes("標準化") || title.includes("ガバメント") || title.includes("デジタル"))) {
+          results.push({ title, summary: "総務省発表。詳細はリンク先でご確認ください", url, source: "総務省", date });
+        }
+      }
+    }
+  } catch { /* スキップ */ }
+
+  // デジタル庁 ニュース（HTML直接パース - 複数セレクタ試行）
+  try {
+    const res = await fetch("https://www.digital.go.jp/news/", {
+      signal: AbortSignal.timeout(6000),
+      headers: { "User-Agent": "Mozilla/5.0" },
+    });
+    if (res.ok) {
+      const html = await res.text();
+      // 複数パターンで試行
+      const patterns = [
+        /<a[^>]+href="(\/news\/[^"?#]+)"[^>]*>\s*<[^>]+>\s*([^<]{10,})\s*<\/[^>]+>/gi,
+        /<a[^>]+href="(\/news\/[^"?#]+)"[^>]*>([^<]{15,})<\/a>/gi,
+        /href="(\/news\/[a-zA-Z0-9_-]+)"[^>]*>[\s\S]{0,100}?<h\d[^>]*>([^<]{10,})<\/h\d>/gi,
+      ];
+      for (const pattern of patterns) {
+        const matches = [...html.matchAll(pattern)].slice(0, 5);
+        for (const m of matches) {
+          const url = `https://www.digital.go.jp${m[1]}`;
+          const title = m[2].replace(/\s+/g, " ").trim();
+          if (title && !results.find(r => r.url === url)) {
+            results.push({ title, summary: "デジタル庁からの公式情報です", url, source: "デジタル庁" });
+          }
+        }
+        if (results.filter(r => r.source === "デジタル庁").length > 0) break;
+      }
+    }
+  } catch { /* スキップ */ }
+
+  // 重複除去 + 最大6件
+  const seen = new Set<string>();
+  return results.filter(r => {
+    if (!r.title || seen.has(r.url)) return false;
+    seen.add(r.url);
+    return true;
+  }).slice(0, 6);
+}
+
 // ----- X API v2 検索 -----
 interface XTweet {
   author: string;
@@ -210,6 +303,9 @@ export async function POST(req: NextRequest) {
     }
   } catch { /* スキップ */ }
 
+  // 5a. ニュース記事収集（常に実行）
+  const newsItems = await fetchNewsItems();
+
   // 5. X + note 自動収集（bodyでvoicePicksが渡されていなければ）
   let voicePicks = bodyData.voicePicks ?? [];
   let xTweets: XTweet[] = [];
@@ -311,6 +407,7 @@ export async function POST(req: NextRequest) {
   const html = renderNewsletterHtml({
     issueNumber,
     intro,
+    newsItems,
     voicePicks,
     migrationStats,
     gcupdates,
@@ -356,6 +453,7 @@ export async function POST(req: NextRequest) {
     x_keywords: xKeywords,
     note_keywords: noteKeywords,
     collected: {
+      news_items: newsItems.length,
       x_tweets: xTweets.length,
       note_articles: noteArticles.length,
       official_news: officialNews.length,

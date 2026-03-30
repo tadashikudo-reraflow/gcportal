@@ -1,7 +1,9 @@
 export interface NewsletterSections {
   issueNumber: number;
   intro: string;
-  // 市民・現場の声（メイン）
+  // 今週のニュース記事（タイトル+概要+リンク）
+  newsItems?: Array<{ title: string; summary: string; url: string; source: string; date?: string }>;
+  // 市民・現場の声（X・note）
   voicePicks: Array<{
     source: "x" | "note";
     author: string;
@@ -25,6 +27,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
   const {
     issueNumber,
     intro,
+    newsItems,
     migrationStats,
     voicePicks,
     gcupdates,
@@ -34,6 +37,20 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     authorStyle,
     authorSignatureHtml,
   } = sections;
+
+  // 今週のニュース記事ブロック
+  const newsItemsHtml = (newsItems ?? [])
+    .map((n) => `
+    <div style="margin-bottom:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:11px;background:#111;color:#fff;padding:2px 7px;border-radius:3px;white-space:nowrap;">${escapeHtml(n.source)}</span>
+        ${n.date ? `<span style="font-size:11px;color:#9ca3af;">${escapeHtml(n.date)}</span>` : ""}
+      </div>
+      <a href="${n.url}" style="font-size:15px;font-weight:700;color:#111;text-decoration:none;line-height:1.4;display:block;margin-bottom:8px;">${escapeHtml(n.title)}</a>
+      <div style="font-size:13px;color:#4b5563;line-height:1.7;">${escapeHtml(n.summary)}</div>
+      <a href="${n.url}" style="font-size:12px;color:#2563eb;margin-top:8px;display:inline-block;text-decoration:none;">続きを読む →</a>
+    </div>`)
+    .join("");
 
   const migrationBlock = migrationStats
     ? `
@@ -144,10 +161,17 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       ${escapeHtml(intro).replace(/\n/g, "<br>")}
     </div>
 
+    <!-- 今週のニュース -->
+    ${(newsItems ?? []).length > 0 ? `
+    <div style="margin-bottom:36px;">
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:4px;padding-bottom:10px;border-bottom:2px solid #111;">&#x1F4F0; 今週のガバクラニュース</div>
+      <div style="margin-top:16px;">${newsItemsHtml}</div>
+    </div>` : ""}
+
     <!-- 現場・市民の声 -->
     <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F5E3; 現場・市民の声</div>
-      ${voicePicksHtml}
+      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:4px;padding-bottom:10px;border-bottom:2px solid #111;">&#x1F5E3; 現場・専門家の声</div>
+      <div style="margin-top:16px;">${voicePicksHtml}</div>
     </div>
 
     <!-- 移行状況 -->
