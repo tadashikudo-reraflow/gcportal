@@ -326,48 +326,6 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       </section>
 
       {/* ================================================================
-          7. コスト試算表（根拠・信頼醸成）
-      ================================================================ */}
-      <section id="cost-table" className="py-16 px-4" style={{ backgroundColor: "#F0F4F8" }}>
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className="text-center space-y-2">
-            <h2 className="text-xl md:text-2xl font-bold" style={{ color: "var(--color-text-primary)" }}>人口帯 × ベンダー別 推定コストレンジ</h2>
-            <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              年額・万円単位。先行事業TCO検証・中核市市長会調査から概算（参考値）。実際の契約条件により異なります。
-            </p>
-          </div>
-          <div className="overflow-x-auto rounded-xl shadow-sm" style={{ border: "1px solid var(--color-border)", backgroundColor: "#FFFFFF" }}>
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ backgroundColor: "#E4E9ED", borderBottom: "1px solid var(--color-border)" }}>
-                  <th className="text-left px-4 py-3 font-semibold w-28" style={{ color: "var(--color-text-secondary)" }}>人口帯</th>
-                  {["TKC", "RKKCS", "富士通", "NEC"].map((v) => (
-                    <th key={v} className="text-center px-4 py-3 font-semibold" style={{ color: "var(--color-text-secondary)" }}>{v}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {FINOPS_COST_TABLE.map((row, i) => (
-                  <tr key={row.popLabel} style={{ backgroundColor: i % 2 === 0 ? "#FFFFFF" : "#F6FAFE" }}>
-                    <td className="px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>{row.popLabel}</td>
-                    {row.vendors.map((v) => (
-                      <td key={v.name} className="px-4 py-3 text-center whitespace-nowrap text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                        {formatManYen(v.afterMin)}〜{formatManYen(v.afterMax)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-end gap-4 text-sm">
-            <Link href="/costs" className="font-medium" style={{ color: "var(--color-brand-primary)" }}>ベンダー別コスト詳細 →</Link>
-            <Link href="/cloud" className="font-medium" style={{ color: "var(--color-brand-primary)" }}>クラウド基盤比較 →</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================
           8. 関連記事（信頼醸成）
       ================================================================ */}
       {articles.length > 0 && (
