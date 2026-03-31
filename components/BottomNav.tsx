@@ -12,7 +12,7 @@ const BOTTOM_NAV_ITEMS = [
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
     ),
-    href: "/",
+    href: "/prefectures",
   },
   {
     label: "地図",
@@ -62,9 +62,7 @@ export default function BottomNav() {
       <div className="flex h-full">
         {BOTTOM_NAV_ITEMS.map((item) => {
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+            pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
 
           return (
             <Link

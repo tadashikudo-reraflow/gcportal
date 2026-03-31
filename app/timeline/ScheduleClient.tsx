@@ -417,45 +417,19 @@ export default function ScheduleClient({ data }: Props) {
           >
             各イベントの出典元ページ。議事録・説明資料・公募要項等はこちらから確認できます。
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="flex flex-col divide-y" style={{ borderRadius: 8, border: "1px solid var(--color-border, #E2E8F0)", overflow: "hidden" }}>
             {data.source_pages.map((sp) => (
               <a
                 key={sp.id}
                 href={sp.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg p-3 transition-colors hover:opacity-80"
-                style={{
-                  backgroundColor: "var(--color-section-bg, #F8F9FA)",
-                  border: "1px solid var(--color-border, #E2E8F0)",
-                }}
+                className="flex items-center gap-3 px-3 py-2.5 no-underline hover:opacity-75 transition-opacity"
+                style={{ backgroundColor: "var(--color-surface-container-low, #F8F9FA)" }}
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "var(--color-text-secondary, #64748b)" }}
-                  >
-                    {sp.org}
-                  </span>
-                  <span
-                    className="text-xs"
-                    style={{ color: "var(--color-brand-primary, #0066FF)" }}
-                  >
-                    ↗
-                  </span>
-                </div>
-                <div
-                  className="text-sm font-bold mb-1"
-                  style={{ color: "var(--color-gov-primary, #002D72)" }}
-                >
-                  {sp.name}
-                </div>
-                <p
-                  className="text-xs leading-relaxed"
-                  style={{ color: "var(--color-text-secondary, #64748b)" }}
-                >
-                  {sp.description}
-                </p>
+                <span className="text-xs flex-shrink-0 w-16 truncate" style={{ color: "var(--color-text-muted, #94a3b8)" }}>{sp.org}</span>
+                <span className="text-xs font-medium flex-1 min-w-0 truncate" style={{ color: "var(--color-gov-primary, #002D72)" }}>{sp.name}</span>
+                <span className="text-xs flex-shrink-0" style={{ color: "var(--color-brand-primary, #0066FF)" }}>↗</span>
               </a>
             ))}
           </div>

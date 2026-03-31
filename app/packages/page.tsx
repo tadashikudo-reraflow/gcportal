@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Vendor, Package, Municipality, MunicipalityPackageRow } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
@@ -106,6 +107,17 @@ export default async function PackagesPage() {
 
       {/* 業務別パッケージ一覧 */}
       <BusinessPackageList packages={packages} />
+
+      {/* ベンチマーク比較へのクロスリンク */}
+      <div className="rounded-xl p-4 flex items-center justify-between gap-4" style={{ backgroundColor: "#f0f5ff", border: "1px solid #bfdbfe" }}>
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "#1e40af" }}>同規模自治体の導入パッケージを比較</p>
+          <p className="text-xs mt-0.5" style={{ color: "#3b82f6" }}>人口帯・都道府県でフィルタして類似団体のベンダー採用状況を確認できます</p>
+        </div>
+        <Link href="/benchmark" className="flex-shrink-0 text-xs font-bold px-3 py-2 rounded-lg no-underline" style={{ backgroundColor: "#1e40af", color: "#fff" }}>
+          ベンチマークで比較 →
+        </Link>
+      </div>
 
       <SourceAttribution sourceIds={PAGE_SOURCES.packages} pageId="packages" />
 

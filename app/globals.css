@@ -70,7 +70,7 @@
   --color-surface: #F6FAFE;
   --color-card: #FFFFFF;
 
-  font-size: 19px;
+  font-size: 16px;
 }
 
 /* ========== ベーススタイル ========== */
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* モバイルではベースフォントをさらに大きく */
 @media (max-width: 640px) {
-  :root { font-size: 17px; }  /* スマホでは17px（小さすぎない程度に） */
+  :root { font-size: 15px; }  /* スマホでは15px */
 }
 
 /* ==========================================================
@@ -368,7 +368,7 @@ h1, h2, h3, h4, h5, h6 {
 
   /* ========== ページタイトル ========== */
   .page-title {
-    font-size: 1.75rem;
+    font-size: var(--font-size-h1, 1.75rem);
     font-weight: 700;
     color: var(--color-brand-primary);
     line-height: 1.3;
