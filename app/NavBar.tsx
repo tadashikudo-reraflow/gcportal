@@ -20,13 +20,13 @@ const NAV_GROUPS = [
       { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・無料PDF診断" },
     ],
   },
+  { label: "スケジュール", short: "日程", href: "/timeline" },
   {
     label: "調べる",
     short: "調べる",
     children: [
       { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
       { href: "/benchmark",  label: "自治体同士を比較する", desc: "人口帯・地域別の比較" },
-      { href: "/timeline",   label: "スケジュールを確認", desc: "移行タイムライン" },
     ],
   },
   {
