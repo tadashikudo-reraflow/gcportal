@@ -11,6 +11,7 @@ import FreshnessBanner from "@/components/FreshnessBanner";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import Breadcrumb from "@/components/Breadcrumb";
+import Callout from "@/components/Callout";
 
 export const metadata: Metadata = {
   title:
@@ -279,6 +280,145 @@ export default function RisksPage() {
           </p>
         </div>
       </div>
+
+      {/* スコアリング基準（折りたたみ） */}
+      <details className="card p-5">
+        <summary
+          className="text-base font-bold list-none flex items-center gap-2 cursor-pointer"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="flex-shrink-0"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 16v-4M12 8h.01" />
+          </svg>
+          スコアリング基準
+        </summary>
+        <div className="mt-4 space-y-4">
+          <Callout variant="info">
+            <p className="font-semibold mb-1">遅延リスクの判定基準</p>
+            <p>
+              手続き進捗率（20業務の平均完了率）をもとに、以下の基準で遅延リスクを判定しています。
+              特定移行支援認定自治体（移行計画延長対象）はリスクリストから除外されます。
+            </p>
+          </Callout>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr style={{ backgroundColor: "#f8fafc" }}>
+                  <th
+                    className="text-left px-4 py-2.5 font-semibold border-b border-gray-200"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    ステータス
+                  </th>
+                  <th
+                    className="text-left px-4 py-2.5 font-semibold border-b border-gray-200"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    条件（手続き進捗率）
+                  </th>
+                  <th
+                    className="text-right px-4 py-2.5 font-semibold border-b border-gray-200"
+                    style={{ color: "var(--color-text-secondary)" }}
+                  >
+                    該当自治体数
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    label: "危機",
+                    color: "#b91c1c",
+                    bg: "#fef2f2",
+                    condition: "進捗率 50% 未満",
+                    count: riskMunicipalities.length,
+                    note: "（遅延リスクリスト対象）",
+                  },
+                  {
+                    label: "要注意",
+                    color: "#d97706",
+                    bg: "#fffbeb",
+                    condition: "進捗率 50% 以上 75% 未満",
+                    count: (data.municipalities as Municipality[]).filter(
+                      (m) =>
+                        typeof m.overall_rate === "number" &&
+                        m.overall_rate >= 0.5 &&
+                        m.overall_rate < 0.75
+                    ).length,
+                    note: "",
+                  },
+                  {
+                    label: "順調",
+                    color: "#1D4ED8",
+                    bg: "#eff6ff",
+                    condition: "進捗率 75% 以上 100% 未満",
+                    count: (data.municipalities as Municipality[]).filter(
+                      (m) =>
+                        typeof m.overall_rate === "number" &&
+                        m.overall_rate >= 0.75 &&
+                        m.overall_rate < 1.0
+                    ).length,
+                    note: "",
+                  },
+                  {
+                    label: "完了",
+                    color: "#378445",
+                    bg: "#f0fdf4",
+                    condition: "進捗率 100%",
+                    count: (data.municipalities as Municipality[]).filter(
+                      (m) => m.overall_rate === 1
+                    ).length,
+                    note: "（20業務全完了）",
+                  },
+                ].map((row) => (
+                  <tr key={row.label} className="border-b border-gray-50">
+                    <td className="px-4 py-2.5">
+                      <span
+                        className="text-xs font-bold px-2 py-0.5 rounded-full"
+                        style={{ color: row.color, backgroundColor: row.bg }}
+                      >
+                        {row.label}
+                      </span>
+                    </td>
+                    <td
+                      className="px-4 py-2.5 text-sm"
+                      style={{ color: "var(--color-text-secondary)" }}
+                    >
+                      {row.condition}
+                      {row.note && (
+                        <span className="ml-1 text-xs text-gray-400">{row.note}</span>
+                      )}
+                    </td>
+                    <td
+                      className="px-4 py-2.5 text-right tabular-nums font-semibold"
+                      style={{ color: row.color }}
+                    >
+                      {row.count.toLocaleString()} 自治体
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            ※ 手続き進捗率は20業務の平均値（作業着手ベース）。実際のシステム移行完了率とは異なります。
+          </p>
+        </div>
+      </details>
 
       <FreshnessBanner dataMonth={summary.data_month} pageLabel="遅延リスク" />
       <SourceAttribution sourceIds={PAGE_SOURCES.risks} pageId="risks" />

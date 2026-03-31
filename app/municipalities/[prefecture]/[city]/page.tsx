@@ -5,6 +5,7 @@ import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import { Municipality, BusinessSummary } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import Breadcrumb from "@/components/Breadcrumb";
+import PrintButton from "@/components/PrintButton";
 import { normalizeBusiness } from "@/lib/businessAlias";
 
 type Props = { params: Promise<{ prefecture: string; city: string }> };
@@ -191,7 +192,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   const hasVendorData = vendorSummary.length > 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 municipality-detail">
       <Breadcrumb
         items={[
           { label: "業務完了率", href: "/#business-cards" },
@@ -199,6 +200,14 @@ export default async function MunicipalityDetailPage({ params }: Props) {
           { label: cityName },
         ]}
       />
+
+      {/* 印刷時のみ表示されるヘッダー（画面上は hidden） */}
+      <div className="municipality-print-header hidden">
+        <div className="print-logo">GCInsight — gcinsight.jp</div>
+        <div className="print-source">
+          出典: 総務省・デジタル庁公表データ　出力日時: {new Date().toLocaleDateString("ja-JP")}
+        </div>
+      </div>
 
       {/* ヘッダー */}
       <div className="border-b border-gray-200 pb-4">
@@ -213,7 +222,10 @@ export default async function MunicipalityDetailPage({ params }: Props) {
             </span>
           )}
         </div>
-        <h1 className="page-title">{cityName}</h1>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <h1 className="page-title">{cityName}</h1>
+          <PrintButton prefName={prefName} cityName={cityName} />
+        </div>
         {overallRate !== null && (
           <p className="page-subtitle">
             全体進捗率:{" "}

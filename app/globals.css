@@ -1117,4 +1117,42 @@ h1, h2, h3, h4, h5, h6 {
     background: transparent !important;
     color: #374151 !important;
   }
+
+  /* 自治体詳細ページ 印刷スタイル */
+  .municipality-detail {
+    max-width: none !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  /* BottomNav・印刷ボタン・パンくず以外のナビ要素を非表示 */
+  [data-bottom-nav],
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* 印刷ヘッダー（タイトル・出典・日時） */
+  .municipality-print-header {
+    display: block !important;
+    border-bottom: 2px solid #00338D;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  .municipality-print-header .print-logo {
+    font-size: 8pt;
+    color: #6b7280;
+  }
+
+  .municipality-print-header .print-source {
+    font-size: 7pt;
+    color: #9ca3af;
+    margin-top: 2px;
+  }
+
+  /* テーブルを印刷でも全列表示 */
+  .municipality-detail table th,
+  .municipality-detail table td {
+    display: table-cell !important;
+  }
 }
