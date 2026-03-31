@@ -61,7 +61,7 @@ export default async function RelatedArticles({
                   return (
                     <span
                       key={tag}
-                      className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                      className="text-xs px-1.5 py-0.5 rounded-full font-medium"
                       style={{ backgroundColor: c.bg, color: c.text }}
                     >
                       {tag}
@@ -82,7 +82,7 @@ export default async function RelatedArticles({
             >
               {article.description}
             </p>
-            <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
               {article.date}
             </span>
           </Link>
