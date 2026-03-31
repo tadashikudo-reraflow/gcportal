@@ -46,9 +46,9 @@ const ALL_CARDS: NavCard[] = [
   },
   {
     href: "/cloud",
-    badge: "クラウド",
+    badge: "ガバクラ比較",
     badgeStyle: { backgroundColor: "#E0F2FE", color: "#0369A1" },
-    title: "クラウド基盤の内訳",
+    title: "ガバクラ比較",
     desc: "AWS / Azure / GCP / OCI / さくらの分布",
   },
   {

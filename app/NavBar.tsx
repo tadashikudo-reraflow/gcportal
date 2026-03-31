@@ -15,8 +15,8 @@ const NAV_GROUPS = [
     label: "コスト",
     short: "コスト",
     children: [
-      { href: "/costs",    label: "コスト分析", desc: "移行コストの実態と要因" },
-      { href: "/cloud",    label: "クラウドコスト比較", desc: "" },
+      { href: "/costs",    label: "コスト分析", desc: "" },
+      { href: "/cloud",    label: "ガバクラ比較", desc: "" },
     ],
   },
   { label: "スケジュール", short: "日程", href: "/timeline" },
@@ -24,16 +24,16 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
-      { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
-      { href: "/benchmark",  label: "自治体同士を比較する", desc: "人口帯・地域別の比較" },
+      { href: "/packages", label: "導入パッケージ一覧", desc: "" },
+      { href: "/benchmark",  label: "自治体同士を比較する", desc: "" },
     ],
   },
   {
     label: "リスク",
     short: "リスク",
     children: [
-      { href: "/risks",   label: "遅延リスク自治体一覧", desc: "進捗率50%未満の自治体" },
-      { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "935団体の認定状況" },
+      { href: "/risks",   label: "遅延リスク自治体一覧", desc: "" },
+      { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
@@ -180,7 +180,7 @@ export default function NavBar() {
                   className={`nav-dropdown-item ${childActive ? "nav-dropdown-item-active" : ""}`}
                 >
                   <span className="nav-dropdown-label">{child.label}</span>
-                  <span className="nav-dropdown-desc">{child.desc}</span>
+                  {child.desc && <span className="nav-dropdown-desc">{child.desc}</span>}
                 </Link>
               );
             })}

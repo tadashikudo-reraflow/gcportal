@@ -177,8 +177,7 @@ export default function TokuteiPage() {
         </h2>
         <div className="text-sm leading-relaxed space-y-2" style={{ color: "var(--color-text-secondary)" }}>
           <p>
-            技術的・運用的に移行困難なシステムをデジタル庁が認定。認定自治体は<strong>期限延長</strong>のうえ別途移行計画を策定するため「遅延」とは異なるステータスです。
-            共同利用型クラウド基盤（北海道HARP等）の自治体群も含まれます。<a href="/articles" className="underline" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</a>
+            技術的・運用的に移行困難なシステムをデジタル庁が認定。認定自治体は<strong>期限延長</strong>のうえ別途移行計画を策定するため「遅延」とは異なるステータスです。<a href="/articles" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</a>
           </p>
           <div
             className="rounded-md px-4 py-3 mt-3"

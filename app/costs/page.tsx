@@ -418,19 +418,19 @@ export default async function CostsPage() {
           <h2 className="text-sm font-bold" style={{ color: "var(--color-gov-primary)" }}>
             R6検証事業 — 8団体のコスト比較
           </h2>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">2026年3月27日公開</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">2026年3月27日公開</span>
         </div>
 
         {/* サマリー帯 */}
         <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-gray-50 border border-gray-200">
           <div className="flex-shrink-0 text-center">
             <p className="text-2xl font-black text-red-600">+8.0%</p>
-            <p className="text-[10px] text-gray-500">8団体・金額加重平均</p>
-            <p className="text-[9px] text-gray-400">49.80億→53.77億（+3.97億）</p>
-            <p className="text-[9px] mt-1 px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>推奨構成適用の好条件団体</p>
+            <p className="text-xs text-gray-500">8団体・金額加重平均</p>
+            <p className="text-xs text-gray-400">49.80億→53.77億（+3.97億）</p>
+            <p className="text-xs mt-1 px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>推奨構成適用の好条件団体</p>
           </div>
           <div className="h-10 w-px bg-gray-300" />
-          <div className="text-[11px] text-gray-600 leading-relaxed">
+          <div className="text-xs text-gray-600 leading-relaxed">
             現行システム継続（<span className="font-semibold text-gray-700">コストA</span>）vs ガバクラ移行＋推奨構成（<span className="font-semibold text-blue-600">コストB</span>）の<strong>5年間ランニングコスト</strong>比較。削減できたのは<span className="text-green-600 font-semibold">盛岡市・佐倉市の2団体のみ</span>
           </div>
         </div>
@@ -448,15 +448,15 @@ export default async function CostsPage() {
             ].map(({ icon, label, r6, survey }) => (
               <div key={label} className="rounded-lg p-2.5 text-center" style={{ backgroundColor: "#fff8ed" }}>
                 <p className="text-xl mb-1">{icon}</p>
-                <p className="text-[11px] font-bold mb-2" style={{ color: "#92400e" }}>{label}</p>
+                <p className="text-xs font-bold mb-2" style={{ color: "#92400e" }}>{label}</p>
                 <div className="space-y-1">
                   <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#dbeafe" }}>
-                    <p className="text-[10px] font-semibold text-blue-700">R6検証</p>
-                    <p className="text-[10px] text-blue-600">{r6}</p>
+                    <p className="text-xs font-semibold text-blue-700">R6検証</p>
+                    <p className="text-xs text-blue-600">{r6}</p>
                   </div>
                   <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#fee2e2" }}>
-                    <p className="text-[10px] font-semibold text-red-700">中核市調査</p>
-                    <p className="text-[10px] text-red-600">{survey}</p>
+                    <p className="text-xs font-semibold text-red-700">中核市調査</p>
+                    <p className="text-xs text-red-600">{survey}</p>
                   </div>
                 </div>
               </div>
@@ -478,18 +478,17 @@ export default async function CostsPage() {
             const isDown = d.rate < 0;
             const barWidth = Math.min(Math.abs(d.rate) / 55 * 100, 100);
             return (
-              <div key={d.name} className="group">
+              <div key={d.name} className="group mb-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <div className="w-32 flex-shrink-0">
+                  <div className="w-28 flex-shrink-0">
                     <div className="flex items-center gap-1">
                       <span className="text-xs font-bold text-gray-800 truncate">{d.name}</span>
-                      <span className={`text-[9px] px-1 py-0.5 rounded font-medium flex-shrink-0 ${
+                      <span className={`text-xs px-1 py-0.5 rounded font-medium flex-shrink-0 ${
                         d.csp === "AWS" ? "bg-orange-100 text-orange-700"
                         : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
                         : "bg-blue-100 text-blue-700"
                       }`}>{d.csp}</span>
                     </div>
-                    <span className="text-[10px] text-gray-400">{d.pop}</span>
                   </div>
                   <div className="flex-1 flex items-center gap-1.5">
                     <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden relative">
@@ -503,105 +502,21 @@ export default async function CostsPage() {
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 ml-32 pl-2">
-                  <span className="text-[10px] text-gray-400">{d.env}</span>
-                  <span className="text-[10px] text-gray-400">現行 {d.costA}億 → {d.costB}億</span>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span className="w-28 flex-shrink-0">{d.pop}</span>
+                  <span>{d.costA}億 → {d.costB}億</span>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* 経費の増減パターン — 視覚的フロー */}
-        <h3 className="text-xs font-bold text-gray-700 mb-2">なぜ増えるのか — 経費項目の入替わり</h3>
-        <div className="grid md:grid-cols-2 gap-3 mb-4">
-          {/* 削減になる場合（盛岡市） */}
-          <div className="rounded-lg border border-green-200 bg-green-50/30 p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-800">盛岡市 <span className="text-green-600">-13.7%</span></span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">DC単独→全面移行</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-green-700 mb-1">消えるコスト</p>
-                <div className="space-y-1">
-                  {["HW借料 -100%", "HW保守 -100%", "DC利用 -100%"].map((s) => (
-                    <div key={s} className="flex items-center gap-1">
-                      <div className="w-full h-2 bg-green-300 rounded-full" />
-                      <span className="text-[9px] text-green-700 whitespace-nowrap">{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="text-lg text-gray-300 font-bold px-1">&gt;</div>
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-red-600 mb-1">増えるコスト</p>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1">
-                    <div className="w-3/4 h-2 bg-red-300 rounded-full" />
-                    <span className="text-[9px] text-red-600 whitespace-nowrap">クラウド 純増</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <p className="text-[9px] text-gray-400 mt-2">削減 &gt; 増加 → トータルで安くなる</p>
-          </div>
-          {/* 増加になる場合（神戸市） */}
-          <div className="rounded-lg border border-red-200 bg-red-50/30 p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-gray-800">神戸市 <span className="text-red-600">+18.0%</span></span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-100 text-red-700 font-medium">DC単独→移行</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-green-700 mb-1">消えるコスト</p>
-                <div className="space-y-1">
-                  {["HW借料 -96%", "SW借料 -72%"].map((s) => (
-                    <div key={s} className="flex items-center gap-1">
-                      <div className="w-full h-2 bg-green-300 rounded-full" />
-                      <span className="text-[9px] text-green-700 whitespace-nowrap">{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="text-lg text-gray-300 font-bold px-1">&lt;</div>
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-red-600 mb-1">増えるコスト</p>
-                <div className="space-y-1">
-                  {["回線 +0.86億", "クラウド +3.41億"].map((s) => (
-                    <div key={s} className="flex items-center gap-1">
-                      <div className={`h-2 bg-red-300 rounded-full ${s.includes("3.41") ? "w-full" : "w-1/3"}`} />
-                      <span className="text-[9px] text-red-600 whitespace-nowrap">{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <p className="text-[9px] text-gray-400 mt-2">削減 &lt; 増加 → 回線＋クラウド純増がHW/SW削減を上回る</p>
-          </div>
-        </div>
-
-        {/* なぜ+8%と2.3倍で違うのか */}
-        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 mb-3">
-          <h3 className="text-xs font-bold text-amber-800 mb-2">なぜ+8%（R6検証事業）と2.3倍（中核市市長会 R7.1）で大きく違うのか？</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { title: "測定対象", desc: "上記+8%=デジ庁R6検証事業の条件統制試算。2.3倍=中核市市長会（令和7年1月）が62市に聞いたベンダー見積もり" },
-              { title: "単位", desc: "+8%は増減率。2.3倍は倍率（+130%相当）" },
-              { title: "母集団", desc: "+8%=この8団体。2.3倍=全国62中核市" },
-              { title: "条件統制", desc: "デジ庁=推奨構成・按分適用後。市長会=対策なしの現状移行額" },
-            ].map((r) => (
-              <div key={r.title} className="rounded border border-amber-100 bg-white/60 p-2">
-                <p className="text-[10px] font-bold text-amber-900">{r.title}</p>
-                <p className="text-[10px] text-amber-700 leading-snug">{r.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 出典 */}
-        <p className="text-[10px] text-gray-400">
-          出典: デジタル庁「令和6年度 ガバメントクラウド早期移行団体検証事業 報告書」（令和8年3月27日公開）/「同 基礎資料」/ 中核市市長会「ガバメントクラウド移行に関するアンケート調査」（令和7年1月）
+        {/* 出典・補足 */}
+        <p className="text-xs text-gray-500 mt-1">
+          ※ +8%はデジ庁R6検証（好条件8団体・推奨構成適用後）、2.3倍は中核市市長会調査（62市・対策なし）で条件が異なります。
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          出典: デジタル庁「令和6年度ガバメントクラウド早期移行団体検証事業 報告書」（令和8年3月27日公開）/ 中核市市長会調査（令和7年1月）
         </p>
       </div>
 
@@ -647,91 +562,60 @@ export default async function CostsPage() {
           </p>
         </div>
 
-        {/* R6検証事業 参画ベンダー — CSP別チップス */}
+        {/* R6検証事業 参画ベンダー — 検証テーマ別 */}
         <div className="mt-4 card p-5">
-          <h3 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-            R6検証事業 参画ベンダー一覧（20社）
+          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+            R6検証事業 参画ベンダー（20社）— 検証テーマ別
           </h3>
-          <div className="mt-3 space-y-4">
+          <div className="space-y-3">
             {[
               {
-                csp: "AWS",
-                count: 14,
-                chipCls: "bg-orange-50 border border-orange-200 text-orange-800",
-                labelCls: "text-orange-500",
-                countCls: "text-orange-600",
-                vendors: [
-                  { name: "TKC", summary: "共同利用・費用按分（カスタムスコア）" },
-                  { name: "NEC", summary: "サーバーレス・IaC深掘検証" },
-                  { name: "富士通", summary: "共同利用・マルチベンダー連携" },
-                  { name: "アイネス", summary: "マルチCSP間VPN（AWS↔OCI）" },
-                  { name: "Gcom", summary: "共同利用・業務横断" },
-                  { name: "JIP", summary: "共同利用基盤" },
-                  { name: "内田洋行", summary: "費用按分（カスタムスコア）" },
-                  { name: "SCC", summary: "環境構築・運用検証" },
-                  { name: "AGS", summary: "環境構築・運用検証" },
-                  { name: "両備システムズ", summary: "環境構築" },
-                  { name: "シンク", summary: "マルチベンダー連携" },
-                  { name: "HARP", summary: "北海道共同利用" },
-                  { name: "NTTデータ", summary: "サーバーレス深掘検証" },
-                  { name: "電算", summary: "Reams（総合行政情報システム）" },
-                ],
+                theme: "共同利用",
+                color: "#1d4ed8",
+                bg: "#eff6ff",
+                border: "#bfdbfe",
+                vendors: ["TKC", "富士通", "Gcom", "JIP", "シンク", "HARP", "RKKCS", "電算"],
               },
               {
-                csp: "OCI",
-                count: 3,
-                chipCls: "bg-red-50 border border-red-200 text-red-800",
-                labelCls: "text-red-500",
-                countCls: "text-red-600",
-                vendors: [
-                  { name: "RKKCS", summary: "共同利用・OCI環境" },
-                  { name: "GCC", summary: "OCI環境構築" },
-                  { name: "RKKコンピューターサービス", summary: "深掘検証" },
-                ],
+                theme: "費用按分",
+                color: "#92400e",
+                bg: "#fffbeb",
+                border: "#fde68a",
+                vendors: ["TKC", "内田洋行"],
               },
               {
-                csp: "マルチCSP",
-                count: 2,
-                chipCls: "bg-purple-50 border border-purple-200 text-purple-800",
-                labelCls: "text-purple-500",
-                countCls: "text-purple-600",
-                vendors: [
-                  { name: "NECネクサソリューションズ", summary: "マルチCSP間VPN（AWS↔Azure）" },
-                  { name: "日本コンピューター", summary: "マルチCSP間VPN（AWS↔OCI）" },
-                ],
+                theme: "技術深掘",
+                color: "#5b21b6",
+                bg: "#f5f3ff",
+                border: "#ddd6fe",
+                vendors: ["NEC", "NTTデータ", "RKKコンピューターサービス", "GCC"],
               },
               {
-                csp: "さくら",
-                count: 1,
-                chipCls: "bg-green-50 border border-green-200 text-green-800",
-                labelCls: "text-green-500",
-                countCls: "text-green-600",
-                vendors: [
-                  { name: "さくらインターネット", summary: "新規CSP環境構築（国内初）" },
-                ],
+                theme: "マルチCSP",
+                color: "#065f46",
+                bg: "#ecfdf5",
+                border: "#a7f3d0",
+                vendors: ["アイネス", "NECネクサソリューションズ", "日本コンピューター"],
+              },
+              {
+                theme: "環境構築・運用",
+                color: "#374151",
+                bg: "#f9fafb",
+                border: "#e5e7eb",
+                vendors: ["SCC", "AGS", "両備システムズ", "さくらインターネット"],
               },
             ].map((group) => (
-              <div key={group.csp}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-sm font-bold ${group.countCls}`}>{group.count}</span>
-                  <span className={`text-xs font-semibold ${group.labelCls}`}>{group.csp}</span>
-                  <div className="flex-1 h-px bg-gray-100" />
-                </div>
+              <div key={group.theme} className="flex items-start gap-3">
+                <span className="text-xs font-semibold whitespace-nowrap mt-0.5 w-28 flex-shrink-0" style={{ color: group.color }}>{group.theme}</span>
                 <div className="flex flex-wrap gap-1.5">
                   {group.vendors.map((v) => (
-                    <div key={v.name} className={`inline-flex flex-col gap-0.5 px-2 py-1 rounded-md ${group.chipCls}`}>
-                      <span className="text-[10px] font-semibold leading-tight">{v.name}</span>
-                      <span className="text-[9px] opacity-70 leading-tight">{v.summary}</span>
-                    </div>
+                    <span key={v} className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: group.bg, border: `1px solid ${group.border}`, color: group.color }}>{v}</span>
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-gray-400 mt-3">
-            日立は令和6年度検証事業に不参加。令和5年度にはAWS環境で参画。
-          </p>
-          <p className="text-[11px] text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-400 mt-3">
             出典: デジタル庁「令和6年度 共同利用方式検証事業 成果報告書」2026年3月27日
           </p>
         </div>
@@ -847,90 +731,49 @@ export default async function CostsPage() {
       </div>
 
       {/* デジタル庁コスト管理ガイド */}
-      <div id="cost-measures" className="bg-blue-50 rounded-lg border border-blue-200 px-6 py-4">
-        <h3 className="text-xs font-bold text-blue-800 mb-3 flex items-center gap-1.5">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
+      <div id="cost-measures" className="card p-5">
+        <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           コスト対策 — デジタル庁の支援策
         </h3>
-
-        {/* 統計カードグリッド */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
-          {/* FinOpsガイド */}
-          <div className="rounded-lg border border-blue-200 bg-white/80 px-3 py-2.5">
-            <p className="text-[10px] text-blue-500 font-medium mb-0.5">FinOpsガイド</p>
-            <p className="text-2xl font-bold text-blue-700 leading-none">1.0</p>
-            <p className="text-[10px] text-blue-600 mt-1">版 策定済み</p>
-            <p className="text-[10px] text-gray-500 mt-1 leading-snug">リザーブドインスタンス・右サイジング等を体系化</p>
-          </div>
-          {/* 見積精査支援 */}
-          <div className="rounded-lg border border-indigo-200 bg-white/80 px-3 py-2.5">
-            <p className="text-[10px] text-indigo-500 font-medium mb-0.5">見積精査支援</p>
-            <p className="text-2xl font-bold text-indigo-700 leading-none">33<span className="text-sm font-semibold">/330</span></p>
-            <p className="text-[10px] text-indigo-600 mt-1">団体が利用（10%）</p>
-            <p className="text-[10px] text-gray-500 mt-1 leading-snug">運用経費見積チェックリスト公開済み</p>
-          </div>
-          {/* 東京都コスト超過 */}
-          <div className="rounded-lg border border-red-200 bg-red-50/60 px-3 py-2.5 col-span-2 sm:col-span-1">
-            <p className="text-[10px] text-red-500 font-medium mb-0.5">東京都 コスト超過</p>
-            <p className="text-2xl font-bold text-red-600 leading-none">+178億<span className="text-sm font-semibold">円</span></p>
-            <p className="text-[10px] text-red-600 mt-1">年間超過見込み</p>
-            <p className="text-[10px] text-gray-500 mt-1 leading-snug">コスト超過が全国規模の政策課題に</p>
-          </div>
-        </div>
-
-        {/* サブカード（割引交渉・SaaS推進） */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-          <div className="rounded-md border border-blue-100 bg-white/60 px-3 py-2 flex items-start gap-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            <div>
-              <p className="text-[11px] font-semibold text-blue-800">クラウド利用料割引交渉</p>
-              <p className="text-[10px] text-gray-500 leading-snug">デジタル庁がCSP各社（AWS・Azure・GCP・OCI）と割引交渉を実施中</p>
-            </div>
-          </div>
-          <div className="rounded-md border border-blue-100 bg-white/60 px-3 py-2 flex items-start gap-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5">
-              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-            </svg>
-            <div>
-              <p className="text-[11px] font-semibold text-blue-800">公共SaaS推進</p>
-              <p className="text-[10px] text-gray-500 leading-snug">個別構築からSaaS共同利用への移行を費用削減策として推進</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-lg border border-blue-200 bg-white/70 px-4 py-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold text-slate-800">特設: 移行済み最適化と未移行見直し</p>
-            <p className="text-xs text-slate-600">運用最適化と基盤再選定を分けて整理しています。</p>
-          </div>
-          <Link
-            href="/finops"
-            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
-          >
-            FinOps コスト最適化ハブ →
-          </Link>
-        </div>
+        <ul className="space-y-2 mb-4">
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-blue-700 tabular-nums w-16 flex-shrink-0">1.0版</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>FinOpsガイド策定済み — RI・右サイジング等を体系化</span>
+          </li>
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-indigo-700 tabular-nums w-16 flex-shrink-0">33/330</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>団体が見積精査支援を利用（チェックリスト公開済み）</span>
+          </li>
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-red-600 tabular-nums w-16 flex-shrink-0">+178億</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>東京都の年間コスト超過見込み — 全国規模の政策課題に</span>
+          </li>
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-gray-500 tabular-nums w-16 flex-shrink-0">交渉中</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>CSP各社（AWS・Azure・GCP・OCI）との利用料割引交渉</span>
+          </li>
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-gray-500 tabular-nums w-16 flex-shrink-0">SaaS化</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>個別構築からSaaS共同利用への移行を費用削減策として推進</span>
+          </li>
+        </ul>
+        <Link
+          href="/finops"
+          className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
+        >
+          FinOps コスト最適化ハブ →
+        </Link>
       </div>
 
-      {/* 注記 */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4">
+      {/* 注記 + 補正予算 */}
+      <div className="bg-gray-50 rounded-lg border border-gray-200 px-5 py-4 space-y-2">
         <p className="text-xs text-gray-400">
           ※ コスト比率は移行前=1.0基準。判明分のみ集計。全国町村会は2025年4月25日付で「移行前比数倍の増加見込み」として国に財政支援の拡充を要望しています。
         </p>
-      </div>
-
-      {/* 令和7年度補正予算 */}
-      <div
-        className="rounded-lg border border-blue-200 bg-blue-50/50 px-5 py-4"
-      >
-        <p className="text-xs font-bold text-blue-800 mb-1">令和7年度補正予算（支援措置）</p>
-        <p className="text-xs text-blue-700 leading-relaxed">
-          地方公共団体情報システム運用最適化支援事業として、補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong> が計上されています。
+        <p className="text-xs text-blue-700">
+          <span className="font-bold">令和7年度補正予算（支援措置）:</span>{" "}
+          地方公共団体情報システム運用最適化支援事業として補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong> を計上。
         </p>
       </div>
 

@@ -213,65 +213,24 @@ export default function RisksPage() {
           移行目標期限を超過した場合の想定リスク
         </summary>
         <div className="mt-3">
-          <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>
-            以下は編集部が法令・公式資料をもとに整理した想定リスクです。標準化法の「努力義務」規定に基づく解釈であり、法的判断は各自治体の顧問弁護士・総務省へご確認ください。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム記事で</Link>
-          </p>
-          <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-            ※ 罰則規定はなく、目標期限は法的強制力のない努力目標です。
+          <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
+            ※ 罰則規定はなく、目標期限は法的強制力のない努力目標です。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>詳しくはコラム →</Link>
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {[
-              {
-                label: "財政",
-                title: "補助金・財政支援の喪失",
-                desc: "標準化対応遅延により、デジタル庁等からの財政支援・補助金の対象外となるリスク。",
-              },
-              {
-                label: "法務",
-                title: "法的・行政的リスク",
-                desc: "標準化法の努力義務違反として行政指導の対象となる可能性がある。",
-              },
-              {
-                label: "保守",
-                title: "旧システムの保守リスク",
-                desc: "ベンダーサポート終了により、障害対応・セキュリティパッチ適用が困難になる。",
-              },
-              {
-                label: "連携",
-                title: "自治体間連携からの孤立",
-                desc: "標準準拠自治体との情報連携・共同調達の枠組みから外れるリスク。",
-              },
-              {
-                label: "費用",
-                title: "コスト増大の悪循環",
-                desc: "移行遅延で独自改修が蓄積し、将来の移行コストが指数的に増加する。",
-              },
-              {
-                label: "評判",
-                title: "説明責任・評判リスク",
-                desc: "住民・議会への標準化対応状況の説明が困難になる。",
-              },
+              { label: "財政", title: "補助金・財政支援の喪失" },
+              { label: "連携", title: "自治体間連携からの孤立" },
             ].map((item) => (
               <div
                 key={item.title}
-                className="rounded-lg p-3 flex items-start gap-3"
+                className="rounded-lg p-3 flex items-center gap-3"
                 style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}
               >
                 <span className="text-xs font-bold px-2 py-1 rounded-md flex-shrink-0" style={{ backgroundColor: "#fecaca", color: "#991b1b" }}>{item.label}</span>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold mb-1" style={{ color: "#991b1b" }}>
-                    {item.title}
-                  </p>
-                  <p className="text-xs leading-relaxed" style={{ color: "#7f1d1d" }}>
-                    {item.desc}
-                  </p>
-                </div>
+                <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>{item.title}</p>
               </div>
             ))}
           </div>
-          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
-            ※ 編集部の解釈に基づく想定リスクです。<Link href="/articles/gc-standardization-law-guide" className="underline ml-1" style={{ color: "var(--color-brand-secondary)" }}>標準化法の解説を読む →</Link>
-          </p>
         </div>
       </details>
 
