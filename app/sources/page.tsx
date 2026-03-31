@@ -234,15 +234,9 @@ export default function SourcesPage() {
       </div>
 
       {/* 既知の制約 */}
-      <div className="rounded-lg border border-amber-200 px-4 py-3" style={{ backgroundColor: "#fffbeb" }}>
-        <p className="text-xs font-semibold mb-2" style={{ color: "#92400e" }}>既知の制約・注意事項</p>
-        <ul className="text-xs leading-relaxed space-y-1" style={{ color: "#92400e" }}>
-          <li>・ 標準化進捗データは総務省Excel公開タイミングに依存</li>
-          <li>・ コスト推定レンジはAI調査を含み、契約条件により大きく異なる場合あり</li>
-          <li>・ 導入実績データは自治体公開資料の独自調査で、全数カバーではない</li>
-          <li>・ 本サイトは政府公式サイトではない</li>
-        </ul>
-      </div>
+      <p className="text-xs px-1" style={{ color: "var(--color-text-muted)" }}>
+        ※ 本サイトは政府公式サイトではありません。コスト推定・導入実績にはAI調査・独自集計を含みます。
+      </p>
 
       {/* ナビゲーション */}
       <div className="flex items-center justify-between pt-1">
