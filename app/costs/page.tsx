@@ -380,6 +380,20 @@ export default async function CostsPage() {
         <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
           コスト変化実績
         </h2>
+        {/* 盛岡市 — 削減成功事例（R6検証事業） */}
+        <div className="flex items-center gap-3 rounded-xl px-4 py-3 mb-2" style={{ backgroundColor: "#f0fdf4", border: "2px solid #10B981" }}>
+          <div className="w-20 flex-shrink-0 text-right">
+            <span className="text-2xl font-black tabular-nums leading-none" style={{ color: "#059669" }}>−13.7%</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>盛岡市（岩手県）</p>
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: "#dcfce7", color: "#166534" }}>削減成功</span>
+            </div>
+            <p className="text-xs leading-snug" style={{ color: "var(--color-text-muted)" }}>R6検証事業（8団体中）。DC単独→ガバクラ移行で11.71億→10.10億（▲1.61億）。大規模自治体かつDC単独が削減の鍵。</p>
+          </div>
+        </div>
+
         {costs.length > 0 ? (
           <div className="grid grid-cols-1 gap-2">
             {costs.map((c) => {
@@ -391,11 +405,9 @@ export default async function CostsPage() {
               const label = `${pctChange >= 0 ? "+" : ""}${pctChange}%`;
               return (
                 <div key={c.id} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ backgroundColor: bg, border: `1px solid ${color}25` }}>
-                  {/* 数値 */}
                   <div className="w-20 flex-shrink-0 text-right">
                     <span className="text-2xl font-black tabular-nums leading-none" style={{ color }}>{label}</span>
                   </div>
-                  {/* 説明 */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{c.scope}</p>
                     <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>{c.notes}</p>
@@ -407,17 +419,6 @@ export default async function CostsPage() {
         ) : (
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
-
-        {/* 東京都調査（日経xTECH 2026-03-19） */}
-        <div className="flex items-center gap-3 rounded-xl px-4 py-3 mt-2" style={{ backgroundColor: "#fef2f2", border: "1px solid rgba(153,27,27,0.15)" }}>
-          <div className="w-20 flex-shrink-0 text-right">
-            <span className="text-xl font-black tabular-nums leading-none" style={{ color: "#991B1B" }}>+50〜100%</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>東京都（区部・市部・町村）</p>
-            <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>東京都独自調査。割引最大適用でも区部1.5倍・市部1.7倍・町村2倍の見込み（日経xTECH）</p>
-          </div>
-        </div>
         <p className="text-xs text-gray-400 mt-3">
           ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
         </p>
