@@ -30,7 +30,6 @@ const NAV_GROUPS = [
     children: [
       { href: "/packages",  label: "パッケージ", desc: "" },
       { href: "/timeline",  label: "スケジュール", desc: "" },
-      { href: "/template",  label: "質問主意書テンプレ", desc: "" },
       { href: "/sources",   label: "出典", desc: "" },
     ],
   },
@@ -70,7 +69,6 @@ const DRAWER_SECTIONS = [
     items: [
       { href: "/packages",  label: "パッケージ" },
       { href: "/timeline",  label: "スケジュール" },
-      { href: "/template",  label: "質問主意書テンプレ" },
       { href: "/sources",   label: "出典" },
     ],
   },
