@@ -565,8 +565,6 @@ export default async function CloudPage() {
                       <span className="text-xs font-extrabold px-2 py-0.5 rounded" style={{ backgroundColor: style.color + "20", color: style.color }}>
                         {cloud}
                       </span>
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{vendors.length}社</span>
-                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>— {note}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {vendors.map((name) => (
