@@ -17,7 +17,6 @@ const NAV_GROUPS = [
     children: [
       { href: "/costs",    label: "コスト分析", desc: "移行コストの実態と要因" },
       { href: "/cloud",    label: "クラウドコスト比較", desc: "" },
-      { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・無料PDF診断" },
     ],
   },
   { label: "スケジュール", short: "日程", href: "/timeline" },
