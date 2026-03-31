@@ -357,6 +357,42 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     notes: "ベンダー公式の最新価格ページ",
   },
 
+  // データ主権・法的リスク
+  "doj-fisa702": {
+    id: "doj-fisa702",
+    name: "FISA Section 702 Collection（外国情報監視法702条）",
+    org: "U.S. Department of Justice",
+    url: "https://www.justice.gov/nsd/surveillance-collection-foreign-intelligence-information",
+    description: "米国司法省によるFISA 702条の公式説明。米国政府が非米国人のデータを裁判所命令なしに収集できる根拠。ガグオーダー（非開示命令）制度を含む。",
+    category: "government",
+    lastAccessed: "2026-03-31",
+    dataMonth: null,
+    confidence: "official",
+  },
+  "pclob-fisa702-report": {
+    id: "pclob-fisa702-report",
+    name: "PCLOB Report on Section 702 and EO 12333",
+    org: "Privacy and Civil Liberties Oversight Board (PCLOB)",
+    url: "https://www.pclob.gov/library/702-Report.pdf",
+    description: "大統領令12333号（EO 12333）によるNSAのバルクデータ収集の実態を分析した独立監視機関報告書。スノーデン事件（2013年）で明らかになった手法の公式評価。",
+    category: "research",
+    lastAccessed: "2026-03-31",
+    dataMonth: null,
+    confidence: "official",
+  },
+  "french-senate-microsoft-2025": {
+    id: "french-senate-microsoft-2025",
+    name: "フランス上院デジタル委員会報告書（Microsoft証言 2025年6月）",
+    org: "フランス上院（Sénat français）",
+    url: "https://www.senat.fr/rap/r24-510/r24-510.html",
+    description: "Microsoft代表がフランス上院の調査に対し「米国法の要求があればデータへのアクセスを保証できない」と証言。GDPRとCLOUD法の両立不可能性を公式認定。",
+    category: "government",
+    lastAccessed: "2026-03-31",
+    dataMonth: "2025-06",
+    confidence: "official",
+    notes: "外資CSPのデータ主権リスクの象徴的事例。引用時は「フランス上院への証言（2025年6月）」と明記",
+  },
+
   // 研究機関
   "iais": {
     id: "iais",
@@ -514,7 +550,7 @@ export const PAGE_SOURCES: Record<string, string[]> = {
   dashboard: ["soumu-progress-excel", "digital-cho-tokutei"],
   costs:     ["digital-cho-senkou-tco", "chukakushi-survey-2025", "digital-cho-cost-measures-detail", "cas-digital-gyozai-wt3", "digital-cho-tca-2022", "grok-web-survey", "vendor-press"],
   costReduction: ["digital-cho-cost-measures-2025-06", "digital-cho-senkou-tco", "chukakushi-survey-2025", "oracle-network-pricing", "aws-ec2-pricing", "azure-bandwidth-pricing", "sakura-cloud-pricing"],
-  cloud:     ["digital-cho-senkou-infra", "applic-products", "oracle-tco", "gartner-iaas", "vendor-press", "grok-web-survey", "digital-cho-vendor-verification-r6", "digital-cho-vendor-verification-r6-data", "lgsys-conformance-gokaku"],
+  cloud:     ["digital-cho-senkou-infra", "applic-products", "oracle-tco", "gartner-iaas", "vendor-press", "grok-web-survey", "digital-cho-vendor-verification-r6", "digital-cho-vendor-verification-r6-data", "lgsys-conformance-gokaku", "doj-fisa702", "pclob-fisa702-report", "french-senate-microsoft-2025"],
   packages:  ["applic-tekigo-excel", "applic-products", "vendor-press"],
   adoption:  ["vendor-press", "grok-web-survey"],
   risks:     ["soumu-progress-excel"],

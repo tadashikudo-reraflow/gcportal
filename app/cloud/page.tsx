@@ -12,7 +12,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド基盤分析（AWS/Azure/GCP/OCI）| ガバメントクラウド移行状況ダッシュボード",
+  title: "ガバクラ比較（AWS/Azure/GCP/OCI/さくら）| ガバメントクラウド移行状況ダッシュボード",
   description: "認定クラウドごとのインフラシェア、対応ベンダー、コスト目安を整理。",
   alternates: { canonical: "/cloud" },
 };
@@ -45,40 +45,14 @@ const CLOUD_CONFIG: Record<string, {
 };
 const CLOUD_ORDER = ["AWS", "OCI", "Azure", "GCP", "Sakura"];
 
-// ベンダー公式サイト（vendor.id → URL）
-const VENDOR_WEBSITES: Record<string, string> = {
-  "1":  "https://www.tkc.jp/",
-  "2":  "https://jpn.nec.com/",
-  "3":  "https://www.fujitsu.com/jp/group/fjj/",
-  "4":  "https://www.hitachi-systems.com/",
-  "5":  "https://www.gyosei-system.co.jp/",
-  "7":  "https://www.ines.co.jp/",
-  "8":  "https://www.gcom.co.jp/",
-  "9":  "https://www.rkkcs.co.jp/",
-  "10": "https://www.den-san.co.jp/",
-  "11": "https://www.gcc.co.jp/",
-  "12": "https://www.jip.co.jp/",
-  "13": "https://www.k-js.co.jp/",
-  "14": "https://www.nttdata.com/jp/",
-  "15": "https://www.dsknet.co.jp/",
-  "16": "https://www.iacnet.co.jp/",
-  "17": "https://www.e-sannet.co.jp/",
-  "18": "https://www.ryomo.co.jp/",
-  "19": "https://www.ics.co.jp/",
-  "20": "https://www.intec.co.jp/",
-  "21": "https://www.ryobi.co.jp/",
-  "22": "https://www.sbs-infosys.co.jp/",
-  "23": "https://www.oec.co.jp/",
-  "24": "https://www.n-computer.co.jp/",
-};
 
 // クラウド別コスト比較
 const COST_COMPARE = [
   {
     item: "処理能力（4コア / メモリ16GB）",
     unit: "USD/月",
-    aws: 180, azure: 170, gcp: 160, oci: 56, sakura: null,
-    note: "OCI E4.Flex vs AWS m6i.xlarge 相当",
+    aws: 180, azure: 170, gcp: 160, oci: 56, sakura: 125,
+    note: "OCI E4.Flex vs AWS m6i.xlarge 相当。さくら: 石狩リージョン高火力プラン参考値",
   },
   {
     item: "オブジェクトストレージ（1TB）",
@@ -93,10 +67,10 @@ const COST_COMPARE = [
     note: "OCI: 月10TBまで無料",
   },
   {
-    item: "総費用の目安",
+    item: "総費用の目安（TCO指標）",
     unit: "AWS=100",
     aws: 100, azure: 95, gcp: 90, oci: 55, sakura: 70,
-    note: "Oracle公式調査・デジタル庁検証資料より。参考値。",
+    note: "デジタル庁・Oracle公式調査より。割引・転送料・ライセンス等を含む総合TCO。上記3項目の単純合計とは異なる",
   },
 ];
 
@@ -111,31 +85,6 @@ type VendorInfo = {
   notes: string | null;
 };
 
-// notesテキスト内のURLをリンクに変換
-function NotesWithLinks({ notes }: { notes: string }) {
-  const urlRegex = /(https?:\/\/[^\s,、。）)]+)/g;
-  const parts = notes.split(urlRegex);
-  return (
-    <>
-      {parts.map((part, i) =>
-        /^https?:\/\//.test(part) ? (
-          <a
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline break-all"
-            style={{ color: "#2563eb" }}
-          >
-            {part}
-          </a>
-        ) : (
-          <span key={i}>{part}</span>
-        )
-      )}
-    </>
-  );
-}
 
 type PackageRow = {
   package_name: string;
@@ -187,43 +136,25 @@ export default async function CloudPage() {
     );
   }
 
-  const totalVendors = new Set(
-    Object.values(cloudVendors).flatMap((entries) => entries.map((e) => e.vendor.id))
-  ).size;
-  const totalPackages = Object.values(cloudVendors).reduce(
-    (s, entries) => s + entries.reduce((ss, e) => ss + e.packages.length, 0), 0
-  );
-
   return (
     <div className="space-y-8">
       {/* パンくず + ページヘッダー */}
-      <Breadcrumb items={[{ label: "クラウド基盤分析" }]} />
+      <Breadcrumb items={[{ label: "ガバメントクラウド比較" }]} />
       <div className="pb-2">
-        <h1 className="page-title">クラウド基盤分析</h1>
+        <h1 className="page-title">ガバメントクラウド比較</h1>
         <p className="page-subtitle">
-          認定クラウドごとの対応ベンダー・パッケージとコスト目安
+          認定5CSPの機能・コスト・割引モデルを比較
         </p>
       </div>
 
       {/* サマリーバー */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="card p-4 text-center">
-          <p className="text-2xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-primary)" }}>
-            {Object.keys(CLOUD_CONFIG).length}
-          </p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>認定クラウド</p>
-        </div>
-        <div className="card p-4 text-center">
-          <p className="text-2xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-            {totalVendors || "—"}
-          </p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>対応ベンダー</p>
-        </div>
-        <div className="card p-4 text-center">
-          <p className="text-2xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-            {totalPackages || "—"}
-          </p>
-          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>パッケージ数</p>
+      <div className="card p-5">
+        <div className="flex items-center gap-4">
+          <p className="text-5xl font-black tabular-nums" style={{ color: "var(--color-brand-primary)" }}>5</p>
+          <div>
+            <p className="text-base font-bold text-gray-800 leading-snug">デジタル庁認定クラウドサービス</p>
+            <p className="text-sm text-gray-500 mt-0.5">AWS・Azure・GCP・OCI・さくらクラウドの5基盤が対象</p>
+          </div>
         </div>
       </div>
 
@@ -310,7 +241,7 @@ export default async function CloudPage() {
           <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ標準システム規模での比較</span>
         </h2>
         <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          各社公式料金表ベースの参考値。実費は構成で変動します。
+          デジタル庁・Oracle公式調査より。割引・転送料等を含む総合TCO指標（参考値）。
         </p>
 
         {/* TCO指数バーチャート（ビジュアル） */}
@@ -339,89 +270,8 @@ export default async function CloudPage() {
               );
             })}
           </div>
-          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-            Oracle公式調査・デジタル庁検証資料より。参考値。
-          </p>
         </div>
 
-        {/* OCI注記 */}
-        <div className="rounded-lg px-4 py-3 mb-4 flex items-start gap-3" style={{ backgroundColor: "#fff8f8", border: "1.5px solid #F8000040" }}>
-          <span className="text-sm flex-shrink-0 mt-0.5" style={{ color: "#F80000" }}>&#9432;</span>
-          <div>
-            <p className="text-xs font-bold" style={{ color: "#F80000" }}>参考比較ではOCIが低コスト側に出やすい</p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-              通信費と料金体系の差が効きやすい。札幌市は2025年4月にOCI採用を公表。
-            </p>
-          </div>
-        </div>
-
-        {/* 詳細テーブル（折りたたみ） */}
-        <details className="group">
-          <summary className="cursor-pointer text-xs font-semibold py-2 flex items-center gap-1" style={{ color: "var(--color-brand-primary)" }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="transition-transform group-open:rotate-90"><polyline points="9 6 15 12 9 18" /></svg>
-            項目別の詳細比較を見る
-          </summary>
-          <div className="overflow-x-auto mt-2">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">項目</th>
-                  {(["AWS", "Azure", "GCP", "OCI", "Sakura"] as const).map((id) => {
-                    const cfg = CLOUD_CONFIG[id];
-                    return (
-                      <th key={id} className="text-right py-2 px-2 text-xs font-bold" style={{ color: cfg.color }}>
-                        {id}
-                      </th>
-                    );
-                  })}
-                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-normal hidden md:table-cell">備考</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COST_COMPARE.map((row) => {
-                  const vals = [row.aws, row.azure, row.gcp, row.oci, row.sakura].filter((v): v is number => v !== null);
-                  const minVal = Math.min(...vals);
-                  return (
-                    <tr key={row.item} className="border-b border-gray-100">
-                      <td className="py-2.5 px-3 text-xs text-gray-600 leading-tight">
-                        {row.item}
-                        <br /><span className="text-gray-400">{row.unit}</span>
-                      </td>
-                      {[
-                        { id: "AWS",    val: row.aws },
-                        { id: "Azure",  val: row.azure },
-                        { id: "GCP",    val: row.gcp },
-                        { id: "OCI",    val: row.oci },
-                        { id: "Sakura", val: row.sakura },
-                      ].map(({ id, val }) => {
-                        const cfg = CLOUD_CONFIG[id];
-                        const isCheapest = val !== null && val === minVal;
-                        return (
-                          <td key={id} className="py-2.5 px-2 text-right tabular-nums">
-                            {val === null ? (
-                              <span className="text-gray-300 text-xs">—</span>
-                            ) : (
-                              <span
-                                className={`font-bold text-sm ${isCheapest ? "px-1.5 py-0.5 rounded" : ""}`}
-                                style={{
-                                  color: isCheapest ? cfg.color : "var(--color-text-secondary)",
-                                  backgroundColor: isCheapest ? cfg.color + "18" : "transparent",
-                                }}
-                              >
-                                {val}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                      <td className="py-2.5 px-3 text-xs text-gray-400 max-w-xs leading-relaxed hidden md:table-cell">{row.note}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </details>
 
         {/* 料金計算ツールリンク */}
         <div className="mt-3 flex flex-wrap gap-2">
@@ -438,257 +288,318 @@ export default async function CloudPage() {
             </a>
           ))}
         </div>
-      </div>
 
-      {/* ① クラウド別ベンダー・パッケージ一覧（メイン） */}
-      <div>
-        <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
-          クラウド別 対応ベンダー一覧
-        </h2>
-
-        <div className="space-y-5">
-          {CLOUD_ORDER.map((cloudKey) => {
-            const cfg = CLOUD_CONFIG[cloudKey];
-            const entries = cloudVendors[cloudKey] ?? [];
-            const pkgCount = entries.reduce((s, e) => s + e.packages.length, 0);
-
-            return (
-              <div
-                key={cloudKey}
-                className="rounded-xl overflow-hidden"
-                style={{ border: `2px solid ${cfg.color}30` }}
-              >
-                {/* クラウドヘッダー */}
-                <div
-                  className="px-4 py-3 flex items-center justify-between"
-                  style={{ backgroundColor: cfg.bgColor, borderBottom: `2px solid ${cfg.color}30` }}
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="text-base font-extrabold"
-                      style={{ color: cfg.color }}
-                    >
-                      {cloudKey}
-                    </span>
-                    <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-                      {cfg.label}
-                    </span>
-                    {cloudKey === "Sakura" && (
-                      <>
-                        <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                          style={{ backgroundColor: "#e2004b20", color: "#e2004b" }}>国産</span>
-                        <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold"
-                          style={{ backgroundColor: "#dcfce7", color: "#15803d" }}>本番提供中</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
-                    <span>{cfg.certYear}年認定</span>
-                    <span>インフラ {cfg.infraPct}</span>
-                    {entries.length > 0 && (
-                      <span
-                        className="px-2 py-0.5 rounded-full font-semibold"
-                        style={{ backgroundColor: cfg.color + "20", color: cfg.color }}
-                      >
-                        {entries.length}社 / {pkgCount}パッケージ
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* ベンダー一覧 */}
-                {entries.length === 0 ? (
-                  <div className="px-4 py-5 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
-                    登録済みデータなし
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {entries.slice(0, 5).map(({ vendor, packages: pkgs }) => {
-                      const displayName = vendor.short_name ?? vendor.name;
+        {/* 割引モデル比較 */}
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          <p className="text-xs font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>割引モデル比較</p>
+          <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>自治体調達で使いやすい割引プランの比較（2026年3月時点・公式情報ベース）</p>
+          <div className="overflow-x-auto -mx-2 px-2">
+            <table className="w-full text-sm" style={{ minWidth: 560 }}>
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500 w-28">比較項目</th>
+                  {CLOUD_ORDER.map((id) => (
+                    <th key={id} className="text-center py-2 px-2 text-xs font-bold whitespace-nowrap" style={{ color: CLOUD_CONFIG[id].color }}>
+                      {id === "Sakura" ? "さくら" : id}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    item: "総費用目安（割引込）",
+                    vals: ["100", "55", "95", "90", "70"],
+                    highlight: ["55"],
+                  },
+                  {
+                    item: "1年割引目安",
+                    vals: ["約40〜55%", "非公開", "約40〜60%", "約20〜30%", "約10〜20%"],
+                  },
+                  {
+                    item: "コミット対象",
+                    vals: ["リソース単位", "全サービス共通", "リソース単位", "リソース単位", "リソース単位"],
+                    highlight: ["全サービス共通"],
+                  },
+                  {
+                    item: "課金通貨",
+                    vals: ["ドル", "円", "ドル", "ドル", "円"],
+                    highlight: ["円"],
+                  },
+                  {
+                    item: "自治体向け評価",
+                    vals: ["▲", "⚪︎", "▲", "▲", "⚪︎"],
+                    highlight: ["⚪︎"],
+                  },
+                ].map((row) => (
+                  <tr key={row.item} className="border-b border-gray-100">
+                    <td className="py-2 px-2 text-xs font-medium text-gray-700 whitespace-nowrap">{row.item}</td>
+                    {row.vals.map((val, i) => {
+                      const isHighlight = row.highlight?.includes(val);
                       return (
-                        <details key={vendor.id} className="group">
-                          <summary
-                            className="flex items-center justify-between px-4 py-3.5 cursor-pointer select-none hover:bg-gray-50 list-none"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              {/* ベンダー名 */}
-                              <span className="font-semibold text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
-                                {displayName}
-                              </span>
-                              {vendor.short_name && (
-                                <span className="text-xs hidden sm:inline truncate" style={{ color: "var(--color-text-muted)" }}>
-                                  {vendor.name}
-                                </span>
-                              )}
-                              {/* マルチテナント */}
-                              {vendor.multitenancy && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
-                              )}
-                              {/* 移行予定 / 未確認バッジ */}
-                              {!vendor.cloud_confirmed && vendor.cloud_platform && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: "#fef3c7", color: "#92400e", border: "1px solid #d97706" }}>移行予定</span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 flex-shrink-0 ml-2">
-                              {/* 自治体数 */}
-                              {vendor.municipality_count != null && (
-                                <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-                                  {vendor.municipality_count.toLocaleString()}自治体
-                                </span>
-                              )}
-                              {/* PKG数バッジ */}
-                              {pkgs.length > 0 && (
-                                <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
-                                  {pkgs.length} パッケージ
-                                </span>
-                              )}
-                              {/* 展開矢印 */}
-                              <span className="text-gray-400 text-xs transition-transform group-open:rotate-90">▶</span>
-                            </div>
-                          </summary>
-
-                          {/* パッケージ一覧 + notes（展開時） */}
-                          <div
-                            className="px-4 pb-4 pt-1"
-                            style={{ backgroundColor: cfg.bgColor + "80" }}
-                          >
-                            {pkgs.length > 0 && (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
-                                {pkgs.map((pkg, i) => (
-                                  <div
-                                    key={i}
-                                    className="flex items-start gap-2 text-sm rounded-lg px-3 py-2"
-                                    style={{ backgroundColor: "white", border: `1px solid ${cfg.color}20` }}
-                                  >
-                                    <span
-                                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5"
-                                      style={{ backgroundColor: cfg.color }}
-                                    />
-                                    <div className="min-w-0">
-                                      <p className="font-medium text-sm leading-snug" style={{ color: "var(--color-text-primary)" }}>
-                                        {pkg.package_name}
-                                      </p>
-                                      {pkg.business && (
-                                        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                                          {pkg.business}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {/* 公式サイト + notes / 出典 */}
-                            <div className="flex flex-wrap items-start gap-3 mt-1">
-                              {VENDOR_WEBSITES[vendor.id] && (
-                                <a
-                                  href={VENDOR_WEBSITES[vendor.id]}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
-                                  style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}
-                                >
-                                  公式サイト ↗
-                                </a>
-                              )}
-                              {vendor.notes && (
-                                <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
-                                  <NotesWithLinks notes={vendor.notes} />
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </details>
+                        <td key={i} className="py-2 px-2 text-center text-xs" style={{
+                          color: isHighlight ? "#15803d" : "var(--color-text-secondary)",
+                          fontWeight: isHighlight ? 600 : 400,
+                        }}>
+                          {val}
+                        </td>
                       );
                     })}
-                    {entries.length > 5 && (
-                      <details className="group">
-                        <summary className="flex items-center justify-center px-4 py-2.5 cursor-pointer select-none hover:bg-gray-50 list-none text-xs font-semibold gap-1" style={{ color: cfg.color }}>
-                          <span className="group-open:hidden">他 {entries.length - 5}社を表示 ▼</span>
-                          <span className="hidden group-open:inline">閉じる ▲</span>
-                        </summary>
-                        <div className="divide-y divide-gray-100">
-                          {entries.slice(5).map(({ vendor, packages: pkgs }) => {
-                            const displayName = vendor.short_name ?? vendor.name;
-                            return (
-                              <details key={vendor.id} className="group/inner">
-                                <summary
-                                  className="flex items-center justify-between px-4 py-3.5 cursor-pointer select-none hover:bg-gray-50 list-none"
-                                >
-                                  <div className="flex items-center gap-3 min-w-0">
-                                    <span className="font-semibold text-sm truncate" style={{ color: "var(--color-text-primary)" }}>
-                                      {displayName}
-                                    </span>
-                                    {vendor.short_name && (
-                                      <span className="text-xs hidden sm:inline truncate" style={{ color: "var(--color-text-muted)" }}>
-                                        {vendor.name}
-                                      </span>
-                                    )}
-                                    {vendor.multitenancy && (
-                                      <span className="text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0"
-                                        style={{ backgroundColor: "#00703c20", color: "#00703c" }}>マルチ</span>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-3 flex-shrink-0 ml-2">
-                                    {vendor.municipality_count != null && (
-                                      <span className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-                                        {vendor.municipality_count.toLocaleString()}自治体
-                                      </span>
-                                    )}
-                                    {pkgs.length > 0 && (
-                                      <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                                        style={{ backgroundColor: cfg.color + "15", color: cfg.color }}>
-                                        {pkgs.length} パッケージ
-                                      </span>
-                                    )}
-                                    <span className="text-gray-400 text-xs transition-transform group-open/inner:rotate-90">▶</span>
-                                  </div>
-                                </summary>
-                                <div className="px-4 pb-4 pt-1" style={{ backgroundColor: cfg.bgColor + "80" }}>
-                                  {pkgs.length > 0 && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mb-3">
-                                      {pkgs.map((pkg, i) => (
-                                        <div key={i} className="flex items-start gap-2 text-sm rounded-lg px-3 py-2"
-                                          style={{ backgroundColor: "white", border: `1px solid ${cfg.color}20` }}>
-                                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: cfg.color }} />
-                                          <div className="min-w-0">
-                                            <p className="font-medium text-sm leading-snug" style={{ color: "var(--color-text-primary)" }}>{pkg.package_name}</p>
-                                            {pkg.business && <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{pkg.business}</p>}
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                  <div className="flex flex-wrap items-start gap-3 mt-1">
-                                    {VENDOR_WEBSITES[vendor.id] && (
-                                      <a href={VENDOR_WEBSITES[vendor.id]} target="_blank" rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0"
-                                        style={{ backgroundColor: cfg.color + "15", color: cfg.color, border: `1px solid ${cfg.color}40` }}>
-                                        公式サイト ↗
-                                      </a>
-                                    )}
-                                    {vendor.notes && (
-                                      <p className="text-xs leading-relaxed flex-1" style={{ color: "var(--color-text-muted)" }}>
-                                        <NotesWithLinks notes={vendor.notes} />
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </details>
-                            );
-                          })}
-                        </div>
-                      </details>
-                    )}
-                  </div>
-                )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs mt-1 sm:hidden text-gray-400">← 横スクロールで全CSPを表示</p>
+          <p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
+            ※ 割引率は最大値。実際の適用条件は各CSP契約内容・調達方式により異なります。
+          </p>
+
+          {/* 補足：コミットの仕組みの違い */}
+          <div className="mt-5 pt-4 border-t border-gray-100">
+            <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>ガバメントクラウド調達の仕組み</p>
+            <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>自治体はCSPと直接契約しない。デジタル庁が一括調達し、自治体はクラウド利用料を負担</p>
+            <div className="flex flex-col items-center gap-0 text-xs">
+              <div className="flex gap-2 flex-wrap justify-center">
+                {["AWS", "OCI", "Azure", "GCP", "さくら"].map((c) => (
+                  <div key={c} className="rounded-lg px-3 py-1.5 font-bold border text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>{c}</div>
+                ))}
               </div>
-            );
-          })}
+              <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
+                <span className="text-xs">一括調達契約</span>
+                <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              </div>
+              <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "#1a56db" }}>デジタル庁</div>
+              <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
+                <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+                <span className="text-xs">利用権付与・運用管理委託</span>
+              </div>
+              <div className="rounded-xl px-6 py-2 font-bold text-sm" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}>自治体（1,741団体）</div>
+              <p className="mt-3 text-xs text-center" style={{ color: "var(--color-text-muted)" }}>
+                ※ クラウド利用料は自治体負担。ドル建てCSPは円安時にコスト増となり自治体負担が増加。円建て（OCI・さくら）は予算が安定しやすい。
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            <p className="text-xs font-bold" style={{ color: "var(--color-text-primary)" }}>コミットの仕組みの違い</p>
+
+            {/* OCI */}
+            <div className="rounded-lg p-3 border border-red-100 bg-red-50">
+              <p className="text-xs font-bold mb-1" style={{ color: "#c00" }}>OCI（財布型）</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、初期見積もりが過剰だと未使用失効リスクがある。
+              </p>
+            </div>
+
+            {/* 他社 */}
+            <div className="rounded-lg p-3 border border-gray-200 bg-gray-50">
+              <p className="text-xs font-bold mb-1 text-gray-700">AWS / Azure / GCP / さくら（予約型）</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで該当リソースを削減すると余ったコミット分が無駄になる。サービスをまたいだ最適化はできない。
+              </p>
+            </div>
+
+          </div>
         </div>
+      </div>
+
+      {/* データ主権リスク */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>データ主権リスク</h2>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          外資CSPは米国法の域外適用を受ける。自治体データが日本国外に開示されるリスクがある。
+        </p>
+
+        <div className="space-y-3">
+          {/* FISA 702 */}
+          <div className="rounded-lg p-3 border border-orange-200 bg-orange-50">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-xs font-bold" style={{ color: "#c2410c" }}>FISA 702条（外国情報監視法）</p>
+              <a href="https://www.justice.gov/nsd/surveillance-collection-foreign-intelligence-information" target="_blank" rel="noopener noreferrer"
+                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
+                style={{ backgroundColor: "#c2410c18", color: "#c2410c", border: "1px solid #c2410c30" }}>
+                DOJ公式 ↗
+              </a>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              米国政府がAWS・Azure・GCP等の米国企業に対し、<strong>裁判所命令なしに非米国人のデータ提供を命令できる</strong>。
+              ガグオーダー（非開示命令）により、自治体が開示を知ることもできない。クラウド事業者は技術的には要件準拠が契約義務と一体化している。
+            </p>
+          </div>
+
+          {/* EO 12333 */}
+          <div className="rounded-lg p-3 border border-orange-200 bg-orange-50">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-xs font-bold" style={{ color: "#c2410c" }}>大統領令12333号（EO 12333）</p>
+              <a href="https://www.pclob.gov/library/702-Report.pdf" target="_blank" rel="noopener noreferrer"
+                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
+                style={{ backgroundColor: "#c2410c18", color: "#c2410c", border: "1px solid #c2410c30" }}>
+                PCLOB報告書 ↗
+              </a>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              NSAが海外サーバーまたは海底ケーブルを通過するデータを<strong>令状なしにバルク収集</strong>できる根拠法。
+              スノーデン事件（2013年）で具体的手法が明らかになり、欧州・日本でも問題視されている。
+            </p>
+          </div>
+
+          {/* MS仏上院証言 */}
+          <div className="rounded-lg p-3 border border-blue-200 bg-blue-50">
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <p className="text-xs font-bold" style={{ color: "#1d4ed8" }}>Microsoft 仏上院証言（2025年6月）</p>
+              <a href="https://www.senat.fr/rap/r24-510/r24-510.html" target="_blank" rel="noopener noreferrer"
+                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
+                style={{ backgroundColor: "#1d4ed818", color: "#1d4ed8", border: "1px solid #1d4ed830" }}>
+                仏上院公式 ↗
+              </a>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              フランス上院の調査に対し、Microsoft代表が<strong>「米国法の要求があればデータへのアクセスを保証できない」</strong>と証言。
+              GDPRに準拠していても、米国CLOUD法の要求を拒否できないことを公式に認めた。
+            </p>
+          </div>
+
+          {/* 外資 vs さくら対比 */}
+          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="rounded-lg p-3 border border-gray-200 bg-gray-50">
+              <p className="text-xs font-bold mb-1 text-gray-700">外資CSP（AWS / Azure / GCP / OCI）</p>
+              <ul className="space-y-1">
+                {["米国FISA 702条・EO12333の域外適用あり", "米国政府からのデータ開示要求を拒否できない", "ガグオーダーで自治体への通知も不可"].map(r => (
+                  <li key={r} className="text-xs flex gap-1.5 text-gray-600"><span className="text-red-500 shrink-0 mt-0.5">✗</span>{r}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-lg p-3 border border-pink-200 bg-pink-50">
+              <p className="text-xs font-bold mb-1" style={{ color: "#e4007f" }}>さくらのクラウド（国産）</p>
+              <ul className="space-y-1">
+                {["日本法人・国内DCのみで運営", "米国域外適用法の対象外", "データが国外に転送されない構造"].map(r => (
+                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}><span style={{ color: "#e4007f" }} className="shrink-0 mt-0.5">✓</span>{r}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            ※ 現状のガバメントクラウドは外資CSPが大多数。データ主権リスクを許容した上で調達しているとも言える。住民基本台帳等の機微データを扱う場合は特に要考慮。
+          </p>
+        </div>
+      </div>
+
+      {/* 自治体向け CSP 採用ポイント */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント</h2>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>コスト・運用・調達の観点から、各CSPの特徴と向いているケースをまとめました</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            {
+              name: "AWS", color: "#FF9900", bg: "#fffbf0", border: "#ffe0a0",
+              points: ["パッケージベンダー対応数が最多・実績豊富", "コミュニティ・事例・ドキュメントが最も充実", "設定・予測管理が複雑。専任担当者が必要"],
+              fit: "IT体制が整った中〜大規模自治体",
+            },
+            {
+              name: "OCI", color: "#c00", bg: "#fff5f5", border: "#fecaca",
+              points: ["財布型でサービス横断の最適化を進めやすい", "円建て・転送料無料でコスト予測が立てやすい"],
+              fit: "単年予算・管理負担を最小にしたい自治体",
+            },
+            {
+              name: "Azure", color: "#0078d4", bg: "#f0f7ff", border: "#bfdbfe",
+              points: ["Microsoft 365・AD・Teamsとの統合が強み", "庁内系システムとの連携で本領発揮"],
+              fit: "Microsoft製品を庁内で広く使っている自治体",
+            },
+            {
+              name: "GCP", color: "#4285f4", bg: "#f0f4ff", border: "#bfcfff",
+              points: ["Vertex AI / Gemini でAI活用が最も容易", "Google Workspace との深い統合", "ガバクラ採用実績は少数（国内シェア0.7%）"],
+              fit: "AI活用を積極的に推進したい自治体",
+            },
+            {
+              name: "さくら", color: "#e4007f", bg: "#fff0f7", border: "#fbcfe8",
+              points: ["国産クラウド・国内DC・ガバメントクラウド正式採択（国産初）", "データ主権・運用主権を国内で完結できる", "データ転送無料・円建て・シンプルな契約体系"],
+              fit: "データ主権・国内法準拠・運用のシンプルさを重視する自治体",
+            },
+          ].map(({ name, color, bg, border, points, fit }) => (
+            <div key={name} className="rounded-xl p-4 border" style={{ backgroundColor: bg, borderColor: border }}>
+              <p className="text-base font-bold mb-2" style={{ color }}>{name}</p>
+              <ul className="space-y-1 mb-3">
+                {points.map((p) => (
+                  <li key={p} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="mt-0.5 shrink-0" style={{ color }}>•</span>{p}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs rounded-lg px-2 py-1.5 font-medium" style={{ backgroundColor: color + "18", color }}>
+                ✓ {fit}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* クラウド別 主要ベンダー */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
+          クラウド別 主要ベンダー
+        </h2>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          各CSPを採用している主要ベンダー
+        </p>
+
+        {(() => {
+          const VENDOR_BY_CLOUD: { cloud: string; note: string; vendors: string[] }[] = [
+            { cloud: "AWS",  note: "国内シェア97%。標準化パッケージの大多数が対応", vendors: ["富士通", "NEC", "Gcom", "日立", "電算", "TKC", "アイネス", "JIP"] },
+            { cloud: "OCI",  note: "円建て・転送料無料。コスト重視の自治体が採用増", vendors: ["RKKCS", "GCC"] },
+          ];
+
+          const CLOUD_COLORS: Record<string, { color: string; bg: string }> = {
+            AWS: { color: "#FF9900", bg: "#fff8f0" },
+            OCI: { color: "#F80000", bg: "#fff8f8" },
+          };
+
+          return (
+            <div className="space-y-3">
+              {VENDOR_BY_CLOUD.map(({ cloud, note, vendors }) => {
+                const style = CLOUD_COLORS[cloud] ?? { color: "#6b7280", bg: "#f9fafb" };
+                return (
+                  <div key={cloud} className="rounded-lg border p-3" style={{ borderColor: style.color + "25", backgroundColor: style.bg }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-extrabold px-2 py-0.5 rounded" style={{ backgroundColor: style.color + "20", color: style.color }}>
+                        {cloud}
+                      </span>
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{vendors.length}社</span>
+                      <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>— {note}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {vendors.map((name) => (
+                        <span key={name} className="text-xs px-2 py-0.5 rounded border bg-white" style={{ borderColor: style.color + "30", color: "var(--color-text-primary)" }}>
+                          {name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* 対応ベンダー・パッケージへの導線 */}
+      <div className="rounded-xl border border-gray-200 px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            対応ベンダー・パッケージの詳細
+          </p>
+          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+            ベンダー別の採用団体数・コスト因子・業務別パッケージ一覧
+          </p>
+        </div>
+        <Link
+          href="/packages"
+          className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ backgroundColor: "var(--color-brand-primary)", color: "#ffffff", textDecoration: "none" }}
+        >
+          パッケージ・ベンダー一覧 →
+        </Link>
       </div>
 
       {/* 免責事項 */}
@@ -714,22 +625,13 @@ export default async function CloudPage() {
             基盤比較だけでなく、移行済み最適化と未移行見直しの整理、全体レポートへの導線も用意しています。
           </p>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Link
-            href="/finops"
-            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
-          >
-            FinOps コスト最適化ハブ
-          </Link>
-          <Link
-            href="/finops#pdf"
-            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
-          >
-            無料PDFを受け取る
-          </Link>
-        </div>
+        <Link
+          href="/finops"
+          className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
+        >
+          FinOps コスト最適化ハブ →
+        </Link>
       </div>
 
       {/* 出典・データソース */}
@@ -742,84 +644,6 @@ export default async function CloudPage() {
         description="クラウド比較だけでなく、進捗、コスト、遅延構造までまとめた無料レポートを受け取れます。"
       />
 
-      {/* マルチCSP間通信の検証結果 */}
-      <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          マルチCSP間通信の検証結果
-        </h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          令和6年度検証事業で実施されたCSP間接続の検証結果（2026年3月27日公開）
-        </p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">接続パターン</th>
-                <th className="text-center py-2 px-3 text-xs text-gray-500 font-medium">検証結果</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">手法</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-400 font-normal hidden md:table-cell">備考</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  pattern: "AWS ↔ Azure",
-                  result: "✅ 成功",
-                  method: "Transit Gateway + Site-to-Site VPN",
-                  note: "NECネクサソリューションズが検証",
-                  success: true,
-                },
-                {
-                  pattern: "AWS ↔ OCI",
-                  result: "✅ 成功",
-                  method: "サイト間VPN接続",
-                  note: "アイネス、日本コンピューターが検証",
-                  success: true,
-                },
-                {
-                  pattern: "AWS ↔ AWS（異アカウント）",
-                  result: "✅ 成功",
-                  method: "VPCピアリング / Transit Gateway",
-                  note: "共同利用方式の基本パターン",
-                  success: true,
-                },
-                {
-                  pattern: "GMCN（政府共通ネットワーク）",
-                  result: "🔄 実証中",
-                  method: "専用線接続",
-                  note: "本番環境での検証を継続中",
-                  success: false,
-                },
-              ].map((row) => (
-                <tr key={row.pattern} className="border-b border-gray-100">
-                  <td className="py-2.5 px-3 text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>
-                    {row.pattern}
-                  </td>
-                  <td className="py-2.5 px-3 text-center">
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-semibold"
-                      style={
-                        row.success
-                          ? { backgroundColor: "#dcfce7", color: "#15803d" }
-                          : { backgroundColor: "#dbeafe", color: "#1d4ed8" }
-                      }
-                    >
-                      {row.result}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-3 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    {row.method}
-                  </td>
-                  <td className="py-2.5 px-3 text-xs text-gray-400 hidden md:table-cell">{row.note}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
-          出典: 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書
-        </p>
-      </div>
 
       <PageNavCards exclude="/cloud" />
       <RelatedArticles cluster={CLUSTERS.tech} />
