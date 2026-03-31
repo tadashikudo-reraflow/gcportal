@@ -471,6 +471,11 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   padding: 2.5rem 3rem;
 }
+@media (min-width: 1024px) {
+  .hero-inner {
+    padding: 3.5rem 4rem;
+  }
+}
 @media (max-width: 640px) {
   .hero-inner {
     padding: 1.5rem 1.25rem;
@@ -483,14 +488,11 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.75rem;
 }
 .hero-headline {
-  font-size: 2.25rem;
+  font-size: clamp(2.25rem, 4vw, 4.5rem);
   font-weight: 800;
   color: var(--color-text-primary);
-  line-height: 1.35;
+  line-height: 1.25;
   margin-bottom: 0.75rem;
-}
-@media (min-width: 1024px) {
-  .hero-headline { font-size: 3rem; }
 }
 @media (max-width: 768px) {
   .hero-headline { font-size: 1.75rem; }
@@ -508,7 +510,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5rem;
 }
 @media (min-width: 1024px) {
-  .hero-sub { font-size: 1.125rem; }
+  .hero-sub { font-size: 1.25rem; }
 }
 .hero-sub strong {
   color: var(--color-text-primary);
@@ -674,7 +676,17 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 1.5rem;
 }
 @media (min-width: 1024px) {
-  .three-metrics-value { font-size: 2rem; }
+  .three-metrics-value { font-size: 2.25rem; }
+}
+.three-metrics-donut {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .three-metrics-donut {
+    transform: scale(1.4);
+    transform-origin: center center;
+    margin: 1rem 0;
+  }
 }
 .three-metrics-card {
   background: #FFFFFF;
@@ -685,6 +697,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .three-metrics-header {
   padding: 1.25rem 1.5rem 1rem;
+}
+@media (min-width: 1024px) {
+  .three-metrics-header { padding: 1.75rem 2rem 1.25rem; }
 }
 .three-metrics-grid {
   display: grid;

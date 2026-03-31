@@ -112,7 +112,7 @@ export default function ThreeMetricsWidget({
           <div key={m.label} className="three-metrics-item">
             <div className="flex flex-col items-center gap-3">
               {/* Donut */}
-              <div className="relative">
+              <div className="relative three-metrics-donut">
                 <DonutRing pct={m.pct} color={m.color} trackColor={m.trackColor} size={120} strokeWidth={12} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   {/* #7 数字を超大型化 */}
