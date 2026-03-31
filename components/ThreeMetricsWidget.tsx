@@ -135,7 +135,7 @@ export default function ThreeMetricsWidget({
                   <span className="text-sm lg:text-base font-semibold" style={{ color: m.color }}>{m.label}</span>
                   {m.badge && (
                     <span
-                      className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-semibold"
+                      className="text-xs px-1.5 py-0.5 rounded font-semibold"
                       style={{ backgroundColor: m.badgeBg ?? "#f3f4f6", color: m.badgeColor }}
                     >
                       {m.badge}
