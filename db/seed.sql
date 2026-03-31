@@ -13,8 +13,8 @@ ON CONFLICT DO NOTHING;
 -- コストレポート初期データ（既知の調査結果）
 -- municipality_idは自治体マスタ投入後に更新
 INSERT INTO cost_reports (municipality_id, vendor_id, change_ratio, scope, source_url, reported_year, notes) VALUES
-(null, null, 0.920, 'municipality', 'https://www.digital.go.jp/policies/local_governments/government-cloud-interim-report', 2024, '岩手県盛岡市 8%削減（好事例）'),
-(null, null, 1.600, 'city_group',   'https://www.soumu.go.jp', 2025, '東京都特別区平均 1.6倍増'),
-(null, null, 2.300, 'city_group',   'https://www.soumu.go.jp', 2025, '中核市平均 2.3倍増（中核市市長会調査 2025/1）'),
-(null, null, 5.700, 'city_group',   'https://www.soumu.go.jp', 2025, '中核市最悪事例 5.7倍増')
+(null, null, 0.920, '個別自治体',     'https://www.digital.go.jp/policies/local_governments/government-cloud-interim-report', 2024, '岩手県盛岡市 8%削減（好事例）'),
+(null, null, 1.600, '東京都特別区',   'https://www.soumu.go.jp', 2025, '東京都特別区平均 1.6倍増'),
+(null, null, 2.300, '中核市平均',     'https://www.soumu.go.jp', 2025, '中核市平均 2.3倍増（中核市市長会調査 2025/1）'),
+(null, null, 5.700, '中核市最悪事例', 'https://www.soumu.go.jp', 2025, '中核市最悪事例 5.7倍増')
 ON CONFLICT DO NOTHING;

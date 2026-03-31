@@ -7,7 +7,7 @@ import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
-import { ExpandableCostCard, VendorCard } from "./CostClientComponents";
+import { ExpandableCostCard } from "./CostClientComponents";
 import Breadcrumb from "@/components/Breadcrumb";
 
 // ベンダー別コスト変化推定レンジ（公開TCO調査・先行事業報告から）
@@ -108,124 +108,6 @@ function toPercent(ratio: number): string {
   if (ratio < 1.0) return `−${((1 - ratio) * 100).toFixed(0)}%`;
   return `+${((ratio - 1) * 100).toFixed(0)}%`;
 }
-
-// ベンダー別評価（出典: 公式プレスリリース・自治体資料・デジタル庁報告書）
-// costFactors: 課金通貨・転送料・移行実績の3軸を事実値で表示
-const vendorEvaluations: Record<string, {
-  label: string; detail: string; mark: string; markColor: string; cloud: string; confirmed: boolean;
-  costTags?: string[];
-  costFactors?: { label: string; value: string; highlight?: boolean; caution?: boolean }[];
-}> = {
-  TKC: {
-    label: "", detail: "マルチテナント共同利用モデルで複数自治体が同一基盤を利用（TKC公式）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "提供モデル", value: "共同利用", highlight: true },
-    ],
-  },
-  NEC: {
-    label: "", detail: "住民・税務系はAWS主軸。GPRIME行政経営のみOCI対応（NEC公式 2024/10）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  富士通: {
-    label: "", detail: "MICJET on AWS。複数自治体で移行遅延が報告されており追加費用事例あり（総務省ヒアリング等）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "複数報告", caution: true },
-    ],
-  },
-  RKKCS: {
-    label: "", detail: "OCI採用。円建て課金・データ転送料月10TBまで無料（日本オラクル公式）。札幌市が2025年4月に32業務OCI移行を発表（RKKCS・日本オラクル共同プレスリリース）",
-    mark: "", markColor: "", cloud: "OCI", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "円建て", highlight: true },
-      { label: "転送料無料枠", value: "月10TBまで", highlight: true },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  日立: {
-    label: "", detail: "ADWORLD全20業務AWS対応確認済。Azure主要8業務も検証済（日立システムズ 2024/8プレスリリース）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  アイネス: {
-    label: "", detail: "倉敷市・町田市等でAWS稼働実績。WebRings福祉総合システム標準化対応済（アイネス公式）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  Gcom: {
-    label: "", detail: "Acrocity/GRAP等をAWS基盤で提供。ガバメントクラウド対応を推進中（Gcom公式採用情報）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  電算: {
-    label: "", detail: "Reams（総合行政情報システム）をAWSガバメントクラウドへ移行。北海道芽室町等2026年2月稼働予定（電算公式プレスリリース）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  GCC: {
-    label: "", detail: "e-SUITE v2 for Government CloudをOCI基盤で提供。富岡市等本稼働（日本オラクル共同プレスリリース）",
-    mark: "", markColor: "", cloud: "OCI", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "円建て", highlight: true },
-      { label: "転送料無料枠", value: "月10TBまで", highlight: true },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  JIP: {
-    label: "", detail: "WizLIFEはAWS対応。自社クラウド「Jip-Base」（自治体専用）も提供（JIP公式）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  "行政S": {
-    label: "", detail: "デジタル庁令和5年度検証事業でAWS上検証実施（2024/9報告）。共同利用・マルチベンダー連携対応",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "移行遅延", value: "報告なし" },
-    ],
-  },
-  "京都GIS": {
-    label: "", detail: "京都GC接続サービス（2024/7〜）。AWSへの専用回線接続が基本。OCI/Azure/GCPもサポート（京都GIS公式）",
-    mark: "", markColor: "", cloud: "AWS", confirmed: true,
-    costFactors: [
-      { label: "課金通貨", value: "ドル建て" },
-      { label: "転送料無料枠", value: "なし" },
-      { label: "提供モデル", value: "接続基盤" },
-    ],
-  },
-};
-
 
 export default async function CostsPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -400,8 +282,8 @@ export default async function CostsPage() {
           },
           {
             label: "ベンダーで探す",
-            desc: "ベンダー別コスト因子",
-            href: "#vendor-cost",
+            desc: "パッケージ・ベンダー一覧",
+            href: "/packages#vendor-cost",
             icon: (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -447,9 +329,9 @@ export default async function CostsPage() {
           const MAX = 5.7;
           const TARGET_RATIO = (1.0 / MAX) * 100; // 移行前基準（100）位置(%)
           const rows = [
-            { label: "当初目標", mult: 0.7, color: "#10B981", pct: "−30%", source: "政府目標", sourceCls: "bg-blue-100 text-blue-700" },
-            { label: "実態平均", mult: 2.3, color: "#EF4444", pct: `+${avgPct}%`, source: "中核市調査", sourceCls: "bg-gray-100 text-gray-600" },
-            { label: "最悪事例", mult: 5.7, color: "#7f1d1d", pct: `+${worstPct}%`, source: "個別事例", sourceCls: "bg-amber-100 text-amber-700" },
+            { label: "当初目標", mult: 0.7, color: "#10B981", pct: "−30%", source: "政府目標（R4）", sourceCls: "bg-blue-100 text-blue-700" },
+            { label: "実態平均", mult: 2.3, color: "#EF4444", pct: `+${avgPct}%`, source: "中核市市長会（R7.1）", sourceCls: "bg-gray-100 text-gray-600" },
+            { label: "最悪事例", mult: 5.7, color: "#7f1d1d", pct: `+${worstPct}%`, source: "個別報告", sourceCls: "bg-amber-100 text-amber-700" },
           ];
           return (
             <div className="mt-3 space-y-4">
@@ -493,6 +375,43 @@ export default async function CostsPage() {
 
       </div>
 
+      {/* コスト変化実績（カード形式） */}
+      <div id="cost-records" className="card p-5">
+        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
+          コスト変化実績
+        </h2>
+        {costs.length > 0 ? (
+          <div className="grid grid-cols-1 gap-2">
+            {costs.map((c) => {
+              const ratio = c.change_ratio ?? 1;
+              const pctChange = Math.round((ratio - 1) * 100);
+              const isReduction = pctChange < 0;
+              const color = isReduction ? "#10B981" : pctChange > 100 ? "#991B1B" : "#EF4444";
+              const bg = isReduction ? "#f0fdf4" : pctChange > 100 ? "#fef2f2" : "#fff5f5";
+              const label = `${pctChange >= 0 ? "+" : ""}${pctChange}%`;
+              return (
+                <div key={c.id} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ backgroundColor: bg, border: `1px solid ${color}25` }}>
+                  {/* 数値 */}
+                  <div className="w-20 flex-shrink-0 text-right">
+                    <span className="text-2xl font-black tabular-nums leading-none" style={{ color }}>{label}</span>
+                  </div>
+                  {/* 説明 */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{c.scope}</p>
+                    <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>{c.notes}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400">データ読み込み中…</p>
+        )}
+        <p className="text-[11px] text-gray-400 mt-3">
+          ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
+        </p>
+      </div>
+
       {/* R6検証事業 団体別コスト比較（図解） */}
       <div id="r6-verification" className="card p-5">
         <div className="flex items-center justify-between mb-1">
@@ -508,10 +427,40 @@ export default async function CostsPage() {
             <p className="text-2xl font-black text-red-600">+8.0%</p>
             <p className="text-[10px] text-gray-500">8団体・金額加重平均</p>
             <p className="text-[9px] text-gray-400">49.80億→53.77億（+3.97億）</p>
+            <p className="text-[9px] mt-1 px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: "#fef9c3", color: "#854d0e" }}>推奨構成適用の好条件団体</p>
           </div>
           <div className="h-10 w-px bg-gray-300" />
           <div className="text-[11px] text-gray-600 leading-relaxed">
             現行システム継続（<span className="font-semibold text-gray-700">コストA</span>）vs ガバクラ移行＋推奨構成（<span className="font-semibold text-blue-600">コストB</span>）の<strong>5年間ランニングコスト</strong>比較。削減できたのは<span className="text-green-600 font-semibold">盛岡市・佐倉市の2団体のみ</span>
+          </div>
+        </div>
+
+        {/* データ差異の説明 */}
+        <div className="rounded-xl border border-amber-200 p-4 mb-4" style={{ backgroundColor: "#fffbeb" }}>
+          <p className="text-sm font-bold mb-3 text-center" style={{ color: "#92400e" }}>
+            なぜ数字がこんなに違うのか？
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { icon: "🎯", label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
+              { icon: "📦", label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
+              { icon: "📏", label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
+            ].map(({ icon, label, r6, survey }) => (
+              <div key={label} className="rounded-lg p-2.5 text-center" style={{ backgroundColor: "#fff8ed" }}>
+                <p className="text-xl mb-1">{icon}</p>
+                <p className="text-[11px] font-bold mb-2" style={{ color: "#92400e" }}>{label}</p>
+                <div className="space-y-1">
+                  <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#dbeafe" }}>
+                    <p className="text-[10px] font-semibold text-blue-700">R6検証</p>
+                    <p className="text-[10px] text-blue-600">{r6}</p>
+                  </div>
+                  <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#fee2e2" }}>
+                    <p className="text-[10px] font-semibold text-red-700">中核市調査</p>
+                    <p className="text-[10px] text-red-600">{survey}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -531,8 +480,17 @@ export default async function CostsPage() {
             return (
               <div key={d.name} className="group">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-xs font-bold text-gray-800 w-28 flex-shrink-0 truncate">{d.name}</span>
-                  <span className="text-[10px] text-gray-400 w-14 flex-shrink-0">{d.pop}</span>
+                  <div className="w-32 flex-shrink-0">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-bold text-gray-800 truncate">{d.name}</span>
+                      <span className={`text-[9px] px-1 py-0.5 rounded font-medium flex-shrink-0 ${
+                        d.csp === "AWS" ? "bg-orange-100 text-orange-700"
+                        : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
+                        : "bg-blue-100 text-blue-700"
+                      }`}>{d.csp}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400">{d.pop}</span>
+                  </div>
                   <div className="flex-1 flex items-center gap-1.5">
                     <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden relative">
                       <div
@@ -544,15 +502,10 @@ export default async function CostsPage() {
                       {isDown ? "" : "+"}{d.rate}%
                     </span>
                   </div>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium flex-shrink-0 ${
-                    d.csp === "AWS" ? "bg-orange-100 text-orange-700"
-                    : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
-                    : "bg-blue-100 text-blue-700"
-                  }`}>{d.csp}</span>
                 </div>
-                <div className="flex items-center gap-3 ml-28 pl-2">
+                <div className="flex items-center gap-3 ml-32 pl-2">
                   <span className="text-[10px] text-gray-400">{d.env}</span>
-                  <span className="text-[10px] text-gray-400">A: {d.costA}億→B: {d.costB}億</span>
+                  <span className="text-[10px] text-gray-400">現行 {d.costA}億 → {d.costB}億</span>
                 </div>
               </div>
             );
@@ -630,10 +583,10 @@ export default async function CostsPage() {
 
         {/* なぜ+8%と2.3倍で違うのか */}
         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 mb-3">
-          <h3 className="text-xs font-bold text-amber-800 mb-2">なぜ+8%と2.3倍（中核市調査）で大きく違うのか？</h3>
+          <h3 className="text-xs font-bold text-amber-800 mb-2">なぜ+8%（R6検証事業）と2.3倍（中核市市長会 R7.1）で大きく違うのか？</h3>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { title: "測定対象", desc: "上記+8%=デジ庁が条件統制した理論値。2.3倍=中核市市長会が各市に聞いたベンダー見積もり" },
+              { title: "測定対象", desc: "上記+8%=デジ庁R6検証事業の条件統制試算。2.3倍=中核市市長会（令和7年1月）が62市に聞いたベンダー見積もり" },
               { title: "単位", desc: "+8%は増減率。2.3倍は倍率（+130%相当）" },
               { title: "母集団", desc: "+8%=この8団体。2.3倍=全国62中核市" },
               { title: "条件統制", desc: "デジ庁=推奨構成・按分適用後。市長会=対策なしの現状移行額" },
@@ -648,57 +601,47 @@ export default async function CostsPage() {
 
         {/* 出典 */}
         <p className="text-[10px] text-gray-400">
-          出典: デジタル庁「令和6年度 ガバメントクラウド早期移行団体検証事業 報告書」（2026年3月27日公開）/「同 基礎資料」/ 中核市市長会「ガバメントクラウド移行に関するアンケート調査」
+          出典: デジタル庁「令和6年度 ガバメントクラウド早期移行団体検証事業 報告書」（令和8年3月27日公開）/「同 基礎資料」/ 中核市市長会「ガバメントクラウド移行に関するアンケート調査」（令和7年1月）
         </p>
       </div>
 
       {/* 費用按分・ベンダー・最適化 */}
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        {/* 費用按分方式の比較 — 4枚カード */}
+        {/* 費用按分方式の比較 — 縦リスト */}
         <div className="mt-6 card p-5">
-          <h3 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-            費用按分方式の比較
+          <h3 className="text-sm font-bold mb-0.5" style={{ color: "var(--color-text-primary)" }}>
+            共同利用の費用 — どう割り勘するか？
           </h3>
           <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-            令和6年度検証事業（20社参画）で検証された共同利用方式における費用按分の4手法比較
+            複数自治体でクラウドを共同利用する際、費用をどう按分するかが課題。R6検証事業（20社参画）で4手法が検証された。
           </p>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+
+          <div className="space-y-2">
             {[
-              { method: "カスタムスコア按分", merit: "自治体規模に応じた公平な負担", demerit: "スコア設計の合意形成が必要", example: "TKC（人口:業務 7:3）、内田洋行", featured: true },
-              { method: "利用状況按分", merit: "実利用に基づく合理的配分", demerit: "測定が複雑・運用負荷高", example: "一部ベンダーで検討中", featured: false },
-              { method: "均等按分", merit: "算定がシンプル", demerit: "小規模自治体に割高", example: "小規模共同利用で採用", featured: false },
-              { method: "他環境コスト按分", merit: "既存比率を流用でき導入容易", demerit: "ガバクラ固有費用構造を反映しにくい", example: "移行過渡期に採用", featured: false },
+              { method: "カスタムスコア按分", merit: "自治体規模に応じた公平な負担", demerit: "スコア設計の合意形成が必要", note: "TKC（人口7：業務量3）、内田洋行", featured: true },
+              { method: "利用状況按分", merit: "実利用に基づく合理的配分", demerit: "測定が複雑・運用負荷高", note: "一部ベンダーで検討中", featured: false },
+              { method: "均等按分", merit: "算定がシンプル", demerit: "小規模自治体に割高", note: "小規模共同利用で採用", featured: false },
+              { method: "他環境コスト按分", merit: "既存比率を流用でき導入容易", demerit: "ガバクラ固有構造を反映しにくい", note: "移行過渡期に採用", featured: false },
             ].map((card) => (
-              <div
-                key={card.method}
-                className={`rounded-lg p-3 flex flex-col gap-2 ${
-                  card.featured ? "border-2 border-blue-400 bg-blue-50/60" : "border border-gray-200 bg-gray-50/50"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-1">
-                  <p className={`text-[11px] font-bold leading-tight ${card.featured ? "text-blue-700" : "text-gray-800"}`}>
-                    {card.method}
-                  </p>
-                  {card.featured && (
-                    <span className="flex-shrink-0 text-[8px] font-bold bg-blue-500 text-white px-1 py-0.5 rounded">主流</span>
-                  )}
+              <div key={card.method} className={`flex items-start gap-3 rounded-lg p-3 ${card.featured ? "border-2 border-blue-300 bg-blue-50" : "border border-gray-200 bg-gray-50"}`}>
+                <div className="flex-shrink-0 pt-0.5">
+                  {card.featured
+                    ? <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full whitespace-nowrap">主流</span>
+                    : <span className="text-[10px] text-gray-400 font-medium">他</span>
+                  }
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-start gap-1">
-                    <span className="flex-shrink-0 text-[10px] text-green-600 font-bold mt-px">✓</span>
-                    <p className="text-[10px] text-gray-700 leading-tight">{card.merit}</p>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-xs font-bold mb-1 ${card.featured ? "text-blue-800" : "text-gray-800"}`}>{card.method}</p>
+                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs">
+                    <span className="text-green-700">✓ {card.merit}</span>
+                    <span className="text-red-500">✕ {card.demerit}</span>
                   </div>
-                  <div className="flex items-start gap-1">
-                    <span className="flex-shrink-0 text-[10px] text-red-500 font-bold mt-px">✕</span>
-                    <p className="text-[10px] text-gray-600 leading-tight">{card.demerit}</p>
-                  </div>
-                </div>
-                <div className="mt-auto pt-1.5 border-t border-gray-200">
-                  <p className="text-[9px] text-gray-500 leading-tight">{card.example}</p>
+                  <p className="text-[10px] text-gray-400 mt-1">{card.note}</p>
                 </div>
               </div>
             ))}
           </div>
+
           <p className="text-[11px] text-gray-400 mt-3">
             出典: 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書 p.9
           </p>
@@ -897,112 +840,9 @@ export default async function CostsPage() {
         </div>
         <div className="mt-3 flex flex-col gap-2">
           <p className="text-[11px] text-gray-400">
-            個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↓</a>
+            個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↑</a>
           </p>
           <ReportLeadCta source="costs-r6" compact title="R6検証データを含むレポートをPDFで確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />
-        </div>
-      </div>
-
-      {/* ⑧ コスト変化実績（展開可能カード） */}
-      <div id="cost-records" className="card p-6">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          コスト変化実績
-        </h2>
-        <p className="text-xs mb-4 flex items-center gap-2 flex-wrap" style={{ color: "var(--color-text-muted)" }}>
-          移行前を基準に増減率・出典を整理しています。
-          <SourceAttribution sourceIds={["digital-cho-senkou-tco", "chukakushi-survey-2025"]} variant="inline" />
-        </p>
-
-        {costs.length === 0 ? (
-          <p className="text-sm text-gray-400">データがありません。</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b-2 border-gray-100">
-                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-medium w-16"></th>
-                  <th className="text-left py-2 px-3 text-xs text-gray-400 font-medium">対象・出典</th>
-                  <th className="text-right py-2 px-3 text-xs text-gray-400 font-medium">変化率</th>
-                  <th className="py-2 px-3 text-xs text-gray-400 font-medium w-32 hidden sm:table-cell"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {costs.map((cost) => {
-                  const isReduction = cost.change_ratio < 1.0;
-                  const pctChange = Math.abs((cost.change_ratio - 1) * 100);
-                  const barColor = isReduction ? "#007a3d" : cost.change_ratio >= 3.0 ? "#7f1d1d" : cost.change_ratio >= 1.5 ? "#EF4444" : "#d97706";
-                  const barWidth = getBarWidth(cost.change_ratio);
-                  const label = getRatioLabel(cost.change_ratio);
-                  const vendorName = cost.vendors?.short_name ?? cost.vendors?.name ?? "—";
-
-                  return (
-                    <ExpandableCostCard
-                      key={cost.id}
-                      scope={scopeToJapanese(cost.scope)}
-                      changeRatio={cost.change_ratio}
-                      vendorName={vendorName}
-                      notes={cost.notes}
-                      sourceUrl={cost.source_url}
-                      reportedYear={cost.reported_year}
-                      barWidth={barWidth}
-                      barColor={barColor}
-                      label={label}
-                      isReduction={isReduction}
-                      pctChange={pctChange}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-green-600" />削減（−%）</div>
-          <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block bg-red-600" />増加（+%）</div>
-          <span className="text-gray-400">縦線 = 変化なし基準（0%）</span>
-        </div>
-        <p className="mt-3 text-[11px] text-gray-400">
-          あなたのベンダーの傾向は <a href="#vendor-cost" className="text-blue-500 hover:underline">ベンダー別コスト因子 ↓</a>
-        </p>
-      </div>
-
-      {/* ベンダー別コスト因子（カード表示） */}
-      <div id="vendor-cost" className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-base font-bold text-gray-800 mb-4">
-          ベンダー別コスト因子
-        </h2>
-        <div className="space-y-2">
-          {vendors
-            .slice()
-            .sort((a, b) => (b.municipality_count ?? 0) - (a.municipality_count ?? 0))
-            .filter((v) => !["NTT西日本", "京都GIS", "SBS情報S", "北日本CS"].includes(v.short_name ?? v.name))
-            .slice(0, 5)
-            .map((vendor) => {
-              const shortName = vendor.short_name ?? vendor.name;
-              const evalData = vendorEvaluations[shortName];
-              const est = VENDOR_COST_ESTIMATE[shortName];
-              const pctLabel = est ? `約+${Math.round((est.ratioTypical - 1) * 100)}%増（中央値） — ` : "";
-              return (
-                <VendorCard
-                  key={shortName}
-                  vendorName={shortName}
-                  cloud={evalData?.cloud ?? vendor.cloud_platform ?? "—"}
-                  mark={evalData?.mark ?? ""}
-                  markColor={evalData?.markColor ?? ""}
-                  label={evalData?.label ?? ""}
-                  detail={`${pctLabel}${evalData?.detail ?? ""}`}
-                  costTags={evalData?.costTags}
-                  costFactors={evalData?.costFactors}
-                />
-              );
-            })}
-        </div>
-        <div className="mt-4">
-          <p className="text-[11px] text-gray-400 mb-2">
-            コスト対策は <a href="#cost-measures" className="text-blue-500 hover:underline">デジタル庁の支援策 ↓</a>
-          </p>
-          <ReportLeadCta source="costs-vendor" compact title="ベンダー比較をまとめて確認" description="コスト因子の背景と対策をPDFで確認できます。" />
         </div>
       </div>
 
@@ -1067,22 +907,13 @@ export default async function CostsPage() {
             <p className="text-sm font-semibold text-slate-800">特設: 移行済み最適化と未移行見直し</p>
             <p className="text-xs text-slate-600">運用最適化と基盤再選定を分けて整理しています。</p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Link
-              href="/finops"
-              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
-            >
-              FinOps コスト最適化ハブ
-            </Link>
-            <Link
-              href="/finops#pdf"
-              className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ backgroundColor: "#ffffff", color: "#1d4ed8", border: "1px solid #93c5fd", textDecoration: "none" }}
-            >
-              無料PDFを受け取る
-            </Link>
-          </div>
+          <Link
+            href="/finops"
+            className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
+          >
+            FinOps コスト最適化ハブ →
+          </Link>
         </div>
       </div>
 

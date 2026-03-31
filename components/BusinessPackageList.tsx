@@ -1,15 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { Vendor, Package } from "@/lib/supabase";
 import { DATA_SOURCES } from "@/lib/sources";
 
-// 適合システムExcelの最終確認日（調査中アイテムの基準日として使用）
 const TEKIGO_LAST_ACCESSED = DATA_SOURCES["applic-tekigo-excel"]?.lastAccessed ?? "";
 
-const INITIAL_COUNT = 10;
-
-// クラウドバッジの色設定
 function getCloudBadgeStyle(
   platform: string | null,
   confirmed: boolean
@@ -27,7 +23,6 @@ function getCloudBadgeStyle(
   return style;
 }
 
-/** "ー" や "—" を「調査中」に置換 */
 function displayValue(val: string | null | undefined): string {
   if (!val) return "調査中";
   const trimmed = val.trim();
@@ -35,7 +30,6 @@ function displayValue(val: string | null | undefined): string {
   return trimmed;
 }
 
-/** confirmed_date が未設定の場合、適合システム確認日を返す */
 function displayConfirmedDate(date: string | null | undefined): string {
   if (!date || displayValue(date) === "調査中") {
     return TEKIGO_LAST_ACCESSED || "調査中";
@@ -45,209 +39,42 @@ function displayConfirmedDate(date: string | null | undefined): string {
 
 type PackageWithVendor = Package & { vendors?: Vendor };
 
-// 同一パッケージ名+ベンダーを統合した表示用型
-type MergedPackage = {
-  package_name: string;
-  vendor: Vendor | undefined;
-  business: string;
-  confirmed_date: string | null;
-  subCount: number; // 適合番号の数（サブシステム数）
-};
-
-/** 同一パッケージ名+ベンダーの重複をマージ */
-function mergePackages(pkgs: PackageWithVendor[]): MergedPackage[] {
-  const map = new Map<string, MergedPackage>();
-  for (const pkg of pkgs) {
-    const vendorName = pkg.vendors?.short_name ?? pkg.vendors?.name ?? "不明";
-    const key = `${pkg.package_name}__${vendorName}`;
-    const existing = map.get(key);
-    if (existing) {
-      existing.subCount++;
-      // 最新の確認日を採用
-      if (pkg.confirmed_date && (!existing.confirmed_date || pkg.confirmed_date > existing.confirmed_date)) {
-        existing.confirmed_date = pkg.confirmed_date;
-      }
-    } else {
-      map.set(key, {
-        package_name: pkg.package_name,
-        vendor: pkg.vendors,
-        business: pkg.business ?? "不明",
-        confirmed_date: pkg.confirmed_date ?? null,
-        subCount: 1,
-      });
-    }
-  }
-  return Array.from(map.values());
-}
-
-function BusinessGroup({
-  biz,
-  pkgs,
-}: {
-  biz: string;
-  pkgs: PackageWithVendor[];
-}) {
-  const [showAll, setShowAll] = useState(false);
-  const merged = mergePackages(pkgs);
-  const visiblePkgs = showAll ? merged : merged.slice(0, INITIAL_COUNT);
-  const hasMore = merged.length > INITIAL_COUNT;
-
-  return (
-    <details className="group" open>
-      <summary className="flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors select-none">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-800 text-sm">{biz}</span>
-          <span className="text-xs text-gray-400 bg-white border border-gray-200 rounded-full px-2 py-0.5">
-            {merged.length}件
-          </span>
-        </div>
-        <span className="text-gray-400 text-xs group-open:rotate-180 transition-transform">▼</span>
-      </summary>
-
-      <div className="mt-2">
-        {/* デスクトップ: テーブル表示 */}
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="w-full text-sm table-fixed">
-            <colgroup>
-              <col className="w-[40%]" />
-              <col className="w-[20%]" />
-              <col className="w-[15%]" />
-              <col className="w-[25%]" />
-            </colgroup>
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">ベンダー</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">クラウド</th>
-                <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">確認日</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visiblePkgs.map((mp, idx) => {
-                const vendor = mp.vendor;
-                const platform = vendor?.cloud_platform ?? null;
-                const confirmed = vendor?.cloud_confirmed ?? false;
-                const badgeStyle = getCloudBadgeStyle(platform, confirmed);
-                return (
-                  <tr
-                    key={`${mp.package_name}-${idx}`}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="py-2 px-3 font-medium text-gray-800">
-                      <span className="flex items-center gap-1.5">
-                        {displayValue(mp.package_name)}
-                        {mp.subCount > 1 && (
-                          <span
-                            className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 rounded-full text-xs font-bold"
-                            style={{ backgroundColor: "#e0e7ff", color: "#3730a3", fontSize: 10 }}
-                          >
-                            {mp.subCount}件
-                          </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3 text-gray-600 whitespace-nowrap">
-                      {displayValue(vendor?.short_name ?? vendor?.name)}
-                    </td>
-                    <td className="py-2 px-3">
-                      {badgeStyle ? (
-                        <span
-                          className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap"
-                          style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                        >
-                          {platform}
-                        </span>
-                      ) : (
-                        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>調査中</span>
-                      )}
-                    </td>
-                    <td className="py-2 px-3 text-xs text-gray-500 whitespace-nowrap">
-                      {displayConfirmedDate(mp.confirmed_date)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* モバイル: カード表示 */}
-        <div className="sm:hidden space-y-2">
-          {visiblePkgs.map((mp, idx) => {
-            const vendor = mp.vendor;
-            const platform = vendor?.cloud_platform ?? null;
-            const confirmed = vendor?.cloud_confirmed ?? false;
-            const badgeStyle = getCloudBadgeStyle(platform, confirmed);
-            return (
-              <div
-                key={`${mp.package_name}-${idx}`}
-                className="flex items-center justify-between gap-2 py-2.5 px-3 rounded-lg border border-gray-100"
-              >
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-800 truncate">
-                    {displayValue(mp.package_name)}
-                    {mp.subCount > 1 && (
-                      <span className="text-xs font-normal text-gray-400 ml-1">({mp.subCount}件)</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {displayValue(vendor?.short_name ?? vendor?.name)}
-                    <span className="text-gray-400 ml-1.5">{displayConfirmedDate(mp.confirmed_date)}</span>
-                  </p>
-                </div>
-                {badgeStyle ? (
-                  <span
-                    className="flex-shrink-0 px-2 py-0.5 rounded text-xs font-semibold"
-                    style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
-                  >
-                    {platform}
-                  </span>
-                ) : (
-                  <span className="flex-shrink-0 text-xs text-gray-400">調査中</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {hasMore && (
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="mt-2 w-full py-2 text-sm font-medium rounded-lg transition-colors"
-            style={{
-              color: "var(--color-brand-primary)",
-              backgroundColor: "color-mix(in srgb, var(--color-brand-primary) 3%, transparent)",
-              border: "1px solid color-mix(in srgb, var(--color-brand-primary) 12%, transparent)",
-            }}
-          >
-            {showAll
-              ? "折りたたむ"
-              : `さらに表示（残り${merged.length - INITIAL_COUNT}件）`}
-          </button>
-        )}
-      </div>
-    </details>
-  );
-}
-
 export default function BusinessPackageList({
   packages,
 }: {
   packages: PackageWithVendor[];
 }) {
-  // 業務でグループ化
-  const businessGroups: Record<string, PackageWithVendor[]> = {};
-  for (const pkg of packages) {
-    const biz = pkg.business ?? "不明";
-    if (!businessGroups[biz]) businessGroups[biz] = [];
-    businessGroups[biz].push(pkg);
-  }
-  const sortedBusinesses = Object.keys(businessGroups).sort();
+  const [query, setQuery] = useState("");
+
+  // 業務一覧（件数付き）
+  const businesses = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const pkg of packages) {
+      const biz = pkg.business ?? "不明";
+      map.set(biz, (map.get(biz) ?? 0) + 1);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0].localeCompare(b[0], "ja"))
+      .map(([name, count]) => ({ name, count }));
+  }, [packages]);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return packages.filter((pkg) => {
+      const name = (pkg.package_name ?? "").toLowerCase();
+      const biz = (pkg.business ?? "").toLowerCase();
+      const vendor = (pkg.vendors?.short_name ?? pkg.vendors?.name ?? "").toLowerCase();
+      return name.includes(q) || biz.includes(q) || vendor.includes(q);
+    });
+  }, [query, packages]);
+
+  const hasQuery = query.trim().length > 0;
 
   return (
     <div className="card p-6">
       <h2
-        className="text-sm font-bold mb-4 flex items-center gap-2"
+        className="text-sm font-bold mb-1 flex items-center gap-2"
         style={{ color: "var(--color-text-primary)" }}
       >
         <span
@@ -256,17 +83,170 @@ export default function BusinessPackageList({
         />
         業務別パッケージ一覧
         <span className="text-xs font-normal ml-1" style={{ color: "var(--color-text-muted)" }}>
-          （{sortedBusinesses.length}業務 / 計{packages.length}件）
+          {businesses.length}業務 / 計{packages.length}件
         </span>
       </h2>
+      <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+        業務名をクリックするか、キーワードで検索
+      </p>
 
-      {sortedBusinesses.length === 0 ? (
-        <p className="text-sm text-gray-400">データがありません。</p>
+      {/* 業務チップ一覧 */}
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {businesses.map(({ name, count }) => {
+          const isActive = query.trim() === name;
+          return (
+            <button
+              key={name}
+              onClick={() => setQuery(isActive ? "" : name)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors"
+              style={isActive ? {
+                backgroundColor: "var(--color-brand-primary)",
+                color: "#fff",
+              } : {
+                backgroundColor: "#f1f5f9",
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              {name}
+              <span className="opacity-60">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 検索ボックス */}
+      <div className="relative mb-4">
+        <svg
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+          style={{ color: "var(--color-text-muted)" }}
+          fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+        >
+          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="パッケージ名・業務・ベンダーで絞り込み..."
+          className="w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1"
+        />
+        {hasQuery && (
+          <button
+            onClick={() => setQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* 結果 */}
+      {!hasQuery ? (
+        <p className="text-xs text-center py-4" style={{ color: "var(--color-text-muted)" }}>
+          業務をクリックするかキーワードを入力してください
+        </p>
+      ) : results.length === 0 ? (
+        <p className="text-sm text-center py-4" style={{ color: "var(--color-text-muted)" }}>
+          「{query}」に一致するパッケージが見つかりませんでした
+        </p>
       ) : (
-        <div className="space-y-4">
-          {sortedBusinesses.map((biz) => (
-            <BusinessGroup key={biz} biz={biz} pkgs={businessGroups[biz]} />
-          ))}
+        <div>
+          <p className="text-xs mb-2" style={{ color: "var(--color-text-muted)" }}>
+            {results.length}件
+          </p>
+          {/* デスクトップ: テーブル */}
+          <div className="hidden sm:block overflow-x-auto">
+            <table className="w-full text-sm table-fixed">
+              <colgroup>
+                <col className="w-[35%]" />
+                <col className="w-[18%]" />
+                <col className="w-[20%]" />
+                <col className="w-[10%]" />
+                <col className="w-[17%]" />
+              </colgroup>
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">パッケージ名</th>
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium">業務</th>
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">ベンダー</th>
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">クラウド</th>
+                  <th className="text-left py-2 px-3 text-xs text-gray-500 font-medium whitespace-nowrap">確認日</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((pkg, idx) => {
+                  const vendor = pkg.vendors;
+                  const platform = vendor?.cloud_platform ?? null;
+                  const confirmed = vendor?.cloud_confirmed ?? false;
+                  const badgeStyle = getCloudBadgeStyle(platform, confirmed);
+                  return (
+                    <tr key={`${pkg.id ?? idx}`} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="py-2 px-3 font-medium text-gray-800 truncate">
+                        {displayValue(pkg.package_name)}
+                      </td>
+                      <td className="py-2 px-3 text-xs text-gray-500 truncate">
+                        {pkg.business ?? "不明"}
+                      </td>
+                      <td className="py-2 px-3 text-gray-600 truncate">
+                        {displayValue(vendor?.short_name ?? vendor?.name)}
+                      </td>
+                      <td className="py-2 px-3">
+                        {badgeStyle ? (
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold whitespace-nowrap"
+                            style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
+                          >
+                            {platform}
+                          </span>
+                        ) : (
+                          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>調査中</span>
+                        )}
+                      </td>
+                      <td className="py-2 px-3 text-xs text-gray-500 whitespace-nowrap">
+                        {displayConfirmedDate(pkg.confirmed_date)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* モバイル: カード */}
+          <div className="sm:hidden space-y-2">
+            {results.map((pkg, idx) => {
+              const vendor = pkg.vendors;
+              const platform = vendor?.cloud_platform ?? null;
+              const confirmed = vendor?.cloud_confirmed ?? false;
+              const badgeStyle = getCloudBadgeStyle(platform, confirmed);
+              return (
+                <div
+                  key={`${pkg.id ?? idx}`}
+                  className="flex items-center justify-between gap-2 py-2.5 px-3 rounded-lg border border-gray-100"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {displayValue(pkg.package_name)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {pkg.business ?? "不明"} · {displayValue(vendor?.short_name ?? vendor?.name)}
+                      <span className="text-gray-400 ml-1.5">{displayConfirmedDate(pkg.confirmed_date)}</span>
+                    </p>
+                  </div>
+                  {badgeStyle ? (
+                    <span
+                      className="flex-shrink-0 px-2 py-0.5 rounded text-xs font-semibold"
+                      style={{ backgroundColor: badgeStyle.bg, color: badgeStyle.text }}
+                    >
+                      {platform}
+                    </span>
+                  ) : (
+                    <span className="flex-shrink-0 text-xs text-gray-400">調査中</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

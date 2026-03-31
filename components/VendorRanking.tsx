@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Vendor } from "@/lib/supabase";
 
 const NAVY = "#00338D";
-const INITIAL_COUNT = 10;
+const INITIAL_COUNT = 5;
 
 // クラウドバッジの色設定
 function getCloudBadgeStyle(

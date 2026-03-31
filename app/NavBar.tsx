@@ -15,9 +15,8 @@ const NAV_GROUPS = [
     label: "コスト",
     short: "コスト",
     children: [
-      { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
-      { href: "/costs",    label: "コスト増の要因を分析", desc: "ベンダー別コスト比較" },
-      { href: "/cloud",    label: "クラウド基盤の内訳", desc: "AWS/Azure/GCP/OCI/さくら" },
+      { href: "/costs",    label: "コスト分析", desc: "移行コストの実態と要因" },
+      { href: "/cloud",    label: "クラウドコスト比較", desc: "" },
       { href: "/finops",   label: "FinOps コスト最適化", desc: "コスト削減・無料PDF診断" },
     ],
   },
@@ -25,6 +24,7 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
+      { href: "/packages", label: "導入パッケージ一覧", desc: "ベンダー別の採用状況" },
       { href: "/benchmark",  label: "自治体同士を比較する", desc: "人口帯・地域別の比較" },
       { href: "/timeline",   label: "スケジュールを確認", desc: "移行タイムライン" },
     ],
