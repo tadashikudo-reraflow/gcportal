@@ -8,6 +8,140 @@ import type {
   PrefectureSummary,
 } from "./page";
 
+const COMPARE_COLORS = ["#0066FF", "#10B981", "#F5B500", "#FF6B6B"];
+
+/* ══════════════════════════════════════════════════════════════
+   Radar Chart (SVG, no external lib)
+   ══════════════════════════════════════════════════════════════ */
+function RadarChart({
+  items,
+  dimensions,
+}: {
+  items: { label: string; values: number[]; color: string }[];
+  dimensions: string[];
+}) {
+  const n = dimensions.length;
+  if (n < 3) return null;
+  const cx = 150, cy = 150, r = 100;
+  const angles = dimensions.map((_, i) => (i * 2 * Math.PI) / n - Math.PI / 2);
+  const rings = [0.25, 0.5, 0.75, 1.0];
+  function poly(values: number[]) {
+    return values.map((v, i) => `${cx + r * v * Math.cos(angles[i])},${cy + r * v * Math.sin(angles[i])}`).join(" ");
+  }
+  return (
+    <svg viewBox="0 0 300 300" className="w-full max-w-[260px] mx-auto">
+      {rings.map((ring) => (
+        <polygon key={ring} points={angles.map((a) => `${cx + r * ring * Math.cos(a)},${cy + r * ring * Math.sin(a)}`).join(" ")} fill="none" stroke="var(--color-border,#e2e8f0)" strokeWidth="0.5" />
+      ))}
+      {angles.map((a, i) => (
+        <g key={i}>
+          <line x1={cx} y1={cy} x2={cx + r * Math.cos(a)} y2={cy + r * Math.sin(a)} stroke="var(--color-border,#e2e8f0)" strokeWidth="0.5" />
+          <text x={cx + (r + 18) * Math.cos(a)} y={cy + (r + 18) * Math.sin(a)} textAnchor="middle" dominantBaseline="middle" fontSize="8" fill="var(--color-text-muted,#94a3b8)">
+            {dimensions[i].length > 5 ? dimensions[i].slice(0, 5) + "…" : dimensions[i]}
+          </text>
+        </g>
+      ))}
+      {items.map((item, idx) => (
+        <polygon key={idx} points={poly(item.values)} fill={item.color} fillOpacity="0.12" stroke={item.color} strokeWidth="1.5" />
+      ))}
+    </svg>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Compare Panel
+   ══════════════════════════════════════════════════════════════ */
+function ComparePanel({
+  selected,
+  municipalities,
+  onRemove,
+  onClear,
+}: {
+  selected: string[];
+  municipalities: ProgressMunicipality[];
+  onRemove: (key: string) => void;
+  onClear: () => void;
+}) {
+  const munis = selected.map((k) => {
+    const [p, c] = k.split("__");
+    return municipalities.find((m) => m.prefecture === p && m.city === c);
+  }).filter(Boolean) as ProgressMunicipality[];
+
+  const allBusinesses = useMemo(() => {
+    const set = new Set<string>();
+    munis.forEach((m) => Object.keys(m.business_rates).forEach((b) => set.add(b)));
+    return Array.from(set).sort();
+  }, [munis]);
+
+  const radarDimensions = allBusinesses.slice(0, 10);
+  const radarItems = munis.map((m, i) => ({
+    label: m.city,
+    color: COMPARE_COLORS[i % COMPARE_COLORS.length],
+    values: radarDimensions.map((d) => m.business_rates[d] ?? 0),
+  }));
+
+  if (munis.length === 0) return null;
+
+  return (
+    <div className="card p-4 space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold" style={{ color: "var(--color-gov-primary,#002D72)" }}>
+          自治体比較 ({munis.length}件)
+        </h3>
+        <button onClick={onClear} className="text-xs" style={{ color: "var(--color-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
+          クリア
+        </button>
+      </div>
+
+      {/* Legend chips */}
+      <div className="flex flex-wrap gap-2">
+        {munis.map((m, i) => (
+          <span key={selected[i]} className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: COMPARE_COLORS[i % COMPARE_COLORS.length] + "20", color: COMPARE_COLORS[i % COMPARE_COLORS.length], border: `1px solid ${COMPARE_COLORS[i % COMPARE_COLORS.length]}` }}>
+            {m.prefecture} {m.city}
+            <button onClick={() => onRemove(selected[i])} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 10, lineHeight: 1, color: "inherit" }}>×</button>
+          </span>
+        ))}
+      </div>
+
+      {/* Radar + Table side by side on desktop */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        {munis.length >= 2 && (
+          <div className="flex-shrink-0">
+            <RadarChart items={radarItems} dimensions={radarDimensions} />
+          </div>
+        )}
+        <div className="flex-1 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{ borderBottom: "2px solid var(--color-border,#e2e8f0)" }}>
+                <th className="text-left px-2 py-1" style={{ color: "var(--color-text-secondary)" }}>業務</th>
+                {munis.map((m, i) => (
+                  <th key={i} className="text-right px-2 py-1 font-medium" style={{ color: COMPARE_COLORS[i % COMPARE_COLORS.length] }}>{m.city}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {allBusinesses.map((biz) => (
+                <tr key={biz} style={{ borderBottom: "1px solid var(--color-border,#e2e8f0)" }}>
+                  <td className="px-2 py-1" style={{ color: "var(--color-text-primary)" }}>{biz}</td>
+                  {munis.map((m, i) => {
+                    const v = m.business_rates[biz];
+                    return (
+                      <td key={i} className="px-2 py-1 text-right font-mono" style={{ color: v != null ? (v >= 1 ? "var(--color-status-complete,#10B981)" : v >= 0.7 ? "var(--color-brand-primary,#0066FF)" : v >= 0.4 ? "var(--color-warning,#F5B500)" : "var(--color-error,#FF6B6B)") : "var(--color-text-muted)" }}>
+                        {v != null ? `${(v * 100).toFixed(0)}%` : "—"}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════
    Constants & Helpers
    ══════════════════════════════════════════════════════════════ */
@@ -318,12 +452,16 @@ function PrefectureDetail({
   municipalities,
   onBack,
   onSelectCity,
+  compareKeys,
+  onToggleCompare,
 }: {
   prefName: string;
   prefSummary: PrefectureSummary | undefined;
   municipalities: ProgressMunicipality[];
   onBack: () => void;
   onSelectCity: (city: string) => void;
+  compareKeys: string[];
+  onToggleCompare: (key: string) => void;
 }) {
   const [sortKey, setSortKey] = useState<"rate" | "city">("rate");
   const sorted = useMemo(() => {
@@ -403,6 +541,7 @@ function PrefectureDetail({
               <th className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ステータス</th>
               <th className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>人口帯</th>
               <th className="text-left px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ベンダー</th>
+              <th className="px-3 py-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -442,6 +581,28 @@ function PrefectureDetail({
                   </td>
                   <td className="px-3 py-2 text-xs truncate max-w-[200px]" style={{ color: "var(--color-text-secondary)" }}>
                     {m.vendors.map((v) => v.name).join(", ") || "—"}
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    {(() => {
+                      const key = `${m.prefecture}__${m.city}`;
+                      const inCompare = compareKeys.includes(key);
+                      const disabled = !inCompare && compareKeys.length >= 4;
+                      return (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onToggleCompare(key); }}
+                          disabled={disabled}
+                          className="rounded text-[10px] px-1.5 py-0.5 font-medium"
+                          style={{
+                            backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
+                            color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
+                            border: `1px solid ${inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-border,#E2E8F0)"}`,
+                            cursor: disabled ? "default" : "pointer",
+                          }}
+                        >
+                          {inCompare ? "比較中" : "+比較"}
+                        </button>
+                      );
+                    })()}
                   </td>
                 </tr>
               );
@@ -732,6 +893,13 @@ function ProgressInner({ data }: { data: ProgressData }) {
   const [filterStatus, setFilterStatus] = useState(paramStatus);
   const [filterPop, setFilterPop] = useState(paramPop);
   const [filterQuery, setFilterQuery] = useState(paramQ);
+  const [compareKeys, setCompareKeys] = useState<string[]>([]);
+
+  const toggleCompare = useCallback((key: string) => {
+    setCompareKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : prev.length < 4 ? [...prev, key] : prev
+    );
+  }, []);
 
   // Build national averages map
   const nationalAvgs = useMemo(() => {
@@ -843,6 +1011,16 @@ function ProgressInner({ data }: { data: ProgressData }) {
         setQuery={setFilterQuery}
       />
 
+      {/* Compare Panel */}
+      {compareKeys.length > 0 && (
+        <ComparePanel
+          selected={compareKeys}
+          municipalities={data.municipalities}
+          onRemove={(key) => setCompareKeys((prev) => prev.filter((k) => k !== key))}
+          onClear={() => setCompareKeys([])}
+        />
+      )}
+
       {/* Results count */}
       <div
         className="text-xs"
@@ -867,6 +1045,8 @@ function ProgressInner({ data }: { data: ProgressData }) {
           municipalities={prefMunis}
           onBack={() => navigate({ pref: "", city: "" })}
           onSelectCity={(city) => navigate({ pref: paramPref, city })}
+          compareKeys={compareKeys}
+          onToggleCompare={toggleCompare}
         />
       ) : (
         <NationalOverview
