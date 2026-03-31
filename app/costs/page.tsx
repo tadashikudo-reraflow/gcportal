@@ -380,20 +380,6 @@ export default async function CostsPage() {
         <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
           コスト変化実績
         </h2>
-        {/* 盛岡市 — 削減成功事例（R6検証事業） */}
-        <div className="flex items-center gap-3 rounded-xl px-4 py-3 mb-2" style={{ backgroundColor: "#f0fdf4", border: "2px solid #10B981" }}>
-          <div className="w-20 flex-shrink-0 text-right">
-            <span className="text-2xl font-black tabular-nums leading-none" style={{ color: "#059669" }}>−13.7%</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>盛岡市（岩手県）</p>
-              <span className="text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ backgroundColor: "#dcfce7", color: "#166534" }}>削減成功</span>
-            </div>
-            <p className="text-xs leading-snug" style={{ color: "var(--color-text-muted)" }}>R6検証事業（8団体中）。DC単独→ガバクラ移行で11.71億→10.10億（▲1.61億）。大規模自治体かつDC単独が削減の鍵。</p>
-          </div>
-        </div>
-
         {costs.length > 0 ? (
           <div className="grid grid-cols-1 gap-2">
             {costs.map((c) => {
