@@ -110,11 +110,6 @@ export default function SourcesPage() {
                   <span className="text-sm font-semibold truncate" style={{ color: "var(--color-text-primary)" }}>
                     {org}
                   </span>
-                  {isOfficial && (
-                    <span className="text-xs px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: "#dbeafe", color: "#1d4ed8" }}>
-                      公式
-                    </span>
-                  )}
                   {hasAi && (
                     <span className="text-xs px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}>
                       AI調査含
