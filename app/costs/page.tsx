@@ -408,6 +408,16 @@ export default async function CostsPage() {
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
 
+        {/* 東京都調査（日経xTECH 2026-03-19） */}
+        <div className="flex items-center gap-3 rounded-xl px-4 py-3 mt-2" style={{ backgroundColor: "#fef2f2", border: "1px solid rgba(153,27,27,0.15)" }}>
+          <div className="w-20 flex-shrink-0 text-right">
+            <span className="text-xl font-black tabular-nums leading-none" style={{ color: "#991B1B" }}>+50〜100%</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>東京都（区部・市部・町村）</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>東京都独自調査。割引最大適用でも区部1.5倍・市部1.7倍・町村2倍の見込み（日経xTECH）</p>
+          </div>
+        </div>
         <p className="text-[11px] text-gray-400 mt-3">
           ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
         </p>
