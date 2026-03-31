@@ -504,10 +504,10 @@ export default async function CostsPage() {
                     {isDown ? "" : "+"}{d.rate}%
                   </span>
                 </div>
-                {/* 行2: バー */}
-                <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden mb-1.5">
+                {/* 行2: バー（増加=左から右、削減=右から左） */}
+                <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden mb-1.5 relative">
                   <div
-                    className={`h-full rounded-full ${isDown ? "bg-green-400" : d.rate > 20 ? "bg-red-400" : "bg-orange-300"}`}
+                    className={`h-full rounded-full absolute top-0 ${isDown ? "bg-green-400 right-0" : d.rate > 20 ? "bg-red-400 left-0" : "bg-orange-300 left-0"}`}
                     style={{ width: `${barWidth}%` }}
                   />
                 </div>
