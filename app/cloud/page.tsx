@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
-import ReportLeadCta from "@/components/ReportLeadCta";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
@@ -586,12 +585,6 @@ export default async function CloudPage() {
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.cloud} pageId="cloud" />
 
-      <ReportLeadCta
-        source="cloud"
-        compact
-        title="基盤比較の背景をPDFでまとめて確認"
-        description="クラウド比較だけでなく、進捗、コスト、遅延構造までまとめた無料レポートを受け取れます。"
-      />
 
 
       <PageNavCards exclude="/cloud" />
