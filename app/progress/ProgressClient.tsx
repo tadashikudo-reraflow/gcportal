@@ -615,37 +615,56 @@ function PrefectureDetail({
       <div className="sm:hidden space-y-2">
         {sorted.map((m) => {
           const st = getStatus(m);
+          const key = `${m.prefecture}__${m.city}`;
+          const inCompare = compareKeys.includes(key);
+          const disabled = !inCompare && compareKeys.length >= 4;
           return (
-            <button
+            <div
               key={m.city}
-              onClick={() => onSelectCity(m.city)}
-              className="card p-3 w-full text-left"
-              style={{ cursor: "pointer" }}
+              className="card p-3"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
-                  {m.city}
-                </span>
-                <StatusBadge status={st} />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1">
-                  <ProgressBar rate={m.overall_rate} />
-                </div>
-                <span
-                  className="text-xs font-mono font-medium"
-                  style={{ color: rateColor(m.overall_rate) }}
+                <button
+                  onClick={() => onSelectCity(m.city)}
+                  className="text-sm font-medium text-left flex-1"
+                  style={{ color: "var(--color-text-primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
                 >
-                  {pct(m.overall_rate)}
-                </span>
+                  {m.city}
+                </button>
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <button
+                    onClick={() => onToggleCompare(key)}
+                    disabled={disabled}
+                    className="rounded text-[10px] px-1.5 py-0.5 font-medium"
+                    style={{
+                      backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
+                      color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
+                      border: `1px solid ${inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-border,#E2E8F0)"}`,
+                      cursor: disabled ? "default" : "pointer",
+                    }}
+                  >
+                    {inCompare ? "比較中" : "+比較"}
+                  </button>
+                  <StatusBadge status={st} />
+                </div>
               </div>
-              <div className="flex gap-2 mt-1 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
-                <span>{POP_LABELS[m.popBand] ?? m.popBand}</span>
-                {m.vendors.length > 0 && (
-                  <span className="truncate">{m.vendors[0].name}{m.vendors.length > 1 ? ` 他${m.vendors.length - 1}社` : ""}</span>
-                )}
-              </div>
-            </button>
+              <button onClick={() => onSelectCity(m.city)} className="w-full text-left" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <ProgressBar rate={m.overall_rate} />
+                  </div>
+                  <span className="text-xs font-mono font-medium" style={{ color: rateColor(m.overall_rate) }}>
+                    {pct(m.overall_rate)}
+                  </span>
+                </div>
+                <div className="flex gap-2 mt-1 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                  <span>{POP_LABELS[m.popBand] ?? m.popBand}</span>
+                  {m.vendors.length > 0 && (
+                    <span className="truncate">{m.vendors[0].name}{m.vendors.length > 1 ? ` 他${m.vendors.length - 1}社` : ""}</span>
+                  )}
+                </div>
+              </button>
+            </div>
           );
         })}
       </div>
