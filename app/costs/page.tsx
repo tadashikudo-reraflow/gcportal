@@ -515,7 +515,10 @@ export default async function CostsPage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                   <span className="w-28 flex-shrink-0">人口 {d.pop}</span>
-                  <span>{d.costA}億 → {d.costB}億</span>
+                  <div className="flex-1 flex items-center gap-1.5">
+                    <span className="flex-1" />
+                    <span className="w-14 text-right tabular-nums">{d.costA}→{d.costB}億</span>
+                  </div>
                 </div>
               </div>
             );
