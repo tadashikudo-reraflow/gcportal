@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import data from "@/public/data/standardization.json";
 import populationBands from "@/public/data/population_bands.json";
 import { Municipality, PrefectureSummary, StandardizationData } from "@/lib/types";
+import { Vendor, Package, Municipality as SupaMunicipality, MunicipalityPackageRow } from "@/lib/supabase";
 import BenchmarkClient from "./BenchmarkClient";
 import Breadcrumb from "@/components/Breadcrumb";
+
+// ISR: 1時間キャッシュ
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "自治体ベンチマーク比較｜人口帯別・都道府県別の進捗ランキング | ガバメントクラウド移行状況ダッシュボード",
@@ -14,23 +18,10 @@ export const metadata: Metadata = {
 
 /* ============================================================
    人口帯の分類ロジック（2段階フォールバック方式）
-
-   【精度: 高】public/data/population_bands.json によるルックアップ
-     - 出典: 総務省住民基本台帳（2025年1月1日現在）
-     - 対象: 政令指定都市20市・中核市62市・施行時特例市23市・特別区23区
-     - これらの自治体は実人口データに基づき正確に分類される
-
-   【精度: 低（推定）】JSONにヒットしなかった自治体のフォールバック
-     - 「区」で終わる → 10-30万（政令市の行政区など）
-     - 「村」で終わる → 1万未満
-     - 「町」で終わる → 1-5万
-     - 「市」で終わる → 5-10万（中小市の中央値として仮置き）
-     - その他          → 1-5万（広域連合等）
    ============================================================ */
 
 type PopBand = "1万未満" | "1-5万" | "5-10万" | "10-30万" | "30万以上";
 
-// population_bands.json から自治体名→人口帯のルックアップMapを構築
 const POPULATION_BAND_MAP = new Map<string, PopBand>(
   (Object.entries(populationBands.bands) as [PopBand, string[]][]).flatMap(
     ([band, cities]) => cities.map((city) => [city, band] as [string, PopBand])
@@ -38,17 +29,14 @@ const POPULATION_BAND_MAP = new Map<string, PopBand>(
 );
 
 function classifyPopBand(city: string): PopBand {
-  // 1st: 静的JSONによる実人口ベースのルックアップ（高精度）
   const fromJson = POPULATION_BAND_MAP.get(city);
   if (fromJson) return fromJson;
 
-  // 2nd: 自治体名末尾キーワードによる推定（フォールバック）
   if (city.endsWith("区")) return "10-30万";
   if (city.endsWith("村")) return "1万未満";
   if (city.endsWith("町")) return "1-5万";
   if (city.endsWith("市")) return "5-10万";
 
-  // その他（広域連合等）
   return "1-5万";
 }
 
@@ -104,12 +92,68 @@ function computePopBandStats(municipalities: Municipality[]): {
   return { stats, municipalitiesWithBand };
 }
 
-export default function BenchmarkPage() {
+/* ============================================================
+   Supabase PKGデータ取得
+   ============================================================ */
+
+type MunicipalityPackageWithPackage = MunicipalityPackageRow & {
+  packages?: Package & { vendors?: Vendor };
+};
+
+export interface PkgData {
+  supabaseMunicipalities: SupaMunicipality[];
+  packagesByMunicipalityId: Record<number, MunicipalityPackageWithPackage[]>;
+}
+
+async function fetchPkgData(): Promise<PkgData | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) return null;
+
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    const [municipalityRes, mpRes] = await Promise.all([
+      supabase
+        .from("municipalities")
+        .select("id, prefecture, city, pref_city_code, size_category")
+        .order("prefecture")
+        .order("city"),
+      supabase
+        .from("municipality_packages")
+        .select(
+          "id, municipality_id, package_id, business, adoption_year, confidence, packages(id, package_name, business, vendor_id, confirmed_date, vendors(name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count))"
+        )
+        .limit(5000),
+    ]);
+
+    const supabaseMunicipalities: SupaMunicipality[] = municipalityRes.data ?? [];
+    const mpRows = (mpRes.data ?? []) as unknown as MunicipalityPackageWithPackage[];
+
+    const packagesByMunicipalityId: Record<number, MunicipalityPackageWithPackage[]> = {};
+    for (const row of mpRows) {
+      if (!packagesByMunicipalityId[row.municipality_id]) {
+        packagesByMunicipalityId[row.municipality_id] = [];
+      }
+      packagesByMunicipalityId[row.municipality_id].push(row);
+    }
+
+    return { supabaseMunicipalities, packagesByMunicipalityId };
+  } catch {
+    return null;
+  }
+}
+
+export default async function BenchmarkPage() {
   const typedData = data as StandardizationData;
   const { stats, municipalitiesWithBand } = computePopBandStats(
     typedData.municipalities as Municipality[]
   );
   const prefectures = typedData.prefectures as PrefectureSummary[];
+
+  const pkgData = await fetchPkgData();
 
   return (
     <div className="space-y-6">
@@ -126,6 +170,7 @@ export default function BenchmarkPage() {
         municipalities={municipalitiesWithBand}
         prefectures={prefectures}
         dataMonth={typedData.summary.data_month}
+        pkgData={pkgData}
       />
     </div>
   );

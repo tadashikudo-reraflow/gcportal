@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import type { PopBandStat, MunicipalityWithBand } from "./page";
+import { useRouter, useSearchParams } from "next/navigation";
+import type { PopBandStat, MunicipalityWithBand, PkgData } from "./page";
 import type { PrefectureSummary } from "@/lib/types";
 
 /* ============================================================
@@ -40,6 +41,98 @@ const ALL_BANDS: PopBand[] = ["1万未満", "1-5万", "5-10万", "10-30万", "30
    Compare tab – colors for up to 4 selected municipalities
    ============================================================ */
 const SLOT_COLORS = ["#1D4ED8", "#378445", "#F59E0B", "#64748B"];
+
+/* ============================================================
+   PKGデータ照合ヘルパー
+   ============================================================ */
+
+// standardization.json の自治体（prefecture + city）と Supabase municipalities を照合し、
+// municipality_id を返す Map を構築
+function buildMuniIdMap(
+  pkgData: PkgData | null
+): Map<string, number> {
+  if (!pkgData) return new Map();
+  const map = new Map<string, number>();
+  for (const m of pkgData.supabaseMunicipalities) {
+    const key = `${m.prefecture}__${m.city}`;
+    map.set(key, m.id);
+  }
+  return map;
+}
+
+interface PackageEntry {
+  business: string | null;
+  packageName: string;
+  vendorName: string;
+  cloudPlatform: string | null;
+}
+
+function getPackagesForMuni(
+  prefecture: string,
+  city: string,
+  muniIdMap: Map<string, number>,
+  pkgData: PkgData | null
+): PackageEntry[] {
+  if (!pkgData) return [];
+  const key = `${prefecture}__${city}`;
+  const id = muniIdMap.get(key);
+  if (!id) return [];
+  const rows = pkgData.packagesByMunicipalityId[id] ?? [];
+  return rows.map((row) => ({
+    business: row.business ?? row.packages?.business ?? null,
+    packageName: row.packages?.package_name ?? "—",
+    vendorName: row.packages?.vendors?.short_name ?? row.packages?.vendors?.name ?? "—",
+    cloudPlatform: row.packages?.vendors?.cloud_platform ?? null,
+  }));
+}
+
+/* ============================================================
+   同規模PKG採用傾向を計算（ランキングタブ用）
+   ============================================================ */
+
+interface VendorShare {
+  vendorName: string;
+  count: number;
+  percent: number;
+}
+
+function computeBandVendorShare(
+  band: PopBand,
+  municipalities: MunicipalityWithBand[],
+  muniIdMap: Map<string, number>,
+  pkgData: PkgData | null
+): VendorShare[] {
+  if (!pkgData) return [];
+  const sameBand = municipalities.filter((m) => m.popBand === band);
+  const vendorCount: Record<string, number> = {};
+
+  for (const m of sameBand) {
+    const key = `${m.prefecture}__${m.city}`;
+    const id = muniIdMap.get(key);
+    if (!id) continue;
+    const rows = pkgData.packagesByMunicipalityId[id] ?? [];
+    const seenVendors = new Set<string>();
+    for (const row of rows) {
+      const vName = row.packages?.vendors?.short_name ?? row.packages?.vendors?.name;
+      if (vName && !seenVendors.has(vName)) {
+        seenVendors.add(vName);
+        vendorCount[vName] = (vendorCount[vName] ?? 0) + 1;
+      }
+    }
+  }
+
+  const total = sameBand.length;
+  if (total === 0) return [];
+
+  return Object.entries(vendorCount)
+    .map(([vendorName, count]) => ({
+      vendorName,
+      count,
+      percent: Math.round((count / total) * 100),
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+}
 
 /* ============================================================
    Compare tab – Autocomplete Input
@@ -237,25 +330,55 @@ function RadarChart({
 function CompareTab({
   municipalities,
   dataMonth,
+  pkgData,
+  initialCities,
+  onCitiesChange,
 }: {
   municipalities: MunicipalityWithBand[];
   dataMonth: string;
+  pkgData: PkgData | null;
+  initialCities: string[];
+  onCitiesChange: (cities: string[]) => void;
 }) {
-  const [selected, setSelected] = useState<string[]>(["", "", "", ""]);
+  const STORAGE_KEY = "benchmark_compare";
+
+  // initialCities (URLパラメータ) → localStorage → デフォルトの優先順
+  const [selected, setSelected] = useState<string[]>(() => {
+    if (initialCities.some(Boolean)) {
+      return [...initialCities, "", "", ""].slice(0, 4);
+    }
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved) as string[];
+          return [...parsed, "", "", "", ""].slice(0, 4);
+        }
+      } catch { /* ignore */ }
+    }
+    return ["", "", "", ""];
+  });
+
+  const muniIdMap = useMemo(() => buildMuniIdMap(pkgData), [pkgData]);
+
+  // 選択変更時: localStorage保存 + URL更新コールバック
+  const handleSelect = useCallback((idx: number, city: string) => {
+    setSelected((prev) => {
+      const next = [...prev];
+      next[idx] = city;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next.filter(Boolean)));
+      } catch { /* ignore */ }
+      onCitiesChange(next);
+      return next;
+    });
+  }, [onCitiesChange]);
 
   const selectedMunis = useMemo(() => {
     return selected
       .map((city) => municipalities.find((m) => m.city === city))
       .filter((m): m is MunicipalityWithBand => !!m);
   }, [selected, municipalities]);
-
-  const handleSelect = useCallback((idx: number, city: string) => {
-    setSelected((prev) => {
-      const next = [...prev];
-      next[idx] = city;
-      return next;
-    });
-  }, []);
 
   const businessNames = useMemo(() => {
     const set = new Set<string>();
@@ -289,7 +412,21 @@ function CompareTab({
     }));
   }, [selectedMunis, radarDimensions, selected]);
 
+  // 採用パッケージデータ（自治体×業務別）
+  const pkgByMuni = useMemo(() => {
+    if (!pkgData) return {};
+    const result: Record<string, PackageEntry[]> = {};
+    for (const m of selectedMunis) {
+      result[m.city] = getPackagesForMuni(m.prefecture, m.city, muniIdMap, pkgData);
+    }
+    return result;
+  }, [selectedMunis, pkgData, muniIdMap]);
+
+  const hasPkgData = pkgData !== null && selectedMunis.some((m) => (pkgByMuni[m.city]?.length ?? 0) > 0);
+
   const [copiedCompare, setCopiedCompare] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState(false);
+
   const handleCopy = useCallback(() => {
     if (selectedMunis.length === 0) return;
     const lines = [`自治体比較結果（${dataMonth}時点）`, ""];
@@ -309,6 +446,17 @@ function CompareTab({
       setTimeout(() => setCopiedCompare(false), 2000);
     });
   }, [selectedMunis, dataMonth]);
+
+  const handleCopyUrl = useCallback(() => {
+    const cities = selected.filter(Boolean);
+    if (cities.length === 0) return;
+    const params = new URLSearchParams({ tab: "compare", cities: cities.join(",") });
+    const url = `${window.location.origin}/benchmark?${params.toString()}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    });
+  }, [selected]);
 
   const excludeCities = selected.filter(Boolean);
 
@@ -331,6 +479,21 @@ function CompareTab({
               slotColor={SLOT_COLORS[idx]}
             />
           ))}
+        </div>
+        {/* URL共有ボタン */}
+        <div className="mt-3 flex justify-end">
+          <button
+            onClick={handleCopyUrl}
+            disabled={!selected.some(Boolean)}
+            className="px-3 py-1.5 rounded-md text-xs font-medium transition-colors disabled:opacity-40"
+            style={{
+              backgroundColor: copiedUrl ? "#378445" : "var(--color-section-bg, #f1f5f9)",
+              color: copiedUrl ? "#fff" : "var(--color-text-primary, #1e293b)",
+              border: "1px solid var(--color-border, #e2e8f0)",
+            }}
+          >
+            {copiedUrl ? "URLをコピーしました" : "この比較をURLで共有"}
+          </button>
         </div>
       </div>
 
@@ -439,6 +602,58 @@ function CompareTab({
                     })}
                   </tr>
                 ))}
+
+                {/* 採用パッケージセクション */}
+                {hasPkgData && (
+                  <>
+                    <tr style={{ backgroundColor: "var(--color-gov-bg, #f8fafc)" }}>
+                      <td colSpan={selectedMunis.length + 1} className="px-4 py-2 font-bold text-xs" style={{ color: "var(--color-muted, #64748b)" }}>
+                        採用パッケージ
+                      </td>
+                    </tr>
+                    {selectedMunis.map((m) => {
+                      const pkgs = pkgByMuni[m.city] ?? [];
+                      return (
+                        <tr key={`pkg-${m.city}`} className="border-b align-top" style={{ borderColor: "var(--color-border, #e2e8f0)" }}>
+                          <td className="px-4 py-2 text-xs font-medium whitespace-nowrap">
+                            {m.city}
+                          </td>
+                          <td colSpan={selectedMunis.length} className="px-4 py-2">
+                            {pkgs.length === 0 ? (
+                              <span className="text-xs" style={{ color: "var(--color-muted, #64748b)" }}>データなし</span>
+                            ) : (
+                              <div className="flex flex-wrap gap-1.5">
+                                {pkgs.map((p, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs border"
+                                    style={{
+                                      backgroundColor: "var(--color-section-bg, #f8fafc)",
+                                      borderColor: "var(--color-border, #e2e8f0)",
+                                    }}
+                                  >
+                                    <span className="font-medium">{p.vendorName}</span>
+                                    <span style={{ color: "var(--color-muted, #64748b)" }}>
+                                      {p.packageName !== "—" ? `/ ${p.packageName}` : ""}
+                                    </span>
+                                    {p.cloudPlatform && (
+                                      <span
+                                        className="px-1 rounded text-[10px]"
+                                        style={{ backgroundColor: "#dbeafe", color: "#1e40af" }}
+                                      >
+                                        {p.cloudPlatform}
+                                      </span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </>
+                )}
               </tbody>
             </table>
           </div>
@@ -496,6 +711,7 @@ interface BenchmarkClientProps {
   municipalities: MunicipalityWithBand[];
   prefectures: PrefectureSummary[];
   dataMonth: string;
+  pkgData: PkgData | null;
 }
 
 export default function BenchmarkClient({
@@ -503,15 +719,54 @@ export default function BenchmarkClient({
   municipalities,
   prefectures,
   dataMonth,
+  pkgData,
 }: BenchmarkClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // URLパラメータからタブ・比較自治体を初期化
+  const initialTab = (searchParams.get("tab") as "ranking" | "compare") ?? "ranking";
+  const initialCitiesRaw = searchParams.get("cities") ?? "";
+  const initialCities = initialCitiesRaw ? initialCitiesRaw.split(",").slice(0, 4) : [];
+
   /* --- Tab state --- */
-  const [activeTab, setActiveTab] = useState<"ranking" | "compare">("ranking");
+  const [activeTab, setActiveTab] = useState<"ranking" | "compare">(initialTab);
 
   /* --- Ranking tab state --- */
   const [prefBandFilter, setPrefBandFilter] = useState<PopBand | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMuni, setSelectedMuni] = useState<MunicipalityWithBand | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const muniIdMap = useMemo(() => buildMuniIdMap(pkgData), [pkgData]);
+
+  // rankingタブ: localStorage復元
+  const RANKING_STORAGE_KEY = "benchmark_ranking";
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(RANKING_STORAGE_KEY);
+      if (saved) {
+        const { query, bandFilter } = JSON.parse(saved) as { query?: string; bandFilter?: string };
+        if (bandFilter) setPrefBandFilter(bandFilter as PopBand | "all");
+        if (query) setSearchQuery(query);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // rankingタブ: 変更時にlocalStorageへ保存
+  useEffect(() => {
+    try {
+      localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify({ query: searchQuery, bandFilter: prefBandFilter }));
+    } catch { /* ignore */ }
+  }, [searchQuery, prefBandFilter]);
+
+  /* --- URL更新（compareタブ） --- */
+  const handleCompareCitiesChange = useCallback((cities: string[]) => {
+    const activeCities = cities.filter(Boolean);
+    const params = new URLSearchParams({ tab: "compare" });
+    if (activeCities.length > 0) params.set("cities", activeCities.join(","));
+    router.replace(`/benchmark?${params.toString()}`, { scroll: false });
+  }, [router]);
 
   /* --- Derived: Prefecture ranking with band filter --- */
   const prefectureRanking = useMemo(() => {
@@ -576,6 +831,12 @@ export default function BenchmarkClient({
     const rank = peers.filter((m) => (m.overall_rate ?? 0) > myRate).length + 1;
     return { avg, total: peers.length, rank };
   }, [municipalities, selectedMuni]);
+
+  /* --- 同規模PKG採用傾向 --- */
+  const bandVendorShare = useMemo(() => {
+    if (!selectedMuni || !pkgData) return [];
+    return computeBandVendorShare(selectedMuni.popBand, municipalities, muniIdMap, pkgData);
+  }, [selectedMuni, pkgData, municipalities, muniIdMap]);
 
   /* --- Budget template copy --- */
   const handleCopyBudgetTemplate = useCallback(() => {
@@ -1007,6 +1268,41 @@ export default function BenchmarkClient({
                   </div>
                 </div>
 
+                {/* 同規模PKG採用傾向 */}
+                {pkgData && bandVendorShare.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-bold mb-1" style={{ color: "var(--color-gov-primary)" }}>
+                      同規模自治体のPKG採用傾向
+                    </h4>
+                    <p className="text-xs mb-3" style={{ color: "var(--color-text-secondary)" }}>
+                      人口帯「{selectedMuni.popBand}」の自治体で採用されているベンダー（自治体単位でカウント）
+                    </p>
+                    <div className="space-y-2">
+                      {bandVendorShare.map((v) => (
+                        <div key={v.vendorName} className="flex items-center gap-3">
+                          <span className="text-xs w-24 truncate font-medium">{v.vendorName}</span>
+                          <div className="flex-1 h-5 rounded-sm overflow-hidden" style={{ backgroundColor: "var(--color-section-bg)" }}>
+                            <div
+                              className="h-full rounded-sm transition-all duration-500"
+                              style={{
+                                width: `${v.percent}%`,
+                                backgroundColor: "#1D4ED8",
+                                opacity: 0.7,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs font-bold w-12 text-right" style={{ color: "#1D4ED8" }}>
+                            {v.percent}%
+                          </span>
+                          <span className="text-xs w-12 text-right" style={{ color: "var(--color-text-secondary)" }}>
+                            {v.count}団体
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {samePrefMunis.length > 0 && (
                   <div>
                     <h4 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
@@ -1212,7 +1508,13 @@ export default function BenchmarkClient({
           TAB: 自治体比較
           ============================================================ */}
       {activeTab === "compare" && (
-        <CompareTab municipalities={municipalities} dataMonth={dataMonth} />
+        <CompareTab
+          municipalities={municipalities}
+          dataMonth={dataMonth}
+          pkgData={pkgData}
+          initialCities={initialCities}
+          onCitiesChange={handleCompareCitiesChange}
+        />
       )}
     </div>
   );
