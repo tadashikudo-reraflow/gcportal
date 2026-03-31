@@ -21,23 +21,23 @@ const NAV_GROUPS = [
   },
   { label: "スケジュール", short: "日程", href: "/timeline" },
   {
-    label: "調べる",
-    short: "調べる",
+    label: "パッケージ・比較",
+    short: "パッケージ",
     children: [
       { href: "/packages", label: "導入パッケージ一覧", desc: "" },
       { href: "/benchmark",  label: "自治体同士を比較する", desc: "" },
     ],
   },
   {
-    label: "リスク",
-    short: "リスク",
+    label: "移行リスク",
+    short: "移行リスク",
     children: [
       { href: "/risks",   label: "遅延リスク自治体一覧", desc: "" },
       { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
-  { label: "ソース・出典", short: "出典", href: "/sources" },
+  { label: "出典", short: "出典", href: "/sources" },
   { label: "無料レポート", short: "レポート", href: "/finops" },
 ] as const;
 

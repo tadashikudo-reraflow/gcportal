@@ -3,13 +3,14 @@ import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
-import FreshnessBanner from "@/components/FreshnessBanner";
 import HeroSection from "@/components/HeroSection";
 import JapanMap from "@/components/JapanMap";
-import PrefectureRanking from "@/components/PrefectureRanking";
 import SourceAttribution from "@/components/SourceAttribution";
 import ThreeMetricsWidget from "@/components/ThreeMetricsWidget";
 import BusinessCards from "@/components/BusinessCards";
+import GlossaryTooltip from "@/components/GlossaryTooltip";
+import PrefectureSelector from "@/components/PrefectureSelector";
+import Callout from "@/components/Callout";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
 import { Municipality } from "@/lib/types";
@@ -44,23 +45,21 @@ function getStatus(rate: number, isTokutei: boolean): "tokutei" | "complete" | "
   return "critical";
 }
 
-function getRateColor(rate: number): string {
-  if (rate >= 0.9) return "#378445";
-  if (rate >= 0.7) return "#1D4ED8";
-  if (rate >= 0.5) return "#F59E0B";
-  return "#b91c1c";
-}
-
-function formatRate(rate: number): string {
-  return (rate * 100).toFixed(1) + "%";
-}
-
 function calcRemainingDays(deadline: string): number {
   const now = new Date();
   const deadlineDate = new Date(deadline + "T23:59:59+09:00");
   const diff = deadlineDate.getTime() - now.getTime();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
+
+// ステータスバーのセグメント定義（クリック先付き）
+const STATUS_SEGMENTS = [
+  { label: "完了", color: "#378445", sub: "全20業務100%", href: "/prefectures?status=complete" },
+  { label: "順調", color: "#1D4ED8", sub: "75%以上", href: "/prefectures?status=ontrack" },
+  { label: "要注意", color: "#F59E0B", sub: "50〜75%", href: "/risks?severity=atrisk" },
+  { label: "危機", color: "#b91c1c", sub: "50%未満", href: "/risks?severity=critical" },
+  { label: "特定移行", color: "#64748B", sub: "期限延長", href: "/tokutei" },
+];
 
 export default function DashboardPage() {
   const { summary, prefectures, businesses, risk_municipalities } = data;
@@ -73,13 +72,6 @@ export default function DashboardPage() {
     )
   );
   const TOKUTEI_OFFICIAL = tokuteiData.total_count as number;
-
-  // 特定移行の都道府県別カウント
-  const tokuteiByPref: Record<string, number> = {};
-  for (const m of tokuteiData.municipalities as { prefecture: string; city: string }[]) {
-    tokuteiByPref[m.prefecture] = (tokuteiByPref[m.prefecture] ?? 0) + 1;
-  }
-  const TOKUTEI_MUNI_COUNT = tokuteiSet.size;
   const TOTAL = summary.total;
 
   // 5段階分類
@@ -98,21 +90,25 @@ export default function DashboardPage() {
     else criticalCount++;
   }
 
+  const statusCounts: Record<string, number> = {
+    完了: completeCount,
+    順調: ontrackCount,
+    要注意: atriskCount,
+    危機: criticalCount,
+    特定移行: TOKUTEI_OFFICIAL,
+  };
+
   // 遅延リスク（特定移行を除外した危機自治体）
   const riskMunis = risk_municipalities.filter(
     (m) => !tokuteiSet.has(`${m.prefecture}/${m.city}`)
   );
-  const top20Risk = riskMunis.slice(0, 20);
 
   const remainingDays = calcRemainingDays(summary.deadline);
-  const completedPct = ((completeCount / TOTAL) * 100).toFixed(1);
-
   // 業務別: 完了率降順
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
 
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-12">
       {/* ========== Hero セクション ========== */}
       <HeroSection
         remainingDays={remainingDays}
@@ -121,6 +117,7 @@ export default function DashboardPage() {
         completeCount={completeCount}
         tokuteiCount={TOKUTEI_OFFICIAL}
         dataMonth={summary.data_month}
+        municipalities={allMunis}
       />
 
       {/* ========== 3指標比較ウィジェット（ヒーロー直下） ========== */}
@@ -134,10 +131,26 @@ export default function DashboardPage() {
         totalSystems={migrationStats.total_systems}
       />
 
-      {/* データ鮮度バナー */}
-      <FreshnessBanner dataMonth={summary.data_month} pageLabel="ダッシュボード" />
+      {/* ========== 日本地図ヒートマップ（ThreeMetrics直後） ========== */}
+      <div>
+        {/* 都道府県ドロップダウン */}
+        <div className="flex items-center gap-3 mb-4">
+          <label
+            htmlFor="pref-select"
+            className="text-xs font-medium flex-shrink-0"
+            style={{ color: "var(--color-text-secondary)" }}
+          >
+            都道府県を選択
+          </label>
+          <PrefectureSelector />
+        </div>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          都道府県をクリックで詳細を確認
+        </p>
+        <JapanMap prefectures={prefectures} />
+      </div>
 
-      {/* ========== ステータス分布バー（統合版） ========== */}
+      {/* ========== ステータス分布バー（クリック可能） ========== */}
       <div className="status-bar-card">
         <div className="flex items-baseline justify-between mb-3">
           <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
@@ -147,89 +160,109 @@ export default function DashboardPage() {
             特定移行とは？ →
           </Link>
         </div>
-        <div className="flex rounded-xl overflow-hidden" style={{ height: 32 }}>
-          {[
-            { label: "完了", count: completeCount, color: "#378445" },
-            { label: "順調", count: ontrackCount, color: "#1D4ED8" },
-            { label: "要注意", count: atriskCount, color: "#F59E0B" },
-            { label: "危機", count: criticalCount, color: "#b91c1c" },
-            { label: "特定移行", count: TOKUTEI_OFFICIAL, color: "#64748B" },
-          ].map((s) => (
-            <div
-              key={s.label}
-              style={{ width: `${(s.count / TOTAL) * 100}%`, backgroundColor: s.color }}
-              title={`${s.label}: ${s.count.toLocaleString()}`}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3">
-          {[
-            { label: "完了", count: completeCount, color: "#378445", sub: "全20業務100%" },
-            { label: "順調", count: ontrackCount, color: "#1D4ED8", sub: "75%以上" },
-            { label: "要注意", count: atriskCount, color: "#F59E0B", sub: "50〜75%" },
-            { label: "危機", count: criticalCount, color: "#b91c1c", sub: "50%未満" },
-            { label: "特定移行", count: TOKUTEI_OFFICIAL, color: "#64748B", sub: "期限延長" },
-          ].map((s) => (
-            <div key={s.label} className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-sm inline-block flex-shrink-0" style={{ backgroundColor: s.color }} />
-              <span className="text-sm font-semibold tabular-nums" style={{ color: s.color }}>
-                {s.count.toLocaleString()}
-              </span>
-              <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                {s.label}
-              </span>
-              <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
-                {s.sub}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
 
-      {/* ========== 進捗率の注釈バナー ========== */}
-      <div className="rounded-xl px-5 py-3 flex items-start gap-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
-        <span style={{ color: "#dc2626", fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠</span>
-        <p className="text-xs leading-relaxed" style={{ color: "#991b1b" }}>
-          <strong>手続き進捗率は移行完了ではありません。</strong>
-          準備工程を含むため、全20業務が完了した自治体は <strong>{completeCount} / {TOTAL.toLocaleString()}（{completedPct}%）</strong> にとどまります。
+        {/* クリッカブルバー */}
+        <div className="flex rounded-xl overflow-hidden" style={{ height: 32 }}>
+          {STATUS_SEGMENTS.map((s) => {
+            const count = statusCounts[s.label] ?? 0;
+            return (
+              <Link
+                key={s.label}
+                href={s.href}
+                style={{
+                  width: `${(count / TOTAL) * 100}%`,
+                  backgroundColor: s.color,
+                  display: "block",
+                  transition: "opacity 0.15s",
+                }}
+                title={`${s.label}: ${count.toLocaleString()}団体 — クリックで詳細`}
+                className="hover:opacity-80 cursor-pointer"
+              />
+            );
+          })}
+        </div>
+
+        {/* クリッカブル凡例 */}
+        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-3">
+          {STATUS_SEGMENTS.map((s) => {
+            const count = statusCounts[s.label] ?? 0;
+            return (
+              <Link
+                key={s.label}
+                href={s.href}
+                className="flex items-center gap-2 no-underline hover:opacity-75 transition-opacity"
+              >
+                <span className="w-3 h-3 rounded-sm inline-block flex-shrink-0" style={{ backgroundColor: s.color }} />
+                <span className="text-sm font-semibold tabular-nums" style={{ color: s.color }}>
+                  {count.toLocaleString()}
+                </span>
+                <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                  {s.label}
+                </span>
+                <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                  {s.sub}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Footnote（赤バナー廃止・amber footnoteに格下げ） */}
+        <p
+          className="mt-3 text-[11px] px-3 py-1.5 rounded-lg"
+          style={{ color: "#78350f", backgroundColor: "#fef3c7" }}
+        >
+          ※ <GlossaryTooltip term="手続き進捗率">手続き進捗率</GlossaryTooltip>は移行完了を意味しません
         </p>
       </div>
 
-      {/* ========== 業務別 手続き進捗率 ========== */}
+      {/* ========== 業務別 手続き進捗率（ワースト5デフォルト） ========== */}
       <BusinessCards
         businesses={sortedBusinesses}
         total={TOTAL}
       />
 
-      {/* 日本地図ヒートマップ */}
-      <JapanMap prefectures={prefectures} />
-
       {/* ========== 初見者向け「特定移行」ガイド ========== */}
-      <div className="rounded-xl px-5 py-3 flex items-center gap-3" style={{ backgroundColor: "#f0f5ff" }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M12 16v-4M12 8h.01"/>
-        </svg>
-        <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
-          <strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong>（{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠です。{" "}
+      <Callout variant="info">
+        <p>
+          <GlossaryTooltip term="特定移行"><strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong></GlossaryTooltip>
+          （{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠です。{" "}
           <Link href="/tokutei" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
             詳しくは特定移行ページへ →
           </Link>
         </p>
-      </div>
+      </Callout>
 
-      {/* ========== 次に調べる（回遊CTA） ========== */}
+      {/* ========== 次に調べる（回遊CTA・視覚階層あり） ========== */}
       <div>
         <p className="text-xs font-semibold mb-3" style={{ color: "var(--color-text-muted)" }}>次に調べる</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <Link href="/risks" className="explore-card">
+          {/* 主要2枚: 大カード（col-span-2） */}
+          <Link
+            href="/risks"
+            className="explore-card col-span-2 sm:col-span-1"
+            style={{ padding: "1.25rem 1.5rem" }}
+          >
             <span className="explore-card-badge" style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}>
               {riskMunis.length}件
             </span>
-            <span className="explore-card-title">遅延リスク自治体</span>
+            <span className="explore-card-title" style={{ fontSize: "1rem" }}>遅延リスク自治体</span>
             <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
           </Link>
 
+          <Link
+            href="/finops#pdf"
+            className="explore-card col-span-2 sm:col-span-1"
+            style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE", padding: "1.25rem 1.5rem" }}
+          >
+            <span className="explore-card-badge" style={{ backgroundColor: "#BFDBFE", color: "#1E40AF" }}>
+              無料PDF
+            </span>
+            <span className="explore-card-title" style={{ color: "#1E40AF", fontSize: "1rem" }}>全体レポート（無料PDF）</span>
+            <span className="explore-card-desc">全国サマリーを報告資料向けにダウンロード</span>
+          </Link>
+
+          {/* 残り4枚: 小カード */}
           <Link href="/benchmark" className="explore-card">
             <span className="explore-card-badge" style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}>
               比較
@@ -261,19 +294,11 @@ export default function DashboardPage() {
             <span className="explore-card-title">導入パッケージ</span>
             <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
           </Link>
-
-          <Link href="/finops#pdf" className="explore-card" style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE" }}>
-            <span className="explore-card-badge" style={{ backgroundColor: "#BFDBFE", color: "#1E40AF" }}>
-              無料PDF
-            </span>
-            <span className="explore-card-title" style={{ color: "#1E40AF" }}>全体レポート</span>
-            <span className="explore-card-desc">全国サマリーを報告資料向けにダウンロード</span>
-          </Link>
         </div>
       </div>
 
       {/* 出典・データソース */}
-      <SourceAttribution sourceIds={PAGE_SOURCES.dashboard} pageId="dashboard" />
+      <SourceAttribution sourceIds={PAGE_SOURCES.dashboard} pageId="dashboard" dataMonth={summary.data_month} />
     </div>
   );
 }

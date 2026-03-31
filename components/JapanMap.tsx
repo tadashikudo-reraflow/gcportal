@@ -211,9 +211,9 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
                   ry={CORNER_RADIUS}
                   fill={fill}
                   stroke={tooltip?.data.prefecture === name ? "#1e293b" : "rgba(0,0,0,0.12)"}
-                  strokeWidth={tooltip?.data.prefecture === name ? 2.5 : 1}
+                  strokeWidth={tooltip?.data.prefecture === name ? 3 : 1}
                   style={{
-                    transition: "stroke-width 0.15s, stroke 0.15s",
+                    transition: "all 150ms ease",
                     filter: tooltip?.data.prefecture === name ? "brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,0.2))" : "none",
                   }}
                 />
@@ -298,9 +298,9 @@ function TooltipOverlay({
   const TIP_H = 100;
   const ARROW_SIZE = 6;
 
-  // Position tooltip above the cell, centered horizontally
+  // Position tooltip above the cell, centered horizontally, with 16px offset
   let tx = anchorX - TIP_W / 2;
-  const ty = anchorY - CELL_SIZE / 2 - TIP_H - ARROW_SIZE - 4;
+  const ty = anchorY - CELL_SIZE / 2 - TIP_H - ARROW_SIZE - 16;
 
   // Clamp horizontal to stay within SVG
   if (tx < 4) tx = 4;

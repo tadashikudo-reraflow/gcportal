@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import type { BusinessSummary } from "@/lib/types";
 
@@ -14,6 +17,12 @@ type Props = {
 };
 
 export default function BusinessCards({ businesses, total }: Props) {
+  const [expanded, setExpanded] = useState(false);
+
+  // ワースト5: 進捗率が低い順に5件
+  const worst5 = [...businesses].sort((a, b) => a.avg_rate - b.avg_rate).slice(0, 5);
+  const displayed = expanded ? businesses : worst5;
+
   return (
     <div className="card p-6">
       <h2
@@ -21,10 +30,12 @@ export default function BusinessCards({ businesses, total }: Props) {
         style={{ color: "var(--color-text-primary)" }}
       >
         業務別 手続き進捗率
-        <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>進捗率降順・クリックで詳細</span>
+        <span className="text-xs font-normal ml-2" style={{ color: "var(--color-text-muted)" }}>
+          {expanded ? "進捗率降順" : "ワースト5"}・クリックで詳細
+        </span>
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2.5">
-        {businesses.map((biz) => {
+        {displayed.map((biz) => {
           const pct = biz.avg_rate * 100;
           const barColor = getRateColor(biz.avg_rate);
 
@@ -63,6 +74,23 @@ export default function BusinessCards({ businesses, total }: Props) {
           );
         })}
       </div>
+
+      {/* 展開/折りたたみボタン */}
+      <button
+        type="button"
+        onClick={() => setExpanded(!expanded)}
+        className="mt-4 w-full py-2 text-xs font-medium rounded-lg transition-colors"
+        style={{
+          backgroundColor: "#F3F4F6",
+          color: "var(--color-text-secondary)",
+          border: "1px solid #E5E7EB",
+        }}
+      >
+        {expanded
+          ? `折りたたむ ▲`
+          : `全${businesses.length}業務を表示 ▼`}
+      </button>
+
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100">
         <span className="text-xs text-gray-500">凡例:</span>
         {[

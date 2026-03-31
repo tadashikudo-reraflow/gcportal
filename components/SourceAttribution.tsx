@@ -77,14 +77,34 @@ function InlineAttribution({ sources }: { sources: DataSource[] }) {
 }
 
 // --- Footer バリアント（シンプル1行） ---
-function FooterAttribution({ sources, pageId }: { sources: DataSource[]; pageId?: string }) {
+function FooterAttribution({
+  sources,
+  pageId,
+  dataMonth,
+}: {
+  sources: DataSource[];
+  pageId?: string;
+  dataMonth?: string;
+}) {
   if (sources.length === 0) return null;
 
   const hasAiSurvey = sources.some(s => s.confidence === "ai_survey");
   const orgs = [...new Set(sources.map(s => s.org))];
 
+  // dataMonth フォーマット: "YYYY-MM" → "YYYY年M月"
+  let formattedMonth: string | null = null;
+  if (dataMonth) {
+    const [y, m] = dataMonth.split("-");
+    formattedMonth = `${y}年${parseInt(m)}月`;
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs py-2 border-t border-gray-100">
+      {formattedMonth && (
+        <span style={{ color: "var(--color-text-muted)" }}>
+          更新: {formattedMonth}
+        </span>
+      )}
       <span style={{ color: "var(--color-text-muted)" }}>
         出典: {orgs.join("・")}
       </span>
@@ -106,12 +126,14 @@ type SourceAttributionProps = {
   sourceIds: string[];
   variant?: "inline" | "footer";
   pageId?: string;
+  dataMonth?: string;
 };
 
 export default function SourceAttribution({
   sourceIds,
   variant = "footer",
   pageId,
+  dataMonth,
 }: SourceAttributionProps) {
   const sources = sourceIds
     .map((id) => getSource(id))
@@ -123,7 +145,7 @@ export default function SourceAttribution({
     return <InlineAttribution sources={sources} />;
   }
 
-  return <FooterAttribution sources={sources} pageId={pageId} />;
+  return <FooterAttribution sources={sources} pageId={pageId} dataMonth={dataMonth} />;
 }
 
 // --- 個別のConfidenceバッジ（他のページから直接使用可能） ---

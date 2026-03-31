@@ -3,7 +3,9 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import NavBar from "./NavBar";
+import BottomNav from "@/components/BottomNav";
 import { useUXTracker } from "@/hooks/useUXTracker";
+import StickyCTA from "@/components/StickyCTA";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
   useUXTracker();
@@ -56,9 +58,12 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* メインコンテンツ */}
-      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-14 sm:pb-6">
         {children}
       </main>
+
+      {/* #9 スティッキーCTA（スクロール30%超でフェードイン） */}
+      <StickyCTA />
 
       {/* フッター */}
       <footer
@@ -104,6 +109,9 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </footer>
+
+      {/* モバイルボトムナビ（sm以下のみ表示） */}
+      <BottomNav />
     </>
   );
 }

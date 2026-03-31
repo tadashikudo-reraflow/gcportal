@@ -59,7 +59,8 @@ export default function ThreeMetricsWidget({
 }: ThreeMetricsWidgetProps) {
   const metrics = [
     {
-      label: "全業務完了率",
+      label: "完了率",
+      description: "全20業務が完了した自治体の割合",
       badge: "真の完了",
       badgeColor: "#dc2626",
       badgeBg: "#fef2f2",
@@ -71,6 +72,7 @@ export default function ThreeMetricsWidget({
     },
     {
       label: "システム移行率",
+      description: "ガバクラへの移行が完了したシステム数",
       badge: null,
       badgeColor: "#2563eb",
       badgeBg: null,
@@ -82,6 +84,7 @@ export default function ThreeMetricsWidget({
     },
     {
       label: "手続き進捗率",
+      description: "移行手続きの全国平均進捗（完了≠稼働開始）",
       badge: "手続きが進んだだけ",
       badgeColor: "#9ca3af",
       badgeBg: "#f3f4f6",
@@ -112,13 +115,22 @@ export default function ThreeMetricsWidget({
               <div className="relative">
                 <DonutRing pct={m.pct} color={m.color} trackColor={m.trackColor} size={120} strokeWidth={12} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-black tabular-nums leading-none" style={{ color: m.color }}>
+                  {/* #7 数字を超大型化 */}
+                  <span
+                    className="tabular-nums leading-none"
+                    style={{
+                      color: m.color,
+                      fontSize: "2.25rem",
+                      fontWeight: 800,
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
                     {m.pct}%
                   </span>
                 </div>
               </div>
 
-              {/* Label + badge */}
+              {/* Label + badge + description */}
               <div className="flex flex-col items-center gap-1 text-center">
                 <div className="flex items-center gap-1.5 flex-wrap justify-center">
                   <span className="text-sm font-semibold" style={{ color: m.color }}>{m.label}</span>
@@ -131,6 +143,13 @@ export default function ThreeMetricsWidget({
                     </span>
                   )}
                 </div>
+                {/* #7 1行説明 */}
+                <p
+                  className="text-[11px] leading-snug px-1"
+                  style={{ color: "var(--color-text-secondary)", maxWidth: "10rem" }}
+                >
+                  {m.description}
+                </p>
                 <p className="text-xs tabular-nums" style={{ color: "var(--color-text-secondary)" }}>
                   {m.note}
                 </p>
