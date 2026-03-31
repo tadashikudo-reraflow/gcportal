@@ -129,6 +129,7 @@ export default function BusinessPackageList({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="パッケージ名・業務・ベンダーで絞り込み..."
           className="w-full pl-9 pr-9 py-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1"
+          style={{ fontSize: 16 }}
         />
         {hasQuery && (
           <button

@@ -74,13 +74,13 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-3 rounded-lg text-sm outline-none text-gray-900"
-          style={{ border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
+          style={{ fontSize: 16, border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
         />
         <select
           value={orgType}
           onChange={(e) => setOrgType(e.target.value)}
           className="w-full px-4 py-3 rounded-lg text-sm outline-none text-gray-700"
-          style={{ border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
+          style={{ fontSize: 16, border: "1px solid #D1D5DB", backgroundColor: "#F9FAFB" }}
         >
           <option value="">ご所属を選択してください</option>
           {ORG_OPTIONS.map((opt) => (

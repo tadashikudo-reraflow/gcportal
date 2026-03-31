@@ -124,6 +124,7 @@ export default function MunicipalitySearch({
             autoComplete="off"
             className="w-full pl-9 pr-9 py-2.5 rounded-lg border text-sm outline-none transition-colors"
             style={{
+              fontSize: 16, /* iOS Safariズーム防止 */
               borderColor: showSuggestions ? NAVY : "var(--color-border)",
               boxShadow: showSuggestions ? `0 0 0 2px ${NAVY}20` : "none",
               color: "var(--color-text-primary)",

@@ -113,7 +113,7 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
                   value={orgType}
                   onChange={(e) => setOrgType(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 text-sm"
-                  style={{ borderColor: "#d1d5db", color: "var(--color-text-primary)" }}
+                  style={{ fontSize: 16, borderColor: "#d1d5db", color: "var(--color-text-primary)" }}
                 >
                   {ORG_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -132,7 +132,7 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border rounded-lg px-3 py-2 text-sm"
-                  style={{ borderColor: "#d1d5db", color: "var(--color-text-primary)" }}
+                  style={{ fontSize: 16, borderColor: "#d1d5db", color: "var(--color-text-primary)" }}
                 />
                 <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                   GCInsightの最新レポートをお届けすることがあります。

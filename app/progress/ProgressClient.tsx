@@ -323,6 +323,7 @@ function FilterBar({
         onChange={(e) => setQuery(e.target.value)}
         className="w-full rounded-lg px-3 py-2 text-sm"
         style={{
+          fontSize: 16, /* iOS Safariズーム防止 */
           border: "1px solid var(--color-border, #E2E8F0)",
           color: "var(--color-text-primary)",
           backgroundColor: "var(--color-surface-container-low, #fff)",
@@ -417,7 +418,7 @@ function NationalOverview({
               </span>
             </div>
             <ProgressBar rate={p.avg_rate} />
-            <div className="flex gap-2 mt-2 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+            <div className="flex gap-2 mt-2 text-[10px] sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
               <span>{p.count}団体</span>
               {p.completed > 0 && (
                 <span style={{ color: "var(--color-status-complete)" }}>
@@ -591,7 +592,7 @@ function PrefectureDetail({
                         <button
                           onClick={(e) => { e.stopPropagation(); onToggleCompare(key); }}
                           disabled={disabled}
-                          className="rounded text-[10px] px-1.5 py-0.5 font-medium"
+                          className="rounded text-[10px] sm:text-xs px-1.5 py-0.5 font-medium"
                           style={{
                             backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
                             color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
@@ -635,7 +636,7 @@ function PrefectureDetail({
                   <button
                     onClick={() => onToggleCompare(key)}
                     disabled={disabled}
-                    className="rounded text-[10px] px-1.5 py-0.5 font-medium"
+                    className="rounded text-[10px] sm:text-xs px-1.5 py-0.5 font-medium"
                     style={{
                       backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
                       color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
@@ -657,7 +658,7 @@ function PrefectureDetail({
                     {pct(m.overall_rate)}
                   </span>
                 </div>
-                <div className="flex gap-2 mt-1 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                <div className="flex gap-2 mt-1 text-[10px] sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
                   <span>{POP_LABELS[m.popBand] ?? m.popBand}</span>
                   {m.vendors.length > 0 && (
                     <span className="truncate">{m.vendors[0].name}{m.vendors.length > 1 ? ` 他${m.vendors.length - 1}社` : ""}</span>
