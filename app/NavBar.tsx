@@ -20,19 +20,15 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: "リスク",
-    short: "リスク",
-    children: [
-      { href: "/risks",    label: "遅延リスク", desc: "" },
-      { href: "/tokutei",  label: "特定移行", desc: "" },
-    ],
+    label: "進捗",
+    short: "進捗",
+    href: "/progress",
   },
   {
     label: "調べる",
     short: "調べる",
     children: [
       { href: "/packages",  label: "パッケージ", desc: "" },
-      { href: "/benchmark", label: "ベンチマーク比較", desc: "" },
       { href: "/timeline",  label: "スケジュール", desc: "" },
       { href: "/template",  label: "質問主意書テンプレ", desc: "" },
       { href: "/sources",   label: "出典", desc: "" },
@@ -64,17 +60,15 @@ const DRAWER_SECTIONS = [
     ],
   },
   {
-    title: "リスク",
+    title: "進捗",
     items: [
-      { href: "/risks",    label: "遅延リスク" },
-      { href: "/tokutei",  label: "特定移行" },
+      { href: "/progress", label: "進捗ダッシュボード" },
     ],
   },
   {
     title: "調べる",
     items: [
       { href: "/packages",  label: "パッケージ" },
-      { href: "/benchmark", label: "ベンチマーク比較" },
       { href: "/timeline",  label: "スケジュール" },
       { href: "/template",  label: "質問主意書テンプレ" },
       { href: "/sources",   label: "出典" },
