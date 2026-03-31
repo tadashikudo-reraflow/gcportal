@@ -503,7 +503,7 @@ export default async function CostsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span className="w-28 flex-shrink-0">{d.pop}</span>
+                  <span className="w-28 flex-shrink-0">人口 {d.pop}</span>
                   <span>{d.costA}億 → {d.costB}億</span>
                 </div>
               </div>
@@ -745,16 +745,16 @@ export default async function CostsPage() {
             <span style={{ color: "var(--color-text-secondary)" }}>団体が見積精査支援を利用（チェックリスト公開済み）</span>
           </li>
           <li className="flex items-baseline gap-2 text-sm">
-            <span className="font-bold text-red-600 tabular-nums w-16 flex-shrink-0">+178億</span>
-            <span style={{ color: "var(--color-text-secondary)" }}>東京都の年間コスト超過見込み — 全国規模の政策課題に</span>
-          </li>
-          <li className="flex items-baseline gap-2 text-sm">
             <span className="font-bold text-gray-500 tabular-nums w-16 flex-shrink-0">交渉中</span>
             <span style={{ color: "var(--color-text-secondary)" }}>CSP各社（AWS・Azure・GCP・OCI）との利用料割引交渉</span>
           </li>
           <li className="flex items-baseline gap-2 text-sm">
             <span className="font-bold text-gray-500 tabular-nums w-16 flex-shrink-0">SaaS化</span>
             <span style={{ color: "var(--color-text-secondary)" }}>個別構築からSaaS共同利用への移行を費用削減策として推進</span>
+          </li>
+          <li className="flex items-baseline gap-2 text-sm">
+            <span className="font-bold text-green-700 tabular-nums w-16 flex-shrink-0">350億円</span>
+            <span style={{ color: "var(--color-text-secondary)" }}>令和7年度補正予算 — 運用最適化支援事業（国費350億・補助対象700億）</span>
           </li>
         </ul>
         <Link
@@ -766,16 +766,10 @@ export default async function CostsPage() {
         </Link>
       </div>
 
-      {/* 注記 + 補正予算 */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 px-5 py-4 space-y-2">
-        <p className="text-xs text-gray-400">
-          ※ コスト比率は移行前=1.0基準。判明分のみ集計。全国町村会は2025年4月25日付で「移行前比数倍の増加見込み」として国に財政支援の拡充を要望しています。
-        </p>
-        <p className="text-xs text-blue-700">
-          <span className="font-bold">令和7年度補正予算（支援措置）:</span>{" "}
-          地方公共団体情報システム運用最適化支援事業として補助対象経費 <strong>700億円</strong>、国費 <strong>350億円</strong> を計上。
-        </p>
-      </div>
+      {/* 注記 */}
+      <p className="text-xs text-gray-400 px-1">
+        ※ コスト比率は移行前=1.0基準。判明分のみ集計。全国町村会は2025年4月25日付で「移行前比数倍の増加見込み」として国に財政支援の拡充を要望しています。
+      </p>
 
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.costs} pageId="costs" />
