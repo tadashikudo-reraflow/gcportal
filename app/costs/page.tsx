@@ -414,7 +414,7 @@ export default async function CostsPage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>東京都（年間超過額）</p>
-            <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>移行前比の%は算出不可。都全体の年間コスト超過見込み額として都議会で報告。</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>23区とは別。東京都庁の基幹システム移行で年間超過見込み。移行前総額不明のため%換算不可。</p>
           </div>
         </div>
         <p className="text-[11px] text-gray-400 mt-3">
