@@ -124,7 +124,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
 
   const handleClick = useCallback(
     (name: string) => {
-      router.push(`/prefectures/${encodeURIComponent(name)}`);
+      router.push(`/progress?pref=${encodeURIComponent(name)}`);
     },
     [router]
   );

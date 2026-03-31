@@ -71,7 +71,7 @@ export default function PrefectureRanking({ prefectures, tokuteiByPref }: Props)
                   <td className="py-2 px-2 text-center text-xs text-gray-400">{i + 1}</td>
                   <td className="py-2 px-2 whitespace-nowrap">
                     <Link
-                      href={`/prefectures/${encodeURIComponent(pref.prefecture)}`}
+                      href={`/progress?pref=${encodeURIComponent(pref.prefecture)}`}
                       className="font-medium text-gray-800 hover:underline"
                     >
                       {pref.prefecture}

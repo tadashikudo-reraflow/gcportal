@@ -45,7 +45,7 @@ export default function PrefectureHeatmap({ prefectures }: PrefectureHeatmapProp
   const totalCount = sorted.reduce((sum, p) => sum + p.count, 0);
 
   const handleClick = (prefecture: string) => {
-    router.push(`/prefectures/${encodeURIComponent(prefecture)}`);
+    router.push(`/progress?pref=${encodeURIComponent(prefecture)}`);
   };
 
   return (

@@ -54,11 +54,11 @@ function calcRemainingDays(deadline: string): number {
 
 // ステータスバーのセグメント定義（クリック先付き）
 const STATUS_SEGMENTS = [
-  { label: "完了", color: "#378445", sub: "全20業務100%", href: "/prefectures?status=complete" },
-  { label: "順調", color: "#1D4ED8", sub: "75%以上", href: "/prefectures?status=ontrack" },
-  { label: "要注意", color: "#F59E0B", sub: "50〜75%", href: "/risks?severity=atrisk" },
-  { label: "危機", color: "#b91c1c", sub: "50%未満", href: "/risks?severity=critical" },
-  { label: "特定移行", color: "#64748B", sub: "期限延長", href: "/tokutei" },
+  { label: "完了", color: "#378445", sub: "全20業務100%", href: "/progress?status=completed" },
+  { label: "順調", color: "#1D4ED8", sub: "75%以上", href: "/progress?status=on_track" },
+  { label: "要注意", color: "#F59E0B", sub: "50〜75%", href: "/progress?status=warning" },
+  { label: "危機", color: "#b91c1c", sub: "50%未満", href: "/progress?status=critical" },
+  { label: "特定移行", color: "#64748B", sub: "期限延長", href: "/progress?status=tokutei" },
 ];
 
 export default function DashboardPage() {
@@ -156,7 +156,7 @@ export default function DashboardPage() {
           <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
             全 {TOTAL.toLocaleString()} 自治体の移行ステータス
           </h2>
-          <Link href="/tokutei" className="text-xs font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
+          <Link href="/progress?status=tokutei" className="text-xs font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
             特定移行とは？ →
           </Link>
         </div>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
         <p>
           <GlossaryTooltip term="特定移行"><strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong></GlossaryTooltip>
           （{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠です。{" "}
-          <Link href="/tokutei" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
+          <Link href="/progress?status=tokutei" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
             詳しくは特定移行ページへ →
           </Link>
         </p>
@@ -239,7 +239,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {/* 主要2枚: 大カード（col-span-2） */}
           <Link
-            href="/risks"
+            href="/progress?status=critical"
             className="explore-card col-span-2 sm:col-span-1"
             style={{ padding: "1.25rem 1.5rem" }}
           >
@@ -263,7 +263,7 @@ export default function DashboardPage() {
           </Link>
 
           {/* 残り4枚: 小カード */}
-          <Link href="/benchmark" className="explore-card">
+          <Link href="/progress" className="explore-card">
             <span className="explore-card-badge" style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}>
               比較
             </span>

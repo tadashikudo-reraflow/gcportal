@@ -10,21 +10,21 @@ type NavCard = {
 
 const ALL_CARDS: NavCard[] = [
   {
-    href: "/benchmark",
+    href: "/progress",
     badge: "比較",
     badgeStyle: { backgroundColor: "#D1FAE5", color: "#065F46" },
     title: "自治体を比較",
     desc: "人口帯・都道府県で類似団体をベンチマーク",
   },
   {
-    href: "/risks",
+    href: "/progress?status=critical",
     badge: "リスク",
     badgeStyle: { backgroundColor: "#FEE2E2", color: "#B91C1C" },
     title: "遅延リスク自治体",
     desc: "進捗50%未満の自治体を地域・人口帯で絞り込む",
   },
   {
-    href: "/tokutei",
+    href: "/progress?status=tokutei",
     badge: "935団体",
     badgeStyle: { backgroundColor: "#FEF3C7", color: "#92400E" },
     title: "特定移行の認定状況",

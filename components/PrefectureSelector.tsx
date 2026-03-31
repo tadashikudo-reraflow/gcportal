@@ -28,7 +28,7 @@ export default function PrefectureSelector() {
       defaultValue=""
       onChange={(e) => {
         if (e.target.value) {
-          router.push(`/prefectures?pref=${encodeURIComponent(e.target.value)}`);
+          router.push(`/progress?pref=${encodeURIComponent(e.target.value)}`);
         }
       }}
     >

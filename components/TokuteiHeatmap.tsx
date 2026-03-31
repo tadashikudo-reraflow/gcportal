@@ -69,7 +69,7 @@ export default function TokuteiHeatmap({ data }: TokuteiHeatmapProps) {
           return (
             <button
               key={pref.prefecture}
-              onClick={() => router.push(`/prefectures/${encodeURIComponent(pref.prefecture)}`)}
+              onClick={() => router.push(`/progress?pref=${encodeURIComponent(pref.prefecture)}`)}
               onMouseEnter={() => setHoveredPref(pref.prefecture)}
               onMouseLeave={() => setHoveredPref(null)}
               className="relative rounded-lg transition-all duration-150 text-left cursor-pointer"
