@@ -489,6 +489,9 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.35;
   margin-bottom: 0.75rem;
 }
+@media (min-width: 1024px) {
+  .hero-headline { font-size: 3rem; }
+}
 @media (max-width: 768px) {
   .hero-headline { font-size: 1.75rem; }
 }
@@ -503,6 +506,9 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-secondary);
   line-height: 1.7;
   margin-bottom: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .hero-sub { font-size: 1.125rem; }
 }
 .hero-sub strong {
   color: var(--color-text-primary);
@@ -664,6 +670,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ========== Three Metrics Widget (prominent) ========== */
+.three-metrics-value {
+  font-size: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .three-metrics-value { font-size: 2rem; }
+}
 .three-metrics-card {
   background: #FFFFFF;
   border-radius: 16px;

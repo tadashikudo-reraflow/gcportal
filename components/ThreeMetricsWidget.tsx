@@ -99,10 +99,10 @@ export default function ThreeMetricsWidget({
   return (
     <div className="three-metrics-card">
       <div className="three-metrics-header">
-        <h3 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+        <h3 className="text-base lg:text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
           3つの指標を正しく読む
         </h3>
-        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
+        <p className="text-xs lg:text-sm mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
           手続きは進んでいるが完了していない——がガバクラ移行の現在地
         </p>
       </div>
@@ -117,10 +117,9 @@ export default function ThreeMetricsWidget({
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   {/* #7 数字を超大型化 */}
                   <span
-                    className="tabular-nums leading-none"
+                    className="three-metrics-value tabular-nums leading-none"
                     style={{
                       color: m.color,
-                      fontSize: "1.5rem",
                       fontWeight: 800,
                       letterSpacing: "-0.03em",
                     }}
@@ -133,7 +132,7 @@ export default function ThreeMetricsWidget({
               {/* Label + badge + description */}
               <div className="flex flex-col items-center gap-1 text-center">
                 <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                  <span className="text-sm font-semibold" style={{ color: m.color }}>{m.label}</span>
+                  <span className="text-sm lg:text-base font-semibold" style={{ color: m.color }}>{m.label}</span>
                   {m.badge && (
                     <span
                       className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
@@ -150,7 +149,7 @@ export default function ThreeMetricsWidget({
                 >
                   {m.description}
                 </p>
-                <p className="text-xs tabular-nums" style={{ color: "var(--color-text-secondary)" }}>
+                <p className="text-xs lg:text-sm tabular-nums" style={{ color: "var(--color-text-secondary)" }}>
                   {m.note}
                 </p>
                 <p className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
