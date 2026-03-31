@@ -148,7 +148,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
   return (
     <div className="card p-6">
       <h2
-        className="text-sm font-bold mb-4 flex items-center gap-2"
+        className="text-sm lg:text-base font-bold mb-4 flex items-center gap-2"
         style={{ color: "var(--color-text-primary)" }}
       >
         <span
@@ -157,11 +157,11 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         />
         日本地図（都道府県カルトグラム）
       </h2>
-      <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+      <p className="text-xs lg:text-sm mb-4" style={{ color: "var(--color-text-muted)" }}>
         色は手続き進捗率を示します。クリックで都道府県詳細へ。
       </p>
 
-      <div className="relative w-full mx-auto" style={{ maxWidth: 580 }}>
+      <div className="relative w-full mx-auto" className="lg:max-w-none" style={{ maxWidth: 720 }}>
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           width="100%"

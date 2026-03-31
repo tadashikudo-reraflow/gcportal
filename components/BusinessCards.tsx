@@ -66,7 +66,7 @@ export default function BusinessCards({ businesses, total }: Props) {
                 />
               </div>
               {biz.critical > 0 && (
-                <p className="text-[10px]" style={{ color: "#b91c1c" }}>
+                <p className="text-[10px] lg:text-xs" style={{ color: "#b91c1c" }}>
                   危機 <span style={{ fontWeight: 700 }}>{biz.critical}</span>団体
                 </p>
               )}
