@@ -28,50 +28,16 @@ const INFRA_TOTAL = INFRA_SHARE.reduce((s, v) => s + v.systems, 0);
 
 // クラウド設定
 const CLOUD_CONFIG: Record<string, {
-  color: string; bgColor: string; borderColor: string;
+  color: string;
   label: string; certYear: number; infraPct: string; costIndex: number;
 }> = {
-  AWS:    { color: "#FF9900", bgColor: "#fffbf0", borderColor: "#FF9900",
-            label: "Amazon Web Services", certYear: 2021, infraPct: "97%", costIndex: 100 },
-  OCI:    { color: "#F80000", bgColor: "#fff8f8", borderColor: "#F80000",
-            label: "Oracle Cloud Infrastructure", certYear: 2022, infraPct: "<1%", costIndex: 55 },
-  Azure:  { color: "#0078D4", bgColor: "#f0f7ff", borderColor: "#0078D4",
-            label: "Microsoft Azure", certYear: 2021, infraPct: "2%", costIndex: 95 },
-  GCP:    { color: "#4285F4", bgColor: "#f0f4ff", borderColor: "#4285F4",
-            label: "Google Cloud Platform", certYear: 2021, infraPct: "<1%", costIndex: 90 },
-  Sakura: { color: "#E2004B", bgColor: "#fff0f5", borderColor: "#E2004B",
-            label: "さくらインターネット", certYear: 2024, infraPct: "<1%", costIndex: 70 },
+  AWS:    { color: "#FF9900", label: "Amazon Web Services",         certYear: 2021, infraPct: "97%",  costIndex: 100 },
+  OCI:    { color: "#F80000", label: "Oracle Cloud Infrastructure", certYear: 2022, infraPct: "<1%",  costIndex: 55  },
+  Azure:  { color: "#0078D4", label: "Microsoft Azure",             certYear: 2021, infraPct: "2%",   costIndex: 95  },
+  GCP:    { color: "#4285F4", label: "Google Cloud Platform",       certYear: 2021, infraPct: "<1%",  costIndex: 90  },
+  Sakura: { color: "#E2004B", label: "さくらインターネット",         certYear: 2024, infraPct: "<1%",  costIndex: 70  },
 };
 const CLOUD_ORDER = ["AWS", "OCI", "Azure", "GCP", "Sakura"];
-
-
-// クラウド別コスト比較
-const COST_COMPARE = [
-  {
-    item: "処理能力（4コア / メモリ16GB）",
-    unit: "USD/月",
-    aws: 180, azure: 170, gcp: 160, oci: 56, sakura: 125,
-    note: "OCI E4.Flex vs AWS m6i.xlarge 相当。さくら: 石狩リージョン高火力プラン参考値",
-  },
-  {
-    item: "オブジェクトストレージ（1TB）",
-    unit: "USD/月",
-    aws: 23, azure: 18, gcp: 20, oci: 3, sakura: 8,
-    note: "OCI Standard vs AWS S3 Standard",
-  },
-  {
-    item: "データ転送・アウトバウンド（1TB）",
-    unit: "USD",
-    aws: 90, azure: 87, gcp: 80, oci: 0, sakura: 0,
-    note: "OCI: 月10TBまで無料",
-  },
-  {
-    item: "総費用の目安（TCO指標）",
-    unit: "AWS=100",
-    aws: 100, azure: 95, gcp: 90, oci: 55, sakura: 70,
-    note: "デジタル庁・Oracle公式調査より。割引・転送料・ライセンス等を含む総合TCO。上記3項目の単純合計とは異なる",
-  },
-];
 
 type VendorInfo = {
   id: string;
@@ -83,7 +49,6 @@ type VendorInfo = {
   cloud_platform: string | null;
   notes: string | null;
 };
-
 
 type PackageRow = {
   package_name: string;
@@ -99,8 +64,6 @@ export default async function CloudPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // packages.cloud_platform 主軸でグループ化
-  // cloudMap[cloud][vendor_id] = { vendor, packages }
   const cloudMap: Record<string, Record<string, CloudVendorEntry>> = {};
 
   if (supabaseUrl && supabaseAnonKey) {
@@ -136,42 +99,27 @@ export default async function CloudPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "ガバメントクラウド比較" }]} />
-      <div className="pb-2">
+      <div>
         <h1 className="page-title">ガバメントクラウド比較</h1>
-        <p className="page-subtitle">
-          認定5CSPの機能・コスト・割引モデルを比較
-        </p>
+        <p className="page-subtitle">認定5CSPの機能・コスト・割引モデルを比較</p>
       </div>
 
-      {/* サマリーバー */}
+      {/* インフラシェア */}
       <div className="card p-5">
-        <div className="flex items-center gap-4">
-          <p className="text-5xl font-black tabular-nums" style={{ color: "var(--color-brand-primary)" }}>5</p>
-          <div>
-            <p className="text-base font-bold text-gray-800 leading-snug">デジタル庁認定クラウドサービス</p>
-            <p className="text-sm text-gray-500 mt-0.5">AWS・Azure・GCP・OCI・さくらクラウドの5基盤が対象</p>
-          </div>
+        <div className="flex items-baseline gap-2 mb-4">
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>インフラシェア実態</h2>
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>本番稼働システム数（2024年10月・デジタル庁調査）</span>
         </div>
-      </div>
-
-      {/* ② ガバクラ インフラシェア実態（ドーナツ + バー） */}
-      <div className="card p-5">
-        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-text-primary)" }}>
-          インフラシェア実態
-          <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>
-            本番稼働システム数（2024年10月・デジタル庁調査）
-          </span>
-        </h2>
 
         <div className="flex flex-col sm:flex-row gap-6 items-center">
           {/* ドーナツチャート */}
           <div className="flex-shrink-0">
-            <svg width="180" height="180" viewBox="0 0 180 180">
+            <svg width="160" height="160" viewBox="0 0 160 160">
               {(() => {
-                const cx = 90, cy = 90, r = 70, strokeW = 28;
+                const cx = 80, cy = 80, r = 60, strokeW = 24;
                 let cumAngle = -90;
                 return INFRA_SHARE.map((item) => {
                   const pct = item.systems / INFRA_TOTAL;
@@ -197,10 +145,10 @@ export default async function CloudPage() {
                   );
                 });
               })()}
-              <text x="90" y="82" textAnchor="middle" fontSize="28" fontWeight="800" fill="var(--color-text-primary)">
+              <text x="80" y="73" textAnchor="middle" fontSize="26" fontWeight="800" fill="var(--color-text-primary)">
                 {INFRA_TOTAL.toLocaleString()}
               </text>
-              <text x="90" y="104" textAnchor="middle" fontSize="11" fill="var(--color-text-muted)">
+              <text x="80" y="92" textAnchor="middle" fontSize="10" fill="var(--color-text-muted)">
                 システム
               </text>
             </svg>
@@ -216,53 +164,52 @@ export default async function CloudPage() {
                   <div className="bar-track flex-1">
                     <div className="bar-fill" style={{ width: `${Math.max(pct, 0.3)}%`, backgroundColor: item.color }} />
                   </div>
-                  <span className="text-sm font-bold w-12 flex-shrink-0 text-right tabular-nums" style={{ color: item.color }}>{pct.toFixed(1)}%</span>
-                  <span className="text-xs w-16 flex-shrink-0 text-right tabular-nums" style={{ color: "var(--color-text-muted)" }}>{item.systems.toLocaleString()}</span>
+                  <span className="text-xs font-bold w-10 flex-shrink-0 text-right tabular-nums" style={{ color: item.color }}>{pct.toFixed(1)}%</span>
+                  <span className="text-xs w-14 flex-shrink-0 text-right tabular-nums" style={{ color: "var(--color-text-muted)" }}>{item.systems.toLocaleString()}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className="mt-3 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ backgroundColor: "#fff8ed", color: "#92400e" }}>
+        <p className="mt-4 text-xs" style={{ color: "var(--color-text-muted)" }}>
           ※ インフラ層のシステム数。ベンダー一覧はアプリ層のため別指標。
-        </div>
-        <div className="mt-2 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ backgroundColor: "#fff0f5", border: "1px solid #e2004b30", color: "#9f1239" }}>
-          <span className="font-semibold" style={{ color: "#e2004b" }}>さくらのクラウド:</span>{" "}
-          2026年3月27日、全技術要件達成・本番環境提供開始（国内クラウド初）
+        </p>
+        <div className="mt-2 border-l-2 pl-3 py-1" style={{ borderColor: "#E2004B" }}>
+          <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+            <span className="font-semibold">さくらのクラウド:</span>{" "}
+            2026年3月27日、全技術要件達成・本番環境提供開始（国内クラウド初）
+          </p>
         </div>
       </div>
 
-      {/* ③ クラウド別コスト比較 */}
+      {/* クラウド別コスト比較 */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          クラウド別コスト比較
-          <span className="ml-1 text-xs font-normal" style={{ color: "var(--color-text-muted)" }}>ガバクラ標準システム規模での比較</span>
-        </h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+        <div className="flex items-baseline gap-2 mb-1">
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>クラウド別コスト比較</h2>
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>ガバクラ標準システム規模での比較</span>
+        </div>
+        <p className="text-xs mb-5" style={{ color: "var(--color-text-muted)" }}>
           デジタル庁・Oracle公式調査より。割引・転送料等を含む総合TCO指標（参考値）。
         </p>
 
-        {/* TCO指数バーチャート（ビジュアル） */}
-        <div className="mb-5 rounded-xl p-4" style={{ backgroundColor: "#f8fafc" }}>
-          <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-            総費用の目安（AWS=100基準）
-          </p>
-          <div className="space-y-3">
+        {/* TCO指数バーチャート */}
+        <div className="mb-5">
+          <p className="text-xs font-semibold mb-3" style={{ color: "var(--color-text-secondary)" }}>総費用の目安（AWS=100基準）</p>
+          <div className="space-y-2.5">
             {CLOUD_ORDER.map((cloudKey) => {
               const cfg = CLOUD_CONFIG[cloudKey];
               const idx = cfg.costIndex;
+              const label = cloudKey === "Sakura" ? "さくら" : cloudKey;
               return (
                 <div key={cloudKey} className="flex items-center gap-3">
-                  <span className="text-xs w-16 flex-shrink-0 text-right font-bold" style={{ color: cfg.color }}>
-                    {cloudKey === "Sakura" ? "さくら" : cloudKey}
-                  </span>
-                  <div className="flex-1 h-7 rounded-full overflow-hidden relative" style={{ backgroundColor: cfg.color + "15" }}>
+                  <span className="text-xs w-14 flex-shrink-0 text-right font-semibold text-gray-600">{label}</span>
+                  <div className="flex-1 h-6 rounded overflow-hidden" style={{ backgroundColor: "var(--color-surface-container)" }}>
                     <div
-                      className="h-full rounded-full flex items-center justify-end pr-2"
-                      style={{ width: `${idx}%`, backgroundColor: cfg.color + "30" }}
+                      className="h-full flex items-center justify-end pr-2 transition-all"
+                      style={{ width: `${idx}%`, backgroundColor: cfg.color + "40" }}
                     >
-                      <span className="text-xs font-extrabold" style={{ color: cfg.color }}>{idx}</span>
+                      <span className="text-xs font-bold" style={{ color: cfg.color }}>{idx}</span>
                     </div>
                   </div>
                 </div>
@@ -271,9 +218,8 @@ export default async function CloudPage() {
           </div>
         </div>
 
-
         {/* 料金計算ツールリンク */}
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 mb-5">
           {[
             { id: "AWS", url: "https://calculator.aws/pricing/2/metaindex" },
             { id: "Azure", url: "https://azure.microsoft.com/ja-jp/pricing/calculator/" },
@@ -281,22 +227,22 @@ export default async function CloudPage() {
             { id: "OCI", url: "https://www.oracle.com/jp/cloud/costestimator.html" },
           ].map(({ id, url }) => (
             <a key={id} href={url} target="_blank" rel="noopener noreferrer"
-              className="text-xs px-2.5 py-1.5 rounded-lg no-underline hover:opacity-80 text-center"
-              style={{ backgroundColor: CLOUD_CONFIG[id].color + "15", color: CLOUD_CONFIG[id].color, border: `1px solid ${CLOUD_CONFIG[id].color}30` }}>
+              className="text-xs px-2.5 py-1.5 rounded-lg no-underline hover:opacity-80 text-center border"
+              style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>
               {id} 料金計算ツール ↗
             </a>
           ))}
         </div>
 
         {/* 割引モデル比較 */}
-        <div className="mt-5 pt-4 border-t border-gray-100">
-          <p className="text-xs font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>割引モデル比較</p>
-          <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>自治体調達で使いやすい割引プランの比較（2026年3月時点・公式情報ベース）</p>
+        <div className="border-t pt-5" style={{ borderColor: "var(--color-border)" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>割引モデル比較</p>
+          <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>自治体調達で使いやすい割引プランの比較（2026年3月時点・公式情報ベース）</p>
           <div className="overflow-x-auto -mx-2 px-2">
             <table className="w-full text-sm" style={{ minWidth: 560 }}>
               <thead>
-                <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-2 px-2 text-xs font-medium text-gray-500 w-28">比較項目</th>
+                <tr className="border-b-2" style={{ borderColor: "var(--color-border)" }}>
+                  <th className="text-left py-2 px-2 text-xs font-medium w-28" style={{ color: "var(--color-text-muted)" }}>比較項目</th>
                   {CLOUD_ORDER.map((id) => (
                     <th key={id} className="text-center py-2 px-2 text-xs font-bold whitespace-nowrap" style={{ color: CLOUD_CONFIG[id].color }}>
                       {id === "Sakura" ? "さくら" : id}
@@ -327,12 +273,12 @@ export default async function CloudPage() {
                   },
                   {
                     item: "自治体向け評価",
-                    vals: ["▲", "⚪︎", "▲", "▲", "⚪︎"],
-                    highlight: ["⚪︎"],
+                    vals: ["▲", "○", "▲", "▲", "○"],
+                    highlight: ["○"],
                   },
                 ].map((row) => (
-                  <tr key={row.item} className="border-b border-gray-100">
-                    <td className="py-2 px-2 text-xs font-medium text-gray-700 whitespace-nowrap">{row.item}</td>
+                  <tr key={row.item} className="border-b" style={{ borderColor: "var(--color-border)" }}>
+                    <td className="py-2 px-2 text-xs font-medium whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>{row.item}</td>
                     {row.vals.map((val, i) => {
                       const isHighlight = row.highlight?.includes(val);
                       return (
@@ -349,75 +295,75 @@ export default async function CloudPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs mt-1 sm:hidden text-gray-400">← 横スクロールで全CSPを表示</p>
+          <p className="text-xs mt-1 sm:hidden" style={{ color: "var(--color-text-muted)" }}>← 横スクロールで全CSPを表示</p>
           <p className="mt-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
             ※ 割引率は最大値。実際の適用条件は各CSP契約内容・調達方式により異なります。
           </p>
+        </div>
 
-          {/* 補足：コミットの仕組みの違い */}
-          <div className="mt-5 pt-4 border-t border-gray-100">
-            <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>ガバメントクラウド調達の仕組み</p>
-            <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>自治体はCSPと直接契約しない。デジタル庁が一括調達し、自治体はクラウド利用料を負担</p>
-            <div className="flex flex-col items-center gap-0 text-xs">
-              <div className="grid grid-cols-5 gap-1 w-full">
-                {["AWS", "OCI", "Azure", "GCP", "さくら"].map((c) => (
-                  <div key={c} className="rounded-lg px-1 py-1.5 font-bold border text-xs text-center" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>{c}</div>
-                ))}
-              </div>
-              <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
-                <span className="text-xs">一括調達契約</span>
-                <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
-              </div>
-              <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "#1a56db" }}>デジタル庁</div>
-              <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
-                <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
-                <span className="text-xs">利用権付与・運用管理委託</span>
-              </div>
-              <div className="rounded-xl px-6 py-2 font-bold text-sm" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}>自治体（1,741団体）</div>
-              <p className="mt-3 text-xs text-center" style={{ color: "var(--color-text-muted)" }}>
-                ※ クラウド利用料は自治体負担。ドル建てCSPは円安時にコスト増となり自治体負担が増加。円建て（OCI・さくら）は予算が安定しやすい。
-              </p>
+        {/* ガバメントクラウド調達の仕組み */}
+        <div className="mt-5 border-t pt-5" style={{ borderColor: "var(--color-border)" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>ガバメントクラウド調達の仕組み</p>
+          <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>自治体はCSPと直接契約しない。デジタル庁が一括調達し、自治体はクラウド利用料を負担</p>
+          <div className="flex flex-col items-center gap-0 text-xs">
+            <div className="grid grid-cols-5 gap-1 w-full">
+              {["AWS", "OCI", "Azure", "GCP", "さくら"].map((c) => (
+                <div key={c} className="rounded-lg px-1 py-1.5 font-bold border text-xs text-center" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>{c}</div>
+              ))}
             </div>
+            <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
+              <span className="text-xs">一括調達契約</span>
+              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+            </div>
+            <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "#4A90E2" }}>デジタル庁</div>
+            <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
+              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <span className="text-xs">利用権付与・運用管理委託</span>
+            </div>
+            <div className="rounded-xl px-6 py-2 font-bold text-sm" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}>自治体（1,741団体）</div>
+            <p className="mt-3 text-xs text-center" style={{ color: "var(--color-text-muted)" }}>
+              ※ クラウド利用料は自治体負担。ドル建てCSPは円安時にコスト増となり自治体負担が増加。円建て（OCI・さくら）は予算が安定しやすい。
+            </p>
+          </div>
+        </div>
+
+        {/* コミットの仕組みの違い */}
+        <div className="mt-5 border-t pt-5 space-y-3" style={{ borderColor: "var(--color-border)" }}>
+          <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>コミットの仕組みの違い</p>
+
+          <div className="border-l-2 pl-3 py-1" style={{ borderColor: "#7FB8E6" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>OCI（財布型）</p>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、初期見積もりが過剰だと未使用失効リスクがある。
+            </p>
           </div>
 
-          <div className="mt-4 space-y-3">
-            <p className="text-xs font-bold" style={{ color: "var(--color-text-primary)" }}>コミットの仕組みの違い</p>
-
-            {/* OCI */}
-            <div className="rounded-lg p-3 border border-red-100 bg-red-50">
-              <p className="text-xs font-bold mb-1" style={{ color: "#c00" }}>OCI（財布型）</p>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、初期見積もりが過剰だと未使用失効リスクがある。
-              </p>
-            </div>
-
-            {/* 他社 */}
-            <div className="rounded-lg p-3 border border-gray-200 bg-gray-50">
-              <p className="text-xs font-bold mb-1 text-gray-700">AWS / Azure / GCP / さくら（予約型）</p>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで該当リソースを削減すると余ったコミット分が無駄になる。サービスをまたいだ最適化はできない。
-              </p>
-            </div>
-
+          <div className="border-l-2 pl-3 py-1" style={{ borderColor: "var(--color-border)" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>AWS / Azure / GCP / さくら（予約型）</p>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで該当リソースを削減すると余ったコミット分が無駄になる。サービスをまたいだ最適化はできない。
+            </p>
           </div>
         </div>
       </div>
 
       {/* データ主権リスク */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>データ主権リスク</h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+        <div className="flex items-baseline gap-2 mb-1">
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>データ主権リスク</h2>
+        </div>
+        <p className="text-xs mb-5" style={{ color: "var(--color-text-muted)" }}>
           外資CSPは米国法の域外適用を受ける。自治体データが日本国外に開示されるリスクがある。
         </p>
 
         <div className="space-y-3">
           {/* FISA 702 */}
-          <div className="rounded-lg p-3 border border-orange-200 bg-orange-50">
+          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#d97706" }}>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-bold" style={{ color: "#c2410c" }}>FISA 702条（外国情報監視法）</p>
+              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>FISA 702条（外国情報監視法）</p>
               <a href="https://www.justice.gov/nsd/surveillance-collection-foreign-intelligence-information" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
-                style={{ backgroundColor: "#c2410c18", color: "#c2410c", border: "1px solid #c2410c30" }}>
+                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
+                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
                 DOJ公式 ↗
               </a>
             </div>
@@ -427,12 +373,12 @@ export default async function CloudPage() {
           </div>
 
           {/* EO 12333 */}
-          <div className="rounded-lg p-3 border border-orange-200 bg-orange-50">
+          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#d97706" }}>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-bold" style={{ color: "#c2410c" }}>大統領令12333号（EO 12333）</p>
+              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>大統領令12333号（EO 12333）</p>
               <a href="https://www.pclob.gov/library/702-Report.pdf" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
-                style={{ backgroundColor: "#c2410c18", color: "#c2410c", border: "1px solid #c2410c30" }}>
+                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
+                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
                 PCLOB報告書 ↗
               </a>
             </div>
@@ -442,12 +388,12 @@ export default async function CloudPage() {
           </div>
 
           {/* MS仏上院証言 */}
-          <div className="rounded-lg p-3 border border-blue-200 bg-blue-50">
+          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#4A90E2" }}>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-bold" style={{ color: "#1d4ed8" }}>Microsoft 仏上院証言（2025年6月）</p>
+              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>Microsoft 仏上院証言（2025年6月）</p>
               <a href="https://www.senat.fr/rap/r24-510/r24-510.html" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded-full no-underline shrink-0"
-                style={{ backgroundColor: "#1d4ed818", color: "#1d4ed8", border: "1px solid #1d4ed830" }}>
+                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
+                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
                 仏上院公式 ↗
               </a>
             </div>
@@ -458,19 +404,23 @@ export default async function CloudPage() {
 
           {/* 外資 vs さくら対比 */}
           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-lg p-3 border border-gray-200 bg-gray-50">
-              <p className="text-xs font-bold mb-1 text-gray-700">外資CSP（AWS / Azure / GCP / OCI）</p>
-              <ul className="space-y-1">
+            <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)" }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>外資CSP（AWS / Azure / GCP / OCI）</p>
+              <ul className="space-y-1.5">
                 {["米国FISA 702条・EO12333の域外適用あり", "米国政府からのデータ開示要求を拒否できない", "ガグオーダーで自治体への通知も不可"].map(r => (
-                  <li key={r} className="text-xs flex gap-1.5 text-gray-600"><span className="text-red-500 shrink-0 mt-0.5">✗</span>{r}</li>
+                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
+                    <span className="text-red-500 shrink-0 mt-0.5">✗</span>{r}
+                  </li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-lg p-3 border border-pink-200 bg-pink-50">
-              <p className="text-xs font-bold mb-1" style={{ color: "#e4007f" }}>さくらのクラウド（国産）</p>
-              <ul className="space-y-1">
+            <div className="rounded-lg p-3 border" style={{ borderColor: "#7FB8E6", backgroundColor: "#f0f7ff" }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-primary)" }}>さくらのクラウド（国産）</p>
+              <ul className="space-y-1.5">
                 {["日本法人・国内DCのみで運営", "米国域外適用法の対象外", "データが国外に転送されない構造"].map(r => (
-                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}><span style={{ color: "#e4007f" }} className="shrink-0 mt-0.5">✓</span>{r}</li>
+                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
+                    <span style={{ color: "#4A90E2" }} className="shrink-0 mt-0.5">✓</span>{r}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -484,47 +434,49 @@ export default async function CloudPage() {
 
       {/* 自治体向け CSP 採用ポイント */}
       <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント</h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>コスト・運用・調達の観点から、各CSPの特徴と向いているケースをまとめました</p>
+        <div className="flex items-baseline gap-2 mb-1">
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント</h2>
+        </div>
+        <p className="text-xs mb-5" style={{ color: "var(--color-text-muted)" }}>コスト・運用・調達の観点から、各CSPの特徴と向いているケースをまとめました</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
             {
-              name: "AWS", color: "#FF9900", bg: "#fffbf0", border: "#ffe0a0",
+              name: "AWS", color: "#FF9900",
               points: ["パッケージベンダー対応数が最多・実績豊富", "コミュニティ・事例・ドキュメントが最も充実", "設定・予測管理が複雑。専任担当者が必要"],
               fit: "IT体制が整った中〜大規模自治体",
             },
             {
-              name: "OCI", color: "#c00", bg: "#fff5f5", border: "#fecaca",
+              name: "OCI", color: "#F80000",
               points: ["財布型でサービス横断の最適化を進めやすい", "円建て・転送料無料でコスト予測が立てやすい"],
               fit: "単年予算・管理負担を最小にしたい自治体",
             },
             {
-              name: "Azure", color: "#0078d4", bg: "#f0f7ff", border: "#bfdbfe",
+              name: "Azure", color: "#0078D4",
               points: ["Microsoft 365・AD・Teamsとの統合が強み", "庁内系システムとの連携で本領発揮"],
               fit: "Microsoft製品を庁内で広く使っている自治体",
             },
             {
-              name: "GCP", color: "#4285f4", bg: "#f0f4ff", border: "#bfcfff",
+              name: "GCP", color: "#4285F4",
               points: ["Vertex AI / Gemini でAI活用が最も容易", "Google Workspace との深い統合", "ガバクラ採用実績は少数（国内シェア0.7%）"],
               fit: "AI活用を積極的に推進したい自治体",
             },
             {
-              name: "さくら", color: "#e4007f", bg: "#fff0f7", border: "#fbcfe8",
+              name: "さくら", color: "#E2004B",
               points: ["国産クラウド・国内DC・ガバメントクラウド正式採択（国産初）", "データ主権・運用主権を国内で完結できる", "データ転送無料・円建て・シンプルな契約体系"],
               fit: "データ主権・国内法準拠・運用のシンプルさを重視する自治体",
             },
-          ].map(({ name, color, bg, border, points, fit }) => (
-            <div key={name} className="rounded-xl p-4 border" style={{ backgroundColor: bg, borderColor: border }}>
-              <p className="text-base font-bold mb-2" style={{ color }}>{name}</p>
-              <ul className="space-y-1 mb-3">
+          ].map(({ name, color, points, fit }) => (
+            <div key={name} className="rounded-xl p-4 border" style={{ borderColor: "var(--color-border)", borderTopWidth: 3, borderTopColor: color }}>
+              <p className="text-sm font-bold mb-2" style={{ color }}>{name}</p>
+              <ul className="space-y-1.5 mb-3">
                 {points.map((p) => (
                   <li key={p} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <span className="mt-0.5 shrink-0" style={{ color }}>•</span>{p}
+                    <span className="mt-0.5 shrink-0" style={{ color: "var(--color-text-muted)" }}>•</span>{p}
                   </li>
                 ))}
               </ul>
-              <p className="text-xs rounded-lg px-2 py-1.5 font-medium" style={{ backgroundColor: color + "18", color }}>
-                ✓ {fit}
+              <p className="text-xs px-2 py-1.5 rounded font-medium" style={{ backgroundColor: "var(--color-surface-container-low)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
+                向き先: {fit}
               </p>
             </div>
           ))}
@@ -532,7 +484,7 @@ export default async function CloudPage() {
       </div>
 
       {/* 対応ベンダー・パッケージへの導線 */}
-      <div className="rounded-xl border border-gray-200 px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="rounded-xl border px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--color-border)" }}>
         <div>
           <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             対応ベンダー・パッケージの詳細
@@ -551,8 +503,8 @@ export default async function CloudPage() {
       </div>
 
       {/* 免責事項 */}
-      <div className="rounded-lg border border-amber-200 px-5 py-3" style={{ backgroundColor: "#fffbeb" }}>
-        <p className="text-xs leading-relaxed" style={{ color: "#92400e" }}>
+      <div className="rounded-lg border px-5 py-3" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#d97706" }}>
+        <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
           <span className="font-semibold">免責事項:</span>{" "}
           公開情報ベースの整理です。最新条件は各社公式サイトで確認してください。
         </p>
@@ -560,16 +512,16 @@ export default async function CloudPage() {
 
       <div
         className="rounded-xl border px-5 py-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
-        style={{ borderColor: "#dbeafe", backgroundColor: "#f8fbff" }}
+        style={{ borderColor: "var(--color-border)" }}
       >
         <div>
-          <p className="text-xs font-semibold" style={{ color: "#1d4ed8" }}>
+          <p className="text-xs font-semibold" style={{ color: "#4A90E2" }}>
             関連導線
           </p>
-          <p className="mt-1 text-sm font-semibold" style={{ color: "#111827" }}>
+          <p className="mt-1 text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
             コスト削減の考え方と無料レポートをあわせて確認
           </p>
-          <p className="mt-1 text-xs leading-6" style={{ color: "#475569" }}>
+          <p className="mt-1 text-xs leading-6" style={{ color: "var(--color-text-muted)" }}>
             基盤比較だけでなく、移行済み最適化と未移行見直しの整理、全体レポートへの導線も用意しています。
           </p>
         </div>
@@ -584,8 +536,6 @@ export default async function CloudPage() {
 
       {/* 出典・データソース */}
       <SourceAttribution sourceIds={PAGE_SOURCES.cloud} pageId="cloud" />
-
-
 
       <PageNavCards exclude="/cloud" />
       <RelatedArticles cluster={CLUSTERS.tech} />
