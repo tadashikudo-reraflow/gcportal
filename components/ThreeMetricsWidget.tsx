@@ -120,12 +120,12 @@ export default function ThreeMetricsWidget({
                     className="tabular-nums leading-none"
                     style={{
                       color: m.color,
-                      fontSize: "2.25rem",
+                      fontSize: "1.5rem",
                       fontWeight: 800,
                       letterSpacing: "-0.03em",
                     }}
                   >
-                    {m.pct}%
+                    {m.pct}<span style={{ fontSize: "0.875rem" }}>%</span>
                   </span>
                 </div>
               </div>
