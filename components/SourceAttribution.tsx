@@ -76,88 +76,26 @@ function InlineAttribution({ sources }: { sources: DataSource[] }) {
   );
 }
 
-// --- Footer バリアント（セクション下部のボックス型） ---
+// --- Footer バリアント（シンプル1行） ---
 function FooterAttribution({ sources, pageId }: { sources: DataSource[]; pageId?: string }) {
   if (sources.length === 0) return null;
 
-  // カテゴリ別にグループ化
-  const grouped: Record<string, DataSource[]> = {};
-  for (const s of sources) {
-    const cat = s.category;
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(s);
-  }
-
-  // confidence 集計
-  const confidenceCounts: Record<ConfidenceLevel, number> = { official: 0, verified: 0, estimated: 0, ai_survey: 0 };
-  for (const s of sources) confidenceCounts[s.confidence]++;
-
-  const officialPct = sources.length > 0
-    ? Math.round(((confidenceCounts.official + confidenceCounts.verified) / sources.length) * 100)
-    : 0;
+  const hasAiSurvey = sources.some(s => s.confidence === "ai_survey");
+  const orgs = [...new Set(sources.map(s => s.org))];
 
   return (
-    <div className="rounded-lg border px-5 py-4 space-y-3" style={{ borderColor: "#e5e7eb", backgroundColor: "#f9fafb" }}>
-      {/* ヘッダー */}
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold" style={{ color: "#374151" }}>
-          データソース・出典
-        </p>
-        <div className="flex items-center gap-2">
-          {officialPct > 0 && (
-            <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#f0fdf4", color: "#15803d" }}>
-              {officialPct}% 公式・確認済
-            </span>
-          )}
-          {pageId && (
-            <Link href="/sources" className="text-xs underline" style={{ color: "#6b7280" }}>
-              詳細 →
-            </Link>
-          )}
-        </div>
-      </div>
-
-      {/* ソース一覧 */}
-      <div className="space-y-1.5">
-        {sources.map((source) => {
-          const cfg = CONFIDENCE_CONFIG[source.confidence];
-          const catCfg = CATEGORY_CONFIG[source.category];
-          return (
-            <div key={source.id} className="flex items-start gap-2 text-xs">
-              <ConfidenceIcon level={source.confidence} size={14} />
-              <div className="flex-1 min-w-0">
-                <span className="font-medium" style={{ color: "#374151" }}>
-                  {source.url ? (
-                    <a href={source.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {source.name}
-                    </a>
-                  ) : (
-                    source.name
-                  )}
-                </span>
-                <span className="ml-1.5" style={{ color: "#9ca3af" }}>
-                  — {source.org}
-                  {source.dataMonth && ` (${source.dataMonth})`}
-                </span>
-              </div>
-              <span
-                className="flex-shrink-0 px-1.5 py-0.5 rounded text-xs"
-                style={{ backgroundColor: cfg.bgColor, color: cfg.color }}
-              >
-                {cfg.labelShort}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* AI調査の警告 */}
-      {confidenceCounts.ai_survey > 0 && (
-        <div className="rounded px-3 py-2 text-xs leading-relaxed" style={{ backgroundColor: "#fef2f2", color: "#991b1b" }}>
-          <span className="font-semibold">注意:</span> 一部データは独自調査（参考値）に基づいています。
-          公式発表と異なる場合があります。最新情報は各機関の公式サイトをご確認ください。
-        </div>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs py-2 border-t border-gray-100">
+      <span style={{ color: "var(--color-text-muted)" }}>
+        出典: {orgs.join("・")}
+      </span>
+      {hasAiSurvey && (
+        <span className="px-1.5 py-0.5 rounded" style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}>
+          AI調査含
+        </span>
       )}
+      <Link href="/sources" className="hover:underline ml-auto" style={{ color: "var(--color-brand-primary)" }}>
+        詳細 →
+      </Link>
     </div>
   );
 }
