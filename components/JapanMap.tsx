@@ -161,7 +161,7 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
         色は手続き進捗率を示します。クリックで都道府県詳細へ。
       </p>
 
-      <div className="relative w-full mx-auto" className="lg:max-w-none" style={{ maxWidth: 720 }}>
+      <div className="relative w-full mx-auto lg:max-w-none" style={{ maxWidth: 720 }}>
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           width="100%"
