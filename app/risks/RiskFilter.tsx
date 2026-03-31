@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import FilterBar, { FilterValues } from "@/components/FilterBar";
 import { REGIONS, STATUS_OPTIONS, POPULATION_BANDS } from "@/lib/regions";
 
@@ -94,6 +95,37 @@ export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilt
         <span className="text-xs text-gray-400">
           {filtered.length} 件表示{filtered.length !== rows.length ? ` / ${rows.length}件中` : ""}
         </span>
+        <button
+          onClick={() => {
+            const header = ["自治体名", "都道府県", "進捗率", "ステータス"];
+            const csvRows = filtered.map((r) => {
+              const badge = getStatusBadge(r.overall_rate);
+              return [
+                `"${r.city}"`,
+                `"${r.prefecture}"`,
+                `"${(r.overall_rate * 100).toFixed(1)}%"`,
+                `"${badge.label}"`,
+              ].join(",");
+            });
+            const csv = [header.join(","), ...csvRows].join("\n");
+            const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "遅延リスク自治体一覧.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          CSVダウンロード
+        </button>
       </div>
 
       {/* テーブル */}
@@ -143,7 +175,13 @@ export default function RiskFilter({ rows, prefectures: _prefectures }: RiskFilt
                     {region ?? ""}
                   </td>
                   <td className="py-2.5 px-2 font-medium text-gray-800 truncate max-w-[120px]">
-                    {row.city}
+                    <Link
+                      href={`/municipalities/${encodeURIComponent(row.prefecture)}/${encodeURIComponent(row.city)}`}
+                      className="hover:underline"
+                      style={{ color: "inherit" }}
+                    >
+                      {row.city}
+                    </Link>
                   </td>
                   <td className="py-2.5 px-2 text-right">
                     <span

@@ -35,17 +35,17 @@ const VARIANT_STYLES: Record<
     ),
   },
   warning: {
-    bg: "#fef2f2",
-    border: "#fecaca",
-    iconColor: "#dc2626",
-    textColor: "#991b1b",
+    bg: "#fffbeb",
+    border: "#fde68a",
+    iconColor: "#d97706",
+    textColor: "#92400e",
     icon: (
       <svg
         width="18"
         height="18"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#dc2626"
+        stroke="#d97706"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

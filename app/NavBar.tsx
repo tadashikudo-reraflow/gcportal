@@ -19,26 +19,26 @@ const NAV_GROUPS = [
       { href: "/cloud",    label: "ガバクラ比較", desc: "" },
     ],
   },
-  { label: "スケジュール", short: "日程", href: "/timeline" },
   {
-    label: "パッケージ・比較",
-    short: "パッケージ",
+    label: "リスク",
+    short: "リスク",
     children: [
-      { href: "/packages", label: "導入パッケージ一覧", desc: "" },
-      { href: "/benchmark",  label: "自治体同士を比較する", desc: "" },
+      { href: "/risks",    label: "遅延リスク", desc: "" },
+      { href: "/tokutei",  label: "特定移行", desc: "" },
     ],
   },
   {
-    label: "移行リスク",
-    short: "移行リスク",
+    label: "調べる",
+    short: "調べる",
     children: [
-      { href: "/risks",   label: "遅延リスク自治体一覧", desc: "" },
-      { href: "/tokutei", label: "期限延長が認められた「特定移行」", desc: "" },
+      { href: "/packages",  label: "パッケージ", desc: "" },
+      { href: "/benchmark", label: "ベンチマーク比較", desc: "" },
+      { href: "/timeline",  label: "スケジュール", desc: "" },
+      { href: "/sources",   label: "出典", desc: "" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
-  { label: "出典", short: "出典", href: "/sources" },
-  { label: "無料レポート", short: "レポート", href: "/finops" },
+  { label: "レポート", short: "レポート", href: "/finops" },
 ] as const;
 
 type NavGroup = (typeof NAV_GROUPS)[number];
@@ -47,10 +47,196 @@ function isGroupWithChildren(g: NavGroup): g is NavGroup & { children: ReadonlyA
   return "children" in g;
 }
 
+// モバイルドロワー用: 全ナビゲーション情報（セクション分け）
+const DRAWER_SECTIONS = [
+  {
+    title: "メニュー",
+    items: [
+      { href: "/", label: "ホーム" },
+    ],
+  },
+  {
+    title: "コスト",
+    items: [
+      { href: "/costs",    label: "コスト分析" },
+      { href: "/cloud",    label: "ガバクラ比較" },
+    ],
+  },
+  {
+    title: "リスク",
+    items: [
+      { href: "/risks",    label: "遅延リスク" },
+      { href: "/tokutei",  label: "特定移行" },
+    ],
+  },
+  {
+    title: "調べる",
+    items: [
+      { href: "/packages",  label: "パッケージ" },
+      { href: "/benchmark", label: "ベンチマーク比較" },
+      { href: "/timeline",  label: "スケジュール" },
+      { href: "/sources",   label: "出典" },
+    ],
+  },
+  {
+    title: "その他",
+    items: [
+      { href: "/articles", label: "コラム" },
+      { href: "/finops",   label: "レポート" },
+    ],
+  },
+];
+
+function MobileDrawer({
+  open,
+  onClose,
+  pathname,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pathname: string;
+}) {
+  // ESCキーで閉じる
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    if (open) {
+      document.addEventListener("keydown", handleKeyDown);
+      // スクロール禁止
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [open, onClose]);
+
+  return (
+    <>
+      {/* オーバーレイ */}
+      <div
+        aria-hidden="true"
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 50,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
+          transition: "opacity 0.2s ease",
+        }}
+      />
+      {/* ドロワーパネル（左からスライド） */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="ナビゲーションメニュー"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 51,
+          width: "min(280px, 80vw)",
+          backgroundColor: "#fff",
+          boxShadow: "4px 0 24px rgba(0,0,0,0.15)",
+          transform: open ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.25s cubic-bezier(0.4,0,0.2,1)",
+          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* ドロワーヘッダー */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "16px",
+            borderBottom: "1px solid var(--color-border)",
+            flexShrink: 0,
+          }}
+        >
+          <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--color-text-primary)" }}>
+            メニュー
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="メニューを閉じる"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              border: "none",
+              background: "none",
+              cursor: "pointer",
+              color: "var(--color-text-secondary)",
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        {/* セクション一覧 */}
+        <div style={{ padding: "8px 0", flex: 1 }}>
+          {DRAWER_SECTIONS.map((section) => (
+            <div key={section.title} style={{ marginBottom: 4 }}>
+              <p
+                style={{
+                  fontSize: "0.6875rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--color-text-muted)",
+                  padding: "8px 16px 4px",
+                }}
+              >
+                {section.title}
+              </p>
+              {section.items.map((item) => {
+                const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={onClose}
+                    style={{
+                      display: "block",
+                      padding: "10px 16px",
+                      fontSize: "0.9375rem",
+                      fontWeight: isActive ? 700 : 400,
+                      color: isActive ? "var(--color-brand-secondary)" : "var(--color-text-primary)",
+                      backgroundColor: isActive ? "rgba(0,51,141,0.06)" : "transparent",
+                      textDecoration: "none",
+                      borderLeft: isActive ? "3px solid var(--color-brand-secondary)" : "3px solid transparent",
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function NavBar() {
   const pathname = usePathname();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ left: number; maxLeft: number } | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -89,6 +275,7 @@ export default function NavBar() {
   // パス変更で閉じる
   useEffect(() => {
     setOpenGroup(null);
+    setDrawerOpen(false);
   }, [pathname]);
 
   function isGroupActive(g: NavGroup): boolean {
@@ -110,83 +297,121 @@ export default function NavBar() {
     : null;
 
   return (
-    <nav style={{ backgroundColor: "var(--color-surface-container-low)" }} ref={navRef}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 relative" ref={innerRef}>
-        {/* スクロール可能なボタン列 */}
-        <div className="flex items-center gap-0 overflow-x-auto scrollbar-none nav-scroll-snap">
-          {NAV_GROUPS.map((group) => {
-            const active = isGroupActive(group);
+    <>
+      <nav style={{ backgroundColor: "var(--color-surface-container-low)" }} ref={navRef}>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 relative flex items-center" ref={innerRef}>
+          {/* ハンバーガーボタン（モバイルのみ） */}
+          <button
+            className="sm:hidden flex-shrink-0 flex items-center justify-center mr-1"
+            style={{
+              width: 40,
+              height: 44,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "var(--color-text-secondary)",
+              WebkitTapHighlightColor: "transparent",
+            }}
+            aria-label="メニューを開く"
+            aria-expanded={drawerOpen}
+            onClick={() => setDrawerOpen(true)}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
 
-            // 単独リンク（ホーム）
-            if (!isGroupWithChildren(group) && "href" in group) {
-              return (
-                <Link
-                  key={group.label}
-                  href={group.href}
-                  className={`nav-link nav-touch-target whitespace-nowrap flex-shrink-0 ${active ? "nav-link-active" : ""}`}
-                >
-                  {group.label}
-                </Link>
-              );
-            }
+          {/* スクロール可能なボタン列（デスクトップのみ表示） */}
+          <div className="hidden sm:flex items-center gap-0 overflow-x-auto scrollbar-none nav-scroll-snap flex-1">
+            {NAV_GROUPS.map((group) => {
+              const active = isGroupActive(group);
 
-            // ドロップダウンボタン（ドロップダウン本体はスクロールコンテナ外にレンダリング）
-            if (isGroupWithChildren(group)) {
-              const isOpen = openGroup === group.label;
-              return (
-                <button
-                  key={group.label}
-                  ref={(el) => { buttonRefs.current[group.label] = el; }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isOpen) {
-                      setOpenGroup(null);
-                    } else {
-                      setOpenGroup(group.label);
-                      updateDropdownPos(group.label);
-                    }
-                  }}
-                  className={`nav-link nav-touch-target whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${active ? "nav-link-active" : ""}`}
-                  style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }}
-                >
-                  {group.label}
-                  <svg
-                    width="10" height="10" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                    className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+              // 単独リンク（ホーム）
+              if (!isGroupWithChildren(group) && "href" in group) {
+                return (
+                  <Link
+                    key={group.label}
+                    href={group.href}
+                    className={`nav-link nav-touch-target whitespace-nowrap flex-shrink-0 ${active ? "nav-link-active" : ""}`}
                   >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              );
-            }
-            return null;
-          })}
+                    {group.label}
+                  </Link>
+                );
+              }
+
+              // ドロップダウンボタン（ドロップダウン本体はスクロールコンテナ外にレンダリング）
+              if (isGroupWithChildren(group)) {
+                const isOpen = openGroup === group.label;
+                return (
+                  <button
+                    key={group.label}
+                    ref={(el) => { buttonRefs.current[group.label] = el; }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isOpen) {
+                        setOpenGroup(null);
+                      } else {
+                        setOpenGroup(group.label);
+                        updateDropdownPos(group.label);
+                      }
+                    }}
+                    className={`nav-link nav-touch-target whitespace-nowrap flex items-center gap-1 flex-shrink-0 ${active ? "nav-link-active" : ""}`}
+                    style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }}
+                  >
+                    {group.label}
+                    <svg
+                      width="10" height="10" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                );
+              }
+              return null;
+            })}
+          </div>
+
+          {/* モバイル: 現在ページ表示（オプション） */}
+          <div className="sm:hidden flex-1" />
+
+          <div className="sm:hidden nav-fade-hint" aria-hidden="true" />
         </div>
-        <div className="nav-fade-hint sm:hidden" aria-hidden="true" />
 
         {/* ドロップダウン: overflow-x-autoコンテナの外側 */}
         {openChildren && (
-          <div
-            className="nav-dropdown"
-            style={dropdownPos ? { left: Math.max(0, Math.min(dropdownPos.left, dropdownPos.maxLeft)) } : undefined}
-          >
-            {openChildren.map((child) => {
-              const childActive = pathname.startsWith(child.href);
-              return (
-                <Link
-                  key={child.href}
-                  href={child.href === "/report" ? "/report?from=nav" : child.href}
-                  className={`nav-dropdown-item ${childActive ? "nav-dropdown-item-active" : ""}`}
-                >
-                  <span className="nav-dropdown-label">{child.label}</span>
-                  {child.desc && <span className="nav-dropdown-desc">{child.desc}</span>}
-                </Link>
-              );
-            })}
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 relative">
+            <div
+              className="nav-dropdown"
+              style={dropdownPos ? { left: Math.max(0, Math.min(dropdownPos.left, dropdownPos.maxLeft)) } : undefined}
+            >
+              {openChildren.map((child) => {
+                const childActive = pathname.startsWith(child.href);
+                return (
+                  <Link
+                    key={child.href}
+                    href={child.href === "/report" ? "/report?from=nav" : child.href}
+                    className={`nav-dropdown-item ${childActive ? "nav-dropdown-item-active" : ""}`}
+                  >
+                    <span className="nav-dropdown-label">{child.label}</span>
+                    {child.desc && <span className="nav-dropdown-desc">{child.desc}</span>}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
-      </div>
-    </nav>
+      </nav>
+
+      {/* モバイルドロワー */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        pathname={pathname}
+      />
+    </>
   );
 }

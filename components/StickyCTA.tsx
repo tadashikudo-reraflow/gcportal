@@ -73,6 +73,7 @@ export default function StickyCTA() {
   return (
     <div
       aria-hidden={!visible}
+      className="hidden sm:block"
       style={{
         position: "fixed",
         bottom: 0,
