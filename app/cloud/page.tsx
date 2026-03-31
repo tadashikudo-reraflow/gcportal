@@ -532,52 +532,6 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* クラウド別 主要ベンダー */}
-      <div className="card p-5">
-        <h2 className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-          クラウド別 主要ベンダー
-        </h2>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
-          各CSPを採用している主要ベンダー
-        </p>
-
-        {(() => {
-          const VENDOR_BY_CLOUD: { cloud: string; note: string; vendors: string[] }[] = [
-            { cloud: "AWS",  note: "国内シェア97%。標準化パッケージの大多数が対応", vendors: ["富士通", "NEC", "Gcom", "日立", "電算", "TKC", "アイネス", "JIP"] },
-            { cloud: "OCI",  note: "円建て・転送料無料。コスト重視の自治体が採用増", vendors: ["RKKCS", "GCC"] },
-          ];
-
-          const CLOUD_COLORS: Record<string, { color: string; bg: string }> = {
-            AWS: { color: "#FF9900", bg: "#fff8f0" },
-            OCI: { color: "#F80000", bg: "#fff8f8" },
-          };
-
-          return (
-            <div className="space-y-3">
-              {VENDOR_BY_CLOUD.map(({ cloud, note, vendors }) => {
-                const style = CLOUD_COLORS[cloud] ?? { color: "#6b7280", bg: "#f9fafb" };
-                return (
-                  <div key={cloud} className="rounded-lg border p-3" style={{ borderColor: style.color + "25", backgroundColor: style.bg }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-extrabold px-2 py-0.5 rounded" style={{ backgroundColor: style.color + "20", color: style.color }}>
-                        {cloud}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {vendors.map((name) => (
-                        <span key={name} className="text-xs px-2 py-0.5 rounded border bg-white" style={{ borderColor: style.color + "30", color: "var(--color-text-primary)" }}>
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
-      </div>
-
       {/* 対応ベンダー・パッケージへの導線 */}
       <div className="rounded-xl border border-gray-200 px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
