@@ -135,7 +135,7 @@ export default function ThreeMetricsWidget({
                   <span className="text-sm lg:text-base font-semibold" style={{ color: m.color }}>{m.label}</span>
                   {m.badge && (
                     <span
-                      className="text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                      className="text-[10px] sm:text-xs px-1.5 py-0.5 rounded font-semibold"
                       style={{ backgroundColor: m.badgeBg ?? "#f3f4f6", color: m.badgeColor }}
                     >
                       {m.badge}
@@ -144,7 +144,7 @@ export default function ThreeMetricsWidget({
                 </div>
                 {/* #7 1行説明 */}
                 <p
-                  className="text-[11px] leading-snug px-1"
+                  className="text-xs leading-snug px-1"
                   style={{ color: "var(--color-text-secondary)", maxWidth: "10rem" }}
                 >
                   {m.description}
@@ -152,7 +152,7 @@ export default function ThreeMetricsWidget({
                 <p className="text-xs lg:text-sm tabular-nums" style={{ color: "var(--color-text-secondary)" }}>
                   {m.note}
                 </p>
-                <p className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                <p className="text-[10px] sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
                   {m.sub}
                 </p>
               </div>

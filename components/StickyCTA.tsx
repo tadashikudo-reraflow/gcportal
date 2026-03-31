@@ -139,7 +139,7 @@ export default function StickyCTA() {
                 paddingBottom: "0.5rem",
                 borderRadius: 8,
                 border: "1.5px solid var(--color-border)",
-                fontSize: "0.875rem",
+                fontSize: "16px", /* iOS Safariズーム防止 */
                 outline: "none",
                 color: "var(--color-text-primary)",
                 backgroundColor: "#fff",
@@ -174,7 +174,7 @@ export default function StickyCTA() {
                         width: "100%",
                         textAlign: "left",
                         padding: "10px 14px",
-                        fontSize: "0.875rem",
+                        fontSize: "16px", /* iOS Safariズーム防止 */
                         display: "flex",
                         alignItems: "center",
                         gap: 8,

@@ -607,7 +607,7 @@ h1, h2, h3, h4, h5, h6 {
   padding-bottom: 0.625rem;
   border-radius: 10px;
   border: 1.5px solid var(--color-border);
-  font-size: 0.9375rem;
+  font-size: 16px; /* iOS Safariズーム防止（16px以上必須） */
   outline: none;
   color: var(--color-text-primary);
   background-color: #fff;
