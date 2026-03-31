@@ -178,26 +178,36 @@ export default function SourcesPage() {
         })}
       </div>
 
-      {/* ページ別ソース（シンプル表） */}
+      {/* ページ別ソース */}
       <div className="card p-5 space-y-3">
         <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>ページ別出典</h2>
-        <div className="space-y-2">
+        <div className="divide-y divide-gray-50">
           {Object.entries(PAGE_SOURCES)
             .filter(([pageId, ids]) => ids.length > 0 && pageLabels[pageId])
             .map(([pageId, sourceIds]) => {
               const sources = sourceIds.map(id => DATA_SOURCES[id]).filter(Boolean);
+              const orgs = sources.map(s => s.org).filter((v, i, a) => a.indexOf(v) === i);
+              const hasAi = sources.some(s => s.confidence === "ai_survey");
               return (
-                <div key={pageId} className="flex flex-col gap-1 py-2 border-b border-gray-50 last:border-0">
+                <div key={pageId} className="flex items-start gap-3 py-2.5">
                   <Link
                     href={`/${pageId === "dashboard" ? "" : pageId}`}
-                    className="text-xs font-semibold hover:underline"
-                    style={{ color: "var(--color-brand-secondary)" }}
+                    className="text-xs font-semibold whitespace-nowrap hover:underline flex-shrink-0 mt-0.5"
+                    style={{ color: "var(--color-brand-secondary)", minWidth: 72 }}
                   >
-                    {pageLabels[pageId]} →
+                    {pageLabels[pageId]}
                   </Link>
-                  <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
-                    {sources.map(s => s.org).filter((v, i, a) => a.indexOf(v) === i).join("・")}
-                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {orgs.map(org => (
+                      <span key={org} className="text-xs px-1.5 py-0.5 rounded-full"
+                        style={{ backgroundColor: "var(--color-surface-container-low)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
+                        {org.length > 12 ? org.slice(0, 12) + "…" : org}
+                      </span>
+                    ))}
+                    {hasAi && (
+                      <span className="text-xs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}>AI調査含</span>
+                    )}
+                  </div>
                 </div>
               );
             })}
