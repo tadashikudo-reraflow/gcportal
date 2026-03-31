@@ -407,6 +407,16 @@ export default async function CostsPage() {
         ) : (
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
+        {/* 東京都 絶対額（%換算不可） */}
+        <div className="flex items-center gap-3 rounded-xl px-4 py-3 mt-2" style={{ backgroundColor: "#fef2f2", border: "1px solid rgba(153,27,27,0.15)" }}>
+          <div className="w-20 flex-shrink-0 text-right">
+            <span className="text-xl font-black tabular-nums leading-none" style={{ color: "#991B1B" }}>+178億</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>東京都（年間超過額）</p>
+            <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>移行前比の%は算出不可。都全体の年間コスト超過見込み額として都議会で報告。</p>
+          </div>
+        </div>
         <p className="text-[11px] text-gray-400 mt-3">
           ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
         </p>
