@@ -137,14 +137,14 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3 mb-4">
           <label
             htmlFor="pref-select"
-            className="text-xs font-medium flex-shrink-0"
+            className="text-xs lg:text-sm font-medium flex-shrink-0"
             style={{ color: "var(--color-text-secondary)" }}
           >
             都道府県を選択
           </label>
           <PrefectureSelector />
         </div>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+        <p className="text-xs lg:text-sm mb-4" style={{ color: "var(--color-text-muted)" }}>
           都道府県をクリックで詳細を確認
         </p>
         <JapanMap prefectures={prefectures} />
@@ -153,10 +153,10 @@ export default function DashboardPage() {
       {/* ========== ステータス分布バー（クリック可能） ========== */}
       <div className="status-bar-card">
         <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-sm lg:text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
             全 {TOTAL.toLocaleString()} 自治体の移行ステータス
           </h2>
-          <Link href="/progress?status=tokutei" className="text-xs font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
+          <Link href="/progress?status=tokutei" className="text-xs lg:text-sm font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
             特定移行とは？ →
           </Link>
         </div>
@@ -193,13 +193,13 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 no-underline hover:opacity-75 transition-opacity"
               >
                 <span className="w-3 h-3 rounded-sm inline-block flex-shrink-0" style={{ backgroundColor: s.color }} />
-                <span className="text-sm font-semibold tabular-nums" style={{ color: s.color }}>
+                <span className="text-sm lg:text-base font-semibold tabular-nums" style={{ color: s.color }}>
                   {count.toLocaleString()}
                 </span>
-                <span className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+                <span className="text-xs lg:text-sm" style={{ color: "var(--color-text-secondary)" }}>
                   {s.label}
                 </span>
-                <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                <span className="text-[10px] lg:text-xs" style={{ color: "var(--color-text-muted)" }}>
                   {s.sub}
                 </span>
               </Link>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
 
       {/* ========== 次に調べる（回遊CTA・視覚階層あり） ========== */}
       <div>
-        <p className="text-xs font-semibold mb-3" style={{ color: "var(--color-text-muted)" }}>次に調べる</p>
+        <p className="text-xs lg:text-sm font-semibold mb-3" style={{ color: "var(--color-text-muted)" }}>次に調べる</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {/* 主要2枚: 大カード（col-span-2） */}
           <Link
