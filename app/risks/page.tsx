@@ -274,7 +274,7 @@ export default function RisksPage() {
             <span className="flex-shrink-0 font-semibold text-green-700 mt-0.5">システム移行率（38.4%）</span>
             <span>= 実際にガバメントクラウドへ本番移行完了したシステムの割合（令和8年1月末時点、デジタル庁2026年2月27日公表）。</span>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             ※ 2つの指標の大きなギャップ（約44ポイント）が移行の実態を表しています。手続きは進んでいても、実際のシステム移行は大幅に遅れています。
           </p>
         </div>

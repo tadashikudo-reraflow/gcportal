@@ -309,7 +309,7 @@ export default async function CostsPage() {
             <span className="flex-shrink-0">{item.icon}</span>
             <span>
               <span className="block text-xs font-semibold text-gray-800 leading-tight">{item.label}</span>
-              <span className="block text-[10px] text-gray-500 leading-tight mt-0.5">{item.desc}</span>
+              <span className="block text-xs text-gray-500 leading-tight mt-0.5">{item.desc}</span>
             </span>
           </a>
         ))}
@@ -357,18 +357,18 @@ export default async function CostsPage() {
                     <div className="w-32 flex-shrink-0 flex flex-col items-end gap-0.5">
                       <div className="flex items-baseline gap-1">
                         <span className="text-base font-extrabold tabular-nums" style={{ color: row.color }}>{row.pct}</span>
-                        <span className="text-[11px] text-gray-400">({row.mult}×)</span>
+                        <span className="text-xs text-gray-400">({row.mult}×)</span>
                       </div>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium leading-none ${row.sourceCls}`}>{row.source}</span>
+                      <span className={`text-xs px-1.5 py-0.5 rounded font-medium leading-none ${row.sourceCls}`}>{row.source}</span>
                     </div>
                   </div>
                 );
               })}
               <div className="flex items-center gap-2 pl-[92px] pt-1">
                 <div style={{ borderLeft: "2px dashed #374151", height: "14px", marginRight: "4px" }} />
-                <span className="text-[11px] text-gray-500">移行前コスト基準（= 100）</span>
+                <span className="text-xs text-gray-500">移行前コスト基準（= 100）</span>
               </div>
-              <p className="text-[11px] text-gray-400 pl-[92px]">出典: デジタル庁 R6検証事業・中核市市長会「ガバメントクラウド移行に関するアンケート調査」（令和7年1月）</p>
+              <p className="text-xs text-gray-400 pl-[92px]">出典: デジタル庁 R6検証事業・中核市市長会「ガバメントクラウド移行に関するアンケート調査」（令和7年1月）</p>
             </div>
           );
         })()}
@@ -418,7 +418,7 @@ export default async function CostsPage() {
             <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>東京都独自調査。割引最大適用でも区部1.5倍・市部1.7倍・町村2倍の見込み（日経xTECH）</p>
           </div>
         </div>
-        <p className="text-[11px] text-gray-400 mt-3">
+        <p className="text-xs text-gray-400 mt-3">
           ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
         </p>
       </div>
@@ -555,8 +555,8 @@ export default async function CostsPage() {
               <div key={card.method} className={`flex items-start gap-3 rounded-lg p-3 ${card.featured ? "border-2 border-blue-300 bg-blue-50" : "border border-gray-200 bg-gray-50"}`}>
                 <div className="flex-shrink-0 pt-0.5">
                   {card.featured
-                    ? <span className="text-[10px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full whitespace-nowrap">主流</span>
-                    : <span className="text-[10px] text-gray-400 font-medium">他</span>
+                    ? <span className="text-xs font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full whitespace-nowrap">主流</span>
+                    : <span className="text-xs text-gray-400 font-medium">他</span>
                   }
                 </div>
                 <div className="flex-1 min-w-0">
@@ -565,13 +565,13 @@ export default async function CostsPage() {
                     <span className="text-green-700">✓ {card.merit}</span>
                     <span className="text-red-500">✕ {card.demerit}</span>
                   </div>
-                  <p className="text-[10px] text-gray-400 mt-1">{card.note}</p>
+                  <p className="text-xs text-gray-400 mt-1">{card.note}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <p className="text-[11px] text-gray-400 mt-3">
+          <p className="text-xs text-gray-400 mt-3">
             出典: 令和6年度 共同利用方式の推進及びマルチベンダーにおけるシステム間連携の検証事業 報告書 p.9
           </p>
         </div>
@@ -693,11 +693,11 @@ export default async function CostsPage() {
 
         {/* 公式資料リンク */}
         <div className="mt-4 pt-3 border-t border-gray-200">
-          <p className="text-[11px] font-semibold text-gray-500 mb-2">公式資料</p>
+          <p className="text-xs font-semibold text-gray-500 mb-2">公式資料</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* デジタル庁資料 */}
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 デジタル庁資料
               </p>
@@ -708,7 +708,7 @@ export default async function CostsPage() {
                   { label: "投資対効果検証（2022年）", url: "https://www.digital.go.jp/assets/contents/node/information/field_ref_resources/8c953d48-271d-467e-8e4c-f7baa8ec018b/4912aad2/20220914_news_local_governments_outline_03.pdf" },
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-md border border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors w-full">
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors w-full">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     {link.label}
                   </a>
@@ -717,7 +717,7 @@ export default async function CostsPage() {
             </div>
             {/* R6検証事業 */}
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                 R6検証事業
               </p>
@@ -727,7 +727,7 @@ export default async function CostsPage() {
                   { label: "R6検証事業報告書（基礎資料）", url: "https://www.digital.go.jp/assets/contents/node/basic_page/field_ref_resources/92d70acb-8407-4f60-8b45-363d9a2d358d/88ea1822/20260327_policies_local_governments_government-cloud-vendor-verification_03.pdf" },
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] rounded-md border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 transition-colors w-full">
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 transition-colors w-full">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                     {link.label}
                   </a>
@@ -737,7 +737,7 @@ export default async function CostsPage() {
           </div>
         </div>
         <div className="mt-3 flex flex-col gap-2">
-          <p className="text-[11px] text-gray-400">
+          <p className="text-xs text-gray-400">
             個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↑</a>
           </p>
           <ReportLeadCta source="costs-r6" compact title="R6検証データを含むレポートをPDFで確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />

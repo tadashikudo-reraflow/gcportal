@@ -164,7 +164,7 @@ export default function TokuteiPage() {
             13,283システムが本番移行完了（全34,594システム中）。
             手続き進捗率（82%）とのギャップが実態を示しています。
           </p>
-          <p className="text-[11px] mt-1 text-green-700">
+          <p className="text-xs mt-1 text-green-700">
             出典: デジタル庁 2026年2月27日公表
           </p>
         </div>
