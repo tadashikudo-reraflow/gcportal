@@ -25,7 +25,7 @@ SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SITE_URL = "https://gcinsight.jp"
 PDF_URL = "https://gcinsight.jp/report?from=nav"
 KW_PLANNER_PATH = os.path.expandvars(
-    "$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v7_20260320.xlsx"
+    "$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx"
 )
 README_PATH = os.path.expandvars(
     "$GDRIVE_WORKSPACE/../../../マイドライブ/ObsidianVault/01_Projects/PJ19_GCInsight/README.md"

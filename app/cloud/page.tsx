@@ -274,7 +274,7 @@ export default async function CloudPage() {
 
 
         {/* 料金計算ツールリンク */}
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           {[
             { id: "AWS", url: "https://calculator.aws/pricing/2/metaindex" },
             { id: "Azure", url: "https://azure.microsoft.com/ja-jp/pricing/calculator/" },
@@ -282,7 +282,7 @@ export default async function CloudPage() {
             { id: "OCI", url: "https://www.oracle.com/jp/cloud/costestimator.html" },
           ].map(({ id, url }) => (
             <a key={id} href={url} target="_blank" rel="noopener noreferrer"
-              className="text-xs px-2.5 py-1 rounded-full no-underline hover:opacity-80"
+              className="text-xs px-2.5 py-1.5 rounded-lg no-underline hover:opacity-80 text-center"
               style={{ backgroundColor: CLOUD_CONFIG[id].color + "15", color: CLOUD_CONFIG[id].color, border: `1px solid ${CLOUD_CONFIG[id].color}30` }}>
               {id} 料金計算ツール ↗
             </a>
@@ -360,9 +360,9 @@ export default async function CloudPage() {
             <p className="text-xs font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>ガバメントクラウド調達の仕組み</p>
             <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>自治体はCSPと直接契約しない。デジタル庁が一括調達し、自治体はクラウド利用料を負担</p>
             <div className="flex flex-col items-center gap-0 text-xs">
-              <div className="flex gap-2 flex-wrap justify-center">
+              <div className="grid grid-cols-5 gap-1 w-full">
                 {["AWS", "OCI", "Azure", "GCP", "さくら"].map((c) => (
-                  <div key={c} className="rounded-lg px-3 py-1.5 font-bold border text-xs" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>{c}</div>
+                  <div key={c} className="rounded-lg px-1 py-1.5 font-bold border text-xs text-center" style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "var(--color-surface-container-low)" }}>{c}</div>
                 ))}
               </div>
               <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
@@ -423,8 +423,7 @@ export default async function CloudPage() {
               </a>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              米国政府がAWS・Azure・GCP等の米国企業に対し、<strong>裁判所命令なしに非米国人のデータ提供を命令できる</strong>。
-              ガグオーダー（非開示命令）により、自治体が開示を知ることもできない。クラウド事業者は技術的には要件準拠が契約義務と一体化している。
+              米国政府がAWS等の米国企業に<strong>裁判所命令なしにデータ提供を命令できる</strong>。ガグオーダー（非開示命令）により自治体への通知も不可。
             </p>
           </div>
 
@@ -439,8 +438,7 @@ export default async function CloudPage() {
               </a>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              NSAが海外サーバーまたは海底ケーブルを通過するデータを<strong>令状なしにバルク収集</strong>できる根拠法。
-              スノーデン事件（2013年）で具体的手法が明らかになり、欧州・日本でも問題視されている。
+              NSAが<strong>令状なしに海外経由データをバルク収集</strong>できる根拠法。スノーデン事件（2013年）で露見し欧日で問題視されている。
             </p>
           </div>
 
@@ -455,8 +453,7 @@ export default async function CloudPage() {
               </a>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              フランス上院の調査に対し、Microsoft代表が<strong>「米国法の要求があればデータへのアクセスを保証できない」</strong>と証言。
-              GDPRに準拠していても、米国CLOUD法の要求を拒否できないことを公式に認めた。
+              Microsoft代表が<strong>「米国法の要求があればデータアクセスを保証できない」</strong>と公式証言。GDPR準拠でも米国CLOUD法は拒否不可。
             </p>
           </div>
 

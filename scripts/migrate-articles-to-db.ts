@@ -163,7 +163,7 @@ async function main() {
 from openpyxl import load_workbook
 import re
 
-xlsx = '${process.env.GDRIVE_WORKSPACE ?? "/Users/tadashikudo/Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace"}/contents/PJ19/gcportal_kw_planner_v7_20260320.xlsx'
+xlsx = '${process.env.GDRIVE_WORKSPACE ?? "/Users/tadashikudo/Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace"}/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx'
 wb = load_workbook(xlsx)
 ws = wb.active
 slugs = set(${JSON.stringify(files.map((f: string) => f.replace(/\\.md$/, "")))})

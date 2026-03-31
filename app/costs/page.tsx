@@ -135,7 +135,7 @@ export default async function CostsPage() {
       supabase
         .from("cost_reports")
         .select("*, vendors(name, short_name, cloud_platform)")
-        .order("change_ratio"),
+        .order("change_ratio", { ascending: false }),
       supabase.from("vendors").select("id, name, short_name, cloud_platform, cloud_confirmed, multitenancy, municipality_count, notes").order("name"),
       supabase
         .from("municipality_packages")
@@ -451,23 +451,23 @@ export default async function CostsPage() {
           <p className="text-sm font-bold mb-3 text-center" style={{ color: "#92400e" }}>
             なぜ数字がこんなに違うのか？
           </p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {[
               { icon: "🎯", label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
               { icon: "📦", label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
               { icon: "📏", label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
             ].map(({ icon, label, r6, survey }) => (
-              <div key={label} className="rounded-lg p-2.5 text-center" style={{ backgroundColor: "#fff8ed" }}>
-                <p className="text-xl mb-1">{icon}</p>
-                <p className="text-xs font-bold mb-2" style={{ color: "#92400e" }}>{label}</p>
+              <div key={label} className="rounded-lg p-2 text-center" style={{ backgroundColor: "#fff8ed" }}>
+                <p className="text-base mb-0.5">{icon}</p>
+                <p className="text-[11px] font-bold mb-1.5" style={{ color: "#92400e" }}>{label}</p>
                 <div className="space-y-1">
-                  <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#dbeafe" }}>
-                    <p className="text-xs font-semibold text-blue-700">R6検証</p>
-                    <p className="text-xs text-blue-600">{r6}</p>
+                  <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#dbeafe" }}>
+                    <p className="text-[10px] font-semibold text-blue-700">R6検証</p>
+                    <p className="text-[10px] text-blue-600 leading-tight">{r6}</p>
                   </div>
-                  <div className="rounded px-1.5 py-1" style={{ backgroundColor: "#fee2e2" }}>
-                    <p className="text-xs font-semibold text-red-700">中核市調査</p>
-                    <p className="text-xs text-red-600">{survey}</p>
+                  <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#fee2e2" }}>
+                    <p className="text-[10px] font-semibold text-red-700">中核市調査</p>
+                    <p className="text-[10px] text-red-600 leading-tight">{survey}</p>
                   </div>
                 </div>
               </div>
@@ -488,37 +488,32 @@ export default async function CostsPage() {
           ].map((d) => {
             const isDown = d.rate < 0;
             const barWidth = Math.min(Math.abs(d.rate) / 55 * 100, 100);
+            const rateColor = isDown ? "text-green-600" : d.rate > 20 ? "text-red-600" : "text-orange-600";
             return (
-              <div key={d.name} className="group mb-1">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <div className="w-28 flex-shrink-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-bold text-gray-800 truncate">{d.name}</span>
-                      <span className={`text-xs px-1 py-0.5 rounded font-medium flex-shrink-0 ${
-                        d.csp === "AWS" ? "bg-orange-100 text-orange-700"
-                        : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-100 text-blue-700"
-                      }`}>{d.csp}</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 flex items-center gap-1.5">
-                    <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden relative">
-                      <div
-                        className={`h-full rounded-full transition-all ${isDown ? "bg-green-400" : d.rate > 20 ? "bg-red-400" : "bg-orange-300"}`}
-                        style={{ width: `${barWidth}%` }}
-                      />
-                    </div>
-                    <span className={`text-xs font-black tabular-nums w-14 text-right ${isDown ? "text-green-600" : d.rate > 20 ? "text-red-600" : "text-orange-600"}`}>
-                      {isDown ? "" : "+"}{d.rate}%
-                    </span>
-                  </div>
+              <div key={d.name} className="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 mb-1">
+                {/* 行1: 自治体名 + バッジ + 増減率 */}
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-gray-800 truncate flex-1 min-w-0">{d.name}</span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 whitespace-nowrap ${
+                    d.csp === "AWS" ? "bg-orange-100 text-orange-700"
+                    : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
+                    : "bg-blue-100 text-blue-700"
+                  }`}>{d.csp}</span>
+                  <span className={`text-sm font-black tabular-nums flex-shrink-0 ${rateColor}`}>
+                    {isDown ? "" : "+"}{d.rate}%
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <span className="w-28 flex-shrink-0">人口 {d.pop}</span>
-                  <div className="flex-1 flex items-center gap-1.5">
-                    <span className="flex-1" />
-                    <span className="w-20 text-right tabular-nums whitespace-nowrap">{d.costA}→{d.costB}億</span>
-                  </div>
+                {/* 行2: バー */}
+                <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden mb-1.5">
+                  <div
+                    className={`h-full rounded-full ${isDown ? "bg-green-400" : d.rate > 20 ? "bg-red-400" : "bg-orange-300"}`}
+                    style={{ width: `${barWidth}%` }}
+                  />
+                </div>
+                {/* 行3: 人口 + 金額 */}
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <span>人口 {d.pop}</span>
+                  <span className="tabular-nums">{d.costA}→{d.costB}億</span>
                 </div>
               </div>
             );
@@ -545,27 +540,31 @@ export default async function CostsPage() {
             複数自治体でクラウドを共同利用する際、費用をどう按分するかが課題。R6検証事業（20社参画）で4手法が検証された。
           </p>
 
-          <div className="space-y-2">
+          {/* 主流方式 */}
+          <div className="rounded-lg p-3 border-2 border-blue-300 bg-blue-50 mb-2">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-xs font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full">主流</span>
+              <span className="text-xs font-bold text-blue-800">カスタムスコア按分</span>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs mb-1">
+              <span className="text-green-700">✓ 規模に応じた公平な負担</span>
+              <span className="text-red-500">✕ スコア合意形成が必要</span>
+            </div>
+            <p className="text-xs text-gray-400">TKC（人口7：業務量3）、内田洋行</p>
+          </div>
+
+          {/* 他の手法 — コンパクトリスト */}
+          <div className="rounded-lg border border-gray-200 bg-gray-50 divide-y divide-gray-100">
             {[
-              { method: "カスタムスコア按分", merit: "自治体規模に応じた公平な負担", demerit: "スコア設計の合意形成が必要", note: "TKC（人口7：業務量3）、内田洋行", featured: true },
-              { method: "利用状況按分", merit: "実利用に基づく合理的配分", demerit: "測定が複雑・運用負荷高", note: "一部ベンダーで検討中", featured: false },
-              { method: "均等按分", merit: "算定がシンプル", demerit: "小規模自治体に割高", note: "小規模共同利用で採用", featured: false },
-              { method: "他環境コスト按分", merit: "既存比率を流用でき導入容易", demerit: "ガバクラ固有構造を反映しにくい", note: "移行過渡期に採用", featured: false },
-            ].map((card) => (
-              <div key={card.method} className={`flex items-start gap-3 rounded-lg p-3 ${card.featured ? "border-2 border-blue-300 bg-blue-50" : "border border-gray-200 bg-gray-50"}`}>
-                <div className="flex-shrink-0 pt-0.5">
-                  {card.featured
-                    ? <span className="text-xs font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded-full whitespace-nowrap">主流</span>
-                    : <span className="text-xs text-gray-400 font-medium">他</span>
-                  }
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-bold mb-1 ${card.featured ? "text-blue-800" : "text-gray-800"}`}>{card.method}</p>
-                  <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-xs">
-                    <span className="text-green-700">✓ {card.merit}</span>
-                    <span className="text-red-500">✕ {card.demerit}</span>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-1">{card.note}</p>
+              { method: "利用状況按分", merit: "実利用に基づく合理的配分", demerit: "測定が複雑・運用負荷高" },
+              { method: "均等按分", merit: "算定がシンプル", demerit: "小規模自治体に割高" },
+              { method: "他環境コスト按分", merit: "既存比率を流用でき導入容易", demerit: "ガバクラ固有構造を反映しにくい" },
+            ].map((item) => (
+              <div key={item.method} className="px-3 py-2 flex items-start gap-2">
+                <span className="text-xs font-semibold text-gray-600 w-28 flex-shrink-0">{item.method}</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs">
+                  <span className="text-green-700">✓ {item.merit}</span>
+                  <span className="text-red-400">✕ {item.demerit}</span>
                 </div>
               </div>
             ))}
@@ -636,9 +635,14 @@ export default async function CostsPage() {
 
         {/* クラウド最適化の知見 */}
         <div className="mt-4 card p-5">
-          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
-            ガバメントクラウド コスト最適化の知見（R6検証事業）
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+              ガバメントクラウド コスト最適化の知見（R6検証事業）
+            </h3>
+            <a href="/articles?tag=finops" className="text-xs font-medium no-underline hover:underline flex-shrink-0" style={{ color: "var(--color-brand-primary)" }}>
+              詳細コラムを読む →
+            </a>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* サーバーレス化 */}
             <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">

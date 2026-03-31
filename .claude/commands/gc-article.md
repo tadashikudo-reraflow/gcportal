@@ -14,7 +14,7 @@
 
 ### Step 0: KWプランナー参照（情報源の事前把握）
 
-KWプランナー（`$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v7_20260320.xlsx`）を確認し、該当KWの行から以下を取得:
+KWプランナー（`$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx`）を確認し、該当KWの行から以下を取得:
 - **第12列「情報源」**: 記事の主要参照先（`デジ庁RAG`, `X+Web`, `Web` 等）
 - **第17列「note有料ネタ」**: 記事の差別化ポイント・切り口
 - KWプランナーに記載がない場合は、最も関連性の高いKW行を参考にする
