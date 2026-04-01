@@ -162,7 +162,7 @@ export default function DashboardPage() {
         </div>
 
         {/* クリッカブルバー */}
-        <div className="flex rounded-xl overflow-hidden" style={{ height: 32 }}>
+        <div className="flex rounded-xl overflow-hidden" style={{ height: 32 }} role="img" aria-label={`移行ステータス内訳: ${STATUS_SEGMENTS.map((s) => `${s.label} ${statusCounts[s.label] ?? 0}団体`).join("、")}`}>
           {STATUS_SEGMENTS.map((s) => {
             const count = statusCounts[s.label] ?? 0;
             return (

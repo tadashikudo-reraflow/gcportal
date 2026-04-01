@@ -117,7 +117,7 @@ export default function RisksPage() {
           className="flex items-start gap-3 rounded-lg px-4 py-3 text-sm"
           style={{ backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1" }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2" className="flex-shrink-0 mt-0.5" aria-hidden="true">
             <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
             <circle cx="12" cy="12" r="10"/>
           </svg>
@@ -236,7 +236,7 @@ export default function RisksPage() {
       </details>
 
       {/* テーブル（フィルター付き Client Component） */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+      <div className="card p-5">
         <RiskFilter rows={rows} prefectures={prefectures} />
       </div>
 
@@ -264,7 +264,7 @@ export default function RisksPage() {
       </div>
 
       {/* 指標の説明 */}
-      <div className="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4">
+      <div className="card px-5 py-4" style={{ backgroundColor: "var(--color-surface-container-low)" }}>
         <p className="text-xs font-bold text-gray-700 mb-2">指標の定義</p>
         <div className="space-y-2 text-xs text-gray-600 leading-relaxed">
           <div className="flex items-start gap-2">

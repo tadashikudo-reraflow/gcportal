@@ -117,7 +117,10 @@ export default async function CloudPage() {
         <div className="flex flex-col sm:flex-row gap-6 items-center">
           {/* ドーナツチャート */}
           <div className="flex-shrink-0">
-            <svg width="160" height="160" viewBox="0 0 160 160">
+            <svg width="160" height="160" viewBox="0 0 160 160"
+              role="img"
+              aria-label={`インフラシェア: ${INFRA_SHARE.map((s) => `${s.cloud} ${((s.systems / INFRA_TOTAL) * 100).toFixed(1)}%`).join("、")}`}
+            >
               {(() => {
                 const cx = 80, cy = 80, r = 60, strokeW = 24;
                 let cumAngle = -90;
@@ -206,7 +209,7 @@ export default async function CloudPage() {
                   <span className="text-xs w-14 flex-shrink-0 text-right font-semibold text-gray-600">{label}</span>
                   <div className="flex-1 h-6 rounded overflow-hidden" style={{ backgroundColor: "var(--color-surface-container)" }}>
                     <div
-                      className="h-full flex items-center justify-end pr-2 transition-all"
+                      className="h-full flex items-center justify-end pr-2"
                       style={{ width: `${idx}%`, backgroundColor: cfg.color + "40" }}
                     >
                       <span className="text-xs font-bold" style={{ color: cfg.color }}>{idx}</span>
