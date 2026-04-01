@@ -92,7 +92,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     .split(/\n\n+/)
     .filter((p) => p.trim())
     .map((p) =>
-      `<p style="margin:0 0 14px 0;font-size:14px;color:#1c1917;line-height:1.9;">${e(p.trim()).replace(/\n/g, "<br>")}</p>`
+      `<p style="margin:0 0 20px 0;font-size:16px;color:#1c1917;line-height:1.85;">${e(p.trim()).replace(/\n/g, "<br>")}</p>`
     )
     .join("");
 
@@ -131,7 +131,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </tr>
                 <tr>
                   <td style="padding-bottom:9px;">
-                    <span style="font-size:13px;color:#1e293b;line-height:1.75;">${e(p.text)}</span>
+                    <span style="font-size:15px;color:#1e293b;line-height:1.8;">${e(p.text)}</span>
                   </td>
                 </tr>
                 <tr>
@@ -166,14 +166,14 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 <tr>
                   <td style="padding-bottom:5px;">
                     <a href="${n.url}"
-                      style="font-size:14px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">
+                      style="font-size:15px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">
                       ${e(n.title)}
                     </a>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding-bottom:6px;">
-                    <span style="font-size:13px;color:#475569;line-height:1.65;">${e(n.summary)}</span>
+                    <span style="font-size:14px;color:#475569;line-height:1.7;">${e(n.summary)}</span>
                   </td>
                 </tr>
                 <tr>
@@ -243,7 +243,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
           <tr>
             <td style="padding-bottom:3px;">
               <a href="${n.url}"
-                style="font-size:13px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.4;">
+                style="font-size:14px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.5;">
                 ${e(n.title)}
               </a>
               <span style="font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;
@@ -251,8 +251,8 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
             </td>
           </tr>
           <tr>
-            <td>
-              <span style="font-size:12px;color:#64748b;line-height:1.55;">${e(n.summary)}</span>
+            <td style="padding-top:4px;">
+              <span style="font-size:13px;color:#64748b;line-height:1.65;">${e(n.summary)}</span>
             </td>
           </tr>
         </table>
@@ -268,7 +268,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
           <tr>
             <td style="padding-bottom:3px;">
               <a href="${n.url}"
-                style="font-size:13px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.4;">
+                style="font-size:14px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.5;">
                 ${e(n.title)}
               </a>
               <span style="font-size:10px;font-weight:600;background:#ede9fe;color:#6d28d9;
@@ -276,8 +276,8 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
             </td>
           </tr>
           <tr>
-            <td>
-              <span style="font-size:12px;color:#64748b;line-height:1.55;">${e(n.summary)}</span>
+            <td style="padding-top:4px;">
+              <span style="font-size:13px;color:#64748b;line-height:1.65;">${e(n.summary)}</span>
             </td>
           </tr>
         </table>
@@ -484,7 +484,7 @@ function sectionHeader(emoji: string, label: string, lead: string): string {
     </tr>
     ${lead ? `<tr>
       <td style="padding-top:8px;">
-        <span style="font-size:12px;color:#64748b;">${e(lead)}</span>
+        <span style="font-size:13px;color:#64748b;">${e(lead)}</span>
       </td>
     </tr>` : ""}
   </table>`;
