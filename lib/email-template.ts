@@ -1,22 +1,16 @@
 export interface NewsletterSections {
   issueNumber: number;
   intro: string;
-  // 今週のニュース記事（タイトル+概要+リンク）
   newsItems?: Array<{ title: string; summary: string; url: string; source: string; date?: string }>;
-  // 市民・現場の声（X・note）
   voicePicks: Array<{
     source: "x" | "note";
     author: string;
     text: string;
     url: string;
   }>;
-  // GCInsightデータ更新
   migrationStats?: { rate: string; completed: string; total: string };
-  // GCInsight上のアップデート（資料公開・データ更新など）
   gcupdates: Array<{ date: string; title: string; detail: string }>;
-  // 公式情報（補足）
   officialNews: Array<{ title: string; summary: string; url: string; source: string }>;
-  // 著者情報（newsletter_configから渡す）
   authorName?: string;
   authorTitle?: string;
   authorStyle?: string;
@@ -34,106 +28,201 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     officialNews,
     authorName,
     authorTitle,
-    authorStyle,
     authorSignatureHtml,
   } = sections;
 
-  // 今週のニュース記事ブロック
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
+
+  // ---- News cards ----
   const newsItemsHtml = (newsItems ?? [])
     .map((n) => `
-    <div style="margin-bottom:20px;padding:16px;background:#f9fafb;border-radius:8px;border:1px solid #e5e7eb;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-        <span style="font-size:11px;background:#111;color:#fff;padding:2px 7px;border-radius:3px;white-space:nowrap;">${escapeHtml(n.source)}</span>
-        ${n.date ? `<span style="font-size:11px;color:#9ca3af;">${escapeHtml(n.date)}</span>` : ""}
-      </div>
-      <a href="${n.url}" style="font-size:15px;font-weight:700;color:#111;text-decoration:none;line-height:1.4;display:block;margin-bottom:8px;">${escapeHtml(n.title)}</a>
-      <div style="font-size:13px;color:#4b5563;line-height:1.7;">${escapeHtml(n.summary)}</div>
-      <a href="${n.url}" style="font-size:12px;color:#2563eb;margin-top:8px;display:inline-block;text-decoration:none;">続きを読む →</a>
-    </div>`)
+      <tr>
+        <td style="padding:0 0 16px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding-bottom:8px;">
+                      <span style="font-size:10px;font-weight:700;background:#0f172a;color:#ffffff;padding:3px 8px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase;">${e(n.source)}</span>
+                      ${n.date ? `<span style="font-size:11px;color:#94a3b8;margin-left:8px;">${e(n.date)}</span>` : ""}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:8px;">
+                      <a href="${n.url}" style="font-size:15px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">${e(n.title)}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:10px;">
+                      <span style="font-size:13px;color:#475569;line-height:1.7;">${e(n.summary)}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="${n.url}" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;">続きを読む &rarr;</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`)
     .join("");
 
-  const migrationBlock = migrationStats
-    ? `
-    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:16px;margin:16px 0;">
-      <div style="display:flex;gap:24px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">移行率</div>
-          <div style="font-size:24px;font-weight:700;color:#111;">${migrationStats.rate}</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">完了団体</div>
-          <div style="font-size:24px;font-weight:700;color:#111;">${migrationStats.completed}</div>
-        </div>
-        <div>
-          <div style="font-size:11px;color:#6b7280;margin-bottom:4px;">対象総数</div>
-          <div style="font-size:24px;font-weight:700;color:#111;">${migrationStats.total}</div>
-        </div>
-      </div>
-    </div>`
-    : "";
+  // ---- Voice picks ----
+  const xVoices = voicePicks.filter((p) => p.source === "x");
+  const noteVoices = voicePicks.filter((p) => p.source === "note");
 
-  const voicePicksHtml = voicePicks
-    .map((p) => {
-      if (p.source === "x") {
-        return `
-    <div style="border-left:3px solid #1d9bf0;background:#f0f9ff;padding:12px;margin-bottom:12px;border-radius:0 4px 4px 0;">
-      <div style="font-size:11px;font-weight:600;color:#1d9bf0;margin-bottom:4px;">&#x1D54F; @${escapeHtml(p.author)}</div>
-      <div style="font-size:14px;color:#111;line-height:1.6;">${escapeHtml(p.text)}</div>
-      ${p.url && p.url !== "#" ? `<a href="${p.url}" style="font-size:12px;color:#1d9bf0;margin-top:6px;display:inline-block;">ポストを見る &rarr;</a>` : ""}
-    </div>`;
-      } else {
-        return `
-    <div style="border-left:3px solid #41c9b4;background:#f0fdfb;padding:12px;margin-bottom:12px;border-radius:0 4px 4px 0;">
-      <div style="font-size:11px;font-weight:600;color:#41c9b4;margin-bottom:4px;">note ${escapeHtml(p.author)}</div>
-      <div style="font-size:14px;color:#111;line-height:1.6;">${escapeHtml(p.text)}</div>
-      ${p.url && p.url !== "#" ? `<a href="${p.url}" style="font-size:12px;color:#41c9b4;margin-top:6px;display:inline-block;">記事を読む &rarr;</a>` : ""}
-    </div>`;
-      }
-    })
-    .join("");
+  const xVoicesHtml = xVoices.map((p) => `
+      <tr>
+        <td style="padding:0 0 12px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding-bottom:10px;">
+                      <table cellpadding="0" cellspacing="0" border="0">
+                        <tr>
+                          <td style="width:36px;height:36px;background:#e7f3ff;border-radius:50%;text-align:center;vertical-align:middle;">
+                            <span style="font-size:18px;line-height:36px;">𝕏</span>
+                          </td>
+                          <td style="padding-left:10px;">
+                            <div style="font-size:13px;font-weight:700;color:#0f172a;">@${e(p.author)}</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:12px;">
+                      <span style="font-size:14px;color:#1e293b;line-height:1.7;">${e(p.text)}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="${p.url}" style="font-size:12px;color:#1d9bf0;font-weight:600;text-decoration:none;">ポストを見る &rarr;</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`).join("");
 
-  const gcupdatesHtml = gcupdates
-    .map(
-      (s) => `
-    <div style="display:flex;gap:12px;margin-bottom:12px;align-items:flex-start;">
-      <div style="flex-shrink:0;background:#111;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;">${escapeHtml(s.date)}</div>
-      <div>
-        <div style="font-size:14px;font-weight:600;color:#111;">${escapeHtml(s.title)}</div>
-        <div style="font-size:13px;color:#6b7280;">${escapeHtml(s.detail)}</div>
-      </div>
-    </div>`
-    )
-    .join("");
+  const noteVoicesHtml = noteVoices.map((p) => `
+      <tr>
+        <td style="padding:0 0 12px 0;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;border:1px solid #d1fae5;border-radius:12px;overflow:hidden;border-left:4px solid #10b981;">
+            <tr>
+              <td style="padding:16px 20px;">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding-bottom:6px;">
+                      <span style="font-size:10px;font-weight:700;background:#10b981;color:#ffffff;padding:2px 8px;border-radius:3px;">note</span>
+                      <span style="font-size:13px;font-weight:600;color:#0f172a;margin-left:8px;">${e(p.author)}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding-bottom:10px;">
+                      <span style="font-size:14px;color:#1e293b;line-height:1.7;">${e(p.text)}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <a href="${p.url}" style="font-size:12px;color:#10b981;font-weight:600;text-decoration:none;">記事を読む &rarr;</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`).join("");
 
-  // 著者ブロック生成
-  const authorBlockHtml = (() => {
-    if (authorSignatureHtml) {
-      return authorSignatureHtml;
-    }
-    const name = authorName ?? "GCInsight編集部";
-    const title = authorTitle ?? "元JTC自治体担当 × 外資IT営業 × 政策ウォッチャー × 地方在住";
-    const style = authorStyle ?? "部外者がズバッと正論で指摘する";
-    return `<div style="margin-top:32px;padding-top:24px;border-top:2px solid #111;display:flex;align-items:flex-start;gap:16px;">
-  <div>
-    <div style="font-size:14px;font-weight:700;color:#111;">${escapeHtml(name)}</div>
-    <div style="font-size:12px;color:#6b7280;margin-top:2px;">${escapeHtml(title)}</div>
-    <div style="font-size:13px;color:#374151;margin-top:8px;line-height:1.6;">${escapeHtml(style)}</div>
-  </div>
-</div>`;
-  })();
+  // ---- Migration stats ----
+  const migrationBlock = migrationStats ? `
+      <tr>
+        <td style="padding:0 0 36px 0;">
+          ${sectionHeader("📊", "移行状況サマリー")}
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;margin-top:16px;">
+            <tr>
+              <td style="padding:20px 24px;">
+                <table cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="padding-right:40px;text-align:center;">
+                      <div style="font-size:11px;color:#64748b;margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase;">移行率</div>
+                      <div style="font-size:28px;font-weight:800;color:#0f172a;">${e(migrationStats.rate)}</div>
+                    </td>
+                    <td style="padding-right:40px;text-align:center;border-left:1px solid #e2e8f0;padding-left:40px;">
+                      <div style="font-size:11px;color:#64748b;margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase;">完了団体</div>
+                      <div style="font-size:28px;font-weight:800;color:#0f172a;">${e(migrationStats.completed)}</div>
+                    </td>
+                    <td style="text-align:center;border-left:1px solid #e2e8f0;padding-left:40px;">
+                      <div style="font-size:11px;color:#64748b;margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase;">対象総数</div>
+                      <div style="font-size:28px;font-weight:800;color:#0f172a;">${e(migrationStats.total)}</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>` : "";
 
-  const officialNewsHtml = officialNews
-    .map(
-      (n) => `
-    <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #f3f4f6;">
-      <div style="margin-bottom:4px;">
-        <a href="${n.url}" style="font-size:14px;font-weight:600;color:#111;text-decoration:none;">${escapeHtml(n.title)}</a>
-        <span style="display:inline-block;margin-left:8px;font-size:11px;background:#f3f4f6;color:#6b7280;padding:2px 6px;border-radius:3px;">${escapeHtml(n.source)}</span>
-      </div>
-      <div style="font-size:13px;color:#4b5563;line-height:1.6;">${escapeHtml(n.summary)}</div>
-    </div>`
-    )
-    .join("");
+  // ---- GC updates ----
+  const gcupdatesHtml = gcupdates.map((s) => `
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+        <tr>
+          <td style="width:90px;vertical-align:top;padding-right:12px;">
+            <span style="font-size:10px;font-weight:700;background:#0f172a;color:#ffffff;padding:3px 7px;border-radius:3px;white-space:nowrap;">${e(s.date)}</span>
+          </td>
+          <td>
+            <div style="font-size:14px;font-weight:600;color:#0f172a;">${e(s.title)}</div>
+            <div style="font-size:13px;color:#64748b;margin-top:2px;">${e(s.detail)}</div>
+          </td>
+        </tr>
+      </table>`).join("");
+
+  // ---- Official news ----
+  const officialNewsHtml = officialNews.map((n, i) => `
+      <tr>
+        <td style="padding:${i === 0 ? "0" : "16px"} 0 16px 0;${i > 0 ? "border-top:1px solid #f1f5f9;" : ""}">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="padding-bottom:4px;">
+                <a href="${n.url}" style="font-size:14px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.5;">${e(n.title)}</a>
+                <span style="display:inline-block;margin-left:6px;font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;padding:2px 7px;border-radius:3px;">${e(n.source)}</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <span style="font-size:13px;color:#475569;line-height:1.6;">${e(n.summary)}</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>`).join("");
+
+  // ---- Author block ----
+  const authorBlock = authorSignatureHtml ?? `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:2px solid #0f172a;margin-top:32px;padding-top:24px;">
+      <tr>
+        <td style="padding-top:24px;">
+          <div style="font-size:15px;font-weight:700;color:#0f172a;">${e(authorName ?? "GCInsight編集部")}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:4px;line-height:1.5;">${e(authorTitle ?? "元JTC自治体担当 × 外資IT営業 × 政策ウォッチャー × 地方在住")}</div>
+          <div style="margin-top:12px;">
+            <a href="https://gcinsight.jp" style="font-size:13px;color:#2563eb;text-decoration:none;">gcinsight.jp</a>
+            <span style="font-size:13px;color:#94a3b8;margin:0 8px;">|</span>
+            <a href="https://gcinsight.jp/unsubscribe" style="font-size:13px;color:#94a3b8;text-decoration:none;">配信停止</a>
+          </div>
+        </td>
+      </tr>
+    </table>`;
 
   return `<!DOCTYPE html>
 <html lang="ja">
@@ -142,71 +231,139 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GCInsight 週次レポート #${issueNumber}</title>
 </head>
-<body style="margin:0;padding:0;background:#ffffff;">
-<div style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;">
+<body style="margin:0;padding:0;background:#f1f5f9;">
 
-  <!-- ヘッダー -->
-  <div style="background:#111;padding:32px 24px;text-align:center;">
-    <div style="font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">
-      GCInsight 週次レポート #${issueNumber}
-    </div>
-    <div style="font-size:13px;color:#9ca3af;margin-top:6px;">ガバメントクラウド最前線</div>
-  </div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f5f9;padding:24px 0;">
+  <tr>
+    <td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
 
-  <!-- 本文 -->
-  <div style="padding:32px 24px;">
+        <!-- ヘッダー -->
+        <tr>
+          <td style="background:#0f172a;border-radius:12px 12px 0 0;padding:32px 32px 28px 32px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td>
+                  <div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">GCINSIGHT WEEKLY</div>
+                  <div style="font-size:22px;font-weight:800;color:#ffffff;line-height:1.3;">ガバメントクラウド最前線<br><span style="font-size:14px;font-weight:500;color:#94a3b8;">#${issueNumber} — ${dateStr}号</span></div>
+                </td>
+                <td align="right" valign="top">
+                  <div style="background:#1e3a5f;border-radius:8px;padding:8px 14px;display:inline-block;">
+                    <div style="font-size:10px;color:#94a3b8;letter-spacing:1px;">ISSUE</div>
+                    <div style="font-size:24px;font-weight:900;color:#ffffff;line-height:1;">#${issueNumber}</div>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-    <!-- イントロ -->
-    <div style="font-size:14px;line-height:1.8;color:#374151;margin-bottom:32px;">
-      ${escapeHtml(intro).replace(/\n/g, "<br>")}
-    </div>
+        <!-- 本文 -->
+        <tr>
+          <td style="background:#ffffff;padding:32px 32px 8px 32px;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;">
 
-    <!-- 今週のニュース -->
-    ${(newsItems ?? []).length > 0 ? `
-    <div style="margin-bottom:36px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:4px;padding-bottom:10px;border-bottom:2px solid #111;">&#x1F4F0; 今週のガバクラニュース</div>
-      <div style="margin-top:16px;">${newsItemsHtml}</div>
-    </div>` : ""}
+            <!-- イントロ -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding-bottom:36px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;">
+                    <tr>
+                      <td style="padding:20px 24px;">
+                        <div style="font-size:11px;font-weight:700;color:#92400e;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">✍️ 今週のまとめ</div>
+                        <div style="font-size:14px;color:#1c1917;line-height:1.9;">${e(intro).replace(/\n/g, "<br>")}</div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
 
-    <!-- 現場・市民の声 -->
-    <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:4px;padding-bottom:10px;border-bottom:2px solid #111;">&#x1F5E3; 現場・専門家の声</div>
-      <div style="margin-top:16px;">${voicePicksHtml}</div>
-    </div>
+              <!-- 今週のニュース -->
+              ${(newsItems ?? []).length > 0 ? `
+              <tr>
+                <td style="padding-bottom:36px;">
+                  ${sectionHeader("📰", "今週のガバクラニュース")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;">
+                    ${newsItemsHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
 
-    <!-- 移行状況 -->
-    ${migrationBlock ? `
-    <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4CA; 移行状況サマリー</div>
-      ${migrationBlock}
-    </div>` : ""}
+              <!-- X の声 -->
+              ${xVoices.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:24px;">
+                  ${sectionHeader("𝕏", "X（Twitter）の声")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;">
+                    ${xVoicesHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
 
-    <!-- GCInsightアップデート -->
-    ${gcupdates.length > 0 ? `
-    <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4C5; GCInsightアップデート</div>
-      ${gcupdatesHtml}
-    </div>` : ""}
+              <!-- note の声 -->
+              ${noteVoices.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:36px;">
+                  ${sectionHeader("📝", "note 専門家コラム")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;">
+                    ${noteVoicesHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
 
-    <!-- 公式情報（補足） -->
-    ${officialNews.length > 0 ? `
-    <div style="margin-bottom:32px;">
-      <div style="font-size:15px;font-weight:700;color:#111;margin-bottom:12px;">&#x1F4F0; 公式情報</div>
-      ${officialNewsHtml}
-    </div>` : ""}
+              <!-- 移行状況 -->
+              ${migrationBlock}
 
-    <!-- 著者ブロック -->
-    ${authorBlockHtml}
+              <!-- GCInsightアップデート -->
+              ${gcupdates.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:36px;">
+                  ${sectionHeader("📅", "GCInsightデータ更新")}
+                  <div style="margin-top:16px;">${gcupdatesHtml}</div>
+                </td>
+              </tr>` : ""}
 
-  </div>
+              <!-- 公式情報 -->
+              ${officialNews.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:36px;">
+                  ${sectionHeader("🏛", "公式情報・業界動向")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;">
+                    ${officialNewsHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
 
-</div>
+            </table>
+          </td>
+        </tr>
+
+        <!-- フッター -->
+        <tr>
+          <td style="background:#f8fafc;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;padding:24px 32px 32px 32px;">
+            ${authorBlock}
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>`;
 }
 
-/** HTMLエスケープ */
-function escapeHtml(str: string): string {
+function sectionHeader(icon: string, label: string): string {
+  return `<table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td style="border-bottom:2px solid #0f172a;padding-bottom:10px;">
+        <span style="font-size:16px;font-weight:800;color:#0f172a;">${icon} ${e(label)}</span>
+      </td>
+    </tr>
+  </table>`;
+}
+
+function e(str: string): string {
   return str
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
