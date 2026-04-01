@@ -36,12 +36,14 @@ type ClickPoint = {
 
 type UxEvent = {
   event_type: string;
-  x_ratio: number | null;
-  y_ratio: number | null;
-  scroll_depth: number | null;
-  dwell_ms: number | null;
-  is_mobile: boolean;
   session_id: string;
+  metadata: {
+    x_ratio?: number | null;
+    y_ratio?: number | null;
+    scroll_depth?: number | null;
+    dwell_ms?: number | null;
+    is_mobile?: boolean;
+  } | null;
 };
 
 export default function HeatmapPage() {
@@ -80,13 +82,13 @@ export default function HeatmapPage() {
     const sessions = new Set(data.map((r) => r.session_id)).size;
     const avgScroll =
       leaves.length > 0
-        ? leaves.reduce((s, r) => s + (r.scroll_depth ?? 0), 0) / leaves.length
+        ? leaves.reduce((s, r) => s + (r.metadata?.scroll_depth ?? 0), 0) / leaves.length
         : 0;
     const avgDwell =
       leaves.length > 0
-        ? leaves.reduce((s, r) => s + (r.dwell_ms ?? 0), 0) / leaves.length
+        ? leaves.reduce((s, r) => s + (r.metadata?.dwell_ms ?? 0), 0) / leaves.length
         : 0;
-    const mobileCount = data.filter((r) => r.is_mobile).length;
+    const mobileCount = data.filter((r) => r.metadata?.is_mobile).length;
 
     setStats({
       total_clicks: clicks.length,
@@ -101,17 +103,17 @@ export default function HeatmapPage() {
     setLoading(false);
   }
 
-  async function drawHeatmap(clicks: Array<{ x_ratio: number | null; y_ratio: number | null }>) {
+  async function drawHeatmap(clicks: UxEvent[]) {
     if (!containerRef.current) return;
     const container = containerRef.current;
     const w = container.offsetWidth;
     const h = container.offsetHeight;
 
     const points: ClickPoint[] = clicks
-      .filter((c) => c.x_ratio !== null && c.y_ratio !== null)
+      .filter((c) => c.metadata?.x_ratio != null && c.metadata?.y_ratio != null)
       .map((c) => ({
-        x: Math.round((c.x_ratio ?? 0) * w),
-        y: Math.round((c.y_ratio ?? 0) * h),
+        x: Math.round((c.metadata!.x_ratio ?? 0) * w),
+        y: Math.round((c.metadata!.y_ratio ?? 0) * h),
         value: 1,
       }));
 

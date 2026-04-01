@@ -18,13 +18,8 @@ function getSessionId(): string {
 type UXEvent = {
   page_path: string;
   event_type: "click" | "leave";
-  x_ratio?: number;
-  y_ratio?: number;
-  scroll_depth?: number;
-  dwell_ms?: number;
-  is_mobile: boolean;
   session_id: string;
-  metadata?: Record<string, unknown>;
+  metadata: Record<string, unknown>;
 };
 
 // バッファに溜めてまとめて送信（DBコネクション節約）
@@ -74,12 +69,14 @@ export function useUXTracker() {
       pushEvent({
         page_path: page,
         event_type: "click",
-        x_ratio: parseFloat((e.clientX / window.innerWidth).toFixed(4)),
-        y_ratio: parseFloat(
-          ((e.clientY + window.scrollY) / document.documentElement.scrollHeight).toFixed(4)
-        ),
-        is_mobile: isMobile,
         session_id: sessionId,
+        metadata: {
+          x_ratio: parseFloat((e.clientX / window.innerWidth).toFixed(4)),
+          y_ratio: parseFloat(
+            ((e.clientY + window.scrollY) / document.documentElement.scrollHeight).toFixed(4)
+          ),
+          is_mobile: isMobile,
+        },
       });
     };
 
@@ -98,10 +95,12 @@ export function useUXTracker() {
       pushEvent({
         page_path: page,
         event_type: "leave",
-        scroll_depth: maxScrollRef.current,
-        dwell_ms: Date.now() - enteredAt.current,
-        is_mobile: isMobile,
         session_id: sessionId,
+        metadata: {
+          scroll_depth: maxScrollRef.current,
+          dwell_ms: Date.now() - enteredAt.current,
+          is_mobile: isMobile,
+        },
       });
       flush(); // 離脱時は即送信
     };

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from("ux_events")
-    .select("event_type, x_ratio, y_ratio, scroll_depth, dwell_ms, is_mobile, session_id")
+    .select("event_type, metadata, session_id")
     .eq("page_path", page)
     .gte("created_at", since.toISOString());
 
