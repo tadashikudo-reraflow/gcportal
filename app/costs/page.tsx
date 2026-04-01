@@ -255,17 +255,32 @@ export default async function CostsPage() {
         <p className="page-subtitle">
           標準化移行に伴うコスト変化を、実績と比較表で整理
         </p>
+        {/* ヒーローKPIバー — ファーストビューで最重要データを即提示 */}
+        <div className="mt-4 grid grid-cols-3 gap-2" role="region" aria-label="コスト変化サマリー">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xl sm:text-2xl font-black tabular-nums text-green-600 leading-none">−30%</span>
+            <span className="text-[11px] text-gray-500 leading-tight">政府目標（R4）</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xl sm:text-2xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
+            <span className="text-[11px] text-gray-500 leading-tight">実態平均（中核市）</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-xl sm:text-2xl font-black tabular-nums text-red-900 leading-none">+{worstPct}%</span>
+            <span className="text-[11px] text-gray-500 leading-tight">最悪事例</span>
+          </div>
+        </div>
       </div>
 
       {/* ページナビ */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {[
           {
             label: "全体像を知る",
             desc: "目標と実態のギャップ",
             href: "#cost-gap",
             icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
               </svg>
             ),
@@ -275,7 +290,7 @@ export default async function CostsPage() {
             desc: "R6検証事業 8団体",
             href: "#r6-verification",
             icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
                 <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
               </svg>
             ),
@@ -285,7 +300,7 @@ export default async function CostsPage() {
             desc: "パッケージ・ベンダー一覧",
             href: "/packages#vendor-cost",
             icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             ),
@@ -295,7 +310,7 @@ export default async function CostsPage() {
             desc: "FinOps・最適化",
             href: "#cost-measures",
             icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
                 <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
             ),
@@ -334,7 +349,11 @@ export default async function CostsPage() {
             { label: "最悪事例", mult: 5.7, color: "#7f1d1d", pct: `+${worstPct}%`, source: "個別報告", sourceCls: "bg-amber-100 text-amber-700" },
           ];
           return (
-            <div className="mt-3 space-y-4">
+            <div
+              className="mt-3 space-y-4"
+              role="img"
+              aria-label={`コスト比較チャート: 政府目標−30%（0.7×）、実態平均+${avgPct}%（2.3×）、最悪事例+${worstPct}%（5.7×）`}
+            >
               {rows.map((row) => {
                 const barW = (row.mult / MAX) * 100;
                 return (
@@ -517,9 +536,8 @@ export default async function CostsPage() {
       </div>
 
       {/* 費用按分・ベンダー・最適化 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         {/* 費用按分方式の比較 — 縦リスト */}
-        <div className="mt-6 card p-5">
+        <div className="card p-5">
           <h3 className="text-sm font-bold mb-0.5" style={{ color: "var(--color-text-primary)" }}>
             共同利用の費用 — どう割り勘するか？
           </h3>
@@ -631,59 +649,59 @@ export default async function CostsPage() {
             </a>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* サーバーレス化 */}
-            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-shrink-0 w-7 h-7 rounded-md bg-blue-100 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            {[
+              {
+                label: "サーバーレス化",
+                desc: "Lambda/Fargate等のサーバーレスサービスにより、EC2比でコスト優位性を確認。特にバッチ処理で効果大",
+                icon: (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
                   </svg>
-                </div>
-                <p className="text-xs font-semibold text-blue-800">サーバーレス化</p>
-              </div>
-              <p className="text-xs leading-relaxed text-blue-700">Lambda/Fargate等のサーバーレスサービスにより、EC2比でコスト優位性を確認。特にバッチ処理で効果大</p>
-            </div>
-            {/* IaC構築効率化 */}
-            <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-shrink-0 w-7 h-7 rounded-md bg-green-100 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                ),
+              },
+              {
+                label: "IaC構築効率化",
+                desc: "Terraform/CloudFormation等でインフラをコード管理。構築工数を大幅削減し、環境複製も容易に",
+                icon: (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
                   </svg>
-                </div>
-                <p className="text-xs font-semibold text-green-800">IaC構築効率化</p>
-              </div>
-              <p className="text-xs leading-relaxed text-green-700">Terraform/CloudFormation等でインフラをコード管理。構築工数を大幅削減し、環境複製も容易に</p>
-            </div>
-            {/* マネージドサービス活用 */}
-            <div className="rounded-lg border border-purple-200 bg-purple-50 px-4 py-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-shrink-0 w-7 h-7 rounded-md bg-purple-100 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                ),
+              },
+              {
+                label: "マネージドサービス活用",
+                desc: "RDS/Aurora等のマネージドDBにより運用負荷とコストを最適化。パッチ適用・バックアップの自動化",
+                icon: (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
                   </svg>
-                </div>
-                <p className="text-xs font-semibold text-purple-800">マネージドサービス活用</p>
-              </div>
-              <p className="text-xs leading-relaxed text-purple-700">RDS/Aurora等のマネージドDBにより運用負荷とコストを最適化。パッチ適用・バックアップの自動化</p>
-            </div>
-            {/* FinOpsダッシュボード */}
-            <div className="rounded-lg border border-teal-200 bg-teal-50 px-4 py-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex-shrink-0 w-7 h-7 rounded-md bg-teal-100 flex items-center justify-center">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0d9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                ),
+              },
+              {
+                label: "FinOpsダッシュボード",
+                desc: "コスト可視化ダッシュボードで日次モニタリング。予算超過の早期検知と最適化サイクルの確立",
+                icon: (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
                   </svg>
+                ),
+              },
+            ].map((item) => (
+              <div key={item.label} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-md bg-white border border-gray-200 flex items-center justify-center text-gray-500">
+                    {item.icon}
+                  </div>
+                  <p className="text-xs font-semibold text-gray-800">{item.label}</p>
                 </div>
-                <p className="text-xs font-semibold text-teal-800">FinOpsダッシュボード</p>
+                <p className="text-xs leading-relaxed text-gray-600">{item.desc}</p>
               </div>
-              <p className="text-xs leading-relaxed text-teal-700">コスト可視化ダッシュボードで日次モニタリング。予算超過の早期検知と最適化サイクルの確立</p>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* 公式資料リンク */}
-        <div className="mt-4 pt-3 border-t border-gray-200">
+        <div className="card p-5">
           <p className="text-xs font-semibold text-gray-500 mb-2">公式資料</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* デジタル庁資料 */}
@@ -727,12 +745,11 @@ export default async function CostsPage() {
             </div>
           </div>
         </div>
-        <div className="mt-3 flex flex-col gap-2">
-          <p className="text-xs text-gray-400">
-            個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↑</a>
-          </p>
-          <ReportLeadCta source="costs-r6" compact title="R6検証データを含むレポートをPDFで確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />
-        </div>
+      <div className="flex flex-col gap-2">
+        <p className="text-xs text-gray-400">
+          個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↑</a>
+        </p>
+        <ReportLeadCta source="costs-r6" compact title="R6検証データを含むレポートをPDFで確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />
       </div>
 
       {/* デジタル庁コスト管理ガイド */}
