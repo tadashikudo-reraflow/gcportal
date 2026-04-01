@@ -164,8 +164,11 @@ async function searchX(keywords: string[]): Promise<XTweet[]> {
     // API失敗はスキップ
   }
 
-  // いいね数でソート → 上位5件
-  return results.sort((a, b) => b.likes - a.likes).slice(0, 5);
+  // いいね数でソート → 5件以上いいねのものに絞り → 上位3件
+  return results
+    .sort((a, b) => b.likes - a.likes)
+    .filter((t) => t.likes >= 5)
+    .slice(0, 3);
 }
 
 // ----- note.com API 検索 -----
@@ -213,7 +216,41 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       return true;
     })
     .sort((a, b) => b.likeCount - a.likeCount)
-    .slice(0, 5);
+    .filter((a) => a.likeCount >= 3)
+    .slice(0, 3);
+}
+
+// ----- GCInsight 新着記事取得 -----
+interface GcArticle {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+}
+
+async function fetchGcArticles(supabase: ReturnType<typeof createClient>): Promise<GcArticle[]> {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffStr = cutoff.toISOString().slice(0, 10); // YYYY-MM-DD
+
+  try {
+    const { data } = await supabase
+      .from("articles")
+      .select("slug, title, description, date")
+      .eq("is_published", true)
+      .gte("date", cutoffStr)
+      .order("date", { ascending: false })
+      .limit(5);
+
+    return (data ?? []).map((a: { slug: string; title: string; description: string; date: string }) => ({
+      slug: a.slug ?? "",
+      title: a.title ?? "",
+      description: a.description ?? "",
+      date: a.date ?? "",
+    }));
+  } catch {
+    return [];
+  }
 }
 
 // POST /api/newsletter/generate — ニュースレター下書き自動生成
@@ -322,6 +359,9 @@ export async function POST(req: NextRequest) {
   // 5a. ニュース記事収集（常に実行）
   const newsItems = await fetchNewsItems();
 
+  // 5b. GCInsight 新着記事（過去7日の公開記事）
+  const gcArticles = await fetchGcArticles(supabase);
+
   // 5. X + note 自動収集（bodyでvoicePicksが渡されていなければ）
   let voicePicks = bodyData.voicePicks ?? [];
   let xTweets: XTweet[] = [];
@@ -420,8 +460,20 @@ export async function POST(req: NextRequest) {
 イントロは上記のペルソナで書いてください。現場感のある一人称で、読者に語りかけるように。`
     : "";
 
-  // 8. イントロ
-  const intro = bodyData.intro ?? "今週のガバメントクラウド動向をお届けします。現場で何が起きているのか、部外者の目線でズバッと斬ります。";
+  // 8. イントロ（\n\n で段落分割されていない場合は句点で自動分割）
+  const rawIntro = bodyData.intro ?? "今週のガバメントクラウド動向をお届けします。現場で何が起きているのか、部外者の目線でズバッと斬ります。";
+  const intro = rawIntro.includes("\n\n")
+    ? rawIntro
+    : rawIntro
+        // 句点の後ろで段落を入れる（3文目以降で改段）
+        .replace(/([。])(\s*)([^\n])/g, (_, p, sp, next, offset, str) => {
+          // 文頭から数えて3文目の句点の後ろだけ改段
+          const before = str.slice(0, offset + 1);
+          const sentenceCount = (before.match(/。/g) ?? []).length;
+          return sentenceCount === 2 || sentenceCount === 4
+            ? `${p}\n\n${next}`
+            : `${p}${sp}${next}`;
+        });
 
   // 9. HTML生成
   const now = new Date();
@@ -435,6 +487,7 @@ export async function POST(req: NextRequest) {
     voicePicks,
     migrationStats,
     gcupdates,
+    gcArticles,
     officialNews,
     relatedArticles,
     authorName: config?.author_name,
@@ -484,6 +537,7 @@ export async function POST(req: NextRequest) {
       related_articles: relatedArticles.length,
       voice_picks: voicePicks.length,
       gcupdates: gcupdates.length,
+      gc_articles: gcArticles.length,
       rag_news: bodyData.ragNews?.length ?? 0,
     },
     ...(warnings.length > 0 && { warnings }),

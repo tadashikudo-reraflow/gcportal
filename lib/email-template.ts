@@ -15,9 +15,11 @@
  *   3. 現場の声（X + note を1セクションに統合）← 最もエンゲージメントを引くコンテンツを前に
  *   4. 今週のニュース（詳細記事へのリンク）
  *   5. 移行状況サマリー（データがある場合）
- *   6. 公式情報・業界動向（補足）
- *   7. メインCTA（末尾1本）
- *   8. フッター
+ *   6. GCInsightデータ更新
+ *   7. 今週のGCInsight新着記事（過去7日の公開記事）
+ *   8. 公式情報・業界動向（補足）
+ *   9. メインCTA（末尾1本）
+ *  10. フッター
  *
  * 【CTA ルール】
  *   - メインCTAは末尾1本のみ
@@ -54,6 +56,8 @@ export interface NewsletterSections {
    * officialNews と明確に区別する（公式≠UGC）
    */
   relatedArticles?: Array<{ title: string; summary: string; url: string; source: string }>;
+  /** GCInsight サイト内の今週新着記事（過去7日） */
+  gcArticles?: Array<{ slug: string; title: string; description: string; date: string }>;
   authorName?: string;
   authorTitle?: string;
   authorSignatureHtml?: string;
@@ -67,6 +71,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     migrationStats,
     voicePicks,
     gcupdates,
+    gcArticles = [],
     officialNews,
     relatedArticles = [],
     authorName,
@@ -80,7 +85,8 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
   // 読了時間（コンテンツ量から自動算出、最低2分）
   const estMinutes = Math.max(2, Math.round(
     voicePicks.length * 0.5 + newsItems.length * 0.4 +
-    officialNews.length * 0.2 + relatedArticles.length * 0.2
+    officialNews.length * 0.2 + relatedArticles.length * 0.2 +
+    gcArticles.length * 0.3
   ));
 
   // プレヘッダー: イントロ先頭80字（メーラーで件名の次に表示）
@@ -284,6 +290,36 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       </td>
     </tr>`).join("");
 
+  // ── GCInsight 新着記事 ───────────────────────────────────────────────────
+  const gcArticlesHtml = gcArticles.map((a, i) => `
+    <tr>
+      <td style="padding:${i === 0 ? "10px" : "12px"} 0 12px 0;
+        ${i > 0 ? "border-top:1px solid #f1f5f9;" : ""}">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding-bottom:4px;">
+              ${a.date ? `<span style="font-size:10px;color:#94a3b8;margin-right:8px;">${e(a.date)}</span>` : ""}
+              <a href="https://gcinsight.jp/articles/${e(a.slug)}"
+                style="font-size:14px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">
+                ${e(a.title)}
+              </a>
+            </td>
+          </tr>
+          ${a.description ? `<tr>
+            <td style="padding-top:3px;">
+              <span style="font-size:13px;color:#475569;line-height:1.65;">${e(a.description)}</span>
+            </td>
+          </tr>` : ""}
+          <tr>
+            <td style="padding-top:6px;">
+              <a href="https://gcinsight.jp/articles/${e(a.slug)}"
+                style="font-size:11px;color:#2563eb;text-decoration:underline;">続きを読む →</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`).join("");
+
   // ── 著者ブロック ─────────────────────────────────────────────────────────
   const authorBlock = authorSignatureHtml ?? `
     <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -418,7 +454,18 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </td>
               </tr>` : ""}
 
-              <!-- 6. 公式情報（デジタル庁・総務省・ベンダー公式PR） -->
+              <!-- 6. GCInsight 新着記事 -->
+              ${gcArticles.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:32px;">
+                  ${sectionHeader("✨", "今週のGCInsight新着記事", "今週サイトに公開した記事をまとめました。")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">
+                    ${gcArticlesHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
+
+              <!-- 7. 公式情報（デジタル庁・総務省・ベンダー公式PR） -->
               ${officialNews.length > 0 ? `
               <tr>
                 <td style="padding-bottom:32px;">
@@ -429,7 +476,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </td>
               </tr>` : ""}
 
-              <!-- 7. 関連記事（Qiita・Zenn・PR Times等） -->
+              <!-- 8. 関連記事（Qiita・Zenn・PR Times等） -->
               ${relatedArticles.length > 0 ? `
               <tr>
                 <td style="padding-bottom:8px;">
@@ -440,7 +487,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </td>
               </tr>` : ""}
 
-              <!-- 8. メインCTA（末尾1本） -->
+              <!-- 9. メインCTA（末尾1本） -->
               <tr>
                 <td>${mainCta}</td>
               </tr>
