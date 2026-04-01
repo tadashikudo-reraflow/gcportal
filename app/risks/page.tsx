@@ -130,46 +130,50 @@ export default function RisksPage() {
 
       {/* 全体サマリー */}
       <div className="card p-5">
-        {/* メインKPI */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-          <div className="text-center">
-            <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#b91c1c" }}>
+        {/* メインKPI — ヒーロー + サブKPI 非対称レイアウト */}
+        <div className="flex flex-col sm:flex-row gap-5 mb-5">
+          {/* ヒーローKPI */}
+          <div className="flex-shrink-0 sm:border-r sm:border-gray-100 sm:pr-5">
+            <p className="text-4xl font-black tabular-nums leading-none" style={{ color: "#b91c1c" }}>
               {riskMunicipalities.length}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>遅延リスク自治体数</p>
-            <p className="text-xs tabular-nums" style={{ color: "var(--color-text-muted)" }}>
+            <p className="text-sm font-semibold mt-1" style={{ color: "var(--color-text-secondary)" }}>遅延リスク自治体数</p>
+            <p className="text-xs mt-0.5 tabular-nums" style={{ color: "var(--color-text-muted)" }}>
               全体の {riskRatio.toFixed(1)}%（{TOTAL_MUNICIPALITIES.toLocaleString()}自治体中）
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-3xl font-extrabold tabular-nums" style={{ color: "#d97706" }}>
-              {avgRate.toFixed(1)}%
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>危機自治体の平均 手続き進捗率</p>
-          </div>
-          <div className="text-center">
-            <p className="text-3xl font-extrabold tabular-nums" style={{ color: "var(--color-brand-secondary)" }}>
-              {prefectures.length}
-            </p>
-            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>対象都道府県</p>
-          </div>
-          <div className="text-center">
-            <p className="text-base font-extrabold" style={{ color: "#b91c1c" }}>
-              2026/3/31
-            </p>
-            {Date.now() >= new Date("2026-03-31").getTime() ? (
-              <>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限</p>
-                <p className="text-xs font-semibold" style={{ color: "#b91c1c" }}>期限到達済み</p>
-              </>
-            ) : (
-              <>
-                <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>移行目標期限まで</p>
-                <p className="text-xs tabular-nums font-semibold" style={{ color: "#b91c1c" }}>
-                  {Math.ceil((new Date("2026-03-31").getTime() - Date.now()) / 86400000)}日
-                </p>
-              </>
-            )}
+          {/* サブKPI 3件 */}
+          <div className="flex flex-wrap gap-x-6 gap-y-3 items-start">
+            <div>
+              <p className="text-2xl font-extrabold tabular-nums leading-none" style={{ color: "#d97706" }}>
+                {avgRate.toFixed(1)}%
+              </p>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>危機自治体の平均進捗率</p>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold tabular-nums leading-none" style={{ color: "var(--color-brand-secondary)" }}>
+                {prefectures.length}
+              </p>
+              <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>対象都道府県</p>
+            </div>
+            <div>
+              <p className="text-base font-extrabold leading-none" style={{ color: "#b91c1c" }}>
+                2026/3/31
+              </p>
+              {Date.now() >= new Date("2026-03-31").getTime() ? (
+                <>
+                  <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>移行目標期限</p>
+                  <p className="text-xs font-semibold" style={{ color: "#b91c1c" }}>期限到達済み</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>移行目標期限まで</p>
+                  <p className="text-xs tabular-nums font-semibold" style={{ color: "#b91c1c" }}>
+                    {Math.ceil((new Date("2026-03-31").getTime() - Date.now()) / 86400000)}日
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

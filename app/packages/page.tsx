@@ -89,11 +89,38 @@ export default async function PackagesPage() {
     <div className="space-y-6">
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "パッケージ・ベンダー" }]} />
-      <div className="pb-4">
+      <div className="pb-2">
         <h1 className="page-title">パッケージ・ベンダー一覧</h1>
         <p className="page-subtitle">
           標準化対応パッケージを提供するベンダーと業務別パッケージの一覧。
         </p>
+        {/* ファーストビューKPIバー */}
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
+          <div>
+            <p className="text-2xl font-black tabular-nums leading-none" style={{ color: "var(--color-brand-primary)" }}>
+              {vendors.length}
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>対応ベンダー数</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black tabular-nums leading-none" style={{ color: "var(--color-brand-primary)" }}>
+              {packages.length}
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>登録パッケージ数</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black tabular-nums leading-none" style={{ color: "var(--color-brand-primary)" }}>
+              {municipalities.length.toLocaleString()}
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>対象自治体数</p>
+          </div>
+          <div>
+            <p className="text-2xl font-black tabular-nums leading-none" style={{ color: "var(--color-brand-primary)" }}>
+              {vendors.filter((v) => v.cloud_confirmed).length}
+            </p>
+            <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>クラウド対応確認済み</p>
+          </div>
+        </div>
       </div>
 
       {/* 自治体名検索 */}
