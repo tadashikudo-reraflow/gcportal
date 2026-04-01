@@ -47,7 +47,13 @@ export interface NewsletterSections {
   }>;
   migrationStats?: { rate: string; completed: string; total: string };
   gcupdates: Array<{ date: string; title: string; detail: string }>;
+  /** 公式情報: デジタル庁・総務省・ベンダー公式PRのみ */
   officialNews: Array<{ title: string; summary: string; url: string; source: string }>;
+  /**
+   * 関連記事: Qiita・Zenn・PR Times等のUGC・技術記事・寄稿
+   * officialNews と明確に区別する（公式≠UGC）
+   */
+  relatedArticles?: Array<{ title: string; summary: string; url: string; source: string }>;
   authorName?: string;
   authorTitle?: string;
   authorSignatureHtml?: string;
@@ -62,6 +68,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     voicePicks,
     gcupdates,
     officialNews,
+    relatedArticles = [],
     authorName,
     authorTitle,
     authorSignatureHtml,
@@ -72,7 +79,8 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
 
   // 読了時間（コンテンツ量から自動算出、最低2分）
   const estMinutes = Math.max(2, Math.round(
-    voicePicks.length * 0.5 + newsItems.length * 0.4 + officialNews.length * 0.2
+    voicePicks.length * 0.5 + newsItems.length * 0.4 +
+    officialNews.length * 0.2 + relatedArticles.length * 0.2
   ));
 
   // プレヘッダー: イントロ先頭80字（メーラーで件名の次に表示）
@@ -226,7 +234,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       </tr>
     </table>`).join("");
 
-  // ── 公式情報・業界動向 ────────────────────────────────────────────────────
+  // ── 公式情報（デジタル庁・総務省・ベンダー公式PRのみ） ───────────────────
   const officialNewsHtml = officialNews.map((n, i) => `
     <tr>
       <td style="padding:${i === 0 ? "10px" : "12px"} 0 12px 0;
@@ -239,6 +247,31 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 ${e(n.title)}
               </a>
               <span style="font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;
+                padding:1px 6px;border-radius:2px;margin-left:6px;">${e(n.source)}</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <span style="font-size:12px;color:#64748b;line-height:1.55;">${e(n.summary)}</span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`).join("");
+
+  // ── 関連記事（Qiita・Zenn・PR Times等 UGC・技術記事） ───────────────────
+  const relatedArticlesHtml = relatedArticles.map((n, i) => `
+    <tr>
+      <td style="padding:${i === 0 ? "10px" : "12px"} 0 12px 0;
+        ${i > 0 ? "border-top:1px solid #f1f5f9;" : ""}">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="padding-bottom:3px;">
+              <a href="${n.url}"
+                style="font-size:13px;font-weight:600;color:#0f172a;text-decoration:none;line-height:1.4;">
+                ${e(n.title)}
+              </a>
+              <span style="font-size:10px;font-weight:600;background:#ede9fe;color:#6d28d9;
                 padding:1px 6px;border-radius:2px;margin-left:6px;">${e(n.source)}</span>
             </td>
           </tr>
@@ -385,18 +418,29 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </td>
               </tr>` : ""}
 
-              <!-- 6. 公式情報・業界動向 -->
+              <!-- 6. 公式情報（デジタル庁・総務省・ベンダー公式PR） -->
               ${officialNews.length > 0 ? `
               <tr>
-                <td style="padding-bottom:8px;">
-                  ${sectionHeader("🏛", "公式情報・業界動向", "デジタル庁・ベンダー各社の最新リリースです。")}
+                <td style="padding-bottom:32px;">
+                  ${sectionHeader("🏛", "公式情報", "デジタル庁・総務省・ベンダー各社の公式発表です。")}
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">
                     ${officialNewsHtml}
                   </table>
                 </td>
               </tr>` : ""}
 
-              <!-- 7. メインCTA（末尾1本） -->
+              <!-- 7. 関連記事（Qiita・Zenn・PR Times等） -->
+              ${relatedArticles.length > 0 ? `
+              <tr>
+                <td style="padding-bottom:8px;">
+                  ${sectionHeader("📖", "関連記事", "エンジニア・実務者によるQiita・Zenn等の技術記事です。")}
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">
+                    ${relatedArticlesHtml}
+                  </table>
+                </td>
+              </tr>` : ""}
+
+              <!-- 8. メインCTA（末尾1本） -->
               <tr>
                 <td>${mainCta}</td>
               </tr>

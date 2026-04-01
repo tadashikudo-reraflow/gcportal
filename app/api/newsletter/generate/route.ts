@@ -230,11 +230,17 @@ export async function POST(req: NextRequest) {
     voicePicks?: Array<{ source: "x" | "note"; author: string; text: string; url: string }>;
     intro?: string;
     officialNews?: Array<{ title: string; summary: string; url: string; source: string }>;
+    /**
+     * ragNews は source によって自動振り分け:
+     * - "PR Times" → newsItems（ガバクラニュース）
+     * - "Qiita" | "Zenn" → relatedArticles（関連記事）
+     * - その他 → officialNews
+     */
     ragNews?: Array<{
       title: string;
       summary: string;
       url: string;
-      source: string;  // "産経新聞", "日経クロステック" etc
+      source: string;
       published_at?: string;
     }>;
   } = {};
@@ -359,25 +365,43 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 6. デジタル庁公式ニュース
-  let officialNews = bodyData.officialNews ?? [];
+  // 6. ragNews をソース種別で振り分け
+  // - PR Times → newsItems（ガバクラニュース）
+  // - Qiita / Zenn → relatedArticles（関連記事）
+  // - その他（産経・日経等）→ officialNews
+  const RELATED_SOURCES = new Set(["Qiita", "Zenn"]);
+  const NEWS_SOURCES = new Set(["PR Times"]);
 
-  // RAG経由のニュース記事を公式情報にマージ（bodyで渡された分）
-  if (bodyData.ragNews && bodyData.ragNews.length > 0) {
-    officialNews = [
-      ...bodyData.ragNews.map(r => ({
-        title: r.title,
-        summary: r.summary,
-        url: r.url,
-        source: r.source,
-      })),
-      ...officialNews,
-    ];
+  const ragNewsItems: typeof newsItems = [];
+  const ragRelated: Array<{ title: string; summary: string; url: string; source: string }> = [];
+  const ragOfficial: Array<{ title: string; summary: string; url: string; source: string }> = [];
+
+  for (const r of bodyData.ragNews ?? []) {
+    const item = { title: r.title, summary: r.summary, url: r.url, source: r.source };
+    if (NEWS_SOURCES.has(r.source)) {
+      ragNewsItems.push({ ...item, date: r.published_at?.slice(0, 10) });
+    } else if (RELATED_SOURCES.has(r.source)) {
+      ragRelated.push(item);
+    } else {
+      ragOfficial.push(item);
+    }
+  }
+
+  // newsItems に PR Times をマージ（末尾に追加）
+  const mergedNewsItems = [...newsItems, ...ragNewsItems];
+
+  // relatedArticles（Qiita・Zenn）
+  const relatedArticles = ragRelated;
+
+  // officialNews
+  let officialNews = bodyData.officialNews ?? [];
+  if (ragOfficial.length > 0) {
+    officialNews = [...ragOfficial, ...officialNews];
   }
 
   // officialNews が空ならnewsItemsから公式情報（デジタル庁）を流用
   if (officialNews.length === 0) {
-    officialNews = newsItems
+    officialNews = mergedNewsItems
       .filter(n => n.source === "デジタル庁")
       .slice(0, 3)
       .map(n => ({ title: n.title, summary: n.summary, url: n.url, source: n.source }));
@@ -407,14 +431,14 @@ export async function POST(req: NextRequest) {
   const html = renderNewsletterHtml({
     issueNumber,
     intro,
-    newsItems,
+    newsItems: mergedNewsItems,
     voicePicks,
     migrationStats,
     gcupdates,
     officialNews,
+    relatedArticles,
     authorName: config?.author_name,
     authorTitle: config?.author_title,
-    authorStyle: config?.author_style,
     authorSignatureHtml: config?.author_signature_html,
   });
 
@@ -453,10 +477,11 @@ export async function POST(req: NextRequest) {
     x_keywords: xKeywords,
     note_keywords: noteKeywords,
     collected: {
-      news_items: newsItems.length,
+      news_items: mergedNewsItems.length,
       x_tweets: xTweets.length,
       note_articles: noteArticles.length,
       official_news: officialNews.length,
+      related_articles: relatedArticles.length,
       voice_picks: voicePicks.length,
       gcupdates: gcupdates.length,
       rag_news: bodyData.ragNews?.length ?? 0,
