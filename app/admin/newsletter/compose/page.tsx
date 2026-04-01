@@ -64,10 +64,19 @@ function ComposeForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editId]);
 
-  // iframeにHTMLを注入
+  // iframeにHTMLを注入 + コンテンツ高さに合わせて自動リサイズ
   useEffect(() => {
     if (view === "preview" && iframeRef.current && bodyHtml) {
-      iframeRef.current.srcdoc = bodyHtml;
+      const iframe = iframeRef.current;
+      iframe.srcdoc = bodyHtml;
+      const onLoad = () => {
+        try {
+          const h = iframe.contentDocument?.documentElement?.scrollHeight;
+          if (h && h > 0) iframe.style.height = `${h + 32}px`;
+        } catch { /* cross-origin等は無視 */ }
+      };
+      iframe.addEventListener("load", onLoad);
+      return () => iframe.removeEventListener("load", onLoad);
     }
   }, [view, bodyHtml]);
 
@@ -280,7 +289,7 @@ function ComposeForm() {
               style={{
                 width: previewWidth,
                 maxWidth: 640,
-                height: 900,
+                height: 900, // onLoadで自動上書きされる
                 border: "none",
                 borderRadius: 8,
                 boxShadow: "0 4px 24px rgba(0,0,0,0.10)",
