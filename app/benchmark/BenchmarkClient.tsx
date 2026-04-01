@@ -1065,6 +1065,7 @@ export default function BenchmarkClient({
                           <div className="flex items-center gap-2">
                             <div
                               className="h-4 rounded-sm"
+                              title={`${p.prefecture}: ${formatRate(p.avgRate)}`}
                               style={{
                                 width: `${Math.max(p.avgRate * 100, 2)}%`,
                                 backgroundColor: getRateColor(p.avgRate),

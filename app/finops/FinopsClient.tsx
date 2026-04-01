@@ -72,7 +72,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             <div className="flex flex-col sm:flex-row gap-3">
               <a
                 href="/finops#pdf"
-                className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm"
+                className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm w-full sm:w-auto"
                 style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)" }}
               >
                 📄 無料PDFを受け取る（メールのみ）
