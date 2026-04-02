@@ -34,8 +34,8 @@ from io import BytesIO
 # ── 設定 ──────────────────────────────────────────────────────────
 SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co"
 SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
-SITE_URL = "https://gcinsight.jp"
-PDF_URL  = "https://gcinsight.jp/report?from=nav"
+SITE_URL   = "https://gcinsight.jp"
+FINOPS_URL = "https://gcinsight.jp/finops"
 
 GCPORTAL_DIR   = Path(__file__).parent.parent  # gcportal/
 SCRIPTS_DIR    = GCPORTAL_DIR / "scripts"
@@ -51,15 +51,18 @@ HEADERS = {
     "Authorization": f"Bearer {SUPABASE_KEY}",
 }
 
-CTA_HTML = """
+
+def build_cta_html(slug: str) -> str:
+    article_url = f"{SITE_URL}/articles/{slug}"
+    return f"""
 <hr style="margin:40px 0; border:none; border-top:2px solid #e5e7eb;">
 <div style="background:#f0f7ff; border-radius:8px; padding:24px; font-size:16px; line-height:1.8;">
-  <p>📊 全国1,741自治体のガバメントクラウド移行状況を無料で確認<br>
-  👉 <a href="{site_url}">{site_url}</a></p>
-  <p>📄 移行コスト実態レポート（無料PDF）<br>
-  👉 <a href="{pdf_url}">{pdf_url}</a></p>
+  <p>📊 この記事の詳細データをインタラクティブに確認<br>
+  👉 <a href="{article_url}">{article_url}</a></p>
+  <p>💰 自治体ガバメントクラウド移行コスト最適化ガイド（FinOps）<br>
+  👉 <a href="{FINOPS_URL}">{FINOPS_URL}</a></p>
 </div>
-""".format(site_url=SITE_URL, pdf_url=PDF_URL)
+"""
 
 # ── Supabase ─────────────────────────────────────────────────────
 
@@ -318,7 +321,7 @@ def git_push(slug):
 
 # ── paste HTML生成 ────────────────────────────────────────────────
 
-def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cover_filename):
+def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cover_filename, slug=None):
     """
     プレースホルダーを <img src="https://gcinsight.jp/..."> に置換して
     X Articles用ペーストHTMLを生成する。
@@ -339,6 +342,8 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
     # タイトル・リード
     title = article["title"]
+    article_slug = slug or article.get("slug", "")
+    cta_html = build_cta_html(article_slug)
 
     paste_html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -374,7 +379,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
 {body}
 
-{CTA_HTML}
+{cta_html}
 <!-- ▲ ここまでコピー -->
 
 <hr style="margin-top:48px">
