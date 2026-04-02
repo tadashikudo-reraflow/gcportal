@@ -220,6 +220,48 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
     .slice(0, 3);
 }
 
+// ----- イントロ自動生成 -----
+function buildAutoIntro(params: {
+  newsItems: Array<{ title: string; source: string }>;
+  gcArticles: Array<{ title: string }>;
+  officialNews: Array<{ title: string; source: string }>;
+  voicePicks: Array<{ source: string }>;
+}): string {
+  const { newsItems, gcArticles, officialNews, voicePicks } = params;
+  const paragraphs: string[] = [];
+
+  // 段落1: 今週の主要ニュース（最大2件タイトル列挙）
+  if (newsItems.length > 0) {
+    const headlines = newsItems.slice(0, 2).map((n) => `「${n.title}」`).join("、");
+    const suffix = newsItems.length > 2 ? `など計${newsItems.length}件` : "";
+    paragraphs.push(`今週は${headlines}${suffix}をお届けします。ガバメントクラウド移行を巡る現場の動きを、部外者の目線でズバッと斬ります。`);
+  } else if (officialNews.length > 0) {
+    const headline = `「${officialNews[0].title}」`;
+    paragraphs.push(`今週は${headline}など、${officialNews[0].source}からの公式発表を中心にお届けします。`);
+  } else {
+    paragraphs.push(`今週のガバメントクラウド動向をお届けします。現場で何が起きているのか、部外者の目線でズバッと斬ります。`);
+  }
+
+  // 段落2: GCInsight新着記事（あれば）
+  if (gcArticles.length > 0) {
+    const top = `「${gcArticles[0].title}」`;
+    const rest = gcArticles.length > 1 ? `など今週${gcArticles.length}本` : "を今週";
+    paragraphs.push(`GCInsightでは${top}${rest}公開しました。移行担当者・ベンダー営業の方にとって実務直結の内容です。ぜひあわせてご覧ください。`);
+  }
+
+  // 段落3: 現場の声（あれば）
+  const noteCount = voicePicks.filter((v) => v.source === "note").length;
+  const xCount = voicePicks.filter((v) => v.source === "x").length;
+  if (noteCount > 0 || xCount > 0) {
+    const sources: string[] = [];
+    if (xCount > 0) sources.push(`X（${xCount}件）`);
+    if (noteCount > 0) sources.push(`note（${noteCount}件）`);
+    paragraphs.push(`現場の声として${sources.join("・")}からエンゲージメントの高い投稿をピックアップしています。`);
+  }
+
+  return paragraphs.join("\n\n");
+}
+
 // ----- GCInsight 新着記事取得 -----
 interface GcArticle {
   slug: string;
@@ -460,8 +502,13 @@ export async function POST(req: NextRequest) {
 イントロは上記のペルソナで書いてください。現場感のある一人称で、読者に語りかけるように。`
     : "";
 
-  // 8. イントロ（\n\n で段落分割されていない場合は句点で自動分割）
-  const rawIntro = bodyData.intro ?? "今週のガバメントクラウド動向をお届けします。現場で何が起きているのか、部外者の目線でズバッと斬ります。";
+  // 8. イントロ（bodyで渡されなければ収集コンテンツから自動生成）
+  const rawIntro = bodyData.intro ?? buildAutoIntro({
+    newsItems: mergedNewsItems,
+    gcArticles,
+    officialNews,
+    voicePicks,
+  });
   const intro = rawIntro.includes("\n\n")
     ? rawIntro
     : rawIntro
