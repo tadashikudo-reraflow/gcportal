@@ -212,10 +212,10 @@ export default async function ProgressPage() {
           <circle cx="12" cy="12" r="10"/>
         </svg>
         <p style={{ color: "#1e40af" }}>
-          <span className="font-semibold">特定移行（🔵マーク）</span>とは、技術的・運用的に移行困難としてデジタル庁が認定した自治体・システムです。「遅延」ではなく期限延長のうえ移行継続中のステータスです。
+          <span className="font-semibold">特定移行</span>とは、技術的・運用的に移行困難としてデジタル庁が認定した自治体・システムです。「遅延」とは異なり、期限延長のうえ移行継続中のステータスです。
           {" "}
-          <a href="/tokutei" className="underline font-medium hover:opacity-80">
-            詳細・自治体一覧 →
+          <a href="/articles/gc-tokutei-vs-delay" className="underline font-medium hover:opacity-80">
+            特定移行と遅延の違いを詳しく →
           </a>
         </p>
       </div>
