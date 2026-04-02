@@ -207,13 +207,14 @@ export default async function CloudPage() {
               return (
                 <div key={cloudKey} className="flex items-center gap-3">
                   <span className="text-xs w-14 flex-shrink-0 text-right font-semibold text-gray-600">{label}</span>
-                  <div className="flex-1 h-6 rounded overflow-hidden" style={{ backgroundColor: "var(--color-surface-container)" }}>
-                    <div
-                      className="h-full flex items-center justify-end pr-2"
-                      style={{ width: `${idx}%`, backgroundColor: cfg.color + "40" }}
-                    >
-                      <span className="text-xs font-bold" style={{ color: cfg.color }}>{idx}</span>
+                  <div className="flex items-center gap-2 flex-1">
+                    <div className="flex-1 h-6 rounded overflow-hidden" style={{ backgroundColor: "var(--color-surface-container)" }}>
+                      <div
+                        className="h-full"
+                        style={{ width: `${idx}%`, backgroundColor: cfg.color + "40" }}
+                      />
                     </div>
+                    <span className="text-xs font-bold w-8 text-right tabular-nums flex-shrink-0" style={{ color: cfg.color }}>{idx}</span>
                   </div>
                 </div>
               );
@@ -318,7 +319,7 @@ export default async function CloudPage() {
               <span className="text-xs">一括調達契約</span>
               <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
             </div>
-            <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "#4A90E2" }}>デジタル庁</div>
+            <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "var(--color-gov-primary)" }}>デジタル庁</div>
             <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
               <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
               <span className="text-xs">利用権付与・運用管理委託</span>

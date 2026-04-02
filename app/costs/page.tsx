@@ -291,15 +291,15 @@ export default async function CostsPage() {
         <div className="mt-4 grid grid-cols-3 gap-2" role="region" aria-label="コスト変化サマリー">
           <div className="flex flex-col gap-0.5">
             <span className="text-xl sm:text-2xl font-black tabular-nums text-green-600 leading-none">−30%</span>
-            <span className="text-[11px] text-gray-500 leading-tight">政府目標（R4）</span>
+            <span className="text-xs text-gray-500 leading-tight">政府目標（R4）</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-xl sm:text-2xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
-            <span className="text-[11px] text-gray-500 leading-tight">実態平均（中核市）</span>
+            <span className="text-xs text-gray-500 leading-tight">実態平均（中核市）</span>
           </div>
           <div className="flex flex-col gap-0.5">
             <span className="text-xl sm:text-2xl font-black tabular-nums text-red-900 leading-none">+{worstPct}%</span>
-            <span className="text-[11px] text-gray-500 leading-tight">最悪事例</span>
+            <span className="text-xs text-gray-500 leading-tight">最悪事例</span>
           </div>
         </div>
       </div>
@@ -446,7 +446,7 @@ export default async function CostsPage() {
                     <span className="text-2xl font-black tabular-nums leading-none" style={{ color }}>{label}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{c.scope}</p>
+                    <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{scopeToJapanese(c.scope)}</p>
                     <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>{c.notes}</p>
                   </div>
                 </div>
@@ -544,7 +544,7 @@ export default async function CostsPage() {
                 {/* 行2: バー（増加=左から右、削減=右から左） */}
                 <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden mb-1.5 relative">
                   <div
-                    className={`h-full rounded-full absolute top-0 ${isDown ? "bg-green-400 right-0" : d.rate > 20 ? "bg-red-400 left-0" : "bg-orange-300 left-0"}`}
+                    className={`h-full rounded-full absolute top-0 left-0 ${isDown ? "bg-green-400" : d.rate > 20 ? "bg-red-400" : "bg-orange-300"}`}
                     style={{ width: `${barWidth}%` }}
                   />
                 </div>
