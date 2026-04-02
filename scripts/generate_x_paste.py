@@ -53,12 +53,11 @@ HEADERS = {
 
 
 def build_cta_html(slug: str) -> str:
-    article_url = f"{SITE_URL}/articles/{slug}"
     return f"""
 <hr style="margin:40px 0; border:none; border-top:2px solid #e5e7eb;">
 <div style="background:#f0f7ff; border-radius:8px; padding:24px; font-size:16px; line-height:1.8;">
-  <p>📊 この記事の詳細データをインタラクティブに確認<br>
-  👉 <a href="{article_url}">{article_url}</a></p>
+  <p>📊 全国1,741自治体のガバメントクラウド移行状況を無料で確認<br>
+  👉 <a href="{SITE_URL}/">{SITE_URL}/</a></p>
   <p>💰 自治体ガバメントクラウド移行コスト最適化ガイド（FinOps）<br>
   👉 <a href="{FINOPS_URL}">{FINOPS_URL}</a></p>
 </div>
