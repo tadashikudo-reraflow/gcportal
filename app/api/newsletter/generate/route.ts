@@ -210,7 +210,7 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
   }
   // タイトル関連性フィルター（ガバクラ関連キーワードを含まない記事を除外）
   const RELEVANCE_KEYWORDS = [
-    "ガバメントクラウド", "ガバクラ", "自治体標準化", "標準化基盤",
+    "ガバメントクラウド", "ガバクラ", "自治体標準化", "標準化基盤", "標準化基準",
     "デジタル庁", "自治体DX", "移行", "クラウド移行", "ガバメント",
   ];
   const seen = new Set<string>();
