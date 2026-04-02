@@ -58,13 +58,6 @@ const ALL_CARDS: NavCard[] = [
     title: "ガバクラ比較",
     desc: "AWS / Azure / GCP / OCI / さくらの分布",
   },
-  {
-    href: "/cost-reduction",
-    badge: "削減",
-    badgeStyle: { backgroundColor: "#DCFCE7", color: "#166534" },
-    title: "コスト削減の現実解",
-    desc: "移行済み最適化と未移行見直しの具体策",
-  },
 ];
 
 type Props = {
