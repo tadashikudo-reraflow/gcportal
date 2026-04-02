@@ -10,7 +10,7 @@ import {
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "データソース・出典 | ガバメントクラウド移行状況ダッシュボード",
+  title: "データソース・出典｜GCInsight",
   description:
     "GCInsightが参照するデジタル庁・総務省・内閣官房等の公式データソース一覧。",
   alternates: { canonical: "/sources" },

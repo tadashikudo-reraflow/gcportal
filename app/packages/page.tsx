@@ -15,7 +15,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "自治体向けガバメントクラウド対応パッケージ一覧 | ガバメントクラウド移行状況ダッシュボード",
+  title: "ガバクラ対応パッケージ一覧｜ベンダー別シェア・導入実績比較｜GCInsight",
   description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
   alternates: { canonical: "/packages" },
 };

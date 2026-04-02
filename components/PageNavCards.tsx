@@ -31,6 +31,13 @@ const ALL_CARDS: NavCard[] = [
     desc: "期限延長が認められた自治体の一覧を確認",
   },
   {
+    href: "/finops",
+    badge: "FinOps",
+    badgeStyle: { backgroundColor: "#FCE4EC", color: "#AD1457" },
+    title: "FinOps コスト最適化",
+    desc: "コスト2.3倍→3割削減の打ち手と無料診断PDF",
+  },
+  {
     href: "/costs",
     badge: "コスト",
     badgeStyle: { backgroundColor: "#FEF3C7", color: "#92400E" },

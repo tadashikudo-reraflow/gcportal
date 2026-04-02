@@ -12,6 +12,11 @@ import Breadcrumb from "@/components/Breadcrumb";
 
 export const dynamic = "force-dynamic";
 
+// カニバリゼーション対策: 特定記事のcanonicalを対応する固定ページに向ける
+const CANONICAL_OVERRIDES: Record<string, string> = {
+  "gc-finops-guide": "/finops",
+};
+
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -31,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} | ガバメントクラウド移行状況ダッシュボード`,
     description: article.description,
-    alternates: { canonical: `/articles/${slug}` },
+    alternates: { canonical: CANONICAL_OVERRIDES[slug] ?? `/articles/${slug}` },
     openGraph: {
       title: article.title,
       description: article.description,

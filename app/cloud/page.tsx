@@ -12,7 +12,7 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "ガバクラ比較（AWS/Azure/GCP/OCI/さくら）| ガバメントクラウド移行状況ダッシュボード",
-  description: "認定クラウドごとのインフラシェア、対応ベンダー、コスト目安を整理。",
+  description: "AWS 97%寡占の実態。認定5クラウド（AWS/Azure/GCP/OCI/さくら）のシェア・コスト・対応ベンダーを徹底比較。",
   alternates: { canonical: "/cloud" },
 };
 

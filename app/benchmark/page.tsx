@@ -10,7 +10,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "自治体ベンチマーク比較｜人口帯別・都道府県別の進捗ランキング | ガバメントクラウド移行状況ダッシュボード",
+  title: "自治体ベンチマーク比較｜人口帯別・都道府県別ランキング｜GCInsight",
   description:
     "人口帯別・都道府県別に自治体のガバメントクラウド移行進捗をベンチマーク比較。類似団体検索や比較データのコピー機能も搭載。",
   alternates: { canonical: "/benchmark" },

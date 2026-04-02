@@ -17,8 +17,8 @@ import { Municipality } from "@/lib/types";
 
 export const metadata: Metadata = {
   title:
-    "GC Insight｜全国1,741自治体の「現在地」と「遅延リスク」を可視化",
-  description: `システム移行率38.4%（13,283/34,592システム）、全20業務完了の自治体はわずか${data.summary.completed_count}団体（3.7%）。1,741自治体のガバメントクラウド移行進捗・コスト・遅延リスクを可視化するダッシュボード。`,
+    "ガバメントクラウド移行ダッシュボード｜1,741自治体の進捗・コスト・遅延を可視化｜GCInsight",
+  description: `移行完了わずか${data.summary.completed_count}団体（3.7%）、コスト平均2.3倍。全国1,741自治体のガバメントクラウド移行進捗・コスト・遅延リスクをリアルタイム可視化する無料ダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
     title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",

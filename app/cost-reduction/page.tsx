@@ -35,9 +35,9 @@ const detailLinks = [
 ];
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド コスト削減特設 | GC Insight",
+  title: "ガバクラ コスト削減ガイド｜移行済み・未移行の二段構え対策｜GCInsight",
   description:
-    "移行済みの運用最適化と、未移行システムの基盤再選定という二段構えで、現実的なコスト削減策を整理。",
+    "コスト平均2.3倍の現実。移行済み→運用最適化、未移行→基盤再選定の二段構えで、現実的なコスト削減策を整理。",
   alternates: { canonical: "/cost-reduction" },
 };
 

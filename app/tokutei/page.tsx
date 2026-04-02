@@ -12,7 +12,7 @@ import { PAGE_SOURCES } from "@/lib/sources";
 import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata: Metadata = {
-  title: "特定移行支援システム認定 自治体一覧 | ガバメントクラウド移行状況ダッシュボード",
+  title: "特定移行支援システム認定 自治体一覧【2026年最新・全件掲載】｜GCInsight",
   description: `デジタル庁が認定した特定移行支援システムの対象となった${tokuteiData.total_count}団体（うち市区町村${(tokuteiData as Record<string, unknown>).municipality_count ?? tokuteiData.municipalities.length}）の一覧。ガバメントクラウド移行の2026年3月末期限延長対象。`,
   alternates: { canonical: "/tokutei" },
 };
