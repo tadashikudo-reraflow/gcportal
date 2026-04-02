@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore")
 TOKEN_PATH = "/Users/tadashikudo/.config/google/token.json"
 # GA4プロパティID（数字のみ・G-xxxxではない）
 # GA4コンソール → 管理 → プロパティ設定 で確認
-GA4_PROPERTY_ID = ""  # 例: "123456789"
+GA4_PROPERTY_ID = "529331412"
 
 
 def get_service():
