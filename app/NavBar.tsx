@@ -387,7 +387,7 @@ export default function NavBar() {
                 return (
                   <Link
                     key={child.href}
-                    href={child.href === "/report" ? "/report?from=nav" : child.href}
+                    href={child.href}
                     className={`nav-dropdown-item ${childActive ? "nav-dropdown-item-active" : ""}`}
                   >
                     <span className="nav-dropdown-label">{child.label}</span>
