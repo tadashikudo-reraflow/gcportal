@@ -117,7 +117,7 @@ async function fetchNewsItems(): Promise<NewsItem[]> {
   }).slice(0, 6);
 }
 
-// ----- X API v2 検索 -----
+// ----- X検索（Grok non-reasoning + live X search） -----
 interface XTweet {
   author: string;
   text: string;
@@ -127,48 +127,59 @@ interface XTweet {
 }
 
 async function searchX(keywords: string[]): Promise<XTweet[]> {
-  const bearerToken = process.env.X_BEARER_TOKEN;
-  if (!bearerToken) return [];
+  const apiKey = process.env.XAI_API_KEY;
+  if (!apiKey) return [];
 
-  const results: XTweet[] = [];
-  // 複数キーワードをOR結合して1リクエスト（API節約）
-  const query = keywords.slice(0, 4).map((k) => `"${k}"`).join(" OR ");
+  const query = keywords.slice(0, 4).join(" OR ");
 
   try {
-    const url = `https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(query)}&max_results=20&tweet.fields=created_at,author_id,public_metrics,text&expansions=author_id&user.fields=name,username`;
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${bearerToken}` },
-      signal: AbortSignal.timeout(10000),
+    const res = await fetch("https://api.x.ai/v1/responses", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "grok-4-1-fast-non-reasoning",
+        tools: [{ type: "x_search" }],
+        input: `Xで「${query}」に関する直近1週間の投稿を検索し、エンゲージメント（いいね・RT）の高い上位3件をJSON配列で返してください。形式: [{"author":"username","text":"投稿本文(200字以内)","url":"https://x.com/username/status/ID","likes":数値}] RT・リプライ・スパム・広告は除外。JSONのみ返答。`,
+      }),
+      signal: AbortSignal.timeout(25000),
     });
+
     if (!res.ok) return [];
     const json = await res.json();
 
-    // usersマップ
-    const usersMap: Record<string, string> = {};
-    for (const u of json?.includes?.users ?? []) {
-      usersMap[u.id] = u.username ?? u.name ?? "unknown";
-    }
+    // /v1/responses 形式: output配列の message type から content を取得
+    const outputs: Array<{ type: string; content?: Array<{ type: string; text?: string }> }> =
+      json?.output ?? [];
+    const content = outputs
+      .filter((o) => o.type === "message")
+      .flatMap((o) => o.content ?? [])
+      .filter((c) => c.type === "output_text")
+      .map((c) => c.text ?? "")
+      .join("");
 
-    for (const t of json?.data ?? []) {
-      // RT・リプライ・リンクだけのツイートを除外
-      if (t.text?.startsWith("RT @")) continue;
-      results.push({
-        author: usersMap[t.author_id] ?? "unknown",
-        text: t.text ?? "",
-        url: `https://x.com/i/status/${t.id}`,
-        likes: t.public_metrics?.like_count ?? 0,
-        createdAt: t.created_at ?? "",
-      });
-    }
+    if (!content) return [];
+
+    // JSON配列を抽出
+    const match = content.match(/\[[\s\S]*?\]/);
+    if (!match) return [];
+
+    const tweets = JSON.parse(match[0]) as Array<{
+      author?: string; text?: string; url?: string; likes?: number;
+    }>;
+
+    return tweets.slice(0, 3).map((t) => ({
+      author: t.author ?? "unknown",
+      text: (t.text ?? "").slice(0, 200),
+      url: t.url ?? "https://x.com",
+      likes: t.likes ?? 0,
+      createdAt: "",
+    }));
   } catch {
-    // API失敗はスキップ
+    return [];
   }
-
-  // いいね数でソート → 5件以上いいねのものに絞り → 上位3件
-  return results
-    .sort((a, b) => b.likes - a.likes)
-    .filter((t) => t.likes >= 5)
-    .slice(0, 3);
 }
 
 // ----- note.com API 検索 -----
