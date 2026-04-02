@@ -202,6 +202,24 @@ export default async function ProgressPage() {
         </p>
       </div>
 
+      {/* 特定移行とは（ミニ解説） */}
+      <div
+        className="flex items-start gap-3 rounded-lg px-4 py-3 text-sm"
+        style={{ backgroundColor: "#eff6ff", border: "1px solid #93c5fd" }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" className="flex-shrink-0 mt-0.5">
+          <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
+          <circle cx="12" cy="12" r="10"/>
+        </svg>
+        <p style={{ color: "#1e40af" }}>
+          <span className="font-semibold">特定移行（🔵マーク）</span>とは、技術的・運用的に移行困難としてデジタル庁が認定した自治体・システムです。「遅延」ではなく期限延長のうえ移行継続中のステータスです。
+          {" "}
+          <a href="/tokutei" className="underline font-medium hover:opacity-80">
+            詳細・自治体一覧 →
+          </a>
+        </p>
+      </div>
+
       <ProgressClient data={data} />
 
       <SourceAttribution
