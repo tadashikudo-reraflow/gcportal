@@ -227,8 +227,8 @@ export default function DashboardPage() {
         <p>
           <GlossaryTooltip term="特定移行"><strong style={{ color: "var(--color-gov-primary)" }}>特定移行</strong></GlossaryTooltip>
           （{TOKUTEI_OFFICIAL.toLocaleString()}団体）は期限延長が認められた別枠です。{" "}
-          <Link href="/progress?status=tokutei" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
-            詳しくは特定移行ページへ →
+          <Link href="/articles/gc-tokutei-vs-delay" className="font-medium underline" style={{ color: "var(--color-gov-primary)" }}>
+            詳しくはコラムで解説 →
           </Link>
         </p>
       </Callout>
