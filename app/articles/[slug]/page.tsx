@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getArticleBySlug, getAllArticles } from "@/lib/articles";
+import { getArticleBySlug } from "@/lib/articles";
 import { getClusterForTags } from "@/lib/clusters";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
@@ -10,15 +10,9 @@ import MermaidRenderer from "@/components/MermaidRenderer";
 import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
 import Breadcrumb from "@/components/Breadcrumb";
 
-// ISR: DB更新後60秒以内に自動反映（公開直後の表示崩れを最小化）
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
-
-export async function generateStaticParams() {
-  const articles = await getAllArticles();
-  return articles.map((a) => ({ slug: a.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
