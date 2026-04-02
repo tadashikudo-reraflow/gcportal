@@ -41,12 +41,44 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cost-reduction" },
 };
 
+const costReductionFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "ガバメントクラウド移行後のコスト削減は可能ですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "可能です。移行済みシステムにはFinOps運用最適化（検証環境の夜間停止で60%以上削減、ストレージ階層化、サイズ見直し）が有効です。未移行システムには基盤再選定（OCI等AWS以外の検討）が効果的です。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "FinOpsだけではコスト削減が不十分な理由は？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "FinOpsは移行後の運用最適化には効果がありますが、回線費・二重負担・ベンダーロックインによる競争不足といった構造的問題は解決できません。未移行システムでは基盤・回線・要件の前提自体を見直す必要があります。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "自治体がすぐに着手できるコスト削減策は？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "移行済みシステムはサイズ見直し・停止ルール・タグ整備・ストレージ階層化が即着手可能です。未移行システムはベンダーとの基盤再選定協議、回線設計の見直し、人口規模に応じた要件の適正化が有効です。",
+      },
+    },
+  ],
+};
+
 export default function CostReductionPage() {
   const increasePct = `+${COST_CONSTANTS.initialIncreaseRate}%`;
   const averageIncrease = `${(1 + COST_CONSTANTS.initialIncreaseRate / 100).toFixed(1)}倍相当`;
 
   return (
     <div className="space-y-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costReductionFaqJsonLd) }} />
       <Breadcrumb items={[{ label: "コスト削減の現実解" }]} />
       <section
         className="rounded-2xl border px-6 py-7"

@@ -61,9 +61,9 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】| ガバメントクラウド移行状況ダッシュボード",
+  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】｜GCInsight",
   description:
-    "ガバメントクラウド移行コストが平均2.3倍（中核市市長会調査）に増加する実態をベンダー別に分析。TKC・富士通・NEC・日立などのコスト指数と費用対効果を比較。自治体のコスト削減・FinOps実践に活用。",
+    "ガバメントクラウド移行コストが平均2.3倍（中核市市長会調査）に増加。TKC・富士通・NEC・日立のコスト指数と費用対効果をベンダー別に比較分析。",
   openGraph: {
     title: "ガバメントクラウド移行コスト分析",
     description:
@@ -246,8 +246,40 @@ export default async function CostsPage() {
   const avgPct = avgRatio != null ? Math.round((avgRatio - 1) * 100) : 156;
   const worstPct = maxRatio != null ? Math.round((maxRatio - 1) * 100) : 470;
 
+  const costFaqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "ガバメントクラウド移行後、コストはどのくらい増加しますか？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "中核市市長会の調査によると、移行後の運用経費は移行前と比べて平均2.3倍に増加しています。最大で5.7倍になった事例も報告されており、5割以上の自治体で2倍以上のコスト増が見込まれています。",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "ベンダーによってコストに差はありますか？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "大きな差があります。RKKCSのOCI基盤は円建て課金でコスト増1.0〜1.5倍、TKCは共同利用方式で1.1〜1.6倍と低コスト。一方、富士通MICJETは1.5〜3.0倍、NEC・日立は1.3〜2.5倍と、AWS基盤かつ大規模カスタマイズの場合にコスト増が大きくなる傾向があります。",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "コスト増加の主な原因は何ですか？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "主要因は3つです。(1)クラウド利用料（AWS寡占97%で価格競争が働かない）、(2)回線費・通信費（庁内LAN→東京リージョン集約に伴う費用増）、(3)移行期間中のオンプレとクラウドの二重運用コストです。",
+        },
+      },
+    ],
+  };
+
   return (
     <div className="space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(costFaqJsonLd) }} />
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "コスト効果分析" }]} />
       <div className="border-b border-gray-200 pb-4">

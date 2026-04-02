@@ -73,6 +73,19 @@ export default async function FinopsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
+      {/* SSR テキストブロック: Googlebotが初回HTMLでコンテンツを読めるようにする */}
+      <section className="max-w-4xl mx-auto space-y-4 mb-6">
+        <h1 className="text-2xl font-extrabold" style={{ color: "var(--color-text-primary)" }}>
+          ガバクラFinOps｜自治体のクラウドコスト最適化
+        </h1>
+        <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+          ガバメントクラウド移行後の運用コストは平均2.3倍に増加（中核市市長会調査）。
+          935団体が特定移行支援として期限延長を認定された今、同規模自治体との比較診断で
+          コスト適正水準を把握し、FinOps運用最適化の具体策を無料PDFで提供します。
+          移行済み自治体は検証環境の夜間停止やストレージ階層化で最大60%のコスト削減、
+          未移行自治体はAWS以外（OCI・さくら等）の基盤再選定でコスト比較が可能です。
+        </p>
+      </section>
       <Suspense fallback={<FinopsLoading />}>
         <FinopsClient articles={finopsArticles.slice(0, 3)} />
       </Suspense>

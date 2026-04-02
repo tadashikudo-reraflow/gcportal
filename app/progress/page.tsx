@@ -11,9 +11,9 @@ import { PAGE_SOURCES } from "@/lib/sources";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "標準化進捗ダッシュボード【2026年最新】| ガバメントクラウド移行状況ダッシュボード",
+  title: "自治体システム標準化 進捗ダッシュボード【2026年最新】｜GCInsight",
   description:
-    "全国1,741自治体の標準化20業務の進捗を都道府県・市区町村・業務別に一覧。遅延リスク・特定移行団体も統合表示。",
+    "全国1,741自治体×20業務の標準化進捗を都道府県・人口帯・業務別に一覧。遅延リスク自治体・特定移行935団体も統合表示。",
   alternates: { canonical: "/progress" },
 };
 
