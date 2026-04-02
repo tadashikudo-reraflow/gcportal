@@ -3,8 +3,6 @@ import { getAllArticles } from "@/lib/articles";
 import Breadcrumb from "@/components/Breadcrumb";
 import ArticlesClient from "./ArticlesClient";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "コラム・解説記事 | ガバメントクラウド移行状況ダッシュボード",
   description:
