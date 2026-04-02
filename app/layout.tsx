@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   title: "ガバメントクラウド移行状況ダッシュボード｜全国1,741自治体の進捗をリアルタイム可視化",
   description: "全国1,741自治体のガバメントクラウド移行進捗・特定移行認定・遅延リスクを可視化。デジタル庁標準化データに基づくリアルタイムダッシュボード。",
   metadataBase: new URL(BASE_URL),
+  icons: {
+    icon: "/favicon.ico",
+  },
   verification: {
     google: "hk66ltVdyRloBqdOteNRmxzjMNnd2U_EPz0zR0zRz8g",
   },
