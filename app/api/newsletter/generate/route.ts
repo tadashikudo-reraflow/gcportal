@@ -208,6 +208,11 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       // 個別キーワードの失敗はスキップ
     }
   }
+  // タイトル関連性フィルター（ガバクラ関連キーワードを含まない記事を除外）
+  const RELEVANCE_KEYWORDS = [
+    "ガバメントクラウド", "ガバクラ", "自治体標準化", "標準化基盤",
+    "デジタル庁", "自治体DX", "移行", "クラウド移行", "ガバメント",
+  ];
   const seen = new Set<string>();
   return results
     .filter((r) => {
@@ -215,6 +220,7 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       seen.add(r.url);
       return true;
     })
+    .filter((r) => RELEVANCE_KEYWORDS.some((kw) => r.title.includes(kw)))
     .sort((a, b) => b.likeCount - a.likeCount)
     .filter((a) => a.likeCount >= 3)
     .slice(0, 3);
