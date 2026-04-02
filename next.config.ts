@@ -51,7 +51,7 @@ const nextConfig: NextConfig = {
       { source: "/adoption",       destination: "/packages", permanent: true },
       { source: "/compare",        destination: "/progress", permanent: true },
       { source: "/cost-reduction", destination: "/finops",   permanent: true },
-      { source: "/report",         destination: "/finops",   permanent: false },
+      { source: "/report",         destination: "/finops",   permanent: true },
       // 旧進捗ページ → /progress 統合
       { source: "/prefectures",              destination: "/progress",                    permanent: true },
       { source: "/prefectures/:prefecture",  destination: "/progress?pref=:prefecture",   permanent: true },

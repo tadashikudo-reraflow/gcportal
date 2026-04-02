@@ -14,8 +14,8 @@ const tokuteiSet = new Set(
 );
 
 export const metadata: Metadata = {
-  title: "自治体標準化20業務 移行進捗一覧【2026年最新】｜GCInsight",
-  description: "住民記録・税務・福祉等20業務のガバクラ移行進捗を可視化。業務別の遅延状況と全国比較を1ページで確認。",
+  title: "標準化20業務の移行進捗一覧｜住民記録・税務・福祉【2026年最新】｜GCInsight",
+  description: "ガバメントクラウド移行対象の20業務（住民記録・税務・福祉等）の進捗率・遅延状況を業務別に可視化。全国1,741自治体の業務別完了率を1ページで比較。",
   alternates: { canonical: "/businesses" },
 };
 
