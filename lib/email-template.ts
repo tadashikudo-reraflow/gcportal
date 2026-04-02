@@ -291,29 +291,40 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
     </tr>`).join("");
 
   // ── GCInsight 新着記事 ───────────────────────────────────────────────────
-  const gcArticlesHtml = gcArticles.map((a, i) => `
+  const gcArticlesHtml = gcArticles.map((a) => `
     <tr>
-      <td style="padding:${i === 0 ? "10px" : "12px"} 0 12px 0;
-        ${i > 0 ? "border-top:1px solid #f1f5f9;" : ""}">
+      <td style="padding:0 0 12px 0;">
         <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <td style="padding-bottom:4px;">
-              ${a.date ? `<span style="font-size:10px;color:#94a3b8;margin-right:8px;">${e(a.date)}</span>` : ""}
-              <a href="https://gcinsight.jp/articles/${e(a.slug)}"
-                style="font-size:14px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">
-                ${e(a.title)}
-              </a>
-            </td>
-          </tr>
-          ${a.description ? `<tr>
-            <td style="padding-top:3px;">
-              <span style="font-size:13px;color:#475569;line-height:1.65;">${e(a.description)}</span>
-            </td>
-          </tr>` : ""}
-          <tr>
-            <td style="padding-top:6px;">
-              <a href="https://gcinsight.jp/articles/${e(a.slug)}"
-                style="font-size:11px;color:#2563eb;text-decoration:underline;">続きを読む →</a>
+            <td style="border-left:3px solid #2563eb;padding-left:14px;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding-bottom:5px;">
+                    <span style="font-size:10px;font-weight:700;background:#2563eb;color:#fff;
+                      padding:2px 7px;border-radius:2px;letter-spacing:0.5px;">GCInsight</span>
+                    ${a.date ? `<span style="font-size:11px;color:#94a3b8;margin-left:6px;">${e(a.date)}</span>` : ""}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding-bottom:5px;">
+                    <a href="https://gcinsight.jp/articles/${e(a.slug)}"
+                      style="font-size:15px;font-weight:700;color:#0f172a;text-decoration:none;line-height:1.5;">
+                      ${e(a.title)}
+                    </a>
+                  </td>
+                </tr>
+                ${a.description ? `<tr>
+                  <td style="padding-bottom:6px;">
+                    <span style="font-size:14px;color:#475569;line-height:1.7;">${e(a.description)}</span>
+                  </td>
+                </tr>` : ""}
+                <tr>
+                  <td>
+                    <a href="https://gcinsight.jp/articles/${e(a.slug)}"
+                      style="font-size:11px;color:#64748b;text-decoration:underline;">続きを読む →</a>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
