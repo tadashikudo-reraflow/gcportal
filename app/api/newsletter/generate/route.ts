@@ -270,7 +270,7 @@ interface GcArticle {
   date: string;
 }
 
-async function fetchGcArticles(supabase: ReturnType<typeof createClient>): Promise<GcArticle[]> {
+async function fetchGcArticles(supabase: ReturnType<typeof getSupabase>): Promise<GcArticle[]> {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 7);
   const cutoffStr = cutoff.toISOString().slice(0, 10); // YYYY-MM-DD
