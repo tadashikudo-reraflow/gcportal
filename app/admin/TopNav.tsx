@@ -14,7 +14,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: "ダッシュボード", href: "/admin" },
   { label: "ニュースレター", href: "/admin/newsletter" },
   { label: "購読者", href: "/admin/newsletter/subscribers" },
-  { label: "アナリティクス", href: "/admin/analytics" },
   { label: "設定", href: "/admin/settings" },
   { label: "NL設定", href: "/admin/newsletter/config" },
 ];
