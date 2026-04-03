@@ -301,9 +301,9 @@ function FilterBar({
   const cloudOptions = [
     { key: "", label: "全クラウド" },
     { key: "AWS", label: "AWS" },
+    { key: "OCI", label: "OCI" },
     { key: "Azure", label: "Azure" },
     { key: "GCP", label: "GCP" },
-    { key: "OCI", label: "OCI" },
     { key: "さくら", label: "さくら" },
   ];
 

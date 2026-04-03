@@ -14,10 +14,12 @@ const NAV_GROUPS = [
   {
     label: "コスト",
     short: "コスト",
-    children: [
-      { href: "/costs",    label: "コスト分析", desc: "" },
-      { href: "/cloud",    label: "ガバクラ比較", desc: "" },
-    ],
+    href: "/costs",
+  },
+  {
+    label: "ガバクラ比較",
+    short: "比較",
+    href: "/cloud",
   },
   {
     label: "進捗",
@@ -52,7 +54,7 @@ const DRAWER_SECTIONS = [
     ],
   },
   {
-    title: "コスト",
+    title: "コスト・比較",
     items: [
       { href: "/costs",    label: "コスト分析" },
       { href: "/cloud",    label: "ガバクラ比較" },
