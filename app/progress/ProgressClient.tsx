@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, Suspense } from "react";
+import JapanMap from "@/components/JapanMap";
 import type {
   ProgressData,
   ProgressMunicipality,
@@ -539,51 +540,61 @@ function NationalOverview({
         })}
       </div>
 
-      {/* Prefecture Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        {sorted.map((p) => (
-          <button
-            key={p.prefecture}
-            onClick={() => onSelectPref(p.prefecture)}
-            className="card p-3 text-left hover:shadow-md transition-shadow"
-            style={{ cursor: "pointer" }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span
-                className="text-sm font-bold"
-                style={{ color: "var(--color-gov-primary, #002D72)" }}
-              >
-                {p.prefecture}
-              </span>
-              <span
-                className="text-xs font-medium"
-                style={{ color: rateColor(p.avg_rate) }}
-              >
-                {pct(p.avg_rate)}
-              </span>
-            </div>
-            <ProgressBar rate={p.avg_rate} />
-            <div className="flex gap-2 mt-2 text-[10px] sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
-              <span>{p.count}団体</span>
-              {p.completed > 0 && (
-                <span style={{ color: "var(--color-status-complete)" }}>
-                  完了{p.completed}
-                </span>
-              )}
-              {p.critical > 0 && (
-                <span style={{ color: "var(--color-error)" }}>
-                  危機{p.critical}
-                </span>
-              )}
-              {p.tokutei_count > 0 && (
-                <span style={{ color: "#8B5CF6" }}>
-                  特定{p.tokutei_count}
-                </span>
-              )}
-            </div>
-          </button>
-        ))}
+      {/* 日本地図（都道府県クリックでドリルダウン） */}
+      <div className="card p-4 sm:p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span
+            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
+            style={{ backgroundColor: "var(--color-brand-primary)" }}
+          />
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+            都道府県を選択
+          </h2>
+        </div>
+        <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
+          地図または下の一覧から都道府県をクリックして自治体一覧を表示
+        </p>
+        <JapanMap prefectures={prefectures} onPrefClick={onSelectPref} />
       </div>
+
+      {/* 都道府県リスト（進捗率低い順 — 地図補助） */}
+      <details className="card" open={false}>
+        <summary
+          className="px-4 py-3 text-sm font-medium cursor-pointer select-none flex items-center justify-between"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          <span>都道府県一覧（進捗率低い順）</span>
+          <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+            {sorted.length}件
+          </span>
+        </summary>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 p-4 pt-0">
+          {sorted.map((p) => (
+            <button
+              key={p.prefecture}
+              onClick={() => onSelectPref(p.prefecture)}
+              className="text-left rounded-lg px-3 py-2 transition-colors hover:bg-gray-50"
+              style={{ border: "1px solid var(--color-border)" }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold" style={{ color: "var(--color-gov-primary, #002D72)" }}>
+                  {p.prefecture}
+                </span>
+                <span className="text-xs font-medium" style={{ color: rateColor(p.avg_rate) }}>
+                  {pct(p.avg_rate)}
+                </span>
+              </div>
+              <ProgressBar rate={p.avg_rate} />
+              <div className="flex gap-2 mt-1 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+                <span>{p.count}団体</span>
+                {p.critical > 0 && (
+                  <span style={{ color: "var(--color-error)" }}>危機{p.critical}</span>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      </details>
     </>
   );
 }

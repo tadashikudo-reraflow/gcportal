@@ -15,6 +15,8 @@ type PrefectureData = {
 
 type JapanMapProps = {
   prefectures: PrefectureData[];
+  /** 指定した場合 router.push の代わりに呼ばれる（進捗ページ内ドリルダウン用） */
+  onPrefClick?: (name: string) => void;
 };
 
 // --- Color scale ---
@@ -109,7 +111,7 @@ const LEGEND_ITEMS = [
 
 // --- Component ---
 
-export default function JapanMap({ prefectures }: JapanMapProps) {
+export default function JapanMap({ prefectures, onPrefClick }: JapanMapProps) {
   const [tooltip, setTooltip] = useState<{
     data: PrefectureData;
     x: number;
@@ -124,9 +126,13 @@ export default function JapanMap({ prefectures }: JapanMapProps) {
 
   const handleClick = useCallback(
     (name: string) => {
-      router.push(`/progress?pref=${encodeURIComponent(name)}`);
+      if (onPrefClick) {
+        onPrefClick(name);
+      } else {
+        router.push(`/progress?pref=${encodeURIComponent(name)}`);
+      }
     },
-    [router]
+    [router, onPrefClick]
   );
 
   const handleMouseEnter = useCallback(
