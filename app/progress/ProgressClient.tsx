@@ -541,21 +541,7 @@ function NationalOverview({
       </div>
 
       {/* 日本地図（都道府県クリックでドリルダウン） */}
-      <div className="card p-4 sm:p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <span
-            className="w-1 h-5 rounded-full inline-block flex-shrink-0"
-            style={{ backgroundColor: "var(--color-brand-primary)" }}
-          />
-          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
-            都道府県を選択
-          </h2>
-        </div>
-        <p className="text-xs mb-3" style={{ color: "var(--color-text-muted)" }}>
-          地図または下の一覧から都道府県をクリックして自治体一覧を表示
-        </p>
-        <JapanMap prefectures={prefectures} onPrefClick={onSelectPref} />
-      </div>
+      <JapanMap prefectures={prefectures} onPrefClick={onSelectPref} />
 
       {/* 都道府県リスト（進捗率低い順 — 地図補助） */}
       <details className="card" open={false}>
