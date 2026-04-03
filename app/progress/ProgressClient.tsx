@@ -10,6 +10,68 @@ import type {
 
 const COMPARE_COLORS = ["#0066FF", "#10B981", "#F5B500", "#FF6B6B"];
 
+const CLOUD_COLORS: Record<string, string> = {
+  AWS: "#FF9900",
+  OCI: "#C74634",
+  Azure: "#0078D4",
+  GCP: "#4285F4",
+};
+
+/* ══════════════════════════════════════════════════════════════
+   VendorChip — クリックで業務一覧をトグル表示
+   ══════════════════════════════════════════════════════════════ */
+function VendorChip({
+  vendor,
+}: {
+  vendor: { name: string; cloud: string; businesses: string[] };
+}) {
+  const [open, setOpen] = useState(false);
+  const cloudColor = CLOUD_COLORS[vendor.cloud] ?? "#888";
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-shadow hover:shadow-sm"
+        style={{
+          backgroundColor: "var(--color-section-bg)",
+          color: "var(--color-text-primary)",
+          border: "1px solid var(--color-border)",
+          cursor: "pointer",
+        }}
+      >
+        {vendor.name}
+        {vendor.cloud && (
+          <span
+            className="text-[10px] rounded px-1"
+            style={{ backgroundColor: cloudColor, color: "#fff" }}
+          >
+            {vendor.cloud}
+          </span>
+        )}
+        <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+          ({vendor.businesses.length}業務) {open ? "▲" : "▼"}
+        </span>
+      </button>
+      {open && vendor.businesses.length > 0 && (
+        <div className="mt-1 ml-2 flex flex-wrap gap-1">
+          {vendor.businesses.map((b) => (
+            <span
+              key={b}
+              className="text-[10px] px-1.5 py-0.5 rounded"
+              style={{
+                backgroundColor: "var(--color-surface-variant)",
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              {b}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════
    Radar Chart (SVG, no external lib)
    ══════════════════════════════════════════════════════════════ */
@@ -845,39 +907,7 @@ function MunicipalityDetail({
           </h3>
           <div className="flex flex-wrap gap-2">
             {muni.vendors.map((v) => (
-              <span
-                key={`${v.name}-${v.cloud}`}
-                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
-                style={{
-                  backgroundColor: "var(--color-section-bg, #F0F0F0)",
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                {v.name}
-                {v.cloud && (
-                  <span
-                    className="text-[10px] rounded px-1"
-                    style={{
-                      backgroundColor:
-                        v.cloud === "AWS"
-                          ? "#FF9900"
-                          : v.cloud === "Azure"
-                            ? "#0078D4"
-                            : v.cloud === "OCI"
-                              ? "#C74634"
-                              : v.cloud === "GCP"
-                                ? "#4285F4"
-                                : "#888",
-                      color: "#fff",
-                    }}
-                  >
-                    {v.cloud}
-                  </span>
-                )}
-                <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
-                  ({v.businesses.length}業務)
-                </span>
-              </span>
+              <VendorChip key={`${v.name}-${v.cloud}`} vendor={v} />
             ))}
           </div>
         </div>
