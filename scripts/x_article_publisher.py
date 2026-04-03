@@ -28,7 +28,7 @@ KW_PLANNER_PATH = os.path.expandvars(
     "$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx"
 )
 README_PATH = os.path.expandvars(
-    "$GDRIVE_WORKSPACE/../../../マイドライブ/ObsidianVault/01_Projects/PJ19_GCInsight/README.md"
+    "$GDRIVE_WORKSPACE/../../../マイドライブ/ObsidianVault/01_Projects/Products/PJ19_GCInsight/README.md"
 )
 
 HEADERS = {
@@ -175,7 +175,7 @@ def update_readme(total_count):
         alt = os.path.join(
             os.path.expanduser("~"),
             "Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com",
-            "マイドライブ/ObsidianVault/01_Projects/PJ19_GCInsight/README.md",
+            "マイドライブ/ObsidianVault/01_Projects/Products/PJ19_GCInsight/README.md",
         )
         if os.path.exists(alt):
             readme_path = alt
