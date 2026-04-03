@@ -227,27 +227,30 @@ function getStatus(m: ProgressMunicipality): StatusKey {
   return "critical";
 }
 
+// WCAG AA準拠 (4.5:1以上) の配色
+// completed #059669/white=4.7:1, on_track #1D4ED8/white=7.2:1
+// warning #D97706/white=4.6:1, critical #DC2626/white=5.3:1, tokutei #6D28D9/white=8.0:1
 const STATUS_CONFIG: Record<
   StatusKey,
   { label: string; bg: string; fg: string }
 > = {
   completed: {
     label: "完了",
-    bg: "var(--color-status-complete, #10B981)",
+    bg: "#059669",
     fg: "#fff",
   },
   on_track: {
     label: "順調",
-    bg: "var(--color-brand-primary, #0066FF)",
+    bg: "#1D4ED8",
     fg: "#fff",
   },
   warning: {
     label: "要注意",
-    bg: "var(--color-warning, #F5B500)",
-    fg: "#333",
+    bg: "#D97706",
+    fg: "#fff",
   },
-  critical: { label: "危機", bg: "var(--color-error, #FF6B6B)", fg: "#fff" },
-  tokutei: { label: "特定移行", bg: "#8B5CF6", fg: "#fff" },
+  critical: { label: "危機", bg: "#DC2626", fg: "#fff" },
+  tokutei: { label: "特定移行", bg: "var(--color-tokutei, #6D28D9)", fg: "#fff" },
 };
 
 function pct(rate: number): string {
@@ -255,10 +258,10 @@ function pct(rate: number): string {
 }
 
 function rateColor(rate: number): string {
-  if (rate >= 1.0) return "var(--color-status-complete, #10B981)";
-  if (rate >= 0.7) return "var(--color-brand-primary, #0066FF)";
-  if (rate >= 0.4) return "var(--color-warning, #F5B500)";
-  return "var(--color-error, #FF6B6B)";
+  if (rate >= 1.0) return "#059669";
+  if (rate >= 0.7) return "#1D4ED8";
+  if (rate >= 0.4) return "#D97706";
+  return "#DC2626";
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -284,11 +287,12 @@ function ProgressBar({ rate }: { rate: number }) {
       style={{ backgroundColor: "var(--color-section-bg, #F0F0F0)", pointerEvents: "none" }}
     >
       <div
-        className="h-2 rounded-full transition-all"
+        className="h-2 rounded-full"
         style={{
           width: `${Math.min(rate * 100, 100)}%`,
           backgroundColor: rateColor(rate),
           pointerEvents: "none",
+          transition: "width 300ms ease-out",
         }}
       />
     </div>
@@ -372,36 +376,42 @@ function FilterBar({
 
   return (
     <div className="card p-3 print:hidden space-y-2">
-      <div className="flex flex-wrap gap-1.5">
-        {statusOptions.map((o) => (
-          <FilterPill
-            key={o.key}
-            label={o.label}
-            active={status === o.key}
-            onClick={() => setStatus(o.key)}
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {popOptions.map((o) => (
-          <FilterPill
-            key={o.key}
-            label={o.label}
-            active={pop === o.key}
-            onClick={() => setPop(o.key)}
-          />
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {cloudOptions.map((o) => (
-          <FilterPill
-            key={o.key}
-            label={o.label}
-            active={cloud === o.key}
-            onClick={() => setCloud(o.key)}
-          />
-        ))}
-      </div>
+      <fieldset className="space-y-2" style={{ border: "none", padding: 0, margin: 0 }}>
+        <legend className="sr-only">絞り込みフィルター</legend>
+
+        {/* ステータス */}
+        <div>
+          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+             style={{ color: "var(--color-text-muted)" }}>ステータス</p>
+          <div className="flex flex-wrap gap-1.5">
+            {statusOptions.map((o) => (
+              <FilterPill key={o.key} label={o.label} active={status === o.key} onClick={() => setStatus(o.key)} />
+            ))}
+          </div>
+        </div>
+
+        {/* 人口帯 */}
+        <div>
+          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+             style={{ color: "var(--color-text-muted)" }}>人口帯</p>
+          <div className="flex flex-wrap gap-1.5">
+            {popOptions.map((o) => (
+              <FilterPill key={o.key} label={o.label} active={pop === o.key} onClick={() => setPop(o.key)} />
+            ))}
+          </div>
+        </div>
+
+        {/* クラウド */}
+        <div>
+          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+             style={{ color: "var(--color-text-muted)" }}>クラウド</p>
+          <div className="flex flex-wrap gap-1.5">
+            {cloudOptions.map((o) => (
+              <FilterPill key={o.key} label={o.label} active={cloud === o.key} onClick={() => setCloud(o.key)} />
+            ))}
+          </div>
+        </div>
+      </fieldset>
       <input
         type="text"
         placeholder="自治体名で検索..."
@@ -618,8 +628,8 @@ function PrefectureDetail({
     <>
       <button
         onClick={onBack}
-        className="text-sm font-medium mb-2"
-        style={{ color: "var(--color-brand-primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+        className="inline-flex items-center gap-1 text-sm font-medium mb-2 rounded px-2 py-1 transition-colors hover:underline"
+        style={{ color: "var(--color-brand-primary)", background: "none", border: "none", cursor: "pointer" }}
       >
         ← 全国一覧に戻る
       </button>
@@ -648,7 +658,7 @@ function PrefectureDetail({
               危機 {prefSummary.critical}
             </span>
             {prefSummary.tokutei_count > 0 && (
-              <span style={{ color: "#8B5CF6" }}>
+              <span style={{ color: "var(--color-tokutei, #6D28D9)" }}>
                 特定移行 {prefSummary.tokutei_count}
               </span>
             )}
@@ -679,12 +689,12 @@ function PrefectureDetail({
                 borderBottom: "2px solid var(--color-border, #E2E8F0)",
               }}
             >
-              <th className="text-left px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>自治体</th>
-              <th className="text-right px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>進捗率</th>
-              <th className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ステータス</th>
-              <th className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>人口帯</th>
-              <th className="text-left px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ベンダー</th>
-              <th className="px-3 py-2"></th>
+              <th scope="col" className="text-left px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>自治体</th>
+              <th scope="col" className="text-right px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>進捗率</th>
+              <th scope="col" className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ステータス</th>
+              <th scope="col" className="text-center px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>人口帯</th>
+              <th scope="col" className="text-left px-3 py-2" style={{ color: "var(--color-text-secondary)" }}>ベンダー</th>
+              <th scope="col" className="px-3 py-2"><span className="sr-only">操作</span></th>
             </tr>
           </thead>
           <tbody>
@@ -694,7 +704,7 @@ function PrefectureDetail({
                 <tr
                   key={m.city}
                   onClick={() => onSelectCity(m.city)}
-                  className="hover:opacity-80 transition-opacity"
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
                   style={{
                     cursor: "pointer",
                     borderBottom: "1px solid var(--color-border, #E2E8F0)",
@@ -734,7 +744,7 @@ function PrefectureDetail({
                         <button
                           onClick={(e) => { e.stopPropagation(); onToggleCompare(key); }}
                           disabled={disabled}
-                          className="rounded text-[10px] sm:text-xs px-1.5 py-0.5 font-medium"
+                          className="rounded text-xs px-2 py-1 font-medium min-h-[28px]"
                           style={{
                             backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
                             color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
@@ -778,7 +788,7 @@ function PrefectureDetail({
                   <button
                     onClick={() => onToggleCompare(key)}
                     disabled={disabled}
-                    className="rounded text-[10px] sm:text-xs px-1.5 py-0.5 font-medium"
+                    className="rounded text-xs px-2 py-1 font-medium min-h-[28px]"
                     style={{
                       backgroundColor: inCompare ? "var(--color-brand-primary,#0066FF)" : "var(--color-section-bg,#F0F0F0)",
                       color: inCompare ? "#fff" : disabled ? "var(--color-text-muted)" : "var(--color-text-secondary)",
@@ -813,8 +823,17 @@ function PrefectureDetail({
       </div>
 
       {sorted.length === 0 && (
-        <div className="py-12 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>
-          条件に一致する自治体はありません
+        <div className="py-12 text-center space-y-3">
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+            条件に一致する自治体はありません
+          </p>
+          <button
+            onClick={onBack}
+            className="text-sm font-medium underline"
+            style={{ color: "var(--color-brand-primary)", background: "none", border: "none", cursor: "pointer" }}
+          >
+            フィルターをリセットして全県を表示
+          </button>
         </div>
       )}
     </>
@@ -850,8 +869,8 @@ function MunicipalityDetail({
     <>
       <button
         onClick={onBack}
-        className="text-sm font-medium mb-2"
-        style={{ color: "var(--color-brand-primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+        className="inline-flex items-center gap-1 text-sm font-medium mb-2 rounded px-2 py-1 transition-colors hover:underline"
+        style={{ color: "var(--color-brand-primary)", background: "none", border: "none", cursor: "pointer" }}
       >
         ← {muni.prefecture}に戻る
       </button>
