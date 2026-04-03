@@ -341,57 +341,117 @@ function NationalOverview({
   data,
   prefectures,
   onSelectPref,
+  onFilterChange,
 }: {
   data: ProgressData;
   prefectures: PrefectureSummary[];
   onSelectPref: (pref: string) => void;
+  onFilterChange?: (status: string) => void;
 }) {
   const sorted = useMemo(
     () => [...prefectures].sort((a, b) => a.avg_rate - b.avg_rate),
     [prefectures]
   );
 
+  const criticalCount = data.summary.critical_count;
+
   return (
     <>
-      {/* KPI Cards */}
+      {/* 危機アラートバナー */}
+      {criticalCount > 0 && (
+        <button
+          onClick={() => onFilterChange?.("critical")}
+          className="w-full text-left rounded-xl px-4 py-3 flex items-center justify-between gap-3 transition-opacity hover:opacity-90"
+          style={{
+            backgroundColor: "#FEF2F2",
+            border: "1.5px solid #FECACA",
+            cursor: onFilterChange ? "pointer" : "default",
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-base">⚠️</span>
+            <span className="text-sm font-semibold" style={{ color: "#DC2626" }}>
+              {criticalCount}自治体が危機状態
+            </span>
+            <span className="text-xs" style={{ color: "#EF4444" }}>
+              — 2025年度末まで移行完了が困難な見込み
+            </span>
+          </div>
+          {onFilterChange && (
+            <span className="text-xs font-medium shrink-0" style={{ color: "#DC2626" }}>
+              一覧を見る →
+            </span>
+          )}
+        </button>
+      )}
+
+      {/* KPI Cards — 危機を先頭に */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           {
-            label: "全自治体数",
-            value: data.summary.total.toLocaleString(),
-            color: "var(--color-gov-primary, #002D72)",
-          },
-          {
-            label: "全国平均進捗率",
-            value: pct(data.summary.avg_rate),
-            color: rateColor(data.summary.avg_rate),
-          },
-          {
-            label: "完了団体",
-            value: data.summary.completed_count.toString(),
-            color: "var(--color-status-complete, #10B981)",
-          },
-          {
+            key: "critical",
             label: "危機的団体",
             value: data.summary.critical_count.toString(),
             color: "var(--color-error, #FF6B6B)",
+            clickable: true,
+            sub: "クリックで絞り込み",
           },
-        ].map((kpi) => (
-          <div key={kpi.label} className="card p-4">
-            <div
-              className="text-xs mb-1"
-              style={{ color: "var(--color-text-secondary)" }}
+          {
+            key: "completed",
+            label: "完了団体",
+            value: data.summary.completed_count.toString(),
+            color: "var(--color-status-complete, #10B981)",
+            clickable: true,
+            sub: "クリックで絞り込み",
+          },
+          {
+            key: "",
+            label: "全国平均進捗率",
+            value: pct(data.summary.avg_rate),
+            color: rateColor(data.summary.avg_rate),
+            clickable: false,
+            sub: undefined,
+          },
+          {
+            key: "",
+            label: "全自治体数",
+            value: data.summary.total.toLocaleString(),
+            color: "var(--color-gov-primary, #002D72)",
+            clickable: false,
+            sub: undefined,
+          },
+        ].map((kpi) => {
+          const isClickable = kpi.clickable && !!onFilterChange;
+          return isClickable ? (
+            <button
+              key={kpi.label}
+              onClick={() => onFilterChange!(kpi.key)}
+              className="card p-4 text-left transition-shadow hover:shadow-md"
+              style={{ cursor: "pointer" }}
             >
-              {kpi.label}
+              <div className="text-xs mb-1" style={{ color: "var(--color-text-secondary)" }}>
+                {kpi.label}
+              </div>
+              <div className="text-2xl font-bold" style={{ color: kpi.color }}>
+                {kpi.value}
+              </div>
+              {kpi.sub && (
+                <div className="text-[10px] mt-1" style={{ color: "var(--color-text-muted)" }}>
+                  {kpi.sub}
+                </div>
+              )}
+            </button>
+          ) : (
+            <div key={kpi.label} className="card p-4">
+              <div className="text-xs mb-1" style={{ color: "var(--color-text-secondary)" }}>
+                {kpi.label}
+              </div>
+              <div className="text-2xl font-bold" style={{ color: kpi.color }}>
+                {kpi.value}
+              </div>
             </div>
-            <div
-              className="text-2xl font-bold"
-              style={{ color: kpi.color }}
-            >
-              {kpi.value}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Prefecture Cards */}
@@ -1073,6 +1133,7 @@ function ProgressInner({ data }: { data: ProgressData }) {
           data={data}
           prefectures={filteredPrefs}
           onSelectPref={(pref) => navigate({ pref, city: "" })}
+          onFilterChange={(status) => setFilterStatus(status)}
         />
       )}
     </div>
