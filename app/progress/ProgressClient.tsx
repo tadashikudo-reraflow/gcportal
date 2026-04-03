@@ -218,13 +218,14 @@ function ProgressBar({ rate }: { rate: number }) {
   return (
     <div
       className="h-2 rounded-full w-full"
-      style={{ backgroundColor: "var(--color-section-bg, #F0F0F0)" }}
+      style={{ backgroundColor: "var(--color-section-bg, #F0F0F0)", pointerEvents: "none" }}
     >
       <div
         className="h-2 rounded-full transition-all"
         style={{
           width: `${Math.min(rate * 100, 100)}%`,
           backgroundColor: rateColor(rate),
+          pointerEvents: "none",
         }}
       />
     </div>
@@ -244,7 +245,7 @@ function FilterPill({
   return (
     <button
       onClick={onClick}
-      className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+      className="rounded-full px-4 py-1.5 text-xs font-medium transition-colors"
       style={{
         backgroundColor: active
           ? "var(--color-brand-primary, #0066FF)"
@@ -267,6 +268,8 @@ function FilterBar({
   setStatus,
   pop,
   setPop,
+  cloud,
+  setCloud,
   query,
   setQuery,
 }: {
@@ -274,6 +277,8 @@ function FilterBar({
   setStatus: (v: string) => void;
   pop: string;
   setPop: (v: string) => void;
+  cloud: string;
+  setCloud: (v: string) => void;
   query: string;
   setQuery: (v: string) => void;
 }) {
@@ -292,6 +297,14 @@ function FilterBar({
     { key: "C", label: "一般市" },
     { key: "D", label: "町" },
     { key: "E", label: "村" },
+  ];
+  const cloudOptions = [
+    { key: "", label: "全クラウド" },
+    { key: "AWS", label: "AWS" },
+    { key: "Azure", label: "Azure" },
+    { key: "GCP", label: "GCP" },
+    { key: "OCI", label: "OCI" },
+    { key: "さくら", label: "さくら" },
   ];
 
   return (
@@ -313,6 +326,16 @@ function FilterBar({
             label={o.label}
             active={pop === o.key}
             onClick={() => setPop(o.key)}
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {cloudOptions.map((o) => (
+          <FilterPill
+            key={o.key}
+            label={o.label}
+            active={cloud === o.key}
+            onClick={() => setCloud(o.key)}
           />
         ))}
       </div>
@@ -972,6 +995,7 @@ function ProgressInner({ data }: { data: ProgressData }) {
 
   const [filterStatus, setFilterStatus] = useState(paramStatus);
   const [filterPop, setFilterPop] = useState(paramPop);
+  const [filterCloud, setFilterCloud] = useState("");
   const [filterQuery, setFilterQuery] = useState(paramQ);
   const [compareKeys, setCompareKeys] = useState<string[]>([]);
 
@@ -1018,6 +1042,10 @@ function ProgressInner({ data }: { data: ProgressData }) {
         if (filterStatus !== "tokutei" && st !== filterStatus) return false;
       }
       if (filterPop && m.popBand !== filterPop) return false;
+      if (filterCloud) {
+        const hasCloud = m.vendors.some((v) => v.cloud === filterCloud);
+        if (!hasCloud) return false;
+      }
       if (filterQuery) {
         const q = filterQuery.toLowerCase();
         if (
@@ -1028,7 +1056,7 @@ function ProgressInner({ data }: { data: ProgressData }) {
       }
       return true;
     });
-  }, [data.municipalities, filterStatus, filterPop, filterQuery]);
+  }, [data.municipalities, filterStatus, filterPop, filterCloud, filterQuery]);
 
   // Determine level
   const level = paramCity ? 2 : paramPref ? 1 : 0;
@@ -1087,6 +1115,8 @@ function ProgressInner({ data }: { data: ProgressData }) {
         setStatus={setFilterStatus}
         pop={filterPop}
         setPop={setFilterPop}
+        cloud={filterCloud}
+        setCloud={setFilterCloud}
         query={filterQuery}
         setQuery={setFilterQuery}
       />
