@@ -287,19 +287,22 @@ export default async function CostsPage() {
         <p className="page-subtitle">
           標準化移行に伴うコスト変化を、実績と比較表で整理
         </p>
-        {/* ヒーローKPIバー — ファーストビューで最重要データを即提示 */}
-        <div className="mt-4 grid grid-cols-3 gap-2" role="region" aria-label="コスト変化サマリー">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xl sm:text-2xl font-black tabular-nums text-green-600 leading-none">−30%</span>
-            <span className="text-xs text-gray-500 leading-tight">政府目標（R4）</span>
+        {/* ヒーローKPIバー — 目標vs実態の対比を強調 */}
+        <div className="mt-4 space-y-2" role="region" aria-label="コスト変化サマリー">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-xl p-3 bg-green-50 border border-green-200 flex flex-col gap-1">
+              <span className="text-2xl sm:text-3xl font-black tabular-nums text-green-600 leading-none">−30%</span>
+              <span className="text-xs text-green-700 leading-tight">政府目標（R4）</span>
+            </div>
+            <div className="rounded-xl p-3 bg-red-50 border border-red-200 flex flex-col gap-1">
+              <span className="text-2xl sm:text-3xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
+              <span className="text-xs text-red-700 leading-tight">実態平均（中核市）</span>
+            </div>
           </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xl sm:text-2xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
-            <span className="text-xs text-gray-500 leading-tight">実態平均（中核市）</span>
-          </div>
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xl sm:text-2xl font-black tabular-nums text-red-900 leading-none">+{worstPct}%</span>
-            <span className="text-xs text-gray-500 leading-tight">最悪事例</span>
+          <div className="flex items-center justify-end gap-1.5 text-xs text-gray-400">
+            <span>最悪事例:</span>
+            <span className="font-bold tabular-nums text-red-900">+{worstPct}%</span>
+            <span>（個別報告）</span>
           </div>
         </div>
       </div>
@@ -328,12 +331,12 @@ export default async function CostsPage() {
             ),
           },
           {
-            label: "ベンダーで探す",
-            desc: "パッケージ・ベンダー一覧",
-            href: "/packages#vendor-cost",
+            label: "費用按分",
+            desc: "4方式・R6検証より",
+            href: "#cost-allocation",
             icon: (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
               </svg>
             ),
           },
@@ -432,27 +435,33 @@ export default async function CostsPage() {
           コスト変化実績
         </h2>
         {costs.length > 0 ? (
-          <div className="grid grid-cols-1 gap-2">
-            {costs.map((c) => {
-              const ratio = c.change_ratio ?? 1;
-              const pctChange = Math.round((ratio - 1) * 100);
-              const isReduction = pctChange < 0;
-              const color = isReduction ? "#10B981" : pctChange > 100 ? "#991B1B" : "#EF4444";
-              const bg = isReduction ? "#f0fdf4" : pctChange > 100 ? "#fef2f2" : "#fff5f5";
-              const label = `${pctChange >= 0 ? "+" : ""}${pctChange}%`;
-              return (
-                <div key={c.id} className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ backgroundColor: bg, border: `1px solid ${color}25` }}>
-                  <div className="w-20 flex-shrink-0 text-right">
-                    <span className="text-2xl font-black tabular-nums leading-none" style={{ color }}>{label}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold leading-tight" style={{ color: "var(--color-text-primary)" }}>{scopeToJapanese(c.scope)}</p>
-                    <p className="text-xs mt-0.5 leading-snug" style={{ color: "var(--color-text-muted)" }}>{c.notes}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <table className="w-full border-collapse">
+            <tbody>
+              {costs.map((c) => {
+                const ratio = c.change_ratio ?? 1;
+                const pctChange = Math.round((ratio - 1) * 100);
+                const isReduction = pctChange < 0;
+                const barColor = isReduction ? "#10B981" : pctChange > 100 ? "#991B1B" : "#EF4444";
+                const vendorName = c.vendors?.short_name ?? c.vendors?.name ?? "—";
+                return (
+                  <ExpandableCostCard
+                    key={c.id}
+                    scope={scopeToJapanese(c.scope)}
+                    changeRatio={ratio}
+                    vendorName={vendorName}
+                    notes={c.notes}
+                    sourceUrl={c.source_url}
+                    reportedYear={c.reported_year}
+                    barWidth={getBarWidth(ratio)}
+                    barColor={barColor}
+                    label={getRatioLabel(ratio)}
+                    isReduction={isReduction}
+                    pctChange={pctChange}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
         ) : (
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
@@ -569,7 +578,7 @@ export default async function CostsPage() {
 
       {/* 費用按分・ベンダー・最適化 */}
         {/* 費用按分方式の比較 — 縦リスト */}
-        <div className="card p-5">
+        <div id="cost-allocation" className="card p-5">
           <h3 className="text-sm font-bold mb-0.5" style={{ color: "var(--color-text-primary)" }}>
             共同利用の費用 — どう割り勘するか？
           </h3>
@@ -613,7 +622,7 @@ export default async function CostsPage() {
         </div>
 
         {/* R6検証事業 参画ベンダー — 検証テーマ別 */}
-        <div className="mt-4 card p-5">
+        <div id="vendor-participation" className="mt-4 card p-5">
           <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
             R6検証事業 参画ベンダー（20社）— 検証テーマ別
           </h3>
