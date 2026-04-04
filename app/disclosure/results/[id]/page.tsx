@@ -62,7 +62,7 @@ export async function generateMetadata(
   if (!r) return { title: "開示請求 | GCInsight" };
   const title = r.result_title ?? r.topic;
   return {
-    title: `${title}｜開示請求ウォッチ｜GCInsight`,
+    title: `${title}｜開示請求依頼｜GCInsight`,
     description: r.result_summary ?? `GCInsight編集部がデジタル庁へ提出した情報公開請求の結果: ${r.topic}`,
   };
 }
@@ -87,7 +87,7 @@ export default async function DisclosureResultDetailPage(
   return (
     <div className="space-y-8 max-w-2xl mx-auto">
       <Breadcrumb items={[
-        { label: "情報公開請求ウォッチ", href: "/disclosure" },
+        { label: "開示請求依頼", href: "/disclosure" },
         { label: "開示結果一覧", href: "/disclosure/results" },
         { label: title.length > 20 ? title.slice(0, 20) + "…" : title },
       ]} />

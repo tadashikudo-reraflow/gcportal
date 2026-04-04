@@ -64,7 +64,7 @@ export default async function DisclosureResultsPage() {
   return (
     <div className="space-y-8">
       <Breadcrumb items={[
-        { label: "情報公開請求ウォッチ", href: "/disclosure" },
+        { label: "開示請求依頼", href: "/disclosure" },
         { label: "開示結果一覧" },
       ]} />
 

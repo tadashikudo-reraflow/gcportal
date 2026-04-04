@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import DisclosureRequestForm from "@/components/DisclosureRequestForm";
 
 export const metadata: Metadata = {
-  title: "情報公開請求ウォッチ｜GCInsight",
+  title: "開示請求依頼｜GCInsight",
   description:
     "デジタル庁への情報公開（開示）請求をGCInsight編集部が代理提出し、結果をサイトで公開するプロジェクト。知りたい情報をリクエストできます。",
   alternates: { canonical: "/disclosure" },
@@ -79,7 +79,7 @@ export default async function DisclosurePage() {
   const recentResults = await getRecentResults();
   return (
     <div className="space-y-8">
-      <Breadcrumb items={[{ label: "情報公開請求ウォッチ" }]} />
+      <Breadcrumb items={[{ label: "開示請求依頼" }]} />
 
       {/* ヒーロー */}
       <div
@@ -91,10 +91,10 @@ export default async function DisclosurePage() {
       >
         <div className="max-w-2xl">
           <p className="text-xs font-semibold uppercase tracking-widest opacity-70 mb-2">
-            Information Disclosure Watch
+            Information Disclosure
           </p>
           <h1 className="text-2xl sm:text-3xl font-extrabold leading-tight mb-3">
-            情報公開請求ウォッチ
+            開示請求依頼
           </h1>
           <p className="text-sm sm:text-base opacity-85 leading-relaxed">
             デジタル庁への行政文書開示請求をGCInsight編集部が代理で提出し、
