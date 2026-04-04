@@ -1,6 +1,41 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
+async function checkAuth(req: NextRequest): Promise<boolean> {
+  const cookieToken = req.cookies.get("admin_token")?.value;
+  if (cookieToken) {
+    const { verifyAdminToken } = await import("@/lib/auth");
+    const payload = await verifyAdminToken(cookieToken);
+    if (payload) return true;
+  }
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Basic ")) {
+    const decoded = atob(authHeader.slice(6));
+    const password = decoded.split(":").slice(1).join(":");
+    if (password === process.env.ADMIN_PASSWORD) return true;
+  }
+  if (authHeader?.startsWith("Bearer ")) {
+    if (authHeader.slice(7) === process.env.GCINSIGHT_ADMIN_KEY) return true;
+  }
+  return false;
+}
+
+// GET /api/disclosure — 管理者向け全件取得
+export async function GET(req: NextRequest) {
+  if (!(await checkAuth(req))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from("disclosure_requests")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) {
+    return NextResponse.json({ error: "取得に失敗しました" }, { status: 500 });
+  }
+  return NextResponse.json(data ?? []);
+}
+
 const CATEGORIES = [
   "migration_plan",
   "delay_reason",

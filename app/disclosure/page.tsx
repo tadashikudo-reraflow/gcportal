@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 import Breadcrumb from "@/components/Breadcrumb";
 import DisclosureRequestForm from "@/components/DisclosureRequestForm";
 
@@ -10,20 +11,31 @@ export const metadata: Metadata = {
   alternates: { canonical: "/disclosure" },
 };
 
-const PAST_RESULTS = [
-  // 今後の開示結果をここに追加
-  // {
-  //   title: "ガバメントクラウド移行遅延理由に関する調査報告書",
-  //   submittedAt: "2026-04-10",
-  //   disclosedAt: "2026-05-09",
-  //   resultUrl: "/articles/disclosure-delay-report-2026",
-  // },
-] as {
-  title: string;
-  submittedAt: string;
-  disclosedAt: string;
-  resultUrl: string;
-}[];
+export const revalidate = 3600;
+
+type RecentResult = {
+  id: string;
+  topic: string;
+  result_title: string | null;
+  status: string;
+  submitted_at: string | null;
+  disclosed_at: string | null;
+  result_url: string | null;
+};
+
+async function getRecentResults(): Promise<RecentResult[]> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  const { data } = await supabase
+    .from("disclosure_requests")
+    .select("id, topic, result_title, status, submitted_at, disclosed_at, result_url")
+    .in("status", ["submitted", "disclosed", "rejected"])
+    .order("submitted_at", { ascending: false, nullsFirst: false })
+    .limit(5);
+  return (data ?? []) as RecentResult[];
+}
 
 const HOW_IT_WORKS = [
   {
@@ -52,7 +64,19 @@ const HOW_IT_WORKS = [
   },
 ];
 
-export default function DisclosurePage() {
+const STATUS_LABELS: Record<string, string> = {
+  submitted: "請求中",
+  disclosed: "開示済",
+  rejected:  "不開示",
+};
+const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
+  submitted: { color: "#2563EB", bg: "#DBEAFE" },
+  disclosed: { color: "#059669", bg: "#D1FAE5" },
+  rejected:  { color: "#DC2626", bg: "#FEE2E2" },
+};
+
+export default async function DisclosurePage() {
+  const recentResults = await getRecentResults();
   return (
     <div className="space-y-8">
       <Breadcrumb items={[{ label: "情報公開請求ウォッチ" }]} />
@@ -207,51 +231,58 @@ export default function DisclosurePage() {
         </div>
       </div>
 
-      {/* 過去の開示結果 */}
+      {/* 開示請求の結果 */}
       <div className="space-y-3">
-        <h2
-          className="text-lg font-bold"
-          style={{ color: "var(--color-text-primary)" }}
-        >
-          過去の開示結果
-        </h2>
-        {PAST_RESULTS.length === 0 ? (
-          <div
-            className="rounded-xl p-6 text-center"
-            style={{
-              backgroundColor: "var(--color-card)",
-              border: "1px dashed var(--color-border-strong)",
-            }}
-          >
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>
+            開示請求の結果
+          </h2>
+          <Link href="/disclosure/results" className="text-xs font-semibold hover:underline"
+            style={{ color: "var(--color-brand-secondary)" }}>
+            すべて見る →
+          </Link>
+        </div>
+        {recentResults.length === 0 ? (
+          <div className="rounded-xl p-6 text-center"
+            style={{ backgroundColor: "var(--color-card)", border: "1px dashed var(--color-border-strong)" }}>
             <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
               現在準備中です。最初のリクエストをお待ちしています。
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            {PAST_RESULTS.map((r, i) => (
-              <Link
-                key={i}
-                href={r.resultUrl}
-                className="flex items-center justify-between rounded-xl p-4 no-underline hover:shadow-md transition-shadow"
-                style={{
-                  backgroundColor: "var(--color-card)",
-                  border: "1px solid var(--color-border)",
-                }}
-              >
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                    {r.title}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                    提出: {r.submittedAt} → 開示: {r.disclosedAt}
-                  </p>
-                </div>
-                <span className="text-xs font-semibold flex-shrink-0 ml-4" style={{ color: "var(--color-brand-secondary)" }}>
-                  記事を読む →
-                </span>
-              </Link>
-            ))}
+            {recentResults.map((r) => {
+              const sc = STATUS_COLORS[r.status] ?? STATUS_COLORS.submitted;
+              const title = r.result_title ?? r.topic;
+              const href = `/disclosure/results/${r.id}`;
+              return (
+                <Link key={r.id} href={href}
+                  className="flex items-center justify-between rounded-xl p-4 no-underline hover:shadow-md transition-shadow"
+                  style={{ backgroundColor: "var(--color-card)", border: "1px solid var(--color-border)" }}>
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded mt-0.5"
+                      style={{ backgroundColor: sc.bg, color: sc.color }}>
+                      {STATUS_LABELS[r.status]}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: "var(--color-text-primary)" }}>
+                        {title}
+                      </p>
+                      {r.submitted_at && (
+                        <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
+                          提出: {new Date(r.submitted_at).toLocaleDateString("ja-JP")}
+                          {r.disclosed_at && ` → 決定: ${new Date(r.disclosed_at).toLocaleDateString("ja-JP")}`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold flex-shrink-0 ml-4"
+                    style={{ color: "var(--color-brand-secondary)" }}>
+                    詳細 →
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
