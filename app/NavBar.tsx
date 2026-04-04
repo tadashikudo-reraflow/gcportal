@@ -30,9 +30,10 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
-      { href: "/packages",  label: "パッケージ", desc: "" },
-      { href: "/timeline",  label: "スケジュール", desc: "" },
-      { href: "/sources",   label: "出典", desc: "" },
+      { href: "/packages",   label: "パッケージ", desc: "" },
+      { href: "/timeline",   label: "スケジュール", desc: "" },
+      { href: "/sources",    label: "出典", desc: "" },
+      { href: "/disclosure", label: "開示請求ウォッチ", desc: "" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
@@ -69,9 +70,10 @@ const DRAWER_SECTIONS = [
   {
     title: "調べる",
     items: [
-      { href: "/packages",  label: "パッケージ" },
-      { href: "/timeline",  label: "スケジュール" },
-      { href: "/sources",   label: "出典" },
+      { href: "/packages",   label: "パッケージ" },
+      { href: "/timeline",   label: "スケジュール" },
+      { href: "/sources",    label: "出典" },
+      { href: "/disclosure", label: "開示請求ウォッチ" },
     ],
   },
   {
