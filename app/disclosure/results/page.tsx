@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import Breadcrumb from "@/components/Breadcrumb";
+import DisclosureTabs from "@/components/DisclosureTabs";
 
 export const metadata: Metadata = {
   title: "開示請求 結果一覧｜GCInsight",
@@ -63,14 +64,14 @@ export default async function DisclosureResultsPage() {
 
   return (
     <div className="space-y-8">
-      <Breadcrumb items={[
-        { label: "開示請求依頼", href: "/disclosure" },
-        { label: "開示結果一覧" },
-      ]} />
+      <Breadcrumb items={[{ label: "開示請求" }]} />
+
+      {/* タブ */}
+      <DisclosureTabs active="results" />
 
       {/* ヘッダー */}
       <div>
-        <h1 className="page-title">開示請求 結果一覧</h1>
+        <h1 className="page-title">開示結果一覧</h1>
         <p className="text-sm mt-2" style={{ color: "var(--color-text-secondary)" }}>
           GCInsight編集部がデジタル庁に提出した情報公開請求の結果です。
           開示された文書をもとにした分析記事もあわせてご覧ください。

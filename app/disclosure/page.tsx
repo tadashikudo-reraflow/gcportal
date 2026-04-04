@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import Breadcrumb from "@/components/Breadcrumb";
 import DisclosureRequestForm from "@/components/DisclosureRequestForm";
+import DisclosureTabs from "@/components/DisclosureTabs";
 
 export const metadata: Metadata = {
   title: "開示請求依頼｜GCInsight",
@@ -79,7 +80,10 @@ export default async function DisclosurePage() {
   const recentResults = await getRecentResults();
   return (
     <div className="space-y-8">
-      <Breadcrumb items={[{ label: "開示請求依頼" }]} />
+      <Breadcrumb items={[{ label: "開示請求" }]} />
+
+      {/* タブ */}
+      <DisclosureTabs active="request" />
 
       {/* ヒーロー */}
       <div
