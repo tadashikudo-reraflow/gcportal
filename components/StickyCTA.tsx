@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import standardizationData from "@/public/data/standardization.json";
 
 type Municipality = {
@@ -200,9 +199,9 @@ export default function StickyCTA() {
           </div>
 
           {/* 無料レポートボタン */}
-          <Link
-            href="/finops#pdf"
-            className="no-underline flex-shrink-0"
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -215,10 +214,13 @@ export default function StickyCTA() {
               fontSize: "0.8125rem",
               borderRadius: 8,
               whiteSpace: "nowrap",
+              flexShrink: 0,
+              border: "none",
+              cursor: "pointer",
             }}
           >
             無料レポート
-          </Link>
+          </button>
         </div>
       </div>
     </div>

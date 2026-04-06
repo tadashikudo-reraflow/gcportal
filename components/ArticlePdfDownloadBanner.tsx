@@ -22,6 +22,7 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,12 +45,28 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
         return;
       }
       setOpen(false);
-      window.print();
+      setSubmitted(true);
     } catch {
       setError("通信エラーが発生しました");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (submitted) {
+    return (
+      <div
+        className="rounded-lg border px-5 py-4 flex items-center gap-3"
+        style={{ borderColor: "#6ee7b7", backgroundColor: "#ecfdf5" }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <p className="text-sm font-semibold" style={{ color: "#065f46" }}>
+          PDFリンクをメールでお送りしました。メールをご確認ください。
+        </p>
+      </div>
+    );
   }
 
   return (

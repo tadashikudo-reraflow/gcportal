@@ -6,6 +6,7 @@ import NavBar from "./NavBar";
 import BottomNav from "@/components/BottomNav";
 import { useUXTracker } from "@/hooks/useUXTracker";
 import StickyCTA from "@/components/StickyCTA";
+import PdfLeadModal from "@/components/PdfLeadModal";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
   useUXTracker();
@@ -43,13 +44,14 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </div>
             </Link>
 
-            <Link
-              href="/finops#pdf"
-              className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold no-underline"
-              style={{ backgroundColor: "transparent", color: "#00338D", border: "2px solid #00338D" }}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
+              className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold"
+              style={{ backgroundColor: "transparent", color: "#00338D", border: "2px solid #00338D", cursor: "pointer" }}
             >
               無料レポート（PDF）
-            </Link>
+            </button>
           </div>
         </div>
         <div style={{ backgroundColor: "var(--color-surface-container-low)" }}>
@@ -64,6 +66,9 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
 
       {/* #9 スティッキーCTA（スクロール30%超でフェードイン） */}
       <StickyCTA />
+
+      {/* グローバルPDFリードモーダル */}
+      <PdfLeadModal />
 
       {/* フッター */}
       <footer
@@ -80,13 +85,14 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/finops#pdf"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
                 className="btn-cta text-xs"
-                style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
+                style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem", cursor: "pointer" }}
               >
                 無料レポート（PDF）
-              </Link>
+              </button>
               <Link
                 href="/sources"
                 className="text-xs font-medium no-underline hover:underline"

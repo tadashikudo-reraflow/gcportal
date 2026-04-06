@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PdfCTAButton from "@/components/PdfCTAButton";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
@@ -364,9 +365,12 @@ export default async function CostsPage() {
           </a>
         ))}
       </div>
-      <a href="/finops#pdf" className="block text-xs text-blue-600 hover:text-blue-800 transition text-right">
+      <PdfCTAButton
+        className="block text-xs text-blue-600 hover:text-blue-800 transition text-right"
+        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, width: "100%" }}
+      >
         PDFでまとめて確認 →
-      </a>
+      </PdfCTAButton>
 
       {/* ⑦ コストギャップ */}
       <div id="cost-gap" className="card p-5">
