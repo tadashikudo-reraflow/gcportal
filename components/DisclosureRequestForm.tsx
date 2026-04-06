@@ -132,12 +132,14 @@ export default function DisclosureRequestForm() {
         {/* カテゴリ */}
         <div>
           <label
+            htmlFor="disclosure-category"
             className="block text-xs font-semibold mb-1.5"
             style={{ color: "var(--color-text-primary)" }}
           >
             カテゴリ <span style={{ color: "var(--color-error)" }}>*</span>
           </label>
           <select
+            id="disclosure-category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
@@ -145,7 +147,7 @@ export default function DisclosureRequestForm() {
               border: "1px solid var(--color-border)",
               backgroundColor: "#F9FAFB",
               color: category ? "var(--color-text-primary)" : "var(--color-text-muted)",
-              fontSize: 14,
+              fontSize: 16,
             }}
           >
             <option value="">選択してください</option>
@@ -161,12 +163,14 @@ export default function DisclosureRequestForm() {
         {isMunicipality && (
           <div>
             <label
+              htmlFor="disclosure-municipality"
               className="block text-xs font-semibold mb-1.5"
               style={{ color: "var(--color-text-primary)" }}
             >
               自治体名
             </label>
             <input
+              id="disclosure-municipality"
               type="text"
               placeholder="例: 横浜市、北海道札幌市"
               value={municipality}
@@ -175,7 +179,7 @@ export default function DisclosureRequestForm() {
               style={{
                 border: "1px solid var(--color-border)",
                 backgroundColor: "#F9FAFB",
-                fontSize: 14,
+                fontSize: 16,
               }}
             />
           </div>
@@ -184,6 +188,7 @@ export default function DisclosureRequestForm() {
         {/* 知りたい内容 */}
         <div>
           <label
+            htmlFor="disclosure-topic"
             className="block text-xs font-semibold mb-1.5"
             style={{ color: "var(--color-text-primary)" }}
           >
@@ -191,6 +196,7 @@ export default function DisclosureRequestForm() {
             <span style={{ color: "var(--color-error)" }}>*</span>
           </label>
           <textarea
+            id="disclosure-topic"
             placeholder="例: ガバメントクラウドへの移行が遅延している自治体の理由・報告書を知りたい。議会質問の参考にしたい。"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
@@ -199,27 +205,36 @@ export default function DisclosureRequestForm() {
             style={{
               border: "1px solid var(--color-border)",
               backgroundColor: "#F9FAFB",
-              fontSize: 14,
+              fontSize: 16,
               lineHeight: 1.7,
             }}
           />
           <p
             className="text-xs mt-1"
-            style={{ color: "var(--color-text-muted)" }}
+            style={{
+              color:
+                topic.trim().length >= 5
+                  ? "var(--color-text-muted)"
+                  : "var(--color-error)",
+            }}
           >
-            {topic.trim().length}/5文字以上必須
+            {topic.trim().length >= 5
+              ? `${topic.trim().length}文字`
+              : `あと${5 - topic.trim().length}文字必要`}
           </p>
         </div>
 
         {/* 所属（任意） */}
         <div>
           <label
+            htmlFor="disclosure-org"
             className="block text-xs font-semibold mb-1.5"
             style={{ color: "var(--color-text-secondary)" }}
           >
             ご所属（任意）
           </label>
           <select
+            id="disclosure-org"
             value={orgType}
             onChange={(e) => setOrgType(e.target.value)}
             className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
@@ -227,7 +242,7 @@ export default function DisclosureRequestForm() {
               border: "1px solid var(--color-border)",
               backgroundColor: "#F9FAFB",
               color: orgType ? "var(--color-text-primary)" : "var(--color-text-muted)",
-              fontSize: 14,
+              fontSize: 16,
             }}
           >
             <option value="">選択しない</option>
@@ -242,12 +257,14 @@ export default function DisclosureRequestForm() {
         {/* メール（任意） */}
         <div>
           <label
+            htmlFor="disclosure-email"
             className="block text-xs font-semibold mb-1.5"
             style={{ color: "var(--color-text-secondary)" }}
           >
             結果通知メール（任意）
           </label>
           <input
+            id="disclosure-email"
             type="email"
             placeholder="example@org.jp"
             value={email}
@@ -256,7 +273,7 @@ export default function DisclosureRequestForm() {
             style={{
               border: "1px solid var(--color-border)",
               backgroundColor: "#F9FAFB",
-              fontSize: 14,
+              fontSize: 16,
             }}
           />
           <p
@@ -287,7 +304,12 @@ export default function DisclosureRequestForm() {
 
         {/* エラー */}
         {error && (
-          <p className="text-xs" style={{ color: "var(--color-error)" }}>
+          <p
+            role="alert"
+            aria-live="assertive"
+            className="text-xs"
+            style={{ color: "var(--color-error)" }}
+          >
             {error}
           </p>
         )}

@@ -23,7 +23,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   received:  { label: "受付済",   color: "#374151", bg: "#F3F4F6" },
   reviewing: { label: "審査中",   color: "#D97706", bg: "#FEF3C7" },
   submitted: { label: "提出済",   color: "#2563EB", bg: "#DBEAFE" },
-  disclosed: { label: "開示済",   color: "#059669", bg: "#D1FAE5" },
+  disclosed: { label: "開示済",   color: "var(--color-success)", bg: "var(--color-success-bg)" },
   rejected:  { label: "不開示",   color: "#DC2626", bg: "#FEE2E2" },
 };
 
@@ -308,7 +308,7 @@ export default function AdminDisclosurePage() {
             </button>
             {saveMsg && (
               <p style={{ fontSize: 12, marginTop: 8, textAlign: "center",
-                color: saveMsg.startsWith("エラー") ? "#dc2626" : "#059669" }}>
+                color: saveMsg.startsWith("エラー") ? "#dc2626" : "var(--color-success)" }}>
                 {saveMsg}
               </p>
             )}

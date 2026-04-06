@@ -43,25 +43,25 @@ const HOW_IT_WORKS = [
     step: "01",
     icon: "📝",
     title: "リクエストを送る",
-    desc: "「こんな情報が欲しい」をフォームで送信。カテゴリ・背景・希望する文書の種類を教えてください。",
+    desc: "フォームで「こんな情報が欲しい」を送信。",
   },
   {
     step: "02",
     icon: "🔍",
-    title: "編集部が審査",
-    desc: "GCInsight編集部が内容を確認。公開価値があると判断した場合、デジタル庁へ行政文書開示請求書を提出します（300円/件）。",
+    title: "編集部が審査・提出",
+    desc: "公開価値があると判断した場合、編集部がデジタル庁へ代理提出します。",
   },
   {
     step: "03",
     icon: "⏳",
     title: "30日以内に決定",
-    desc: "行政機関情報公開法に基づき、デジタル庁は原則30日以内に開示・不開示を決定し通知。",
+    desc: "デジタル庁が原則30日以内に開示・不開示を通知。",
   },
   {
     step: "04",
     icon: "📢",
     title: "GCInsightで公開",
-    desc: "開示された文書はGCInsightでコラム・分析記事として公開。希望者にはメールで通知します。",
+    desc: "開示文書をもとにした分析記事をサイトで公開します。",
   },
 ];
 
@@ -72,7 +72,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 const STATUS_COLORS: Record<string, { color: string; bg: string }> = {
   submitted: { color: "#2563EB", bg: "#DBEAFE" },
-  disclosed: { color: "#059669", bg: "#D1FAE5" },
+  disclosed: { color: "var(--color-success)", bg: "var(--color-success-bg)" },
   rejected:  { color: "#DC2626", bg: "#FEE2E2" },
 };
 
@@ -101,10 +101,7 @@ export default async function DisclosurePage() {
             開示請求依頼
           </h1>
           <p className="text-sm sm:text-base opacity-85 leading-relaxed">
-            デジタル庁への行政文書開示請求をGCInsight編集部が代理で提出し、
-            結果をサイトで公開するプロジェクトです。
-            <br />
-            「ガバメントクラウド関連でこんな情報が知りたい」を下のフォームで送ってください。
+            知りたい情報をリクエストすると、編集部がデジタル庁へ代理で開示請求し、結果をサイトで公開します。
           </p>
         </div>
       </div>
@@ -179,59 +176,6 @@ export default async function DisclosurePage() {
             </p>
           </div>
 
-          {/* 費用 */}
-          <div
-            className="rounded-xl p-4"
-            style={{
-              backgroundColor: "var(--color-card)",
-              border: "1px solid var(--color-border)",
-            }}
-          >
-            <p
-              className="text-xs font-bold mb-2"
-              style={{ color: "var(--color-text-primary)" }}
-            >
-              💴 費用について
-            </p>
-            <div className="space-y-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-              <p>・請求手数料: 1件 300円（収入印紙）</p>
-              <p>・開示実施手数料: 300円まで無料</p>
-              <p className="pt-1" style={{ color: "var(--color-text-muted)" }}>
-                ※ 費用はGCInsight編集部が負担します。リクエスト者の費用負担はありません。
-              </p>
-            </div>
-          </div>
-
-          {/* デジタル庁窓口 */}
-          <div
-            className="rounded-xl p-4"
-            style={{
-              backgroundColor: "var(--color-card)",
-              border: "1px solid var(--color-border)",
-            }}
-          >
-            <p
-              className="text-xs font-bold mb-2"
-              style={{ color: "var(--color-text-primary)" }}
-            >
-              🏢 デジタル庁 情報公開窓口
-            </p>
-            <div className="space-y-1 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-              <p>東京都千代田区紀尾井町1-3</p>
-              <p>東京ガーデンテラス紀尾井町</p>
-              <p>📞 03-4477-6775</p>
-              <p>受付: 平日 9:30〜17:00</p>
-            </div>
-            <Link
-              href="https://www.digital.go.jp/disclosure"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 text-xs hover:underline"
-              style={{ color: "var(--color-brand-secondary)" }}
-            >
-              デジタル庁 情報公開ページ →
-            </Link>
-          </div>
         </div>
       </div>
 

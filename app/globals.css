@@ -66,6 +66,9 @@
   --color-status-critical: #EF4444;
   --color-status-tokutei: #64748B;
   --color-accent-cta: var(--color-brand-primary);
+  --color-success: #059669;
+  --color-success-bg: #D1FAE5;
+  --color-success-dark: #065F46;
 
   --color-surface: #F6FAFE;
   --color-card: #FFFFFF;

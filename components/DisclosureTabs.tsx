@@ -46,7 +46,7 @@ export default function DisclosureTabs({ active }: { active: Tab }) {
           href="/disclosure/results"
           className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-bold no-underline"
           style={{
-            backgroundColor: "#059669",
+            backgroundColor: "var(--color-success)",
             color: "#ffffff",
           }}
         >
