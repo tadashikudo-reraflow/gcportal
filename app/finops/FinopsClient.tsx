@@ -70,13 +70,14 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
               今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href="/finops#pdf"
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
                 className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm w-full sm:w-auto"
-                style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)" }}
+                style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)", border: "none", cursor: "pointer" }}
               >
                 📄 無料PDFを受け取る（メールのみ）
-              </a>
+              </button>
             </div>
             <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>スパムなし・いつでも配信解除できます</p>
           </div>

@@ -173,7 +173,12 @@ export default function HeroSection({
         {/* #6 CTA — プライマリ/セカンダリ視覚差 */}
         <div className="hero-cta-row">
           {/* プライマリ: filled, large */}
-          <Link href="/finops#pdf" className="btn-cta-primary">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
+            className="btn-cta-primary"
+            style={{ border: "none", cursor: "pointer" }}
+          >
             <svg
               width="16"
               height="16"
@@ -189,7 +194,7 @@ export default function HeroSection({
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
             無料レポート（PDF）
-          </Link>
+          </button>
           {/* セカンダリ: ghost/text */}
           <Link href="/articles" className="btn-ghost">
             コラム・解説を読む
