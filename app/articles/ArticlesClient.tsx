@@ -119,8 +119,8 @@ export default function ArticlesClient({ articles }: { articles: Article[] }) {
                 <ArticlePlaceholder title={article.title} />
               )}
               <div className="p-6 flex flex-col gap-3 flex-1">
-                <h2 className="text-base font-bold leading-snug group-hover:underline"
-                  style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
+                <h2 className={`text-base font-bold leading-snug group-hover:underline ${article.coverImage ? "sr-only" : ""}`}
+                  style={article.coverImage ? {} : { color: "var(--color-text-primary)" }}>{article.title}</h2>
                 {article.description && (
                   <p className="text-sm leading-relaxed line-clamp-3"
                     style={{ color: "var(--color-text-secondary)" }}>{article.description}</p>
