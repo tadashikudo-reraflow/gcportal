@@ -5,7 +5,7 @@ import mermaid from "mermaid";
 
 mermaid.initialize({
   startOnLoad: false,
-  theme: "neutral",
+  theme: "default",
   fontFamily: "system-ui, sans-serif",
   fontSize: 14,
   // ⚠️ securityLevel: "loose" 必須 — "strict" にすると innerHTML 挿入が制限され
