@@ -8,6 +8,7 @@ import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import VendorRanking from "@/components/VendorRanking";
 import BusinessPackageList from "@/components/BusinessPackageList";
+import ReportLeadCta from "@/components/ReportLeadCta";
 import MunicipalitySearch from "@/components/MunicipalitySearch";
 import Breadcrumb from "@/components/Breadcrumb";
 
@@ -273,7 +274,7 @@ export default async function PackagesPage() {
       </div>
 
       <SourceAttribution sourceIds={PAGE_SOURCES.packages} pageId="packages" />
-
+      <ReportLeadCta source="packages" compact title="ベンダー別パッケージ採用状況をPDFで確認" description="全17業務の標準パッケージ採用率・ベンダー別シェアをまとめたレポートです。" />
       <PageNavCards exclude="/packages" />
       <RelatedArticles cluster={CLUSTERS.vendor} />
     </div>

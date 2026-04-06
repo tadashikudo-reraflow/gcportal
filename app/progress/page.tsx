@@ -7,6 +7,7 @@ import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import ReportLeadCta from "@/components/ReportLeadCta";
 
 export const revalidate = 3600;
 
@@ -226,6 +227,7 @@ export default async function ProgressPage() {
         sourceIds={PAGE_SOURCES.prefectures ?? []}
         pageId="progress"
       />
+      <ReportLeadCta source="progress" compact title="全国移行進捗の詳細分析をPDFで確認" description="都道府県別・人口帯別の進捗分布と遅延構造をまとめたレポートです。" />
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );

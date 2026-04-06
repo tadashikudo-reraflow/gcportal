@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import scheduleData from "@/public/data/schedule.json";
 import ScheduleClient from "./ScheduleClient";
 import Breadcrumb from "@/components/Breadcrumb";
+import ReportLeadCta from "@/components/ReportLeadCta";
 
 export const metadata: Metadata = {
   title:
@@ -55,6 +56,7 @@ export default function SchedulePage() {
       </div>
 
       <ScheduleClient data={data} />
+      <ReportLeadCta source="timeline" compact title="移行スケジュールの背景と対策をPDFで確認" description="2026年3月末期限・特定移行・延長措置の全体像をまとめたレポートです。" />
     </div>
   );
 }
