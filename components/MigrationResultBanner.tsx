@@ -1,5 +1,7 @@
 "use client";
 
+import { Upload, Info } from "lucide-react";
+
 type MigrationResultBannerProps = {
   completionRate: number;      // e.g. 0.384
   totalSystems: number;        // e.g. 34592
@@ -65,14 +67,7 @@ export default function MigrationResultBanner({
     >
       {/* Header */}
       <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-        <svg
-          width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-        >
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-          <polyline points="17 8 12 3 7 8" />
-          <line x1="12" y1="3" x2="12" y2="15" />
-        </svg>
+        <Upload size={20} color="#60a5fa" aria-hidden="true" />
         <h2 className="text-sm font-bold tracking-wide" style={{ color: "#93c5fd" }}>
           自治体標準化 最終移行結果（2026年3月）
         </h2>
@@ -103,14 +98,7 @@ export default function MigrationResultBanner({
         className="px-6 py-2.5 text-xs flex items-center gap-1.5"
         style={{ backgroundColor: "rgba(0,0,0,0.2)", color: "#64748b" }}
       >
-        <svg
-          width="12" height="12" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="16" x2="12" y2="12" />
-          <line x1="12" y1="8" x2="12.01" y2="8" />
-        </svg>
+        <Info size={12} aria-hidden="true" />
         出典: 総務省・デジタル庁公表データ ({formattedMonth})
       </div>
 

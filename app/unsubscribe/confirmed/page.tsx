@@ -1,22 +1,11 @@
+import { CheckCircle } from "lucide-react";
+
 export default function UnsubscribeConfirmedPage() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full mx-auto p-8 bg-white rounded-lg shadow-sm text-center">
         <div className="mb-6">
-          <svg
-            className="mx-auto h-12 w-12 text-green-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+          <CheckCircle className="mx-auto text-green-500" size={48} aria-hidden="true" />
         </div>
         <h1 className="text-xl font-semibold text-gray-900 mb-3">
           配信停止が完了しました

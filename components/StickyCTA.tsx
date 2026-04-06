@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import standardizationData from "@/public/data/standardization.json";
+import { Search } from "lucide-react";
 
 type Municipality = {
   prefecture: string;
@@ -104,19 +105,7 @@ export default function StickyCTA() {
               style={{ color: "var(--color-text-muted)" }}
               aria-hidden
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <Search size={16} aria-hidden="true" />
             </span>
             <input
               type="search"

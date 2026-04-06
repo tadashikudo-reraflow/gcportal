@@ -1,5 +1,15 @@
+import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+
+const BASE_URL = "https://gcinsight.jp";
+
+function generatePdfTrackingUrl(leadId: number): string | null {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return null;
+  const token = crypto.createHmac("sha256", secret).update(String(leadId)).digest("hex");
+  return `${BASE_URL}/api/track/pdf?lid=${leadId}&token=${token}`;
+}
 
 const ORGANIZATION_TYPES = [
   "municipality",
@@ -59,16 +69,16 @@ async function notifySlack({
   });
 }
 
-/** Resend: ユーザーへのPDF配信メール (source="report" のみ) */
+/** Resend: ユーザーへのPDF配信メール */
 async function sendPdfEmail({
   email,
-  downloadUrl,
+  trackingUrl,
 }: {
   email: string;
-  downloadUrl: string | null;
+  trackingUrl: string | null;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || !downloadUrl) return;
+  if (!apiKey || !trackingUrl) return;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -82,7 +92,7 @@ async function sendPdfEmail({
       subject: "レポートのダウンロードありがとうございます｜GCInsight",
       html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
 <p style="font-size:18px;font-weight:bold;margin-bottom:16px">
-  📄 <a href="${downloadUrl}" style="color:#2563eb">PDFをダウンロードする（48時間以内有効）→</a>
+  📄 <a href="${trackingUrl}" style="color:#2563eb">PDFをダウンロードする（48時間以内有効）→</a>
 </p>
 <p>ガバメントクラウド移行 全実態レポート2026をダウンロードいただき、ありがとうございます。</p>
 <p>本レポートでは、全国1,741自治体の移行状況を約20,000字で徹底解説しています。38.4%というシステム移行率の実態、935団体に上る延長認定の背景、コスト2.3倍増加の構造まで、現場で使えるデータをまとめました。</p>
@@ -166,22 +176,6 @@ async function notifyTelegram({
   }
 }
 
-/** Supabase Storage から 48h Signed URL を生成 */
-async function generateDownloadUrl(): Promise<string | null> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !serviceRoleKey) return null;
-
-  const { createClient } = await import("@supabase/supabase-js");
-  const supabase = createClient(supabaseUrl, serviceRoleKey);
-  const { data } = await supabase.storage
-    .from("reports")
-    .createSignedUrl("report-2026.pdf", 60 * 60 * 48); // 48h
-  return data?.signedUrl ?? null;
-}
-
 
 /**
  * POST /api/leads — リード（メアド+所属）を保存
@@ -230,15 +224,15 @@ export async function POST(req: NextRequest) {
 
     const effectiveSource = source || "report";
 
-    // PDF配信メール: 全登録者に送信（finopsフォーム統合済みのため条件不要）
-    const downloadUrl = await generateDownloadUrl();
+    // PDFトラッキングURL生成（HMAC署名付き）
+    const trackingUrl = generatePdfTrackingUrl(data.id);
 
-    // 通知: Slack / 管理者メール / Telegram（並列実行）
+    // 通知: Slack / 管理者メール / Telegram + PDF配信（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report導線のみ）
+      sendPdfEmail({ email, trackingUrl }),
     ]);
 
     return NextResponse.json({ success: true, lead: data });

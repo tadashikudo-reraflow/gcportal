@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { Vendor, Package } from "@/lib/supabase";
 import { DATA_SOURCES } from "@/lib/sources";
+import { Search } from "lucide-react";
 
 const TEKIGO_LAST_ACCESSED = DATA_SOURCES["applic-tekigo-excel"]?.lastAccessed ?? "";
 
@@ -116,13 +117,7 @@ export default function BusinessPackageList({
 
       {/* 検索ボックス */}
       <div className="relative mb-4">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-          style={{ color: "var(--color-text-muted)" }}
-          fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
-        >
-          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--color-text-muted)" }} aria-hidden="true" />
         <input
           type="text"
           value={query}

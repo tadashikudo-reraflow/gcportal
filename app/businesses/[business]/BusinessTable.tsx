@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 
 type Row = {
   prefecture: string;
@@ -57,13 +58,7 @@ export default function BusinessTable({ rows }: { rows: Row[] }) {
       {/* 検索バー */}
       <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
         <div className="relative flex-1 max-w-xs">
-          <svg
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-            width="14" height="14" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-          </svg>
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} aria-hidden="true" />
           <input
             type="text"
             placeholder="自治体名・都道府県で検索…"

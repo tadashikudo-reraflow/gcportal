@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LayoutGrid, Home, DollarSign, Info, Cloud, Code2, Database, BarChart3, LayoutTemplate, FileText, ClipboardCheck } from "lucide-react";
 import PdfCTAButton from "@/components/PdfCTAButton";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
@@ -315,41 +316,25 @@ export default async function CostsPage() {
             label: "全体像を知る",
             desc: "目標と実態のギャップ",
             href: "#cost-gap",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-              </svg>
-            ),
+            icon: <LayoutGrid size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "団体別データ",
             desc: "R6検証事業 8団体",
             href: "#r6-verification",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            ),
+            icon: <Home size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "費用按分",
             desc: "4方式・R6検証より",
             href: "#cost-allocation",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-            ),
+            icon: <DollarSign size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "対策を知る",
             desc: "FinOps・最適化",
             href: "#cost-measures",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-            ),
+            icon: <Info size={16} className="text-gray-500" aria-hidden="true" />,
           },
         ].map((item) => (
           <a
@@ -698,38 +683,22 @@ export default async function CostsPage() {
               {
                 label: "サーバーレス化",
                 desc: "Lambda/Fargate等のサーバーレスサービスにより、EC2比でコスト優位性を確認。特にバッチ処理で効果大",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
-                  </svg>
-                ),
+                icon: <Cloud size={14} aria-hidden="true" />,
               },
               {
                 label: "IaC構築効率化",
                 desc: "Terraform/CloudFormation等でインフラをコード管理。構築工数を大幅削減し、環境複製も容易に",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                ),
+                icon: <Code2 size={14} aria-hidden="true" />,
               },
               {
                 label: "マネージドサービス活用",
                 desc: "RDS/Aurora等のマネージドDBにより運用負荷とコストを最適化。パッチ適用・バックアップの自動化",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                  </svg>
-                ),
+                icon: <Database size={14} aria-hidden="true" />,
               },
               {
                 label: "FinOpsダッシュボード",
                 desc: "コスト可視化ダッシュボードで日次モニタリング。予算超過の早期検知と最適化サイクルの確立",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                ),
+                icon: <BarChart3 size={14} aria-hidden="true" />,
               },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
@@ -752,7 +721,7 @@ export default async function CostsPage() {
             {/* デジタル庁資料 */}
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <LayoutTemplate size={9} aria-hidden="true" />
                 デジタル庁資料
               </p>
               <div className="flex flex-col gap-1.5">
@@ -763,7 +732,7 @@ export default async function CostsPage() {
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors w-full">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <FileText size={10} aria-hidden="true" />
                     {link.label}
                   </a>
                 ))}
@@ -772,7 +741,7 @@ export default async function CostsPage() {
             {/* R6検証事業 */}
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <ClipboardCheck size={9} aria-hidden="true" />
                 R6検証事業
               </p>
               <div className="flex flex-col gap-1.5">
@@ -782,7 +751,7 @@ export default async function CostsPage() {
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 transition-colors w-full">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <FileText size={10} aria-hidden="true" />
                     {link.label}
                   </a>
                 ))}

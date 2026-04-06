@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowDown } from "lucide-react";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
@@ -317,11 +318,11 @@ export default async function CloudPage() {
             </div>
             <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
               <span className="text-xs">一括調達契約</span>
-              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <ArrowDown size={16} aria-hidden="true" />
             </div>
             <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "var(--color-gov-primary)" }}>デジタル庁</div>
             <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
-              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <ArrowDown size={16} aria-hidden="true" />
               <span className="text-xs">利用権付与・運用管理委託</span>
             </div>
             <div className="rounded-xl px-6 py-2 font-bold text-sm" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}>自治体（1,741団体）</div>

@@ -9,6 +9,7 @@ import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
 import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
 import Breadcrumb from "@/components/Breadcrumb";
+import { BookOpen } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -143,10 +144,7 @@ export default async function ArticlePage({ params }: Props) {
       {article.sources && Array.isArray(article.sources) && article.sources.length > 0 && (
         <div className="card p-6 space-y-3">
           <h2 className="text-sm font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-            </svg>
+            <BookOpen size={16} aria-hidden="true" />
             参考文献・出典
           </h2>
           <ol className="list-decimal list-inside space-y-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>

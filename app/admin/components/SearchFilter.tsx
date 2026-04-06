@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { togglePublishAction, deleteArticleAction } from "../actions";
+import { Search } from "lucide-react";
 
 type Article = {
   id: number;
@@ -76,16 +77,7 @@ export default function SearchFilter({ articles }: { articles: Article[] }) {
       <div className="px-5 pt-4 pb-2 space-y-3">
         {/* 検索 */}
         <div className="relative">
-          <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-            style={{ color: "var(--color-text-muted)" }}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="11" cy="11" r="8" strokeWidth="2" />
-            <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--color-text-muted)" }} aria-hidden="true" />
           <input
             type="text"
             value={query}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { ArrowRight } from "lucide-react";
 
 /**
  * 人口帯 x ベンダー → 推定コストレンジ（年額、万円単位）
@@ -145,9 +146,7 @@ export default function CostSimulator() {
               </p>
             </div>
             <div className="flex items-center justify-center">
-              <svg width="32" height="24" viewBox="0 0 32 24" fill="none" className="text-gray-400">
-                <path d="M4 12h20m0 0l-6-6m6 6l-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <ArrowRight size={24} className="text-gray-400" aria-hidden="true" />
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">移行後（年額推定レンジ）</p>
