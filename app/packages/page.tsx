@@ -274,7 +274,7 @@ export default async function PackagesPage() {
       </div>
 
       <SourceAttribution sourceIds={PAGE_SOURCES.packages} pageId="packages" />
-      <ReportLeadCta source="packages" compact title="ベンダー別パッケージ採用状況をPDFで確認" description="全17業務の標準パッケージ採用率・ベンダー別シェアをまとめたレポートです。" />
+      <ReportLeadCta source="packages" compact title="移行コスト・ベンダー選定の判断材料をPDFで確認" description="全国自治体の移行状況・コスト構造・ベンダー動向をまとめた無料レポートです。" />
       <PageNavCards exclude="/packages" />
       <RelatedArticles cluster={CLUSTERS.vendor} />
     </div>

@@ -225,7 +225,7 @@ export default async function ProgressPage() {
         sourceIds={PAGE_SOURCES.prefectures ?? []}
         pageId="progress"
       />
-      <ReportLeadCta source="progress" compact title="全国移行進捗の詳細分析をPDFで確認" description="都道府県別・人口帯別の進捗分布と遅延構造をまとめたレポートです。" />
+      <ReportLeadCta source="progress" compact title="進捗・コスト・遅延の全体像を1本のPDFで確認" description="全国1,741自治体の移行状況、コスト変化、遅延構造をまとめた無料レポートです。" />
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );

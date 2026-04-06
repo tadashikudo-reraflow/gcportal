@@ -56,7 +56,7 @@ export default function SchedulePage() {
       </div>
 
       <ScheduleClient data={data} />
-      <ReportLeadCta source="timeline" compact title="移行スケジュールの背景と対策をPDFで確認" description="2026年3月末期限・特定移行・延長措置の全体像をまとめたレポートです。" />
+      <ReportLeadCta source="timeline" compact title="期限後の移行状況とコスト変化をPDFで確認" description="移行完了後に顕在化したコスト増加・遅延構造・対策をまとめた無料レポートです。" />
     </div>
   );
 }
