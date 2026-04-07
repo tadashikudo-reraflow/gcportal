@@ -7,13 +7,13 @@ import { getArticlesByTags, type ArticleMeta } from "@/lib/articles";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "ガバクラFinOps｜コスト2.3倍→3割削減の打ち手と無料診断PDF｜GCInsight",
+  title: "ガバメントクラウド コスト削減30%の実践手順【2026年最新】FinOps完全ガイド｜GCInsight",
   description:
-    "移行後コスト平均2.3倍・最大5.7倍。935団体が期限延長の今、同規模自治体と比較診断。移行済み→FinOps運用最適化・未移行→基盤再選定の具体策を無料PDFで提供。",
+    "移行後コスト平均2.3倍・最大5.7倍の現実。検証環境の夜間停止で60%削減、基盤再選定で30%削減——自治体規模別の具体的な打ち手を無料PDFで公開。935団体の実績データ付き。",
   openGraph: {
-    title: "ガバクラFinOps｜コスト2.3倍→3割削減の打ち手｜GCInsight",
+    title: "ガバメントクラウド コスト削減30%の実践手順【2026年最新】FinOps完全ガイド｜GCInsight",
     description:
-      "移行後コスト平均2.3倍・最大5.7倍。同規模自治体と比較診断し、FinOps運用最適化の具体策を無料PDFで提供。",
+      "移行後コスト平均2.3倍・最大5.7倍。検証環境夜間停止で60%削減、基盤再選定で30%削減の具体策を自治体規模別に解説。無料PDF付き。",
     images: [
       {
         url: `/og?title=${encodeURIComponent("FinOps コスト最適化")}&subtitle=${encodeURIComponent("コスト2.3倍→3割削減の打ち手")}&type=cost`,
@@ -76,14 +76,13 @@ export default async function FinopsPage() {
       {/* SSR テキストブロック: Googlebotが初回HTMLでコンテンツを読めるようにする */}
       <section className="max-w-4xl mx-auto space-y-4 mb-6">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--color-text-primary)" }}>
-          ガバクラFinOps｜自治体のクラウドコスト最適化
+          ガバメントクラウド コスト削減30%の実践手順【2026年最新】FinOps完全ガイド
         </h1>
         <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-          ガバメントクラウド移行後の運用コストは平均2.3倍に増加（中核市市長会調査）。
-          935団体が特定移行支援として期限延長を認定された今、同規模自治体との比較診断で
-          コスト適正水準を把握し、FinOps運用最適化の具体策を無料PDFで提供します。
-          移行済み自治体は検証環境の夜間停止やストレージ階層化で最大60%のコスト削減、
-          未移行自治体はAWS以外（OCI・さくら等）の基盤再選定でコスト比較が可能です。
+          ガバメントクラウド移行後の運用コストは平均2.3倍・最大5.7倍に増加（中核市市長会調査）。
+          935団体が特定移行支援として期限延長を認定された今、自治体規模別の具体策を解説。
+          移行済みは検証環境の夜間停止・ストレージ階層化で最大60%のコスト削減、
+          未移行はAWS以外（OCI・さくら等）の基盤再選定で30%削減が可能です。実績データ付き無料PDFを提供。
         </p>
       </section>
       <Suspense fallback={<FinopsLoading />}>
