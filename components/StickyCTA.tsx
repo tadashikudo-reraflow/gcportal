@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import standardizationData from "@/public/data/standardization.json";
 import { Search } from "lucide-react";
 
@@ -187,10 +188,9 @@ export default function StickyCTA() {
             )}
           </div>
 
-          {/* 無料レポートボタン */}
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
+          {/* ニュースレター登録ボタン */}
+          <Link
+            href="/finops"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -204,12 +204,11 @@ export default function StickyCTA() {
               borderRadius: 8,
               whiteSpace: "nowrap",
               flexShrink: 0,
-              border: "none",
-              cursor: "pointer",
+              textDecoration: "none",
             }}
           >
-            無料レポート
-          </button>
+            無料登録
+          </Link>
         </div>
       </div>
     </div>
