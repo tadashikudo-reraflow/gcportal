@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Download } from "lucide-react";
+import { Search, Mail } from "lucide-react";
 
 type Municipality = {
   prefecture: string;
@@ -161,16 +161,15 @@ export default function HeroSection({
 
         {/* #6 CTA — プライマリ/セカンダリ視覚差 */}
         <div className="hero-cta-row">
-          {/* プライマリ: filled, large */}
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent("openPdfModal"))}
+          {/* プライマリ: ニュースレター登録 */}
+          <Link
+            href="/finops"
             className="btn-cta-primary"
-            style={{ border: "none", cursor: "pointer" }}
+            style={{ textDecoration: "none" }}
           >
-            <Download size={16} aria-hidden="true" />
-            無料レポート（PDF）
-          </button>
+            <Mail size={16} aria-hidden="true" />
+            ニュースレターに登録（無料）
+          </Link>
           {/* セカンダリ: ghost/text */}
           <Link href="/articles" className="btn-ghost">
             コラム・解説を読む

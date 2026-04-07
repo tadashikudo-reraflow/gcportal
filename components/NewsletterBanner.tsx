@@ -63,7 +63,7 @@ export default function NewsletterBanner() {
           ガバクラ・自治体DXの最新動向を週1でお届け
         </p>
         <p className="text-xs mt-1" style={{ color: "#4B6A8A" }}>
-          自治体職員・ベンダー・コンサル 3,000+ 読者。いつでも解除できます。
+          自治体職員・ITベンダー・コンサル向け。いつでも解除できます。
         </p>
       </div>
       <form onSubmit={handleSubmit} className="px-6 pb-5 space-y-2">
