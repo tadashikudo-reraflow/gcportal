@@ -108,6 +108,49 @@ async function sendPdfEmail({
   }
 }
 
+/** Resend: ニュースレター登録ウェルカムメール */
+async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "GCInsight編集部 <noreply@gcinsight.jp>",
+      to: email,
+      subject: "ニュースレター登録ありがとうございます｜GCInsight",
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1f2937">
+<p style="font-size:20px;font-weight:bold;margin-bottom:8px;color:#00338D">
+  📬 GCInsightニュースレターへようこそ
+</p>
+<p>ガバメントクラウド・自治体情報システム標準化の最新動向を、毎週まとめてお届けします。</p>
+<p><strong>お届けする内容：</strong></p>
+<ul style="padding-left:20px;line-height:1.8">
+  <li>総務省・デジタル庁の最新動向</li>
+  <li>全国1,741自治体の移行進捗データ更新</li>
+  <li>ベンダー・クラウド動向の分析</li>
+  <li>コスト・FinOps関連の事例・解説</li>
+</ul>
+<p style="margin-top:24px">
+  ▶ <a href="https://gcinsight.jp" style="color:#2563eb;font-weight:bold">ダッシュボードで今すぐデータを確認する →</a>
+</p>
+<p style="margin-top:32px;font-size:12px;color:#6b7280">
+  配信停止はいつでも可能です。<a href="https://gcinsight.jp/unsubscribe" style="color:#6b7280">こちらから解除</a>
+</p>
+<p>GCInsight編集部</p>
+</div>`,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    console.error("sendNewsletterWelcomeEmail error:", res.status, JSON.stringify(body));
+  }
+}
+
 /** Resend メール通知 (RESEND_API_KEY + NOTIFY_EMAIL が設定されている場合のみ) */
 async function notifyEmail({
   email,
@@ -227,15 +270,17 @@ export async function POST(req: NextRequest) {
     // PDFトラッキングURL生成（HMAC署名付き）
     const trackingUrl = generatePdfTrackingUrl(data.id);
 
-    // PDF配信はレポート系ソースのみ（ニュースレター登録には送らない）
-    const isPdfSource = !effectiveSource.startsWith("newsletter");
+    // ソース別メール分岐: newsletter系はウェルカムメール / それ以外はPDF配信
+    const isNewsletterSource = effectiveSource.startsWith("newsletter");
 
-    // 通知: Slack / 管理者メール / Telegram + PDF配信（並列実行）
+    // 通知: Slack / 管理者メール / Telegram + ユーザーメール（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      ...(isPdfSource ? [sendPdfEmail({ email, trackingUrl })] : []),
+      isNewsletterSource
+        ? sendNewsletterWelcomeEmail({ email })
+        : sendPdfEmail({ email, trackingUrl }),
     ]);
 
     return NextResponse.json({ success: true, lead: data });
