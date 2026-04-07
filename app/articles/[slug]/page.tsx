@@ -7,7 +7,7 @@ import { getClusterForTags } from "@/lib/clusters";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
-import ArticlePdfDownloadBanner from "@/components/ArticlePdfDownloadBanner";
+import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BookOpen } from "lucide-react";
 
@@ -133,8 +133,6 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </div>
 
-      <ArticlePdfDownloadBanner articleTitle={article.title} slug={slug} />
-
       <MermaidRenderer
         html={article.contentHtml}
         className="card p-6 prose-article"
@@ -193,7 +191,7 @@ export default async function ArticlePage({ params }: Props) {
         );
       })()}
 
-      <ArticlePdfDownloadBanner articleTitle={article.title} slug={slug} />
+      <ArticleNewsletterBanner />
 
       <div className="flex items-center justify-between pt-2">
         <Link href="/articles" className="text-sm font-semibold hover:underline"
