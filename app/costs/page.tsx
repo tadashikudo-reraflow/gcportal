@@ -63,13 +63,13 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】｜GCInsight",
+  title: "ガバメントクラウド移行コストは本当に削減できるか？自治体別試算と削減策【2026年最新】｜GCInsight",
   description:
-    "ガバメントクラウド移行コストが平均2.3倍（中核市市長会調査）に増加。TKC・富士通・NEC・日立のコスト指数と費用対効果をベンダー別に比較分析。",
+    "政府目標−30%に対し実態は平均+156%（中核市市長会調査）。R6検証事業8団体データ・ベンダー別コスト比較（TKC/RKKCS/富士通/NEC）・ネットワーク費・SaaS構築費の費用内訳を公開。自治体規模別の削減策付き。",
   openGraph: {
-    title: "ガバメントクラウド移行コスト分析",
+    title: "ガバメントクラウド移行コスト分析【2026年最新】",
     description:
-      "移行コストが平均2.3倍（中核市市長会調査）に増加。ベンダー別コスト比較と費用対効果を可視化。",
+      "政府目標−30%→実態+156%。R6検証8団体データ・ベンダー別コスト比較・費用内訳を自治体規模別に公開。",
     images: [
       {
         url: `/og?title=${encodeURIComponent("コスト分析")}&subtitle=${encodeURIComponent("ガバメントクラウド移行コスト増減を可視化")}&type=cost`,
@@ -276,6 +276,14 @@ export default async function CostsPage() {
           text: "主要因は3つです。(1)クラウド利用料（AWS寡占97%で価格競争が働かない）、(2)回線費・通信費（庁内LAN→東京リージョン集約に伴う費用増）、(3)移行期間中のオンプレとクラウドの二重運用コストです。",
         },
       },
+      {
+        "@type": "Question",
+        name: "デジタル庁が示す「コスト4%削減」の根拠は正しいですか？",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "デジタル庁のR6検証事業では好条件8団体で推奨構成適用時のランニングコストが平均+8%増（現行継続比）と試算されています。一方、移行費込み・全体集計の中核市市長会調査では実態平均+2.3倍（+130%）。計測対象・コスト範囲・比較基準が異なるため、単純比較はできません。多くの自治体では移行費・回線費・SaaS構築費を含めると増加が避けられない状況です。",
+        },
+      },
     ],
   };
 
@@ -454,9 +462,44 @@ export default async function CostsPage() {
         ) : (
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
-        <p className="text-xs text-gray-400 mt-3">
-          ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
-        </p>
+        {/* クラウド基盤別コスト傾向（インライン）— /cloudへのQuickBack防止 */}
+        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold text-gray-700 mb-2">クラウド基盤別 コスト傾向まとめ</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              {
+                cloud: "AWS",
+                share: "97%",
+                costRange: "+1.3〜3.0倍",
+                badge: "bg-orange-100 text-orange-700",
+                note: "シェア最大。価格競争が働きにくく割高になりやすい。富士通/NEC/日立が主力。",
+              },
+              {
+                cloud: "OCI（Oracle）",
+                share: "〜2%",
+                costRange: "+1.0〜1.5倍",
+                badge: "bg-red-100 text-red-700",
+                note: "円建て課金・データ転送10TB/月無料。RKKCS採用。札幌市32業務（2025年4月）。",
+              },
+              {
+                cloud: "さくら・国内",
+                share: "〜1%",
+                costRange: "試算中",
+                badge: "bg-purple-100 text-purple-700",
+                note: "2026年に政府認定取得済み。競合圧力による価格抑制効果に期待。",
+              },
+            ].map((item) => (
+              <div key={item.cloud} className="rounded-md border border-gray-200 bg-white px-3 py-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.badge}`}>{item.cloud}</span>
+                  <span className="text-[10px] text-gray-400">シェア {item.share}</span>
+                </div>
+                <p className="text-xs font-bold text-gray-800 mb-0.5">コスト比 {item.costRange}</p>
+                <p className="text-[11px] text-gray-500 leading-relaxed">{item.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* R6検証事業 団体別コスト比較（図解） */}
