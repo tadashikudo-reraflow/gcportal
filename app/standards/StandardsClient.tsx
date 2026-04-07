@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
 
 interface Standard {
   no: number;
@@ -94,9 +93,9 @@ export default function StandardsClient({ standards }: { standards: Standard[] }
         {filtered.length}件表示
       </p>
 
-      {/* テーブル（PC） */}
-      <div className="hidden sm:block" style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem" }}>
+      {/* テーブル（横スクロール対応） */}
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.875rem", minWidth: 480 }}>
           <thead>
             <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
               {["No.", "業務名", "所管省庁", "標準仕様書名", "最新版", "公表"].map((h) => (
@@ -118,14 +117,11 @@ export default function StandardsClient({ standards }: { standards: Standard[] }
           </thead>
           <tbody>
             {filtered.map((s) => (
-              <tr
-                key={s.no}
-                style={{ borderBottom: "1px solid var(--color-border)" }}
-              >
+              <tr key={s.no} style={{ borderBottom: "1px solid var(--color-border)" }}>
                 <td style={{ padding: "10px 12px", color: "var(--color-text-muted)", fontVariantNumeric: "tabular-nums" }}>
                   {s.no}
                 </td>
-                <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--color-text-primary)" }}>
+                <td style={{ padding: "10px 12px", fontWeight: 600, color: "var(--color-text-primary)", whiteSpace: "nowrap" }}>
                   {s.business}
                 </td>
                 <td style={{ padding: "10px 12px" }}>
@@ -143,14 +139,7 @@ export default function StandardsClient({ standards }: { standards: Standard[] }
                   </span>
                 </td>
                 <td style={{ padding: "10px 12px", color: "var(--color-text-secondary)" }}>
-                  <Link
-                    href={s.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "var(--color-brand-secondary)", textDecoration: "none" }}
-                  >
-                    {s.spec_name} ↗
-                  </Link>
+                  {s.spec_name}
                 </td>
                 <td style={{ padding: "10px 12px", whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums", fontWeight: 600 }}>
                   {s.latest_version}
@@ -162,48 +151,6 @@ export default function StandardsClient({ standards }: { standards: Standard[] }
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* カード（モバイル） */}
-      <div className="sm:hidden" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {filtered.map((s) => (
-          <div
-            key={s.no}
-            style={{
-              border: "1px solid var(--color-border)",
-              borderRadius: 10,
-              padding: "14px 16px",
-              backgroundColor: "var(--color-surface)",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: "var(--color-text-primary)" }}>
-                {s.business}
-              </span>
-              <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>#{s.no}</span>
-            </div>
-            <span style={{
-              display: "inline-block",
-              padding: "2px 8px",
-              borderRadius: 4,
-              fontSize: "0.75rem",
-              fontWeight: 600,
-              backgroundColor: `${getMinistryColor(s.ministry)}18`,
-              color: getMinistryColor(s.ministry),
-              marginBottom: 8,
-            }}>
-              {s.ministry}
-            </span>
-            <p style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)", marginBottom: 4 }}>
-              <Link href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-brand-secondary)", textDecoration: "none" }}>
-                {s.spec_name} ↗
-              </Link>
-            </p>
-            <p style={{ fontSize: "0.8125rem", color: "var(--color-text-muted)" }}>
-              {s.latest_version}　{s.published}
-            </p>
-          </div>
-        ))}
       </div>
 
       {filtered.length === 0 && (
