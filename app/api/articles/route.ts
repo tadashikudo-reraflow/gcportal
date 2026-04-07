@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
+import matter from "gray-matter";
 
 /**
  * POST /api/articles — 記事作成（gc-article Agent / 外部ツール用）
@@ -51,13 +52,16 @@ export async function POST(req: NextRequest) {
     serviceKey
   );
 
+  // YAMLフロントマターをstrip（gc-articleエージェントがMDファイルをそのまま渡した場合の保険）
+  const { content: markdownBody } = matter(content);
+
   // Markdown → HTML 変換（API経由は常にMDを受け取りHTMLで保存）
   // ⚠️ sanitize: false 必須 — Mermaid コードブロック等のHTMLタグを保持するため。
   // true にすると Mermaid 図・テーブル等のHTMLが除去されて表示が壊れる。
   const processed = await remark()
     .use(remarkGfm)
     .use(remarkHtml, { sanitize: false })
-    .process(content);
+    .process(markdownBody);
   const contentHtml = processed.toString();
 
   // upsert: 同じslugがあれば更新、なければ新規作成
