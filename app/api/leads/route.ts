@@ -227,12 +227,15 @@ export async function POST(req: NextRequest) {
     // PDFトラッキングURL生成（HMAC署名付き）
     const trackingUrl = generatePdfTrackingUrl(data.id);
 
+    // PDF配信はレポート系ソースのみ（ニュースレター登録には送らない）
+    const isPdfSource = !effectiveSource.startsWith("newsletter");
+
     // 通知: Slack / 管理者メール / Telegram + PDF配信（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      sendPdfEmail({ email, trackingUrl }),
+      ...(isPdfSource ? [sendPdfEmail({ email, trackingUrl })] : []),
     ]);
 
     return NextResponse.json({ success: true, lead: data });

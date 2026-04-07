@@ -4,6 +4,7 @@ import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
 import PdfCTAButton from "@/components/PdfCTAButton";
+import NewsletterBanner from "@/components/NewsletterBanner";
 import HeroSection from "@/components/HeroSection";
 import JapanMap from "@/components/JapanMap";
 import SourceAttribution from "@/components/SourceAttribution";
@@ -131,6 +132,9 @@ export default function DashboardPage() {
         completedSystems={migrationStats.completed_systems}
         totalSystems={migrationStats.total_systems}
       />
+
+      {/* ========== ニュースレター登録バナー ========== */}
+      <NewsletterBanner />
 
       {/* ========== 日本地図ヒートマップ（ThreeMetrics直後） ========== */}
       <div>
