@@ -31,6 +31,7 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
+      { href: "/standards",  label: "標準仕様書", desc: "" },
       { href: "/packages",   label: "パッケージ", desc: "" },
       { href: "/timeline",   label: "スケジュール", desc: "" },
       { href: "/sources",    label: "出典", desc: "" },
@@ -71,6 +72,7 @@ const DRAWER_SECTIONS = [
   {
     title: "調べる",
     items: [
+      { href: "/standards",  label: "標準仕様書" },
       { href: "/packages",   label: "パッケージ" },
       { href: "/timeline",   label: "スケジュール" },
       { href: "/sources",    label: "出典" },
