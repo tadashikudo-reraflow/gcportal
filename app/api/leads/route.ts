@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { LATEST_SLUG } from "@/app/members/reports";
 
 const BASE_URL = "https://gcinsight.jp";
 
@@ -113,6 +114,8 @@ async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
+  const memberReportUrl = `${BASE_URL}/members/${LATEST_SLUG}`;
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -128,7 +131,12 @@ async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
   📬 GCInsightニュースレターへようこそ
 </p>
 <p>ガバメントクラウド・自治体情報システム標準化の最新動向を、毎週まとめてお届けします。</p>
-<p><strong>お届けする内容：</strong></p>
+<p style="margin-top:20px"><strong>🔒 登録特典：最新限定レポートを無料でプレゼント</strong></p>
+<p style="margin-bottom:16px">会員限定コンテンツとして、最新の深掘りレポートをご用意しています。</p>
+<p style="margin-bottom:24px">
+  ▶ <a href="${memberReportUrl}" style="color:#2563eb;font-weight:bold">限定レポートを読む（会員専用URL）→</a>
+</p>
+<p><strong>今後お届けする内容：</strong></p>
 <ul style="padding-left:20px;line-height:1.8">
   <li>総務省・デジタル庁の最新動向</li>
   <li>全国1,741自治体の移行進捗データ更新</li>
@@ -139,7 +147,8 @@ async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
   ▶ <a href="https://gcinsight.jp" style="color:#2563eb;font-weight:bold">ダッシュボードで今すぐデータを確認する →</a>
 </p>
 <p style="margin-top:32px;font-size:12px;color:#6b7280">
-  配信停止はいつでも可能です。<a href="https://gcinsight.jp/unsubscribe" style="color:#6b7280">こちらから解除</a>
+  配信停止はいつでも可能です。<a href="https://gcinsight.jp/unsubscribe" style="color:#6b7280">こちらから解除</a><br>
+  ※限定レポートのURLは第三者への共有はご遠慮ください。
 </p>
 <p>GCInsight編集部</p>
 </div>`,
