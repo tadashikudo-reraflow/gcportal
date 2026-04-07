@@ -416,6 +416,50 @@ export default async function CostsPage() {
           );
         })()}
 
+        {/* 費用項目別内訳 */}
+        <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold text-gray-700 mb-3">コスト増加の主な費用項目</p>
+          <div className="space-y-2">
+            {[
+              {
+                label: "クラウド利用料",
+                pct: "約40〜50%",
+                color: "#EF4444",
+                note: "AWS寡占97%で価格競争が働きにくい。EC2・RDS・S3等の合計。Reserved Instance活用で削減余地あり。",
+              },
+              {
+                label: "ネットワーク・回線費",
+                pct: "約20〜30%",
+                color: "#F97316",
+                note: "庁内LAN→東京/大阪リージョン集約に伴うWAN回線増強費。移行後も発生し続ける固定費。",
+              },
+              {
+                label: "SaaS構築・カスタマイズ費",
+                pct: "約15〜25%",
+                color: "#EAB308",
+                note: "標準仕様に合わせたシステム改修・データ移行・テスト費用。自治体固有の業務フローで膨らみやすい。",
+              },
+              {
+                label: "運用保守費（人件費含む）",
+                pct: "約10〜20%",
+                color: "#6B7280",
+                note: "クラウド運用の専門人材不足により外部委託コストが増加。移行期間中はオンプレとの二重運用も発生。",
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full mt-1.5" style={{ backgroundColor: item.color }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-xs font-semibold text-gray-800">{item.label}</span>
+                    <span className="text-[11px] font-bold tabular-nums" style={{ color: item.color }}>{item.pct}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 leading-relaxed mt-0.5">{item.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-3">※ 比率は中核市市長会調査・デジタル庁R6検証事業・総務省地方財政調査をもとにした推計。自治体規模・ベンダーにより大きく異なる。</p>
+        </div>
       </div>
 
       {/* コスト変化実績（カード形式） */}
