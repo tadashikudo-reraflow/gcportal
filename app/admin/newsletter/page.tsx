@@ -73,8 +73,11 @@ function CampaignRow({ c }: { c: Campaign }) {
         borderBottom: "1px solid #f3f4f6",
       }}
     >
-      {/* 左: 件名 + 日付 */}
-      <div style={{ minWidth: 0, flex: 1 }}>
+      {/* 左: 件名 + 日付（クリックで編集/詳細へ） */}
+      <Link
+        href={c.status === "sent" ? `/admin/newsletter/${c.id}` : `/admin/newsletter/compose?id=${c.id}`}
+        style={{ minWidth: 0, flex: 1, textDecoration: "none", cursor: "pointer" }}
+      >
         <p style={{
           fontSize: 15,
           color: "#111111",
@@ -94,7 +97,7 @@ function CampaignRow({ c }: { c: Campaign }) {
               })}`
             : `作成: ${new Date(c.created_at).toLocaleDateString("ja-JP")}`}
         </p>
-      </div>
+      </Link>
 
       {/* 右: 統計 + アクション */}
       <div style={{ display: "flex", alignItems: "center", gap: 20, flexShrink: 0, marginLeft: 24 }}>
