@@ -568,12 +568,11 @@ export default async function CostsPage() {
           </p>
           <div className="grid grid-cols-3 gap-1.5">
             {[
-              { icon: "🎯", label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
-              { icon: "📦", label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
-              { icon: "📏", label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
-            ].map(({ icon, label, r6, survey }) => (
+              { label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
+              { label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
+              { label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
+            ].map(({ label, r6, survey }) => (
               <div key={label} className="rounded-lg p-2 text-center" style={{ backgroundColor: "#fff8ed" }}>
-                <p className="text-base mb-0.5">{icon}</p>
                 <p className="text-[11px] font-bold mb-1.5" style={{ color: "#92400e" }}>{label}</p>
                 <div className="space-y-1">
                   <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#dbeafe" }}>

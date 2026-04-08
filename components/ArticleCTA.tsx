@@ -15,7 +15,7 @@ export default function ArticleCTA({ cluster }: Props) {
       }}
     >
       <div className="flex items-start gap-3">
-        <span className="text-xl flex-shrink-0 mt-0.5">📊</span>
+        <span className="text-xl flex-shrink-0 mt-0.5 font-bold" style={{ color: "var(--color-brand-primary, #1a365d)" }}>▶</span>
         <div className="space-y-2">
           <p
             className="text-sm font-semibold"

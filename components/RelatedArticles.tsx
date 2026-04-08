@@ -43,7 +43,6 @@ export default async function RelatedArticles({
         className="text-base font-bold mb-4 flex items-center gap-2"
         style={{ color: "var(--color-text-primary)" }}
       >
-        <span>📖</span>
         {cluster.label} 関連コラム
       </h2>
 

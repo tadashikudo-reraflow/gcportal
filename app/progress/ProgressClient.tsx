@@ -465,7 +465,6 @@ function NationalOverview({
           }}
         >
           <div className="flex items-center gap-2">
-            <span className="text-base">⚠️</span>
             <span className="text-sm font-semibold" style={{ color: "#DC2626" }}>
               {criticalCount}自治体が危機状態
             </span>

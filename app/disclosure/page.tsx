@@ -41,25 +41,21 @@ async function getRecentResults(): Promise<RecentResult[]> {
 const HOW_IT_WORKS = [
   {
     step: "01",
-    icon: "📝",
     title: "リクエストを送る",
     desc: "フォームで「こんな情報が欲しい」を送信。",
   },
   {
     step: "02",
-    icon: "🔍",
     title: "編集部が審査・提出",
     desc: "公開価値があると判断した場合、編集部がデジタル庁へ代理提出します。",
   },
   {
     step: "03",
-    icon: "⏳",
     title: "30日以内に決定",
     desc: "デジタル庁が原則30日以内に開示・不開示を通知。",
   },
   {
     step: "04",
-    icon: "📢",
     title: "GCInsightで公開",
     desc: "開示文書をもとにした分析記事をサイトで公開します。",
   },
@@ -136,7 +132,7 @@ export default async function DisclosurePage() {
                 </div>
                 <div>
                   <p className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>
-                    {item.icon} {item.title}
+                    {item.title}
                   </p>
                   <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
                     {item.desc}
