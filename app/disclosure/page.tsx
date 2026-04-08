@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
+import { Send, Search, Clock, FileText } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 import DisclosureRequestForm from "@/components/DisclosureRequestForm";
 import DisclosureTabs from "@/components/DisclosureTabs";
@@ -41,21 +42,25 @@ async function getRecentResults(): Promise<RecentResult[]> {
 const HOW_IT_WORKS = [
   {
     step: "01",
+    Icon: Send,
     title: "リクエストを送る",
     desc: "フォームで「こんな情報が欲しい」を送信。",
   },
   {
     step: "02",
+    Icon: Search,
     title: "編集部が審査・提出",
     desc: "公開価値があると判断した場合、編集部がデジタル庁へ代理提出します。",
   },
   {
     step: "03",
+    Icon: Clock,
     title: "30日以内に決定",
     desc: "デジタル庁が原則30日以内に開示・不開示を通知。",
   },
   {
     step: "04",
+    Icon: FileText,
     title: "GCInsightで公開",
     desc: "開示文書をもとにした分析記事をサイトで公開します。",
   },
@@ -122,13 +127,13 @@ export default async function DisclosurePage() {
             >
               <div className="flex items-start gap-3">
                 <div
-                  className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                  className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
                   style={{
                     backgroundColor: "#EFF6FF",
                     color: "var(--color-brand-primary)",
                   }}
                 >
-                  {item.step}
+                  <item.Icon size={16} />
                 </div>
                 <div>
                   <p className="text-sm font-bold mb-1" style={{ color: "var(--color-text-primary)" }}>

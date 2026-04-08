@@ -2,6 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, Suspense } from "react";
+import { AlertTriangle } from "lucide-react";
 import JapanMap from "@/components/JapanMap";
 import type {
   ProgressData,
@@ -465,6 +466,7 @@ function NationalOverview({
           }}
         >
           <div className="flex items-center gap-2">
+            <AlertTriangle size={16} style={{ color: "#DC2626", flexShrink: 0 }} />
             <span className="text-sm font-semibold" style={{ color: "#DC2626" }}>
               {criticalCount}自治体が危機状態
             </span>

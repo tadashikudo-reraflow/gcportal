@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { COST_CONSTANTS } from "@/lib/constants";
 import type { ArticleMeta } from "@/lib/articles";
 import PdfLeadForm from "@/components/PdfLeadForm";
@@ -181,7 +182,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             ))}
           </div>
           <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B", color: "#92400E" }}>
-            <strong>注意: FinOps は「移行後の運用最適化」に効く手法です。</strong>
+            <span className="flex items-center gap-1.5 mb-1"><AlertTriangle size={15} /><strong>FinOps は「移行後の運用最適化」に効く手法です。</strong></span>
             移行前の基盤選定ミスや回線費の構造問題は、FinOps だけでは解決できません。
             このページでは、<strong>移行済み・未移行それぞれの打ち手</strong>を整理しています。
           </div>
