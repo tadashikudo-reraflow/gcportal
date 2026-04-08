@@ -81,6 +81,12 @@ export async function PATCH(
   const updates: Record<string, unknown> = {};
   if (typeof body.subject === "string") updates.subject = body.subject.trim();
   if (typeof body.body_html === "string") updates.body_html = body.body_html;
+  if (typeof body.scheduled_at === "string" || body.scheduled_at === null) {
+    updates.scheduled_at = body.scheduled_at;
+  }
+  if (body.status === "scheduled" || body.status === "draft") {
+    updates.status = body.status;
+  }
   updates.updated_at = new Date().toISOString();
 
   const supabase = getSupabase();
