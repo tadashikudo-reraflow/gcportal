@@ -14,8 +14,8 @@ const tokuteiSet = new Set(
 );
 
 export const metadata: Metadata = {
-  title: "標準化20業務の移行進捗一覧｜住民記録・税務・福祉【2026年最新】｜GCInsight",
-  description: "ガバメントクラウド移行対象の20業務（住民記録・税務・福祉等）の進捗率・遅延状況を業務別に可視化。全国1,741自治体の業務別完了率を1ページで比較。",
+  title: "完了率が最も低い業務は？ガバメントクラウド20業務の移行進捗ランキング【全国比較】｜GCInsight",
+  description: "ガバメントクラウド移行対象の20業務を完了率が低い順にランキング表示。全国1,741自治体の業務別データをもとに、遅延が深刻な業務・進捗が進んでいる業務を一目で比較できます。",
   alternates: { canonical: "/businesses" },
 };
 
@@ -57,9 +57,9 @@ export default function BusinessesPage() {
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "業務別の進捗" }]} />
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="page-title">業務別 標準化進捗</h1>
+        <h1 className="page-title">ガバメントクラウド移行 20業務 進捗ランキング</h1>
         <p className="page-subtitle">
-          全20業務の手続き進捗率を低い順に表示（全{data.summary.total.toLocaleString()}団体対象）
+          完了率が低い業務から順に表示 — 全{data.summary.total.toLocaleString()}自治体のデータをもとに業務別の遅延状況を可視化
         </p>
         <div className="mt-2 flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-white" style={{ backgroundColor: "#64748B", fontSize: 10, fontWeight: 700 }}>特定移行</span>
