@@ -19,7 +19,7 @@
     },
     {
       "path": "/api/newsletter/cron-send",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
