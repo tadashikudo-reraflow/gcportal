@@ -36,7 +36,7 @@ const CLOUD_CONFIG: Record<string, {
   OCI:    { color: "#F80000", label: "Oracle Cloud Infrastructure", certYear: 2022, infraPct: "<1%",  costIndex: 55  },
   Azure:  { color: "#0078D4", label: "Microsoft Azure",             certYear: 2021, infraPct: "2%",   costIndex: 95  },
   GCP:    { color: "#4285F4", label: "Google Cloud Platform",       certYear: 2021, infraPct: "<1%",  costIndex: 90  },
-  Sakura: { color: "#E2004B", label: "さくらインターネット",         certYear: 2024, infraPct: "<1%",  costIndex: 70  },
+  Sakura: { color: "#E2004B", label: "さくらインターネット",         certYear: 2026, infraPct: "<1%",  costIndex: 70  },
 };
 const CLOUD_ORDER = ["AWS", "OCI", "Azure", "GCP", "Sakura"];
 
