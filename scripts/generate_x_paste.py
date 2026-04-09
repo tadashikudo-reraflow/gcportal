@@ -232,6 +232,48 @@ def render_blocks_to_png(blocks, slug, tmp_dir: Path):
 
     return [p for p in png_paths if Path(p).exists()]
 
+# ── URLバリデーション ──────────────────────────────────────────────
+
+def validate_article_urls(article: dict) -> list:
+    """
+    記事HTMLコンテンツ内の外部URLをHTTPリクエストで検証する。
+    戻り値: [{"url": str, "status": int|None, "ok": bool, "error": str|None}]
+    """
+    content = article.get("content", "")
+    # href="https://..." を抽出（内部リンク / 始まりは除外）
+    urls = re.findall(r'href="(https?://[^"]+)"', content)
+    # 重複除去（順序保持）
+    seen = set()
+    unique_urls = []
+    for url in urls:
+        if url not in seen:
+            seen.add(url)
+            unique_urls.append(url)
+
+    results = []
+    session_headers = {"User-Agent": "GCInsight-LinkChecker/1.0"}
+
+    for url in unique_urls:
+        status = None
+        ok = False
+        error = None
+        try:
+            resp = requests.head(url, timeout=5, allow_redirects=True, headers=session_headers)
+            status = resp.status_code
+            if status == 405:
+                # HEAD を拒否するサーバー向けフォールバック
+                resp = requests.get(url, timeout=5, stream=True, headers=session_headers)
+                status = resp.status_code
+            ok = 200 <= status < 400
+        except Exception as e:
+            error = str(e)
+            ok = False
+
+        results.append({"url": url, "status": status, "ok": ok, "error": error})
+
+    return results
+
+
 # ── カバー画像生成（Gemini直接生成）────────────────────────────────
 
 X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 — サイト表示・X投稿の両方で使用
@@ -427,6 +469,17 @@ def process_article(article, no_push=False, open_browser=True):
                 print(f"  ✅ x-articles/id{article['id']}/{fname}")
     else:
         print("  (図解ブロックなし)")
+
+    # URLバリデーション
+    url_results = validate_article_urls(article)
+    broken = [r for r in url_results if not r["ok"]]
+    if broken:
+        print(f"  ⚠️  壊れたURL {len(broken)}件:")
+        for r in broken:
+            print(f"     [{r['status'] or 'ERR'}] {r['url']}")
+        print("     → 処理は続行します（公開後に手動修正が必要）")
+    else:
+        print(f"  ✅ 外部URL {len(url_results)}件 すべてOK")
 
     # カバー画像生成（Grok+HTML+Playwright）
     cover_fname = generate_cover_image(article)
