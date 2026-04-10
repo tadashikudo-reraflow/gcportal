@@ -96,12 +96,14 @@ export default function ScheduleClient({ data }: Props) {
 
   const t = today();
 
-  // Filter events
-  const filteredEvents = data.recent_schedule.filter((ev) => {
-    if (filter === "upcoming") return ev.date >= t;
-    if (filter === "done") return ev.date < t || ev.status === "done";
-    return true;
-  });
+  // Filter events（新しい順）
+  const filteredEvents = data.recent_schedule
+    .filter((ev) => {
+      if (filter === "upcoming") return ev.date >= t;
+      if (filter === "done") return ev.date < t || ev.status === "done";
+      return true;
+    })
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   const grouped = groupByMonth(filteredEvents);
 

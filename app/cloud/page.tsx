@@ -339,14 +339,14 @@ export default async function CloudPage() {
           <div className="border-l-2 pl-3 py-1" style={{ borderColor: "#7FB8E6" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>OCI（財布型）</p>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、初期見積もりが過剰だと未使用失効リスクがある。
+              年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、<span className="font-semibold px-1 rounded" style={{ backgroundColor: "#fef3c7", color: "#b45309" }}>⚠ 初期見積もりが過剰だと未使用失効リスクがある</span>。
             </p>
           </div>
 
           <div className="border-l-2 pl-3 py-1" style={{ borderColor: "var(--color-border)" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>AWS / Azure / GCP / さくら（予約型）</p>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで該当リソースを削減すると余ったコミット分が無駄になる。サービスをまたいだ最適化はできない。
+              EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで<span className="font-semibold px-1 rounded" style={{ backgroundColor: "#fef3c7", color: "#b45309" }}>⚠ 該当リソースを削減すると余ったコミット分が無駄になる</span>。サービスをまたいだ最適化はできない。
             </p>
           </div>
         </div>
@@ -440,51 +440,52 @@ export default async function CloudPage() {
       {/* 自治体向け CSP 採用ポイント */}
       <div className="card p-5">
         <div className="flex items-baseline gap-2 mb-1">
-          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント</h2>
+          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント比較</h2>
         </div>
-        <p className="text-xs mb-5" style={{ color: "var(--color-text-muted)" }}>コスト・運用・調達の観点から、各CSPの特徴と向いているケースをまとめました</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            {
-              name: "AWS", color: "#FF9900",
-              points: ["パッケージベンダー対応数が最多・実績豊富", "コミュニティ・事例・ドキュメントが最も充実", "設定・予測管理が複雑。専任担当者が必要"],
-              fit: "IT体制が整った中〜大規模自治体",
-            },
-            {
-              name: "OCI", color: "#F80000",
-              points: ["財布型でサービス横断の最適化を進めやすい", "円建て・転送料無料でコスト予測が立てやすい"],
-              fit: "単年予算・管理負担を最小にしたい自治体",
-            },
-            {
-              name: "Azure", color: "#0078D4",
-              points: ["Microsoft 365・AD・Teamsとの統合が強み", "庁内系システムとの連携で本領発揮"],
-              fit: "Microsoft製品を庁内で広く使っている自治体",
-            },
-            {
-              name: "GCP", color: "#4285F4",
-              points: ["Vertex AI / Gemini でAI活用が最も容易", "Google Workspace との深い統合", "ガバクラ採用実績は少数（国内シェア0.7%）"],
-              fit: "AI活用を積極的に推進したい自治体",
-            },
-            {
-              name: "さくら", color: "#E2004B",
-              points: ["国産クラウド・国内DC・ガバメントクラウド正式採択（国産初）", "データ主権・運用主権を国内で完結できる", "データ転送無料・円建て・シンプルな契約体系"],
-              fit: "データ主権・国内法準拠・運用のシンプルさを重視する自治体",
-            },
-          ].map(({ name, color, points, fit }) => (
-            <div key={name} className="rounded-xl p-4 border" style={{ borderColor: "var(--color-border)", borderTopWidth: 3, borderTopColor: color }}>
-              <p className="text-sm font-bold mb-2" style={{ color }}>{name}</p>
-              <ul className="space-y-1.5 mb-3">
-                {points.map((p) => (
-                  <li key={p} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <span className="mt-0.5 shrink-0" style={{ color: "var(--color-text-muted)" }}>•</span>{p}
-                  </li>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>データ主権の観点から各CSPを評価。◎ 優位 ／ △ 限定的 ／ ✗ 課題あり</p>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr>
+                <th className="text-left py-2 pr-4 font-medium whitespace-nowrap" style={{ color: "var(--color-text-secondary)", borderBottom: "2px solid var(--color-border)", minWidth: 140 }}>評価軸</th>
+                {(["AWS", "OCI", "Azure", "GCP", "さくら"] as const).map((csp, i) => (
+                  <th key={csp} className="text-center py-2 px-3 font-bold whitespace-nowrap" style={{
+                    borderBottom: "2px solid var(--color-border)",
+                    color: i === 4 ? "#E2004B" : ["#FF9900","#F80000","#0078D4","#4285F4"][i],
+                    backgroundColor: i === 4 ? "#fff0f4" : "transparent",
+                  }}>{csp}</th>
                 ))}
-              </ul>
-              <p className="text-xs px-2 py-1.5 rounded font-medium" style={{ backgroundColor: "var(--color-surface-container-low)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
-                向き先: {fit}
-              </p>
-            </div>
-          ))}
+              </tr>
+            </thead>
+            <tbody>
+              {([
+                { axis: "データ主権（外国法非適用）", scores: ["✗","✗","✗","✗","◎"] as const },
+                { axis: "国内データ完結",              scores: ["✗","△","✗","✗","◎"] as const },
+              ]).map(({ axis, scores }) => (
+                <tr key={axis} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                  <td className="py-2 pr-4 whitespace-nowrap font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                    <span className="mr-1 text-xs" style={{ color: "#E2004B" }}>▶</span>{axis}
+                  </td>
+                  {scores.map((score, i) => (
+                    <td key={i} className="text-center py-2 px-3 font-bold" style={{
+                      color: score === "◎" ? (i === 4 ? "#E2004B" : "#059669") : score === "○" ? "#0369a1" : score === "△" ? "#d97706" : "#9ca3af",
+                      backgroundColor: i === 4 ? "#fff8f9" : "transparent",
+                      fontSize: score === "◎" ? "0.85rem" : "0.75rem",
+                    }}>{score}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 rounded-lg p-3 border-l-2" style={{ borderColor: "#E2004B", backgroundColor: "#fff0f4" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "#E2004B" }}>さくらが特に優位なケース</p>
+          <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+            住民基本台帳・医療・税務など機微データを扱う自治体、または国内法準拠・運用コスト削減を優先する場合、
+            <strong>データ主権・転送料無料・円建て・シンプル契約</strong>の四点で唯一優位。IT専任担当者が少ない小規模自治体にも適合しやすい。
+          </p>
         </div>
       </div>
 

@@ -46,10 +46,15 @@ type Article = {
 export default function ArticlesClient({ articles }: { articles: Article[] }) {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // 全記事のタグを集計（出現順に重複除去）
-  const allTags = Array.from(
-    new Set(articles.flatMap((a) => a.tags))
-  );
+  // 全記事のタグを集計（出現頻度2以上・多い順に表示）
+  const tagCounts = articles.flatMap((a) => a.tags).reduce<Record<string, number>>((acc, tag) => {
+    acc[tag] = (acc[tag] ?? 0) + 1;
+    return acc;
+  }, {});
+  const allTags = Object.entries(tagCounts)
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 
   const filtered = selectedTag
     ? articles.filter((a) => a.tags.includes(selectedTag))

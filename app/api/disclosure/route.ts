@@ -73,6 +73,31 @@ function getSupabase() {
   );
 }
 
+async function notifyTelegram(payload: {
+  topic: string;
+  category: string;
+  municipality?: string;
+  orgType?: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+  if (!token || !chatId) return;
+  const now = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+  const lines = [
+    `📨 *新規開示請求リクエスト*`,
+    `カテゴリ: ${CATEGORY_LABELS[payload.category] ?? payload.category}`,
+    `内容: ${payload.topic}`,
+    payload.municipality ? `自治体: ${payload.municipality}` : null,
+    payload.orgType ? `所属: ${ORG_LABELS[payload.orgType] ?? payload.orgType}` : null,
+    `日時: ${now}`,
+  ].filter(Boolean).join("\n");
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text: lines, parse_mode: "Markdown" }),
+  });
+}
+
 async function notifySlack(payload: {
   topic: string;
   category: string;
@@ -142,12 +167,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "登録に失敗しました" }, { status: 500 });
     }
 
-    await notifySlack({
-      topic: topic.trim(),
-      category: cat,
-      municipality: municipality?.trim(),
-      orgType: organization_type,
-    });
+    await Promise.all([
+      notifySlack({ topic: topic.trim(), category: cat, municipality: municipality?.trim(), orgType: organization_type }),
+      notifyTelegram({ topic: topic.trim(), category: cat, municipality: municipality?.trim(), orgType: organization_type }),
+    ]);
 
     return NextResponse.json({ success: true, id: data.id });
   } catch {

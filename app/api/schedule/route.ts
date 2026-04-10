@@ -22,13 +22,17 @@ const LOG_PATH = join(process.cwd(), "public/data/schedule-log.json");
 // ---------------------------------------------------------------------------
 
 function isAuthorized(req: NextRequest): boolean {
-  const cronSecret = req.headers.get("x-cron-secret");
   const expectedCron = process.env.CRON_SECRET;
+  const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
+
+  // x-cron-secret ヘッダー（手動呼び出し用）
+  const cronSecret = req.headers.get("x-cron-secret");
   if (cronSecret && expectedCron && cronSecret === expectedCron) return true;
 
-  const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
-  const authHeader = req.headers.get("authorization")?.replace("Bearer ", "");
-  if (authHeader && adminKey && authHeader === adminKey) return true;
+  // Authorization: Bearer — Vercel Cron は CRON_SECRET を Bearer で送る
+  const bearer = req.headers.get("authorization")?.replace("Bearer ", "");
+  if (bearer && expectedCron && bearer === expectedCron) return true;
+  if (bearer && adminKey && bearer === adminKey) return true;
 
   // ローカル開発時はキーなしで許可
   if (!expectedCron && !adminKey) return true;
