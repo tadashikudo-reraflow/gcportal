@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import standardizationData from "@/public/data/standardization.json";
+import NewsletterModal from "./NewsletterModal";
 import { Search } from "lucide-react";
 
 type Municipality = {
@@ -189,9 +189,10 @@ export default function StickyCTA() {
           </div>
 
           {/* ニュースレター登録ボタン */}
-          <Link
-            href="/finops"
-            style={{
+          <NewsletterModal
+            label="無料登録"
+            source="newsletter_stickycta"
+            buttonStyle={{
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
@@ -204,11 +205,8 @@ export default function StickyCTA() {
               borderRadius: 8,
               whiteSpace: "nowrap",
               flexShrink: 0,
-              textDecoration: "none",
             }}
-          >
-            無料登録
-          </Link>
+          />
         </div>
       </div>
     </div>

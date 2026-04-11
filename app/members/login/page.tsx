@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import NewsletterModal from "@/components/NewsletterModal";
 
 function LoginForm() {
   const router = useRouter();
@@ -117,9 +118,20 @@ function LoginForm() {
 
           <p style={{ fontSize: "0.8rem", color: "#9ca3af", textAlign: "center", marginTop: 20, lineHeight: 1.6 }}>
             未登録の方は{" "}
-            <Link href="/finops" style={{ color: "#00338D", fontWeight: 600 }}>
-              こちらから無料登録
-            </Link>
+            <NewsletterModal
+              label="こちらから無料登録"
+              source="newsletter_members_login"
+              buttonStyle={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                color: "#00338D",
+                fontWeight: 600,
+                fontSize: "0.8rem",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            />
           </p>
         </div>
       </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import ContentTabNav from "@/components/ContentTabNav";
 import { REPORTS } from "./reports";
+import NewsletterModal from "@/components/NewsletterModal";
 
 export const metadata: Metadata = {
   title: "会員限定レポート｜GCInsight",
@@ -53,11 +54,26 @@ export default function MembersPage() {
         })}
       </div>
 
-      <div className="rounded-lg border px-5 py-4" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "var(--color-brand-primary)" }}>
+      <div className="rounded-lg border px-5 py-4 flex items-center justify-between gap-4" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "var(--color-brand-primary)" }}>
         <p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
           <span className="font-semibold">会員限定コンテンツ</span> — ニュースレター登録者に毎月お届けしています。
-          未登録の方は右上の「ニュースレター登録」からどうぞ。
         </p>
+        <NewsletterModal
+          label="無料登録"
+          source="newsletter_members_page"
+          buttonStyle={{
+            flexShrink: 0,
+            padding: "6px 14px",
+            backgroundColor: "#00338D",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            fontWeight: 700,
+            fontSize: "0.75rem",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        />
       </div>
     </div>
   );
