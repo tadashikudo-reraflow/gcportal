@@ -59,6 +59,8 @@ const nextConfig: NextConfig = {
       { source: "/benchmark",                destination: "/progress",                    permanent: true },
       { source: "/risks",                    destination: "/progress?status=critical",    permanent: true },
       { source: "/tokutei",                  destination: "/progress?status=tokutei",     permanent: true },
+      // govcloud-basics → govcloud-what-is-govcloud に統合（カニバリゼーション解消）
+      { source: "/articles/govcloud-basics", destination: "/articles/govcloud-what-is-govcloud", permanent: true },
     ];
   },
 };
