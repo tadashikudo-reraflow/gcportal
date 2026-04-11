@@ -6,7 +6,6 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 import { REPORTS } from "../reports";
-import NewsletterModal from "@/components/NewsletterModal";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -90,26 +89,27 @@ export default async function MemberReportPage({ params }: Props) {
             会員限定コンテンツ
           </p>
           <p style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>
-            毎月のレポートをニュースレターでお届けしています
+            他のレポートも読む
           </p>
           <p style={{ fontSize: "0.85rem", color: "#c8d8f0", marginBottom: 16 }}>
-            未登録の方はこちらから無料でご参加いただけます。
+            毎月発行のレポートで、ガバメントクラウド移行の最新動向をお届けしています。
           </p>
-          <NewsletterModal
-            label="無料でニュースレターに登録 →"
-            source="newsletter_report_footer"
-            buttonStyle={{
+          <Link
+            href="/members"
+            style={{
+              display: "inline-block",
               padding: "10px 20px",
               backgroundColor: "#fff",
               color: "#00338D",
-              border: "none",
               borderRadius: 8,
               fontWeight: 700,
               fontSize: "0.875rem",
-              cursor: "pointer",
+              textDecoration: "none",
               marginBottom: 16,
             }}
-          />
+          >
+            レポート一覧に戻る →
+          </Link>
           <p style={{ fontSize: "0.75rem", color: "#94b4d8" }}>
             このレポートの第三者への転送・SNS掲載はご遠慮ください。
           </p>
