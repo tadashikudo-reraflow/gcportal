@@ -16,12 +16,12 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド対応パッケージ一覧【2026年最新】ベンダー比較・導入実績｜GCInsight",
-  description: "TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのガバメントクラウド対応パッケージを自治体標準化20業務別に比較。2026年3月移行期限を踏まえた最新の導入実績・クラウド対応状況を一覧で確認できます。",
+  title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較【2026年4月】",
+  description: "TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのガバメントクラウド対応パッケージを自治体標準化20業務別に比較。各ベンダーの採用自治体数・クラウド基盤・クラウド対応確認状況を一覧で確認できます。",
   alternates: { canonical: "/packages" },
   openGraph: {
-    title: "ガバメントクラウド対応パッケージ一覧【2026年最新】",
-    description: "自治体標準化20業務のパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータ等の採用実績・クラウドプラットフォームを網羅。",
+    title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較",
+    description: "自治体標準化20業務のパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータ等の採用自治体数・クラウドプラットフォームを網羅。",
   },
 };
 
