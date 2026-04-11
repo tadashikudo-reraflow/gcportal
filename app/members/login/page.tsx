@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NewsletterModal from "@/components/NewsletterModal";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const rawNext = searchParams.get("next") ?? "/members";
   // オープンリダイレクト対策: 内部パス（/始まり）のみ許可
@@ -29,8 +28,7 @@ function LoginForm() {
     });
 
     if (res.ok) {
-      router.push(next);
-      router.refresh();
+      window.location.href = next;
     } else {
       const body = await res.json().catch(() => ({}));
       if (body.error === "not_found") {
