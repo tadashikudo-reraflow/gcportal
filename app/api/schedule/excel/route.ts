@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import scheduleStaticData from "@/public/data/schedule.json";
 import * as XLSX from "xlsx";
@@ -203,6 +204,8 @@ export async function POST(req: NextRequest) {
       .insert(parsedEvents);
 
     if (insertError) throw insertError;
+
+    revalidatePath("/timeline");
 
     return NextResponse.json({
       success: true,

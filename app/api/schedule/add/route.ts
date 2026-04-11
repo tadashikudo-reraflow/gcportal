@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const ADMIN_KEY = process.env.GCINSIGHT_ADMIN_KEY || "";
@@ -90,6 +91,8 @@ export async function POST(req: NextRequest) {
       addedCount++;
     }
   }
+
+  if (addedCount > 0) revalidatePath("/timeline");
 
   return NextResponse.json({
     added: addedCount,

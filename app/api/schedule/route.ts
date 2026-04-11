@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 import scheduleStaticData from "@/public/data/schedule.json";
 
@@ -328,6 +329,8 @@ export async function POST(req: NextRequest) {
   }
 
   const pendingReview = detected.filter((d) => d.confidence !== "high");
+
+  revalidatePath("/timeline");
 
   return NextResponse.json({
     summary: {
