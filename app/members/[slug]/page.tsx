@@ -6,6 +6,7 @@ import { remark } from "remark";
 import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 import { REPORTS } from "../reports";
+import NewsletterModal from "@/components/NewsletterModal";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -91,9 +92,24 @@ export default async function MemberReportPage({ params }: Props) {
           <p style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>
             毎月のレポートをニュースレターでお届けしています
           </p>
-          <p style={{ fontSize: "0.85rem", color: "#c8d8f0", marginBottom: 20 }}>
-            未登録の方は右上の「ニュースレター登録」から無料でご参加ください。
+          <p style={{ fontSize: "0.85rem", color: "#c8d8f0", marginBottom: 16 }}>
+            未登録の方はこちらから無料でご参加いただけます。
           </p>
+          <NewsletterModal
+            label="無料でニュースレターに登録 →"
+            source="newsletter_report_footer"
+            buttonStyle={{
+              padding: "10px 20px",
+              backgroundColor: "#fff",
+              color: "#00338D",
+              border: "none",
+              borderRadius: 8,
+              fontWeight: 700,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              marginBottom: 16,
+            }}
+          />
           <p style={{ fontSize: "0.75rem", color: "#94b4d8" }}>
             このレポートの第三者への転送・SNS掲載はご遠慮ください。
           </p>

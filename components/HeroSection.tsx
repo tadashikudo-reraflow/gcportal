@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Mail } from "lucide-react";
+import NewsletterModal from "./NewsletterModal";
 
 type Municipality = {
   prefecture: string;
@@ -162,14 +163,11 @@ export default function HeroSection({
         {/* #6 CTA — プライマリ/セカンダリ視覚差 */}
         <div className="hero-cta-row">
           {/* プライマリ: ニュースレター登録 */}
-          <Link
-            href="/finops"
-            className="btn-cta-primary"
-            style={{ textDecoration: "none" }}
-          >
-            <Mail size={16} aria-hidden="true" />
-            ニュースレターに登録（無料）
-          </Link>
+          <NewsletterModal
+            label={<><Mail size={16} aria-hidden="true" style={{ marginRight: 6 }} />ニュースレターに登録（無料）</>}
+            source="newsletter_hero"
+            buttonClassName="btn-cta-primary"
+          />
           {/* セカンダリ: ghost/text */}
           <Link href="/articles" className="btn-ghost">
             コラム・解説を読む
