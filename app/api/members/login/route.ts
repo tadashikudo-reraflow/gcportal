@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     .from("leads")
     .select("id")
     .eq("email", normalized)
-    .neq("unsubscribed", true)   // NULL も有効（未設定 = 購読中）
+    .or("unsubscribed.is.null,unsubscribed.eq.false")  // NULL も有効（未設定 = 購読中）
     .maybeSingle();
 
   if (error) {

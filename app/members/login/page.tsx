@@ -7,7 +7,9 @@ import Link from "next/link";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/members";
+  const rawNext = searchParams.get("next") ?? "/members";
+  // オープンリダイレクト対策: 内部パス（/始まり）のみ許可
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/members";
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");

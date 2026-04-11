@@ -167,10 +167,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "登録に失敗しました" }, { status: 500 });
     }
 
-    await Promise.all([
+    // 通知失敗はログのみ（DB保存済みなのにユーザーに失敗を見せない）
+    Promise.all([
       notifySlack({ topic: topic.trim(), category: cat, municipality: municipality?.trim(), orgType: organization_type }),
       notifyTelegram({ topic: topic.trim(), category: cat, municipality: municipality?.trim(), orgType: organization_type }),
-    ]);
+    ]).catch((err) => console.error("[disclosure] notify error:", err));
 
     return NextResponse.json({ success: true, id: data.id });
   } catch {
