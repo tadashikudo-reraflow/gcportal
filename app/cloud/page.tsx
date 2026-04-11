@@ -469,7 +469,7 @@ export default async function CloudPage() {
                   </td>
                   {scores.map((score, i) => (
                     <td key={i} className="text-center py-2 px-3 font-bold" style={{
-                      color: score === "◎" ? (i === 4 ? "#E2004B" : "#059669") : score === "○" ? "#0369a1" : score === "△" ? "#d97706" : "#9ca3af",
+                      color: score === "◎" ? (i === 4 ? "#E2004B" : "#059669") : score === "△" ? "#d97706" : "#9ca3af",
                       backgroundColor: i === 4 ? "#fff8f9" : "transparent",
                       fontSize: score === "◎" ? "0.85rem" : "0.75rem",
                     }}>{score}</td>
