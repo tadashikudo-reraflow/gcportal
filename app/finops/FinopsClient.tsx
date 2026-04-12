@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 import { COST_CONSTANTS } from "@/lib/constants";
 import type { ArticleMeta } from "@/lib/articles";
 import PdfLeadForm from "@/components/PdfLeadForm";
@@ -66,16 +67,16 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
               <span style={{ color: "var(--color-brand-primary)" }}>3割削減への3つの階段</span>
             </h1>
             <p className="text-base md:text-lg max-w-xl leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              全国1,741自治体の移行後データを分析。コスト増の構造的原因と、
-              今すぐ着手できる最適化の打ち手を無料PDFでお届けします。
+              全国1,741自治体の移行後データを分析。コスト増の構造的原因と最適化の打ち手を、
+              週次ニュースレターでお届けします。
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href="/finops#pdf"
-                className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl transition-colors text-sm w-full sm:w-auto"
+                href="#newsletter"
+                className="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl text-sm w-full sm:w-auto no-underline"
                 style={{ backgroundColor: "var(--color-brand-primary)", color: "#FFFFFF", boxShadow: "0 2px 4px rgba(0,51,141,0.2)" }}
               >
-                📄 無料PDFを受け取る（メールのみ）
+                📬 ニュースレターに登録（無料）
               </a>
             </div>
             <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>スパムなし・いつでも配信解除できます</p>
@@ -181,7 +182,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
             ))}
           </div>
           <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B", color: "#92400E" }}>
-            ⚠️ <strong>FinOps は「移行後の運用最適化」に効く手法です。</strong>
+            <span className="flex items-center gap-1.5 mb-1"><AlertTriangle size={15} /><strong>FinOps は「移行後の運用最適化」に効く手法です。</strong></span>
             移行前の基盤選定ミスや回線費の構造問題は、FinOps だけでは解決できません。
             このページでは、<strong>移行済み・未移行それぞれの打ち手</strong>を整理しています。
           </div>
@@ -244,17 +245,18 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
       {/* ================================================================
           6. PDF CTA（Action — メイン転換点）
       ================================================================ */}
-      <section id="pdf" className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
+      <section id="newsletter" className="py-16 px-4" style={{ backgroundColor: "#00338D" }}>
         <div className="max-w-3xl mx-auto space-y-10 text-white">
           {/* ヘッダー */}
           <div className="text-center space-y-4">
-            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#94b4d8" }}>無料レポート（PDF）2026年版</p>
+            <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#94b4d8" }}>ニュースレター登録（無料）</p>
             <h2 className="text-2xl md:text-3xl font-bold leading-snug">
               FinOpsだけでは10%止まり。<br />
               <span style={{ color: "#F5B500" }}>3割削減への3つの階段</span>
             </h2>
             <p className="text-sm leading-relaxed max-w-xl mx-auto" style={{ color: "#c8d8f0" }}>
-              全国1,741自治体のデータをもとに、コスト増の構造的原因と段階的な打ち手を整理した実務レポートです。庁内説明・事業者との協議材料にそのまま使えます。
+              全国1,741自治体のデータをもとに、ガバクラ移行・コスト・ベンダー動向を毎週お届け。
+              自治体職員・ITベンダー・コンサル向けの実務情報です。
             </p>
           </div>
 
@@ -309,7 +311,7 @@ export default function FinopsClient({ articles }: { articles: ArticleMeta[] }) 
 
           {/* インラインフォーム */}
           <div className="max-w-md mx-auto">
-            <PdfLeadForm source="finops_pdf" />
+            <PdfLeadForm source="newsletter_finops" mode="newsletter" />
           </div>
         </div>
       </section>

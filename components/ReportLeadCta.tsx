@@ -1,4 +1,4 @@
-import Link from "next/link";
+"use client";
 
 type Props = {
   source: string;
@@ -7,14 +7,16 @@ type Props = {
   compact?: boolean;
 };
 
+function openPdfModal() {
+  window.dispatchEvent(new CustomEvent("openPdfModal"));
+}
+
 export default function ReportLeadCta({
   source,
   title = "無料レポートで全体像をまとめて確認",
   description = "全国1,741自治体の進捗、コスト、遅延構造を1本に整理したPDFです。メールアドレスとご所属の入力で受け取れます。",
   compact = false,
 }: Props) {
-  const reportHref = `/finops#pdf`;
-
   if (compact) {
     return (
       <div
@@ -32,13 +34,14 @@ export default function ReportLeadCta({
             {description}
           </p>
         </div>
-        <Link
-          href={reportHref}
+        <button
+          type="button"
+          onClick={openPdfModal}
           className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+          style={{ backgroundColor: "#1d4ed8", color: "#ffffff", border: "none", cursor: "pointer" }}
         >
           PDFを受け取る
-        </Link>
+        </button>
       </div>
     );
   }
@@ -77,13 +80,14 @@ export default function ReportLeadCta({
         </div>
 
         <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[240px]">
-          <Link
-            href={reportHref}
+          <button
+            type="button"
+            onClick={openPdfModal}
             className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
-            style={{ backgroundColor: "#1d4ed8", color: "#ffffff", textDecoration: "none" }}
+            style={{ backgroundColor: "#1d4ed8", color: "#ffffff", border: "none", cursor: "pointer" }}
           >
             無料でPDFを受け取る
-          </Link>
+          </button>
           <p className="text-xs text-center" style={{ color: "#475569" }}>
             入力はメールアドレスとご所属のみ
           </p>

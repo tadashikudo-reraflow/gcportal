@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowDown } from "lucide-react";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
 import { CLUSTERS } from "@/lib/clusters";
@@ -35,7 +36,7 @@ const CLOUD_CONFIG: Record<string, {
   OCI:    { color: "#F80000", label: "Oracle Cloud Infrastructure", certYear: 2022, infraPct: "<1%",  costIndex: 55  },
   Azure:  { color: "#0078D4", label: "Microsoft Azure",             certYear: 2021, infraPct: "2%",   costIndex: 95  },
   GCP:    { color: "#4285F4", label: "Google Cloud Platform",       certYear: 2021, infraPct: "<1%",  costIndex: 90  },
-  Sakura: { color: "#E2004B", label: "さくらインターネット",         certYear: 2024, infraPct: "<1%",  costIndex: 70  },
+  Sakura: { color: "#E2004B", label: "さくらインターネット",         certYear: 2026, infraPct: "<1%",  costIndex: 70  },
 };
 const CLOUD_ORDER = ["AWS", "OCI", "Azure", "GCP", "Sakura"];
 
@@ -317,11 +318,11 @@ export default async function CloudPage() {
             </div>
             <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
               <span className="text-xs">一括調達契約</span>
-              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <ArrowDown size={16} aria-hidden="true" />
             </div>
             <div className="rounded-xl px-6 py-2 font-bold text-sm text-white" style={{ backgroundColor: "var(--color-gov-primary)" }}>デジタル庁</div>
             <div className="flex flex-col items-center my-1" style={{ color: "var(--color-text-muted)" }}>
-              <svg width="16" height="20" viewBox="0 0 16 20"><line x1="8" y1="0" x2="8" y2="14" stroke="currentColor" strokeWidth="1.5"/><polyline points="3,10 8,18 13,10" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+              <ArrowDown size={16} aria-hidden="true" />
               <span className="text-xs">利用権付与・運用管理委託</span>
             </div>
             <div className="rounded-xl px-6 py-2 font-bold text-sm" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-text-primary)", border: "1.5px solid var(--color-border)" }}>自治体（1,741団体）</div>
@@ -338,14 +339,14 @@ export default async function CloudPage() {
           <div className="border-l-2 pl-3 py-1" style={{ borderColor: "#7FB8E6" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>OCI（財布型）</p>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、初期見積もりが過剰だと未使用失効リスクがある。
+              年間総額をコミットするが、<strong>Compute・DB・Storageなど全サービスに自由配分</strong>できる。サービス間でリソースを移動・最適化しやすくFinOpsとの相性はよい。総額は年度内固定のため、<span className="font-semibold px-1 rounded" style={{ backgroundColor: "#fef3c7", color: "#b45309" }}>⚠ 初期見積もりが過剰だと未使用失効リスクがある</span>。
             </p>
           </div>
 
           <div className="border-l-2 pl-3 py-1" style={{ borderColor: "var(--color-border)" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>AWS / Azure / GCP / さくら（予約型）</p>
             <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで該当リソースを削減すると余ったコミット分が無駄になる。サービスをまたいだ最適化はできない。
+              EC2・VMタイプ・vCPUなど<strong>リソース単位で事前指定</strong>してコミット。FinOpsで<span className="font-semibold px-1 rounded" style={{ backgroundColor: "#fef3c7", color: "#b45309" }}>⚠ 該当リソースを削減すると余ったコミット分が無駄になる</span>。サービスをまたいだ最適化はできない。
             </p>
           </div>
         </div>
@@ -361,73 +362,61 @@ export default async function CloudPage() {
         </p>
 
         <div className="space-y-3">
-          {/* FISA 702 */}
-          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#d97706" }}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>FISA 702条（外国情報監視法）</p>
-              <a href="https://www.justice.gov/nsd/surveillance-collection-foreign-intelligence-information" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
-                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
-                DOJ公式 ↗
-              </a>
-            </div>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              米国政府がAWS等の米国企業に<strong>裁判所命令なしにデータ提供を命令できる</strong>。ガグオーダー（非開示命令）により自治体への通知も不可。
-            </p>
-          </div>
-
-          {/* EO 12333 */}
-          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#d97706" }}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>大統領令12333号（EO 12333）</p>
-              <a href="https://www.pclob.gov/library/702-Report.pdf" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
-                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
-                PCLOB報告書 ↗
-              </a>
-            </div>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              NSAが<strong>令状なしに海外経由データをバルク収集</strong>できる根拠法。スノーデン事件（2013年）で露見し欧日で問題視されている。
-            </p>
-          </div>
-
-          {/* MS仏上院証言 */}
-          <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)", borderLeftWidth: 3, borderLeftColor: "#4A90E2" }}>
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <p className="text-xs font-semibold" style={{ color: "var(--color-text-primary)" }}>Microsoft 仏上院証言（2025年6月）</p>
-              <a href="https://www.senat.fr/rap/r24-510/r24-510.html" target="_blank" rel="noopener noreferrer"
-                className="text-xs px-2 py-0.5 rounded no-underline shrink-0 border"
-                style={{ borderColor: "var(--color-border)", color: "var(--color-text-muted)" }}>
-                仏上院公式 ↗
-              </a>
-            </div>
-            <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              Microsoft代表が<strong>「米国法の要求があればデータアクセスを保証できない」</strong>と公式証言。GDPR準拠でも米国CLOUD法は拒否不可。
-            </p>
-          </div>
-
-          {/* 外資 vs さくら対比 */}
-          <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="rounded-lg p-3 border" style={{ borderColor: "var(--color-border)" }}>
-              <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-secondary)" }}>外資CSP（AWS / Azure / GCP / OCI）</p>
-              <ul className="space-y-1.5">
-                {["米国FISA 702条・EO12333の域外適用あり", "米国政府からのデータ開示要求を拒否できない", "ガグオーダーで自治体への通知も不可"].map(r => (
-                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <span className="text-red-500 shrink-0 mt-0.5">✗</span>{r}
-                  </li>
+          {/* 外資 vs さくら比較テーブル */}
+          <div className="overflow-x-auto rounded-lg border" style={{ borderColor: "var(--color-border)" }}>
+            <table className="w-full text-xs border-collapse">
+              <thead>
+                <tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+                  <th className="text-left py-2 px-3 font-medium" style={{ color: "var(--color-text-secondary)", minWidth: 160 }}>評価項目</th>
+                  <th className="text-center py-2 px-4 font-bold whitespace-nowrap" style={{ color: "var(--color-text-secondary)" }}>外資CSP<br/><span className="font-normal text-xs">（AWS / Azure / GCP / OCI）</span></th>
+                  <th className="text-center py-2 px-4 font-bold whitespace-nowrap" style={{ color: "#E2004B", backgroundColor: "#fff0f4" }}>さくら<br/><span className="font-normal text-xs">（国産）</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {([
+                  ["米国法の域外適用（FISA 702 / EO12333）", "あり", "対象外"],
+                  ["米国政府のデータ開示要求",               "拒否不可", "対象外"],
+                  ["ガグオーダー（自治体への通知禁止）",     "あり", "適用なし"],
+                  ["運営主体・データセンター",               "外国法人", "日本法人・国内DC"],
+                  ["データの国外転送リスク",                 "あり", "転送されない構造"],
+                ] as const).map(([axis, ng, ok]) => (
+                  <tr key={axis} style={{ borderBottom: "1px solid var(--color-border)" }}>
+                    <td className="py-2 px-3 font-medium" style={{ color: "var(--color-text-primary)" }}>{axis}</td>
+                    <td className="text-center py-2 px-4" style={{ color: "var(--color-text-secondary)" }}>
+                      <span className="text-red-500 mr-1">✗</span>{ng}
+                    </td>
+                    <td className="text-center py-2 px-4" style={{ backgroundColor: "#fff8f9" }}>
+                      <span style={{ color: "#4A90E2" }} className="mr-1">✓</span><strong style={{ color: "#E2004B" }}>{ok}</strong>
+                    </td>
+                  </tr>
                 ))}
-              </ul>
-            </div>
-            <div className="rounded-lg p-3 border" style={{ borderColor: "#7FB8E6", backgroundColor: "#f0f7ff" }}>
-              <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-text-primary)" }}>さくらのクラウド（国産）</p>
-              <ul className="space-y-1.5">
-                {["日本法人・国内DCのみで運営", "米国域外適用法の対象外", "データが国外に転送されない構造"].map(r => (
-                  <li key={r} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <span style={{ color: "#4A90E2" }} className="shrink-0 mt-0.5">✓</span>{r}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              </tbody>
+            </table>
+            <p className="text-xs px-3 py-2 leading-relaxed" style={{ borderTop: "1px solid var(--color-border)", color: "var(--color-text-secondary)", backgroundColor: "#fff8f9" }}>
+              住民基本台帳・医療・税務など機微データを扱う自治体にとって、<strong style={{ color: "#E2004B" }}>データ主権の観点で唯一の選択肢</strong>。IT専任担当者が少ない小規模自治体にも適合しやすい。
+            </p>
+          </div>
+
+          {/* 法律根拠コメント */}
+          <div className="space-y-1.5 pt-1">
+            <p className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>根拠法・事例</p>
+            {([
+              { label: "FISA 702条", desc: "米国企業に裁判所命令なしのデータ提供命令が可能。ガグオーダーで自治体への通知も不可。", href: "https://www.justice.gov/nsd/surveillance-collection-foreign-intelligence-information", linkText: "DOJ公式" },
+              { label: "EO 12333", desc: "NSAが令状なしに海外経由データをバルク収集できる根拠法。スノーデン事件（2013年）で露見。", href: "https://www.pclob.gov/library/702-Report.pdf", linkText: "PCLOB報告書" },
+              { label: "MS 仏上院証言（2025年6月）", desc: "「米国法の要求があればデータアクセスを保証できない」と公式証言。GDPR準拠でもCLOUD法は拒否不可。", href: "https://www.senat.fr/rap/r24-510/r24-510.html", linkText: "仏上院公式" },
+            ]).map(({ label, desc, href, linkText }) => (
+              <div key={label} className="flex gap-2 pl-2 border-l" style={{ borderColor: "var(--color-border)" }}>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs font-semibold mr-1.5" style={{ color: "var(--color-text-secondary)" }}>{label}</span>
+                  <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{desc}</span>
+                </div>
+                <a href={href} target="_blank" rel="noopener noreferrer"
+                  className="text-xs no-underline shrink-0 self-start"
+                  style={{ color: "var(--color-text-muted)" }}>
+                  {linkText} ↗
+                </a>
+              </div>
+            ))}
           </div>
 
           <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
@@ -436,56 +425,6 @@ export default async function CloudPage() {
         </div>
       </div>
 
-      {/* 自治体向け CSP 採用ポイント */}
-      <div className="card p-5">
-        <div className="flex items-baseline gap-2 mb-1">
-          <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>自治体向け CSP 採用ポイント</h2>
-        </div>
-        <p className="text-xs mb-5" style={{ color: "var(--color-text-muted)" }}>コスト・運用・調達の観点から、各CSPの特徴と向いているケースをまとめました</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            {
-              name: "AWS", color: "#FF9900",
-              points: ["パッケージベンダー対応数が最多・実績豊富", "コミュニティ・事例・ドキュメントが最も充実", "設定・予測管理が複雑。専任担当者が必要"],
-              fit: "IT体制が整った中〜大規模自治体",
-            },
-            {
-              name: "OCI", color: "#F80000",
-              points: ["財布型でサービス横断の最適化を進めやすい", "円建て・転送料無料でコスト予測が立てやすい"],
-              fit: "単年予算・管理負担を最小にしたい自治体",
-            },
-            {
-              name: "Azure", color: "#0078D4",
-              points: ["Microsoft 365・AD・Teamsとの統合が強み", "庁内系システムとの連携で本領発揮"],
-              fit: "Microsoft製品を庁内で広く使っている自治体",
-            },
-            {
-              name: "GCP", color: "#4285F4",
-              points: ["Vertex AI / Gemini でAI活用が最も容易", "Google Workspace との深い統合", "ガバクラ採用実績は少数（国内シェア0.7%）"],
-              fit: "AI活用を積極的に推進したい自治体",
-            },
-            {
-              name: "さくら", color: "#E2004B",
-              points: ["国産クラウド・国内DC・ガバメントクラウド正式採択（国産初）", "データ主権・運用主権を国内で完結できる", "データ転送無料・円建て・シンプルな契約体系"],
-              fit: "データ主権・国内法準拠・運用のシンプルさを重視する自治体",
-            },
-          ].map(({ name, color, points, fit }) => (
-            <div key={name} className="rounded-xl p-4 border" style={{ borderColor: "var(--color-border)", borderTopWidth: 3, borderTopColor: color }}>
-              <p className="text-sm font-bold mb-2" style={{ color }}>{name}</p>
-              <ul className="space-y-1.5 mb-3">
-                {points.map((p) => (
-                  <li key={p} className="text-xs flex gap-1.5" style={{ color: "var(--color-text-secondary)" }}>
-                    <span className="mt-0.5 shrink-0" style={{ color: "var(--color-text-muted)" }}>•</span>{p}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-xs px-2 py-1.5 rounded font-medium" style={{ backgroundColor: "var(--color-surface-container-low)", color: "var(--color-text-secondary)", border: "1px solid var(--color-border)" }}>
-                向き先: {fit}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* 対応ベンダー・パッケージへの導線 */}
       <div className="rounded-xl border px-5 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: "var(--color-border)" }}>

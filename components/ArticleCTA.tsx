@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BarChart2 } from "lucide-react";
 import type { ClusterConfig } from "@/lib/clusters";
 
 type Props = {
@@ -15,7 +16,7 @@ export default function ArticleCTA({ cluster }: Props) {
       }}
     >
       <div className="flex items-start gap-3">
-        <span className="text-xl flex-shrink-0 mt-0.5">📊</span>
+        <BarChart2 className="flex-shrink-0 mt-0.5" size={20} style={{ color: "var(--color-brand-primary, #1a365d)" }} />
         <div className="space-y-2">
           <p
             className="text-sm font-semibold"

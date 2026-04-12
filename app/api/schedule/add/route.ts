@@ -1,22 +1,19 @@
 /**
- * POST /api/schedule/add — スケジュールイベントを追加
- *
- * Body:
- * {
- *   "events": [
- *     { "date": "2026-04-15", "title": "...", "org": "デジタル庁", "url": "...", "important": false }
- *   ]
- * }
- *
- * Admin key 認証必須。
+ * POST /api/schedule/add — スケジュールイベントを追加（Supabase版）
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import { revalidatePath } from "next/cache";
+import { createClient } from "@supabase/supabase-js";
 
-const SCHEDULE_PATH = join(process.cwd(), "public/data/schedule.json");
 const ADMIN_KEY = process.env.GCINSIGHT_ADMIN_KEY || "";
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 interface NewEvent {
   date: string;
@@ -28,7 +25,6 @@ interface NewEvent {
 }
 
 export async function POST(req: NextRequest) {
-  // Admin key check
   const authHeader = req.headers.get("authorization");
   const providedKey = authHeader?.replace("Bearer ", "") || "";
   if (ADMIN_KEY && providedKey !== ADMIN_KEY) {
@@ -46,7 +42,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "events array is required" }, { status: 400 });
   }
 
-  // Validate events
   for (const ev of body.events) {
     if (!ev.date || !ev.title || !ev.org) {
       return NextResponse.json(
@@ -62,61 +57,46 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Read current schedule
-  let schedule: Record<string, unknown>;
-  try {
-    const raw = await readFile(SCHEDULE_PATH, "utf-8");
-    schedule = JSON.parse(raw);
-  } catch {
-    return NextResponse.json({ error: "Failed to read schedule" }, { status: 500 });
-  }
-
-  const existingEvents = (schedule.recent_schedule as { date: string; title: string }[]) || [];
-  const existingTitles = new Set(existingEvents.map((e) => e.title));
-
+  const supabase = getSupabase();
   const today = new Date().toISOString().slice(0, 10);
+
+  // 既存タイトル取得（重複チェック用）
+  const { data: existing } = await supabase
+    .from("schedule_events")
+    .select("title");
+  const existingTitles = new Set((existing ?? []).map((e) => e.title as string));
+
   let addedCount = 0;
   let skippedCount = 0;
 
   for (const ev of body.events) {
-    // Duplicate check
     if (existingTitles.has(ev.title)) {
       skippedCount++;
       continue;
     }
 
-    const newEvent: Record<string, unknown> = {
+    const { error } = await supabase.from("schedule_events").insert({
       date: ev.date,
       status: ev.date < today ? "done" : "upcoming",
       title: ev.title,
       org: ev.org,
-    };
-    if (ev.important) newEvent.important = true;
-    if (ev.note) newEvent.note = ev.note;
-    if (ev.url) newEvent.url = ev.url;
+      important: ev.important ?? false,
+      note: ev.note ?? null,
+      url: ev.url ?? null,
+      source: "manual",
+    });
 
-    existingEvents.push(newEvent as { date: string; title: string });
-    existingTitles.add(ev.title);
-    addedCount++;
+    if (!error) {
+      existingTitles.add(ev.title);
+      addedCount++;
+    }
   }
 
-  // Sort by date
-  existingEvents.sort((a, b) => a.date.localeCompare(b.date));
-
-  // Update
-  schedule.recent_schedule = existingEvents;
-  schedule.last_updated = today;
-
-  try {
-    await writeFile(SCHEDULE_PATH, JSON.stringify(schedule, null, 2) + "\n", "utf-8");
-  } catch {
-    return NextResponse.json({ error: "Failed to write schedule" }, { status: 500 });
-  }
+  if (addedCount > 0) revalidatePath("/timeline");
 
   return NextResponse.json({
     added: addedCount,
     skipped: skippedCount,
-    total: existingEvents.length,
     message: `${addedCount}件追加、${skippedCount}件重複スキップ`,
   });
 }

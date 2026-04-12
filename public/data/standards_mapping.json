@@ -1,0 +1,205 @@
+{
+  "updated": "2026-04-07",
+  "standards": [
+    {
+      "no": 1,
+      "business": "住民基本台帳",
+      "ministry": "総務省",
+      "spec_name": "住民記録システム標準仕様書",
+      "latest_version": "第6.1版",
+      "published": "2025年8月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "住民・戸籍"
+    },
+    {
+      "no": 2,
+      "business": "印鑑登録",
+      "ministry": "総務省",
+      "spec_name": "印鑑登録システム標準仕様書",
+      "latest_version": "第2.4版",
+      "published": "2025年2月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "住民・戸籍"
+    },
+    {
+      "no": 3,
+      "business": "戸籍の附票",
+      "ministry": "総務省",
+      "spec_name": "戸籍附票システム標準仕様書",
+      "latest_version": "第3.1版",
+      "published": "2025年8月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "住民・戸籍"
+    },
+    {
+      "no": 4,
+      "business": "選挙人名簿管理",
+      "ministry": "総務省",
+      "spec_name": "選挙人名簿管理システム標準仕様書",
+      "latest_version": "第4.1版",
+      "published": "2025年9月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "住民・戸籍"
+    },
+    {
+      "no": 5,
+      "business": "個人住民税",
+      "ministry": "総務省",
+      "spec_name": "個人住民税システム標準仕様書",
+      "latest_version": "第10.0版",
+      "published": "2026年2月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "税務"
+    },
+    {
+      "no": 6,
+      "business": "法人住民税",
+      "ministry": "総務省",
+      "spec_name": "法人住民税システム標準仕様書",
+      "latest_version": "第10.0版",
+      "published": "2026年2月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "税務"
+    },
+    {
+      "no": 7,
+      "business": "固定資産税",
+      "ministry": "総務省",
+      "spec_name": "固定資産税システム標準仕様書",
+      "latest_version": "第10.0版",
+      "published": "2026年2月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "税務"
+    },
+    {
+      "no": 8,
+      "business": "軽自動車税",
+      "ministry": "総務省",
+      "spec_name": "軽自動車税（種別割）システム標準仕様書",
+      "latest_version": "第10.0版",
+      "published": "2026年2月",
+      "url": "https://www.soumu.go.jp/denshijiti/standard.html",
+      "category": "税務"
+    },
+    {
+      "no": 9,
+      "business": "戸籍",
+      "ministry": "法務省",
+      "spec_name": "戸籍システム標準仕様書",
+      "latest_version": "第5.0版",
+      "published": "2025年9月",
+      "url": "https://www.moj.go.jp/",
+      "category": "住民・戸籍"
+    },
+    {
+      "no": 10,
+      "business": "就学",
+      "ministry": "文部科学省",
+      "spec_name": "就学援助システム標準仕様書",
+      "latest_version": "第7.0版",
+      "published": "2026年2月",
+      "url": "https://www.mext.go.jp/",
+      "category": "教育・子育て"
+    },
+    {
+      "no": 11,
+      "business": "健康管理",
+      "ministry": "厚生労働省・こども家庭庁",
+      "spec_name": "健康管理システム標準仕様書",
+      "latest_version": "第7.0版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 12,
+      "business": "児童扶養手当",
+      "ministry": "こども家庭庁",
+      "spec_name": "児童扶養手当システム標準仕様書",
+      "latest_version": "第4.1版",
+      "published": "2025年9月",
+      "url": "https://www.cfa.go.jp/",
+      "category": "教育・子育て"
+    },
+    {
+      "no": 13,
+      "business": "児童手当",
+      "ministry": "こども家庭庁",
+      "spec_name": "児童手当システム標準仕様書",
+      "latest_version": "第2.5版",
+      "published": "2025年2月",
+      "url": "https://www.cfa.go.jp/",
+      "category": "教育・子育て"
+    },
+    {
+      "no": 14,
+      "business": "子ども・子育て支援",
+      "ministry": "こども家庭庁",
+      "spec_name": "子ども・子育て支援システム標準仕様書",
+      "latest_version": "デジタル庁公開ページ参照",
+      "published": "—",
+      "url": "https://www.digital.go.jp/policies/local_governments/specification",
+      "category": "教育・子育て"
+    },
+    {
+      "no": 15,
+      "business": "生活保護",
+      "ministry": "厚生労働省",
+      "spec_name": "生活保護システム標準仕様書",
+      "latest_version": "第6.0版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 16,
+      "business": "障害者福祉",
+      "ministry": "厚生労働省",
+      "spec_name": "障害者福祉システム標準仕様書",
+      "latest_version": "第4.1版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 17,
+      "business": "介護保険",
+      "ministry": "厚生労働省",
+      "spec_name": "介護保険システム標準仕様書",
+      "latest_version": "第8.1版",
+      "published": "2026年3月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 18,
+      "business": "国民健康保険",
+      "ministry": "厚生労働省",
+      "spec_name": "国民健康保険システム標準仕様書",
+      "latest_version": "第8.0版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 19,
+      "business": "後期高齢者医療",
+      "ministry": "厚生労働省",
+      "spec_name": "後期高齢者医療システム標準仕様書",
+      "latest_version": "第4.1版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    },
+    {
+      "no": 20,
+      "business": "国民年金",
+      "ministry": "厚生労働省",
+      "spec_name": "国民年金システム標準仕様書",
+      "latest_version": "第4.1版",
+      "published": "2026年2月",
+      "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/system_hyojunka.html",
+      "category": "福祉・医療"
+    }
+  ]
+}

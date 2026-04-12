@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LayoutGrid, Home, DollarSign, Info, Cloud, Code2, Database, BarChart3, LayoutTemplate, FileText, ClipboardCheck } from "lucide-react";
+import PdfCTAButton from "@/components/PdfCTAButton";
 import { CostReport, Vendor } from "@/lib/supabase";
 import RelatedArticles from "@/components/RelatedArticles";
 import PageNavCards from "@/components/PageNavCards";
@@ -61,13 +63,13 @@ const VENDOR_COST_ESTIMATE: Record<string, {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド移行コスト分析【ベンダー別比較】｜GCInsight",
+  title: "ガバメントクラウド移行コストは本当に削減できるか？自治体別試算と削減策【2026年最新】｜GCInsight",
   description:
-    "ガバメントクラウド移行コストが平均2.3倍（中核市市長会調査）に増加。TKC・富士通・NEC・日立のコスト指数と費用対効果をベンダー別に比較分析。",
+    "政府目標−30%に対し実態は平均+156%（中核市市長会調査）。R6検証事業8団体データ・ベンダー別コスト比較（TKC/RKKCS/富士通/NEC）・ネットワーク費・SaaS構築費の費用内訳を公開。自治体規模別の削減策付き。",
   openGraph: {
-    title: "ガバメントクラウド移行コスト分析",
+    title: "ガバメントクラウド移行コスト分析【2026年最新】",
     description:
-      "移行コストが平均2.3倍（中核市市長会調査）に増加。ベンダー別コスト比較と費用対効果を可視化。",
+      "政府目標−30%→実態+156%。R6検証8団体データ・ベンダー別コスト比較・費用内訳を自治体規模別に公開。",
     images: [
       {
         url: `/og?title=${encodeURIComponent("コスト分析")}&subtitle=${encodeURIComponent("ガバメントクラウド移行コスト増減を可視化")}&type=cost`,
@@ -314,41 +316,25 @@ export default async function CostsPage() {
             label: "全体像を知る",
             desc: "目標と実態のギャップ",
             href: "#cost-gap",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-              </svg>
-            ),
+            icon: <LayoutGrid size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "団体別データ",
             desc: "R6検証事業 8団体",
             href: "#r6-verification",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            ),
+            icon: <Home size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "費用按分",
             desc: "4方式・R6検証より",
             href: "#cost-allocation",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-            ),
+            icon: <DollarSign size={16} className="text-gray-500" aria-hidden="true" />,
           },
           {
             label: "対策を知る",
             desc: "FinOps・最適化",
             href: "#cost-measures",
-            icon: (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-500" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-            ),
+            icon: <Info size={16} className="text-gray-500" aria-hidden="true" />,
           },
         ].map((item) => (
           <a
@@ -364,9 +350,12 @@ export default async function CostsPage() {
           </a>
         ))}
       </div>
-      <a href="/finops#pdf" className="block text-xs text-blue-600 hover:text-blue-800 transition text-right">
+      <PdfCTAButton
+        className="block text-xs text-blue-600 hover:text-blue-800 transition text-right"
+        style={{ background: "none", border: "none", cursor: "pointer", padding: 0, width: "100%" }}
+      >
         PDFでまとめて確認 →
-      </a>
+      </PdfCTAButton>
 
       {/* ⑦ コストギャップ */}
       <div id="cost-gap" className="card p-5">
@@ -427,6 +416,50 @@ export default async function CostsPage() {
           );
         })()}
 
+        {/* 費用項目別内訳 */}
+        <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold text-gray-700 mb-3">コスト増加の主な費用項目</p>
+          <div className="space-y-2">
+            {[
+              {
+                label: "クラウド利用料",
+                pct: "約40〜50%",
+                color: "#EF4444",
+                note: "AWS寡占97%で価格競争が働きにくい。EC2・RDS・S3等の合計。Reserved Instance活用で削減余地あり。",
+              },
+              {
+                label: "ネットワーク・回線費",
+                pct: "約20〜30%",
+                color: "#F97316",
+                note: "庁内LAN→東京/大阪リージョン集約に伴うWAN回線増強費。移行後も発生し続ける固定費。",
+              },
+              {
+                label: "SaaS構築・カスタマイズ費",
+                pct: "約15〜25%",
+                color: "#EAB308",
+                note: "標準仕様に合わせたシステム改修・データ移行・テスト費用。自治体固有の業務フローで膨らみやすい。",
+              },
+              {
+                label: "運用保守費（人件費含む）",
+                pct: "約10〜20%",
+                color: "#6B7280",
+                note: "クラウド運用の専門人材不足により外部委託コストが増加。移行期間中はオンプレとの二重運用も発生。",
+              },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-2 h-2 rounded-full mt-1.5" style={{ backgroundColor: item.color }} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-xs font-semibold text-gray-800">{item.label}</span>
+                    <span className="text-[11px] font-bold tabular-nums" style={{ color: item.color }}>{item.pct}</span>
+                  </div>
+                  <p className="text-[11px] text-gray-500 leading-relaxed mt-0.5">{item.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-gray-400 mt-3">※ 比率は中核市市長会調査・デジタル庁R6検証事業・総務省地方財政調査をもとにした推計。自治体規模・ベンダーにより大きく異なる。</p>
+        </div>
       </div>
 
       {/* コスト変化実績（カード形式） */}
@@ -465,9 +498,44 @@ export default async function CostsPage() {
         ) : (
           <p className="text-xs text-gray-400">データ読み込み中…</p>
         )}
-        <p className="text-xs text-gray-400 mt-3">
-          ベンダー別の傾向は <a href="/cloud#vendor-cloud" className="text-blue-500 hover:underline">クラウド基盤分析</a> で確認
-        </p>
+        {/* クラウド基盤別コスト傾向（インライン）— /cloudへのQuickBack防止 */}
+        <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold text-gray-700 mb-2">クラウド基盤別 コスト傾向まとめ</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              {
+                cloud: "AWS",
+                share: "97%",
+                costRange: "+1.3〜3.0倍",
+                badge: "bg-orange-100 text-orange-700",
+                note: "シェア最大。価格競争が働きにくく割高になりやすい。富士通/NEC/日立が主力。",
+              },
+              {
+                cloud: "OCI（Oracle）",
+                share: "〜2%",
+                costRange: "+1.0〜1.5倍",
+                badge: "bg-red-100 text-red-700",
+                note: "円建て課金・データ転送10TB/月無料。RKKCS採用。札幌市32業務（2025年4月）。",
+              },
+              {
+                cloud: "さくら・国内",
+                share: "〜1%",
+                costRange: "試算中",
+                badge: "bg-purple-100 text-purple-700",
+                note: "2026年に政府認定取得済み。競合圧力による価格抑制効果に期待。",
+              },
+            ].map((item) => (
+              <div key={item.cloud} className="rounded-md border border-gray-200 bg-white px-3 py-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.badge}`}>{item.cloud}</span>
+                  <span className="text-[10px] text-gray-400">シェア {item.share}</span>
+                </div>
+                <p className="text-xs font-bold text-gray-800 mb-0.5">コスト比 {item.costRange}</p>
+                <p className="text-[11px] text-gray-500 leading-relaxed">{item.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* R6検証事業 団体別コスト比較（図解） */}
@@ -500,12 +568,11 @@ export default async function CostsPage() {
           </p>
           <div className="grid grid-cols-3 gap-1.5">
             {[
-              { icon: "🎯", label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
-              { icon: "📦", label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
-              { icon: "📏", label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
-            ].map(({ icon, label, r6, survey }) => (
+              { label: "計測対象", r6: "好条件8団体", survey: "59市の実態" },
+              { label: "コスト範囲", r6: "ランニングのみ", survey: "移行費込み" },
+              { label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
+            ].map(({ label, r6, survey }) => (
               <div key={label} className="rounded-lg p-2 text-center" style={{ backgroundColor: "#fff8ed" }}>
-                <p className="text-base mb-0.5">{icon}</p>
                 <p className="text-[11px] font-bold mb-1.5" style={{ color: "#92400e" }}>{label}</p>
                 <div className="space-y-1">
                   <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#dbeafe" }}>
@@ -694,38 +761,22 @@ export default async function CostsPage() {
               {
                 label: "サーバーレス化",
                 desc: "Lambda/Fargate等のサーバーレスサービスにより、EC2比でコスト優位性を確認。特にバッチ処理で効果大",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
-                  </svg>
-                ),
+                icon: <Cloud size={14} aria-hidden="true" />,
               },
               {
                 label: "IaC構築効率化",
                 desc: "Terraform/CloudFormation等でインフラをコード管理。構築工数を大幅削減し、環境複製も容易に",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                  </svg>
-                ),
+                icon: <Code2 size={14} aria-hidden="true" />,
               },
               {
                 label: "マネージドサービス活用",
                 desc: "RDS/Aurora等のマネージドDBにより運用負荷とコストを最適化。パッチ適用・バックアップの自動化",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-                  </svg>
-                ),
+                icon: <Database size={14} aria-hidden="true" />,
               },
               {
                 label: "FinOpsダッシュボード",
                 desc: "コスト可視化ダッシュボードで日次モニタリング。予算超過の早期検知と最適化サイクルの確立",
-                icon: (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                ),
+                icon: <BarChart3 size={14} aria-hidden="true" />,
               },
             ].map((item) => (
               <div key={item.label} className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
@@ -748,7 +799,7 @@ export default async function CostsPage() {
             {/* デジタル庁資料 */}
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <LayoutTemplate size={9} aria-hidden="true" />
                 デジタル庁資料
               </p>
               <div className="flex flex-col gap-1.5">
@@ -759,7 +810,7 @@ export default async function CostsPage() {
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-blue-100 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors w-full">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <FileText size={10} aria-hidden="true" />
                     {link.label}
                   </a>
                 ))}
@@ -768,7 +819,7 @@ export default async function CostsPage() {
             {/* R6検証事業 */}
             <div>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                <ClipboardCheck size={9} aria-hidden="true" />
                 R6検証事業
               </p>
               <div className="flex flex-col gap-1.5">
@@ -778,7 +829,7 @@ export default async function CostsPage() {
                 ].map((link) => (
                   <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-green-100 bg-green-50 text-green-700 hover:bg-green-100 transition-colors w-full">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <FileText size={10} aria-hidden="true" />
                     {link.label}
                   </a>
                 ))}

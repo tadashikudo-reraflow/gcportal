@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllArticles } from "@/lib/articles";
 import Breadcrumb from "@/components/Breadcrumb";
+import ContentTabNav from "@/components/ContentTabNav";
 import ArticlesClient from "./ArticlesClient";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default async function ArticlesPage() {
         <h1 className="page-title">コラム・解説記事</h1>
         <p className="page-subtitle">ガバメントクラウド・自治体標準化に関する実務情報・解説</p>
       </div>
+      <ContentTabNav />
 
       {articles.length === 0 ? (
         <div className="card p-8 text-center">

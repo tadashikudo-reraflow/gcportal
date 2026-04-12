@@ -3,6 +3,8 @@ import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import migrationStats from "@/public/data/migration_stats.json";
 import Link from "next/link";
+import NewsletterBanner from "@/components/NewsletterBanner";
+import NewsletterExploreCard from "@/components/NewsletterExploreCard";
 import HeroSection from "@/components/HeroSection";
 import JapanMap from "@/components/JapanMap";
 import SourceAttribution from "@/components/SourceAttribution";
@@ -131,6 +133,9 @@ export default function DashboardPage() {
         totalSystems={migrationStats.total_systems}
       />
 
+      {/* ========== ニュースレター登録バナー ========== */}
+      <NewsletterBanner />
+
       {/* ========== 日本地図ヒートマップ（ThreeMetrics直後） ========== */}
       <div>
         {/* 都道府県ドロップダウン */}
@@ -250,17 +255,7 @@ export default function DashboardPage() {
             <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
           </Link>
 
-          <Link
-            href="/finops#pdf"
-            className="explore-card col-span-2 sm:col-span-1"
-            style={{ backgroundColor: "#EFF6FF", borderColor: "#BFDBFE", padding: "1.25rem 1.5rem" }}
-          >
-            <span className="explore-card-badge" style={{ backgroundColor: "#BFDBFE", color: "#1E40AF" }}>
-              無料PDF
-            </span>
-            <span className="explore-card-title" style={{ color: "#1E40AF", fontSize: "1rem" }}>全体レポート（無料PDF）</span>
-            <span className="explore-card-desc">全国サマリーを報告資料向けにダウンロード</span>
-          </Link>
+          <NewsletterExploreCard />
 
           {/* 残り4枚: 小カード */}
           <Link href="/progress" className="explore-card">

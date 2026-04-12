@@ -21,6 +21,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/articles`,      lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
     { url: `${BASE_URL}/sources`,       lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/timeline`,      lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
+    { url: `${BASE_URL}/disclosure`,         lastModified: now, changeFrequency: "weekly",  priority: 0.8 },
+    { url: `${BASE_URL}/disclosure/results`, lastModified: now, changeFrequency: "weekly",  priority: 0.7 },
     { url: `${BASE_URL}/privacy`,       lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
     { url: `${BASE_URL}/terms`,         lastModified: now, changeFrequency: "yearly",  priority: 0.3 },
     // 以下は301リダイレクト対象のため除外:

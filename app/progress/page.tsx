@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { readFileSync } from "fs";
 import { join } from "path";
+import { Info } from "lucide-react";
 import ProgressClient from "./ProgressClient";
 import Breadcrumb from "@/components/Breadcrumb";
 import RelatedArticles from "@/components/RelatedArticles";
 import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
+import ReportLeadCta from "@/components/ReportLeadCta";
 
 export const revalidate = 3600;
 
@@ -207,10 +209,7 @@ export default async function ProgressPage() {
         className="flex items-start gap-3 rounded-lg px-4 py-3 text-sm"
         style={{ backgroundColor: "#eff6ff", border: "1px solid #93c5fd" }}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" strokeWidth="2" className="flex-shrink-0 mt-0.5">
-          <path d="M13 16h-1v-4h-1m1-4h.01" strokeLinecap="round"/>
-          <circle cx="12" cy="12" r="10"/>
-        </svg>
+        <Info size={16} color="#1d4ed8" className="flex-shrink-0 mt-0.5" aria-hidden="true" />
         <p style={{ color: "#1e40af" }}>
           <span className="font-semibold">特定移行</span>とは、技術的・運用的に移行困難としてデジタル庁が認定した自治体・システムです。「遅延」とは異なり、期限延長のうえ移行継続中のステータスです。
           {" "}
@@ -226,6 +225,7 @@ export default async function ProgressPage() {
         sourceIds={PAGE_SOURCES.prefectures ?? []}
         pageId="progress"
       />
+      <ReportLeadCta source="progress" compact title="進捗・コスト・遅延の全体像を1本のPDFで確認" description="全国1,741自治体の移行状況、コスト変化、遅延構造をまとめた無料レポートです。" />
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );

@@ -1,4 +1,5 @@
 import { getDataFreshness } from "@/lib/sources";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 
 type FreshnessBannerProps = {
   dataMonth: string;        // "YYYY-MM"
@@ -29,15 +30,7 @@ export default function FreshnessBanner({
         className="rounded-lg px-4 py-3 flex items-start gap-3"
         style={{ backgroundColor: "#fef2f2", border: "1px solid #fca5a5" }}
       >
-        <svg
-          width="18" height="18" viewBox="0 0 24 24" fill="none"
-          stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          className="flex-shrink-0 mt-0.5"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
+        <AlertCircle size={18} color="#dc2626" className="flex-shrink-0 mt-0.5" aria-hidden="true" />
         <div>
           <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
             {label}時点のデータです（{daysOld}日前）
@@ -65,15 +58,7 @@ export default function FreshnessBanner({
       className="rounded-lg px-4 py-2.5 flex items-center gap-2"
       style={{ backgroundColor: "#fffbeb", border: "1px solid #fcd34d" }}
     >
-      <svg
-        width="16" height="16" viewBox="0 0 24 24" fill="none"
-        stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-        className="flex-shrink-0"
-      >
-        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-        <line x1="12" y1="9" x2="12" y2="13" />
-        <line x1="12" y1="17" x2="12.01" y2="17" />
-      </svg>
+      <AlertTriangle size={16} color="#d97706" className="flex-shrink-0" aria-hidden="true" />
       <p className="text-xs" style={{ color: "#92400e" }}>
         <span className="font-semibold">{label}</span>時点（{daysOld}日前）
       </p>

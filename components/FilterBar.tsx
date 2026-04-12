@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { REGIONS, POPULATION_BANDS, STATUS_OPTIONS } from "@/lib/regions";
+import { SlidersHorizontal } from "lucide-react";
 
 /** /api/vendors レスポンスの型 */
 type VendorOption = { id: number; name: string; short_name: string | null };
@@ -229,25 +230,7 @@ export default function FilterBar({ filters, values, onChange, businessOptions }
           onClick={() => setCollapsed(!collapsed)}
           className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="flex-shrink-0"
-          >
-            <line x1="4" y1="21" x2="4" y2="14" />
-            <line x1="4" y1="10" x2="4" y2="3" />
-            <line x1="12" y1="21" x2="12" y2="12" />
-            <line x1="12" y1="8" x2="12" y2="3" />
-            <line x1="20" y1="21" x2="20" y2="16" />
-            <line x1="20" y1="12" x2="20" y2="3" />
-            <line x1="1" y1="14" x2="7" y2="14" />
-            <line x1="9" y1="8" x2="15" y2="8" />
-            <line x1="17" y1="16" x2="23" y2="16" />
-          </svg>
+          <SlidersHorizontal size={16} className="flex-shrink-0" aria-hidden="true" />
           フィルター
           {activeCount > 0 && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full bg-blue-100 text-blue-700">

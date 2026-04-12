@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Search, Mail } from "lucide-react";
+import NewsletterModal from "./NewsletterModal";
 
 type Municipality = {
   prefecture: string;
@@ -107,19 +109,7 @@ export default function HeroSection({
               style={{ color: "var(--color-text-muted)" }}
               aria-hidden
             >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <Search size={18} />
             </span>
             <input
               ref={inputRef}
@@ -172,24 +162,12 @@ export default function HeroSection({
 
         {/* #6 CTA — プライマリ/セカンダリ視覚差 */}
         <div className="hero-cta-row">
-          {/* プライマリ: filled, large */}
-          <Link href="/finops#pdf" className="btn-cta-primary">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            無料レポート（PDF）
-          </Link>
+          {/* プライマリ: ニュースレター登録 */}
+          <NewsletterModal
+            label={<><Mail size={16} aria-hidden="true" style={{ marginRight: 6 }} />ニュースレターに登録（無料）</>}
+            source="newsletter_hero"
+            buttonClassName="btn-cta-primary"
+          />
           {/* セカンダリ: ghost/text */}
           <Link href="/articles" className="btn-ghost">
             コラム・解説を読む

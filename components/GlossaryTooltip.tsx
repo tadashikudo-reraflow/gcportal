@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { HelpCircle } from "lucide-react";
 
 const GLOSSARY: Record<string, string> = {
   "ガバメントクラウド": "政府が整備したクラウドサービス利用環境。AWS・Azure・GCP・OCI・さくらの5社が認定。自治体の情報システムをこの基盤上に移行する国策。",
@@ -50,11 +51,7 @@ export default function GlossaryTooltip({ term, children }: Props) {
         aria-describedby={open ? `glossary-${term}` : undefined}
       >
         {children}
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="glossary-icon">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
+        <HelpCircle size={12} className="glossary-icon" aria-hidden="true" />
       </button>
       {open && (
         <span id={`glossary-${term}`} className="glossary-popup" role="tooltip">

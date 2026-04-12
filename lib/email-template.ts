@@ -7,7 +7,7 @@
  *   - イントロは \n\n で段落を分ける（1段落 = 1トピック）
  *   - 推奨構成: 冒頭断言（1文）→ 背景・状況（2-3文）→ 読者への含意（1-2文）
  *   - 1段落あたり60〜120字。それ以上は分割する
- *   - 本文内に絵文字を使わない（セクション見出しのみ可）
+ *   - 絵文字を使わない（行政向け・テキストクライアント互換性のため）
  *
  * 【セクション順序（重要度順）】
  *   1. ヘッダー（ブランド + 号数 + 日付 + 読了時間）
@@ -30,7 +30,7 @@
  *   - table-based レイアウト（Flexbox/Grid 不使用）
  *   - インラインstyleのみ（CSSクラス・Webフォント不使用）
  *   - 600px固定幅
- *   - SVG不使用（絵文字テキストで代替）
+ *   - SVG不使用（テキストのみで代替）
  *
  * ────────────────────────────────────────────────────────────────────────────
  */
@@ -530,14 +530,14 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
 }
 
 /**
- * セクション見出し（絵文字アイコン + ラベル + 1行リード文）
+ * セクション見出し（ラベル + 1行リード文）
  * リード文を入れることで各セクションの目的が明確になる
  */
-function sectionHeader(emoji: string, label: string, lead: string): string {
+function sectionHeader(_emoji: string, label: string, lead: string): string {
   return `<table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
       <td style="border-bottom:2px solid #0f172a;padding-bottom:10px;">
-        <span style="font-size:15px;font-weight:800;color:#0f172a;">${emoji} ${e(label)}</span>
+        <span style="font-size:15px;font-weight:800;color:#0f172a;">${e(label)}</span>
       </td>
     </tr>
     ${lead ? `<tr>

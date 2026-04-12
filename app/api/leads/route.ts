@@ -1,5 +1,16 @@
+import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
+import { LATEST_SLUG } from "@/app/members/reports";
+
+const BASE_URL = "https://gcinsight.jp";
+
+function generatePdfTrackingUrl(leadId: number): string | null {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return null;
+  const token = crypto.createHmac("sha256", secret).update(String(leadId)).digest("hex");
+  return `${BASE_URL}/api/track/pdf?lid=${leadId}&token=${token}`;
+}
 
 const ORGANIZATION_TYPES = [
   "municipality",
@@ -59,16 +70,16 @@ async function notifySlack({
   });
 }
 
-/** Resend: ユーザーへのPDF配信メール (source="report" のみ) */
+/** Resend: ユーザーへのPDF配信メール */
 async function sendPdfEmail({
   email,
-  downloadUrl,
+  trackingUrl,
 }: {
   email: string;
-  downloadUrl: string | null;
+  trackingUrl: string | null;
 }) {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || !downloadUrl) return;
+  if (!apiKey || !trackingUrl) return;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -82,7 +93,7 @@ async function sendPdfEmail({
       subject: "レポートのダウンロードありがとうございます｜GCInsight",
       html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
 <p style="font-size:18px;font-weight:bold;margin-bottom:16px">
-  📄 <a href="${downloadUrl}" style="color:#2563eb">PDFをダウンロードする（48時間以内有効）→</a>
+  📄 <a href="${trackingUrl}" style="color:#2563eb">PDFをダウンロードする（48時間以内有効）→</a>
 </p>
 <p>ガバメントクラウド移行 全実態レポート2026をダウンロードいただき、ありがとうございます。</p>
 <p>本レポートでは、全国1,741自治体の移行状況を約20,000字で徹底解説しています。38.4%というシステム移行率の実態、935団体に上る延長認定の背景、コスト2.3倍増加の構造まで、現場で使えるデータをまとめました。</p>
@@ -95,6 +106,57 @@ async function sendPdfEmail({
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     console.error("sendPdfEmail error:", res.status, JSON.stringify(body));
+  }
+}
+
+/** Resend: ニュースレター登録ウェルカムメール */
+async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  const memberReportUrl = `${BASE_URL}/members/${LATEST_SLUG}`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "GCInsight編集部 <noreply@gcinsight.jp>",
+      to: email,
+      subject: "ニュースレター登録ありがとうございます｜GCInsight",
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#1f2937">
+<p style="font-size:20px;font-weight:bold;margin-bottom:8px;color:#00338D">
+  📬 GCInsightニュースレターへようこそ
+</p>
+<p>ガバメントクラウド・自治体情報システム標準化の最新動向を、毎週まとめてお届けします。</p>
+<p style="margin-top:20px"><strong>🔒 登録特典：最新限定レポートを無料でプレゼント</strong></p>
+<p style="margin-bottom:16px">会員限定コンテンツとして、最新の深掘りレポートをご用意しています。</p>
+<p style="margin-bottom:24px">
+  ▶ <a href="${memberReportUrl}" style="color:#2563eb;font-weight:bold">限定レポートを読む（会員専用URL）→</a>
+</p>
+<p><strong>今後お届けする内容：</strong></p>
+<ul style="padding-left:20px;line-height:1.8">
+  <li>総務省・デジタル庁の最新動向</li>
+  <li>全国1,741自治体の移行進捗データ更新</li>
+  <li>ベンダー・クラウド動向の分析</li>
+  <li>コスト・FinOps関連の事例・解説</li>
+</ul>
+<p style="margin-top:24px">
+  ▶ <a href="https://gcinsight.jp" style="color:#2563eb;font-weight:bold">ダッシュボードで今すぐデータを確認する →</a>
+</p>
+<p style="margin-top:32px;font-size:12px;color:#6b7280">
+  配信停止はいつでも可能です。<a href="https://gcinsight.jp/unsubscribe" style="color:#6b7280">こちらから解除</a><br>
+  ※限定レポートのURLは第三者への共有はご遠慮ください。
+</p>
+<p>GCInsight編集部</p>
+</div>`,
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    console.error("sendNewsletterWelcomeEmail error:", res.status, JSON.stringify(body));
   }
 }
 
@@ -166,22 +228,6 @@ async function notifyTelegram({
   }
 }
 
-/** Supabase Storage から 48h Signed URL を生成 */
-async function generateDownloadUrl(): Promise<string | null> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !serviceRoleKey) return null;
-
-  const { createClient } = await import("@supabase/supabase-js");
-  const supabase = createClient(supabaseUrl, serviceRoleKey);
-  const { data } = await supabase.storage
-    .from("reports")
-    .createSignedUrl("report-2026.pdf", 60 * 60 * 48); // 48h
-  return data?.signedUrl ?? null;
-}
-
 
 /**
  * POST /api/leads — リード（メアド+所属）を保存
@@ -230,15 +276,20 @@ export async function POST(req: NextRequest) {
 
     const effectiveSource = source || "report";
 
-    // PDF配信メール: 全登録者に送信（finopsフォーム統合済みのため条件不要）
-    const downloadUrl = await generateDownloadUrl();
+    // PDFトラッキングURL生成（HMAC署名付き）
+    const trackingUrl = generatePdfTrackingUrl(data.id);
 
-    // 通知: Slack / 管理者メール / Telegram（並列実行）
+    // ソース別メール分岐: newsletter系はウェルカムメール / それ以外はPDF配信
+    const isNewsletterSource = effectiveSource.startsWith("newsletter");
+
+    // 通知: Slack / 管理者メール / Telegram + ユーザーメール（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      sendPdfEmail({ email, downloadUrl }), // ユーザーへのPDF配信（report導線のみ）
+      isNewsletterSource
+        ? sendNewsletterWelcomeEmail({ email })
+        : sendPdfEmail({ email, trackingUrl }),
     ]);
 
     return NextResponse.json({ success: true, lead: data });

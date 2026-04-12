@@ -466,10 +466,12 @@ export async function POST(req: NextRequest) {
 
   // 6. ragNews をソース種別で振り分け
   // - PR Times → newsItems（ガバクラニュース）
-  // - Qiita / Zenn → relatedArticles（関連記事）
-  // - その他（産経・日経等）→ officialNews
+  // - Qiita / Zenn → relatedArticles（関連記事 / 技術ブログ）
+  // - メディア記事（朝日・毎日・日経・産経等）→ newsItems（今週のガバクラニュース）
+  // - PR Times → newsItems（ガバクラニュース）
+  // - その他（デジタル庁・総務省等公式）→ officialNews
   const RELATED_SOURCES = new Set(["Qiita", "Zenn"]);
-  const NEWS_SOURCES = new Set(["PR Times"]);
+  const NEWS_SOURCES = new Set(["PR Times", "朝日新聞", "毎日新聞", "日経新聞", "日経クロステック", "産経新聞", "読売新聞", "NHK"]);
 
   const ragNewsItems: typeof newsItems = [];
   const ragRelated: Array<{ title: string; summary: string; url: string; source: string }> = [];

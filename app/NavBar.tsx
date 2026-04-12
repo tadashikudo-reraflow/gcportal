@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { X, Menu, ChevronDown } from "lucide-react";
 
 // 目的別ナビゲーション構造
 const NAV_GROUPS = [
@@ -30,6 +31,7 @@ const NAV_GROUPS = [
     label: "調べる",
     short: "調べる",
     children: [
+      { href: "/standards",  label: "標準仕様書", desc: "" },
       { href: "/packages",   label: "パッケージ", desc: "" },
       { href: "/timeline",   label: "スケジュール", desc: "" },
       { href: "/sources",    label: "出典", desc: "" },
@@ -37,7 +39,7 @@ const NAV_GROUPS = [
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
-  { label: "レポート", short: "レポート", href: "/finops" },
+  { label: "会員限定", short: "会員", href: "/members" },
 ] as const;
 
 type NavGroup = (typeof NAV_GROUPS)[number];
@@ -70,6 +72,7 @@ const DRAWER_SECTIONS = [
   {
     title: "調べる",
     items: [
+      { href: "/standards",  label: "標準仕様書" },
       { href: "/packages",   label: "パッケージ" },
       { href: "/timeline",   label: "スケジュール" },
       { href: "/sources",    label: "出典" },
@@ -80,7 +83,7 @@ const DRAWER_SECTIONS = [
     title: "その他",
     items: [
       { href: "/articles", label: "コラム" },
-      { href: "/finops",   label: "レポート" },
+      { href: "/members",  label: "会員限定レポート" },
     ],
   },
 ];
@@ -177,10 +180,7 @@ function MobileDrawer({
               color: "var(--color-text-secondary)",
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
@@ -314,11 +314,7 @@ export default function NavBar() {
             aria-expanded={drawerOpen}
             onClick={() => setDrawerOpen(true)}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
+            <Menu size={22} aria-hidden="true" />
           </button>
 
           {/* スクロール可能なボタン列（デスクトップのみ表示） */}
@@ -359,13 +355,7 @@ export default function NavBar() {
                     style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }}
                   >
                     {group.label}
-                    <svg
-                      width="10" height="10" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                      className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
-                    >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
+                    <ChevronDown size={10} strokeWidth={2.5} className={`transition-transform ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" />
                   </button>
                 );
               }

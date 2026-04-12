@@ -22,7 +22,7 @@ type DisclosureRequest = {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   submitted: { label: "請求中",  color: "#2563EB", bg: "#DBEAFE" },
-  disclosed: { label: "開示済",  color: "#059669", bg: "#D1FAE5" },
+  disclosed: { label: "開示済",  color: "var(--color-success)", bg: "var(--color-success-bg)" },
   rejected:  { label: "不開示",  color: "#DC2626", bg: "#FEE2E2" },
 };
 
@@ -165,15 +165,15 @@ export default async function DisclosureResultDetailPage(
       {r.status === "disclosed" && r.result_url && (
         <div className="rounded-xl p-5"
           style={{ backgroundColor: "#F0FDF4", border: "1px solid #BBF7D0" }}>
-          <p className="text-sm font-bold mb-1" style={{ color: "#059669" }}>
-            ✅ 開示文書の分析記事
+          <p className="text-sm font-bold mb-1" style={{ color: "var(--color-success)" }}>
+            開示文書の分析記事
           </p>
-          <p className="text-xs mb-3" style={{ color: "#065F46" }}>
+          <p className="text-xs mb-3" style={{ color: "var(--color-success-dark)" }}>
             開示された行政文書をもとにGCInsight編集部が分析した記事です。
           </p>
           <Link href={r.result_url}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-bold no-underline"
-            style={{ backgroundColor: "#059669", color: "#ffffff" }}>
+            style={{ backgroundColor: "var(--color-success)", color: "#ffffff" }}>
             分析記事を読む →
           </Link>
         </div>

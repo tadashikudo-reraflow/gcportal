@@ -11,9 +11,9 @@ const ORG_OPTIONS = [
   { value: "other", label: "その他" },
 ];
 
-type Props = { source?: string };
+type Props = { source?: string; mode?: "pdf" | "newsletter" };
 
-export default function PdfLeadForm({ source = "finops" }: Props) {
+export default function PdfLeadForm({ source = "finops", mode = "pdf" }: Props) {
   const [email, setEmail] = useState("");
   const [orgType, setOrgType] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -46,14 +46,20 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
     }
   }
 
+  const isNewsletter = mode === "newsletter";
+
   if (showThanks) {
     return (
       <div className="text-center rounded-2xl p-8 bg-white">
         <div className="text-4xl mb-3">✉️</div>
         <p className="font-bold text-lg mb-2" style={{ color: "#00338D" }}>登録ありがとうございます</p>
         <p className="text-sm text-gray-600">
-          <strong className="text-gray-900">{email}</strong> 宛にPDFリンクをお送りしました。<br />
-          <span className="text-xs text-gray-500">リンクの有効期限は48時間です。</span>
+          {isNewsletter ? (
+            <><strong className="text-gray-900">{email}</strong> 宛にウェルカムメールをお送りしました。</>
+          ) : (
+            <><strong className="text-gray-900">{email}</strong> 宛にPDFリンクをお送りしました。<br />
+            <span className="text-xs text-gray-500">リンクの有効期限は48時間です。</span></>
+          )}
         </p>
       </div>
     );
@@ -63,7 +69,7 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
     <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
       <div className="px-6 pt-5 pb-2 text-center" style={{ borderBottom: "1px solid #E5E7EB" }}>
         <p className="text-sm font-semibold" style={{ color: "#00338D" }}>
-          📄 無料PDFを受け取る
+          {isNewsletter ? "📬 ニュースレターに登録（無料）" : "📄 無料PDFを受け取る"}
         </p>
         <p className="text-xs text-gray-400 mt-0.5">メールアドレスとご所属のみ・スパムなし・社内共有OK</p>
       </div>
@@ -94,7 +100,7 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
             onChange={(e) => setAgreed(e.target.checked)}
             className="mt-0.5 shrink-0 accent-blue-600"
           />
-          <span>レポートのダウンロードおよびメール配信に同意します。いつでも解除できます。</span>
+          <span>{isNewsletter ? "ニュースレター配信に同意します。" : "レポートのダウンロードおよびメール配信に同意します。"}いつでも解除できます。</span>
         </label>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
@@ -103,10 +109,10 @@ export default function PdfLeadForm({ source = "finops" }: Props) {
           className="w-full font-bold py-3 rounded-xl transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ backgroundColor: "#00338D", color: "#FFFFFF" }}
         >
-          {loading ? "準備中..." : "無料でPDFを受け取る →"}
+          {loading ? "準備中..." : isNewsletter ? "無料で登録する →" : "無料でPDFを受け取る →"}
         </button>
         <p className="text-xs text-center text-gray-400">
-          ※ご入力情報はレポート配信のみに使用します。第三者への提供はいたしません。
+          ※ご入力情報は配信のみに使用します。第三者への提供はいたしません。
         </p>
       </div>
     </div>

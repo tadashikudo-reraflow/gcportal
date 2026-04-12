@@ -5,32 +5,38 @@
  *   1. デジタル庁等の公開ページをスクレイプし新規イベントを検出
  *   2. 信頼度 high のイベントを自動追加（source: "auto"）
  *   3. 過去日付のイベントを自動で「完了」に更新
- *   4. 変更ログを schedule-log.json に記録
  *
  * 認証: CRON_SECRET or GCINSIGHT_ADMIN_KEY
+ * ストレージ: Supabase schedule_events テーブル（Vercel serverless対応）
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { readFile, writeFile } from "fs/promises";
-import { join } from "path";
+import { revalidatePath } from "next/cache";
+import { createClient } from "@supabase/supabase-js";
+import scheduleStaticData from "@/public/data/schedule.json";
 
-const SCHEDULE_PATH = join(process.cwd(), "public/data/schedule.json");
-const LOG_PATH = join(process.cwd(), "public/data/schedule-log.json");
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // ---------------------------------------------------------------------------
 // 認証ヘルパー
 // ---------------------------------------------------------------------------
 
 function isAuthorized(req: NextRequest): boolean {
-  const cronSecret = req.headers.get("x-cron-secret");
   const expectedCron = process.env.CRON_SECRET;
+  const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
+
+  const cronSecret = req.headers.get("x-cron-secret");
   if (cronSecret && expectedCron && cronSecret === expectedCron) return true;
 
-  const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
-  const authHeader = req.headers.get("authorization")?.replace("Bearer ", "");
-  if (authHeader && adminKey && authHeader === adminKey) return true;
+  const bearer = req.headers.get("authorization")?.replace("Bearer ", "");
+  if (bearer && expectedCron && bearer === expectedCron) return true;
+  if (bearer && adminKey && bearer === adminKey) return true;
 
-  // ローカル開発時はキーなしで許可
   if (!expectedCron && !adminKey) return true;
 
   return false;
@@ -90,7 +96,6 @@ function extractDates(text: string): DateMatch[] {
   const results: DateMatch[] = [];
   const seen = new Set<string>();
 
-  // パターン1: 令和X年M月D日
   const reiwaPat = /令和(\d{1,2})年(\d{1,2})月(\d{1,2})日/g;
   let m;
   while ((m = reiwaPat.exec(text)) !== null) {
@@ -102,13 +107,9 @@ function extractDates(text: string): DateMatch[] {
     const end = Math.min(text.length, m.index + m[0].length + 120);
     const context = text.slice(start, end).replace(/\s+/g, " ").trim();
     const key = `${date}:${context.slice(0, 40)}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      results.push({ date, context });
-    }
+    if (!seen.has(key)) { seen.add(key); results.push({ date, context }); }
   }
 
-  // パターン2: YYYY年M月D日
   const fullPat = /(202\d)年(\d{1,2})月(\d{1,2})日/g;
   while ((m = fullPat.exec(text)) !== null) {
     const month = String(parseInt(m[2])).padStart(2, "0");
@@ -118,111 +119,78 @@ function extractDates(text: string): DateMatch[] {
     const end = Math.min(text.length, m.index + m[0].length + 120);
     const context = text.slice(start, end).replace(/\s+/g, " ").trim();
     const key = `${date}:${context.slice(0, 40)}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      results.push({ date, context });
-    }
+    if (!seen.has(key)) { seen.add(key); results.push({ date, context }); }
   }
 
   return results;
 }
 
-// ---------------------------------------------------------------------------
-// 重複チェック（既存タイトルとのファジーマッチ）
-// ---------------------------------------------------------------------------
-
 function isDuplicate(newTitle: string, existingTitles: string[]): boolean {
   const normalized = newTitle.replace(/\s+/g, "").toLowerCase();
   for (const existing of existingTitles) {
     const existNorm = existing.replace(/\s+/g, "").toLowerCase();
-    // 完全一致
     if (normalized === existNorm) return true;
-    // 片方が他方に含まれる（70%以上の長さ）
     if (normalized.length > 10 && existNorm.includes(normalized.slice(0, Math.floor(normalized.length * 0.7)))) return true;
     if (existNorm.length > 10 && normalized.includes(existNorm.slice(0, Math.floor(existNorm.length * 0.7)))) return true;
   }
   return false;
 }
 
-// ---------------------------------------------------------------------------
-// タイトル抽出（コンテキストからクリーンなイベント名を生成）
-// ---------------------------------------------------------------------------
-
 function extractTitle(context: string, keywords: string[]): string {
-  // キーワード周辺の意味のある部分を抽出
   let bestSegment = context;
-
-  // 「〜について」「〜に関する」等のパターンでタイトルらしい部分を切り出す
   const titlePatterns = [
     /「([^」]+)」/,
     /(.{5,50}(?:説明会|協議会|公募|改定|公開|リリース|施行|開始|検討会|審議会|ワーキング))/,
     /(.{5,50}(?:について|に関する|に係る))/,
   ];
-
   for (const pat of titlePatterns) {
     const match = context.match(pat);
-    if (match) {
-      bestSegment = match[1] || match[0];
-      break;
-    }
+    if (match) { bestSegment = match[1] || match[0]; break; }
   }
-
-  // 80字を超えたら切り詰め
-  if (bestSegment.length > 80) {
-    bestSegment = bestSegment.slice(0, 77) + "…";
-  }
-
+  if (bestSegment.length > 80) bestSegment = bestSegment.slice(0, 77) + "…";
   return bestSegment.trim();
 }
 
 // ---------------------------------------------------------------------------
-// 変更ログ
-// ---------------------------------------------------------------------------
-
-interface LogEntry {
-  timestamp: string;
-  action: "auto_add" | "auto_complete" | "manual_add" | "manual_edit" | "excel_upload";
-  details: string;
-  count: number;
-}
-
-async function appendLog(entries: LogEntry[]): Promise<void> {
-  if (entries.length === 0) return;
-
-  let log: LogEntry[] = [];
-  try {
-    const raw = await readFile(LOG_PATH, "utf-8");
-    log = JSON.parse(raw);
-  } catch {
-    // ファイルがなければ新規作成
-  }
-
-  log.push(...entries);
-
-  // 最新200件に制限
-  if (log.length > 200) {
-    log = log.slice(-200);
-  }
-
-  await writeFile(LOG_PATH, JSON.stringify(log, null, 2) + "\n", "utf-8");
-}
-
-// ---------------------------------------------------------------------------
-// GET
+// GET — Supabase から全イベント取得 + static データを結合
 // ---------------------------------------------------------------------------
 
 export async function GET() {
   try {
-    const raw = await readFile(SCHEDULE_PATH, "utf-8");
-    const data = JSON.parse(raw);
-    return NextResponse.json(data);
-  } catch {
-    return NextResponse.json({ error: "Schedule data not found" }, { status: 404 });
+    const supabase = getSupabase();
+    const { data: events, error } = await supabase
+      .from("schedule_events")
+      .select("*")
+      .order("date", { ascending: true });
+
+    if (error) throw error;
+
+    const recentSchedule = (events ?? []).map((ev) => ({
+      date: ev.date,
+      status: ev.status,
+      title: ev.title,
+      org: ev.org,
+      ...(ev.important ? { important: true } : {}),
+      ...(ev.note ? { note: ev.note } : {}),
+      ...(ev.url ? { url: ev.url } : {}),
+    }));
+
+    const staticData = scheduleStaticData as Record<string, unknown>;
+
+    return NextResponse.json({
+      last_updated: new Date().toISOString().slice(0, 10),
+      annual_schedule: staticData.annual_schedule ?? [],
+      recent_schedule: recentSchedule,
+      source_pages: staticData.source_pages ?? [],
+    });
+  } catch (err) {
+    console.error("[schedule GET]", err);
+    return NextResponse.json({ error: "Failed to fetch schedule" }, { status: 500 });
   }
 }
 
 // ---------------------------------------------------------------------------
-// POST — Scrape → 自動追加 → ステータス更新 → ログ記録
+// POST — Scrape → 自動追加 → ステータス更新
 // ---------------------------------------------------------------------------
 
 export async function POST(req: NextRequest) {
@@ -230,35 +198,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // ── 1. 現在のスケジュール読み込み ──
-  let schedule: Record<string, unknown>;
-  try {
-    const raw = await readFile(SCHEDULE_PATH, "utf-8");
-    schedule = JSON.parse(raw);
-  } catch {
-    return NextResponse.json({ error: "Failed to read schedule" }, { status: 500 });
+  const supabase = getSupabase();
+  const today = new Date().toISOString().slice(0, 10);
+
+  // ── 1. 現在のイベント取得 ──
+  const { data: currentEvents, error: fetchError } = await supabase
+    .from("schedule_events")
+    .select("id, date, status, title");
+
+  if (fetchError) {
+    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
   }
 
-  const events = (schedule.recent_schedule || []) as Record<string, unknown>[];
+  const events = currentEvents ?? [];
   const existingTitles = events.map((e) => e.title as string);
-  const today = new Date().toISOString().slice(0, 10);
-  const logEntries: LogEntry[] = [];
 
   // ── 2. 過去イベントの自動完了 ──
+  const toComplete = events
+    .filter((e) => e.date < today && e.status === "upcoming")
+    .map((e) => e.id as number);
+
   let statusUpdated = 0;
-  for (const ev of events) {
-    if ((ev.date as string) < today && ev.status === "upcoming") {
-      ev.status = "done";
-      statusUpdated++;
-    }
-  }
-  if (statusUpdated > 0) {
-    logEntries.push({
-      timestamp: new Date().toISOString(),
-      action: "auto_complete",
-      details: `${statusUpdated}件の過去イベントを「完了」に更新`,
-      count: statusUpdated,
-    });
+  if (toComplete.length > 0) {
+    const { error: updateError } = await supabase
+      .from("schedule_events")
+      .update({ status: "done" })
+      .in("id", toComplete);
+
+    if (!updateError) statusUpdated = toComplete.length;
   }
 
   // ── 3. スクレイプ＆新規イベント検出 ──
@@ -298,61 +265,55 @@ export async function POST(req: NextRequest) {
         .replace(/<[^>]+>/g, " ")
         .replace(/&nbsp;/g, " ")
         .replace(/&amp;/g, "&")
-        .replace(/&lt;/g, "<")
-        .replace(/&gt;/g, ">")
         .replace(/\s+/g, " ");
 
       const dates = extractDates(text);
       let detectedCount = 0;
       let addedCount = 0;
 
-      for (const { date, context } of dates) {
-        // 未来〜直近3ヶ月のイベントのみ対象
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        if (date < threeMonthsAgo.toISOString().slice(0, 10)) continue;
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      const cutoff = threeMonthsAgo.toISOString().slice(0, 10);
 
-        // キーワードマッチ
+      for (const { date, context } of dates) {
+        if (date < cutoff) continue;
+
         const matchedKeywords = target.keywords.filter((kw) => context.includes(kw));
         if (matchedKeywords.length === 0) continue;
 
-        // タイトル生成
         const title = extractTitle(context, matchedKeywords);
         if (title.length < 5) continue;
 
-        // 重複チェック
         if (isDuplicate(title, existingTitles)) continue;
 
         const confidence: "high" | "medium" | "low" =
           matchedKeywords.length >= 3 ? "high" : matchedKeywords.length >= 2 ? "medium" : "low";
 
         const detectedEvent: DetectedEvent = {
-          date,
-          title,
-          org: target.org,
-          url: target.url,
-          source_id: target.id,
-          confidence,
-          keywords_matched: matchedKeywords.length,
+          date, title, org: target.org, url: target.url,
+          source_id: target.id, confidence, keywords_matched: matchedKeywords.length,
         };
 
         detected.push(detectedEvent);
         detectedCount++;
 
-        // 信頼度 high → 自動追加
         if (confidence === "high") {
-          const newEvent: Record<string, unknown> = {
-            date,
-            status: date < today ? "done" : "upcoming",
-            title,
-            org: target.org,
-            url: target.url,
-            source: "auto",
-          };
-          events.push(newEvent);
-          existingTitles.push(title);
-          autoAdded.push(title);
-          addedCount++;
+          const { error: insertError } = await supabase
+            .from("schedule_events")
+            .insert({
+              date,
+              status: date < today ? "done" : "upcoming",
+              title,
+              org: target.org,
+              url: target.url,
+              source: "auto",
+            });
+
+          if (!insertError) {
+            existingTitles.push(title);
+            autoAdded.push(title);
+            addedCount++;
+          }
         }
       }
 
@@ -367,30 +328,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── 4. ソート＆保存 ──
-  events.sort((a, b) => (a.date as string).localeCompare(b.date as string));
-  schedule.recent_schedule = events;
-  schedule.last_updated = today;
-
-  try {
-    await writeFile(SCHEDULE_PATH, JSON.stringify(schedule, null, 2) + "\n", "utf-8");
-  } catch {
-    return NextResponse.json({ error: "Failed to write schedule" }, { status: 500 });
-  }
-
-  // ── 5. ログ記録 ──
-  if (autoAdded.length > 0) {
-    logEntries.push({
-      timestamp: new Date().toISOString(),
-      action: "auto_add",
-      details: `自動追加: ${autoAdded.join("、")}`,
-      count: autoAdded.length,
-    });
-  }
-  await appendLog(logEntries);
-
-  // ── 6. レスポンス ──
   const pendingReview = detected.filter((d) => d.confidence !== "high");
+
+  revalidatePath("/timeline");
 
   return NextResponse.json({
     summary: {
@@ -398,15 +338,10 @@ export async function POST(req: NextRequest) {
       events_detected: detected.length,
       events_auto_added: autoAdded.length,
       events_pending_review: pendingReview.length,
-      total_events: events.length,
     },
     auto_added: autoAdded,
     pending_review: pendingReview.map((d) => ({
-      date: d.date,
-      title: d.title,
-      org: d.org,
-      confidence: d.confidence,
-      url: d.url,
+      date: d.date, title: d.title, org: d.org, confidence: d.confidence, url: d.url,
     })),
     scrape_results: scrapeResults,
     message: [

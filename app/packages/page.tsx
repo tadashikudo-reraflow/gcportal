@@ -8,6 +8,7 @@ import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import VendorRanking from "@/components/VendorRanking";
 import BusinessPackageList from "@/components/BusinessPackageList";
+import ReportLeadCta from "@/components/ReportLeadCta";
 import MunicipalitySearch from "@/components/MunicipalitySearch";
 import Breadcrumb from "@/components/Breadcrumb";
 
@@ -15,9 +16,13 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバクラ対応パッケージ一覧｜ベンダー別シェア・導入実績比較｜GCInsight",
-  description: "TKC・富士通・NEC・日立・NTTなど主要ベンダーのガバメントクラウド対応パッケージ一覧。業務別・ベンダー別のシェアと導入実績を比較。",
+  title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較【2026年4月】",
+  description: "TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのガバメントクラウド対応パッケージを自治体標準化20業務別に比較。各ベンダーの採用自治体数・クラウド基盤・クラウド対応確認状況を一覧で確認できます。",
   alternates: { canonical: "/packages" },
+  openGraph: {
+    title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較",
+    description: "自治体標準化20業務のパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータ等の採用自治体数・クラウドプラットフォームを網羅。",
+  },
 };
 
 type MunicipalityPackageWithPackage = MunicipalityPackageRow & {
@@ -90,9 +95,9 @@ export default async function PackagesPage() {
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "パッケージ・ベンダー" }]} />
       <div className="pb-2">
-        <h1 className="page-title">パッケージ・ベンダー一覧</h1>
+        <h1 className="page-title">ガバメントクラウド対応パッケージ・ベンダー一覧</h1>
         <p className="page-subtitle">
-          標準化対応パッケージを提供するベンダーと業務別パッケージの一覧。
+          自治体標準化20業務に対応したパッケージをベンダー別に掲載。TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのクラウド対応状況と採用自治体数を比較できます。2026年3月移行期限に向けた最新情報を随時更新。
         </p>
         {/* ファーストビューKPIバー */}
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
@@ -135,6 +140,128 @@ export default async function PackagesPage() {
       {/* 業務別パッケージ一覧 */}
       <BusinessPackageList packages={packages} />
 
+      {/* 主要ベンダー比較テーブル */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-1 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+          主要ベンダー比較（2026年）
+        </h2>
+        <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
+          ガバメントクラウド対応・クラウドプラットフォーム・共同利用（マルチテナント）の有無を比較
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
+                <th className="text-left py-2 px-3 text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>ベンダー</th>
+                <th className="text-center py-2 px-3 text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>クラウド基盤</th>
+                <th className="text-center py-2 px-3 text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>共同利用</th>
+                <th className="text-center py-2 px-3 text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>対応確認</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: "TKC", cloud: "AWS", multi: true, confirmed: true },
+                { name: "富士通Japan", cloud: "AWS", multi: false, confirmed: true },
+                { name: "NEC", cloud: "AWS / GCP", multi: true, confirmed: true },
+                { name: "日立製作所", cloud: "Azure", multi: true, confirmed: true },
+                { name: "NTTデータ", cloud: "GCP", multi: true, confirmed: true },
+                { name: "さくらインターネット", cloud: "Sakura", multi: false, confirmed: true },
+              ].map((v, i) => (
+                <tr key={v.name} style={{ borderBottom: "1px solid #f1f5f9", backgroundColor: i % 2 === 0 ? "transparent" : "#fafafa" }}>
+                  <td className="py-2.5 px-3 font-medium" style={{ color: "var(--color-text-primary)" }}>{v.name}</td>
+                  <td className="py-2.5 px-3 text-center text-xs" style={{ color: "var(--color-text-secondary)" }}>{v.cloud}</td>
+                  <td className="py-2.5 px-3 text-center">
+                    {v.multi
+                      ? <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold" style={{ backgroundColor: "#d1fae5", color: "#166534" }}>あり</span>
+                      : <span className="inline-block px-2 py-0.5 rounded text-xs" style={{ backgroundColor: "#f3f4f6", color: "#6b7280" }}>なし</span>}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    {v.confirmed
+                      ? <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold" style={{ backgroundColor: "#dbeafe", color: "#1e40af" }}>確認済み</span>
+                      : <span className="inline-block px-2 py-0.5 rounded text-xs" style={{ backgroundColor: "#f3f4f6", color: "#6b7280" }}>調査中</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+          ※ 表は代表的なパッケージの掲載情報をもとに作成。詳細はデジタル庁「適合確認」一覧を参照。
+        </p>
+      </div>
+
+      {/* FAQセクション */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+          よくある質問
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Q. ガバメントクラウド対応パッケージとは何ですか？
+            </p>
+            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              A. デジタル庁が定めた「自治体情報システムの標準化・共通化」に準拠し、ガバメントクラウド（AWS・GCP・Azure・OCI・さくらのクラウド）上で稼働することが確認されたシステムパッケージです。住民基本台帳や税務など20業務が対象で、2026年3月までに全国の自治体が移行を求められています。
+            </p>
+          </div>
+          <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Q. TKCと富士通Japanはどちらが多くの自治体に採用されていますか？
+            </p>
+            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              A. GCInsightのデータベースに基づく採用団体数ランキングで確認できます。上記「ベンダー 採用団体ランキング」セクションをご覧ください。2026年4月時点の実績を反映しています。
+            </p>
+          </div>
+          <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
+            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Q. 自分の自治体が使っているパッケージを調べられますか？
+            </p>
+            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+              A. はい。このページ上部の「自治体名で検索」から市区町村名を入力すると、当該自治体の導入パッケージ一覧を確認できます。都道府県・人口規模での横断比較は「進捗で比較」ページをご利用ください。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "ガバメントクラウド対応パッケージとは何ですか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "デジタル庁が定めた「自治体情報システムの標準化・共通化」に準拠し、ガバメントクラウド（AWS・GCP・Azure・OCI・さくらのクラウド）上で稼働することが確認されたシステムパッケージです。住民基本台帳や税務など20業務が対象で、2026年3月までに全国の自治体が移行を求められています。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "TKCと富士通Japanはどちらが多くの自治体に採用されていますか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "GCInsightのデータベースに基づく採用団体数ランキングで確認できます。ベンダー採用団体ランキングセクションで2026年4月時点の最新実績を確認できます。"
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "自分の自治体が使っているパッケージを調べられますか？",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "はい。ページ上部の「自治体名で検索」から市区町村名を入力すると、当該自治体の導入パッケージ一覧を確認できます。都道府県・人口規模での横断比較は「進捗で比較」ページをご利用ください。"
+                }
+              }
+            ]
+          })
+        }}
+      />
+
       {/* ベンチマーク比較へのクロスリンク */}
       <div className="rounded-xl p-4 flex items-center justify-between gap-4" style={{ backgroundColor: "#f0f5ff", border: "1px solid #bfdbfe" }}>
         <div>
@@ -147,7 +274,7 @@ export default async function PackagesPage() {
       </div>
 
       <SourceAttribution sourceIds={PAGE_SOURCES.packages} pageId="packages" />
-
+      <ReportLeadCta source="packages" compact title="移行コスト・ベンダー選定の判断材料をPDFで確認" description="全国自治体の移行状況・コスト構造・ベンダー動向をまとめた無料レポートです。" />
       <PageNavCards exclude="/packages" />
       <RelatedArticles cluster={CLUSTERS.vendor} />
     </div>

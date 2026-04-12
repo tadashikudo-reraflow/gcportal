@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { verifyAdminToken, COOKIE_NAME } from "@/lib/auth";
+import { verifyMemberToken, MEMBER_COOKIE } from "@/lib/member-auth";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -29,6 +30,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // /members/* を保護（/members/login は除外）
+  if (pathname.startsWith("/members") && !pathname.startsWith("/members/login")) {
+    const token = request.cookies.get(MEMBER_COOKIE)?.value;
+    if (!token || !(await verifyMemberToken(token))) {
+      const loginUrl = new URL("/members/login", request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   // /admin/* を保護（/admin/login は除外）
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
     const token = request.cookies.get(COOKIE_NAME)?.value;
@@ -44,5 +55,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/tracker", "/prefectures", "/admin/:path*", "/api/scrape/:path*"],
+  matcher: ["/tracker", "/prefectures", "/admin/:path*", "/api/scrape/:path*", "/members", "/members/:path*"],
 };

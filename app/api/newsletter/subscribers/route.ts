@@ -94,6 +94,17 @@ export async function DELETE(req: NextRequest) {
   const { ids } = body as { ids: number[] };
 
   const supabase = getSupabase();
+
+  // email_events は leads への FK 制約があるため先に削除
+  const { error: eventsError } = await supabase
+    .from("email_events")
+    .delete()
+    .in("lead_id", ids);
+
+  if (eventsError) {
+    return NextResponse.json({ error: eventsError.message }, { status: 500 });
+  }
+
   const { error } = await supabase
     .from("leads")
     .delete()

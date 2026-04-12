@@ -46,10 +46,15 @@ type Article = {
 export default function ArticlesClient({ articles }: { articles: Article[] }) {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
-  // 全記事のタグを集計（出現順に重複除去）
-  const allTags = Array.from(
-    new Set(articles.flatMap((a) => a.tags))
-  );
+  // 全記事のタグを集計（出現頻度2以上・多い順に表示）
+  const tagCounts = articles.flatMap((a) => a.tags).reduce<Record<string, number>>((acc, tag) => {
+    acc[tag] = (acc[tag] ?? 0) + 1;
+    return acc;
+  }, {});
+  const allTags = Object.entries(tagCounts)
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag]) => tag);
 
   const filtered = selectedTag
     ? articles.filter((a) => a.tags.includes(selectedTag))
@@ -119,8 +124,8 @@ export default function ArticlesClient({ articles }: { articles: Article[] }) {
                 <ArticlePlaceholder title={article.title} />
               )}
               <div className="p-6 flex flex-col gap-3 flex-1">
-                <h2 className="text-base font-bold leading-snug group-hover:underline"
-                  style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
+                <h2 className={`text-base font-bold leading-snug group-hover:underline ${article.coverImage ? "sr-only" : ""}`}
+                  style={article.coverImage ? {} : { color: "var(--color-text-primary)" }}>{article.title}</h2>
                 {article.description && (
                   <p className="text-sm leading-relaxed line-clamp-3"
                     style={{ color: "var(--color-text-secondary)" }}>{article.description}</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Download } from "lucide-react";
 
 const ORG_OPTIONS = [
   { value: "municipality", label: "自治体職員" },
@@ -22,6 +23,7 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,12 +46,26 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
         return;
       }
       setOpen(false);
-      window.print();
+      setSubmitted(true);
     } catch {
       setError("通信エラーが発生しました");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (submitted) {
+    return (
+      <div
+        className="rounded-lg border px-5 py-4 flex items-center gap-3"
+        style={{ borderColor: "#6ee7b7", backgroundColor: "#ecfdf5" }}
+      >
+        <Check size={20} color="#059669" strokeWidth={2.5} aria-hidden="true" />
+        <p className="text-sm font-semibold" style={{ color: "#065f46" }}>
+          PDFリンクをメールでお送りしました。メールをご確認ください。
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -79,11 +95,7 @@ export default function ArticlePdfDownloadBanner({ articleTitle, slug }: Props) 
           style={{ backgroundColor: "#f59e0b", color: "#fff" }}
         >
           記事をダウンロードする
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
+          <Download size={14} strokeWidth={2.5} aria-hidden="true" />
         </button>
       </div>
 

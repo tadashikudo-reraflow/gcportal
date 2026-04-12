@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import scheduleData from "@/public/data/schedule.json";
+import { createClient } from "@supabase/supabase-js";
+import scheduleStaticData from "@/public/data/schedule.json";
 import ScheduleClient from "./ScheduleClient";
 import Breadcrumb from "@/components/Breadcrumb";
+import ReportLeadCta from "@/components/ReportLeadCta";
+
+// スケジュールは最大1時間キャッシュ（POST更新後は自動失効しないため次回アクセス時に反映）
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title:
@@ -41,8 +46,46 @@ export interface ScheduleData {
   source_pages?: SourcePage[];
 }
 
-export default function SchedulePage() {
-  const data = scheduleData as ScheduleData;
+async function fetchRecentSchedule(): Promise<ScheduleEvent[]> {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data, error } = await supabase
+      .from("schedule_events")
+      .select("date, status, title, org, important, note, url")
+      .order("date", { ascending: true });
+
+    if (error) throw error;
+
+    return (data ?? []).map((ev) => ({
+      date: ev.date as string,
+      status: ev.status as "done" | "upcoming",
+      title: ev.title as string,
+      org: ev.org as string,
+      ...(ev.important ? { important: true as const } : {}),
+      ...(ev.note ? { note: ev.note as string } : {}),
+      ...(ev.url ? { url: ev.url as string } : {}),
+    }));
+  } catch (err) {
+    console.error("[timeline] Supabase fetch failed, falling back to JSON:", err);
+    // フォールバック: JSON静的データ
+    const staticData = scheduleStaticData as ScheduleData;
+    return staticData.recent_schedule ?? [];
+  }
+}
+
+export default async function SchedulePage() {
+  const staticData = scheduleStaticData as ScheduleData;
+  const recentSchedule = await fetchRecentSchedule();
+
+  const data: ScheduleData = {
+    last_updated: new Date().toISOString().slice(0, 10),
+    annual_schedule: staticData.annual_schedule ?? [],
+    recent_schedule: recentSchedule,
+    source_pages: staticData.source_pages,
+  };
 
   return (
     <div className="space-y-6">
@@ -55,6 +98,7 @@ export default function SchedulePage() {
       </div>
 
       <ScheduleClient data={data} />
+      <ReportLeadCta source="timeline" compact title="期限後の移行状況とコスト変化をPDFで確認" description="移行完了後に顕在化したコスト増加・遅延構造・対策をまとめた無料レポートです。" />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import NavBar from "./NavBar";
 import BottomNav from "@/components/BottomNav";
 import { useUXTracker } from "@/hooks/useUXTracker";
 import StickyCTA from "@/components/StickyCTA";
+import NewsletterModal from "@/components/NewsletterModal";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
   useUXTracker();
@@ -43,13 +44,12 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </div>
             </Link>
 
-            <Link
-              href="/finops#pdf"
-              className="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold no-underline"
-              style={{ backgroundColor: "transparent", color: "#00338D", border: "2px solid #00338D" }}
-            >
-              無料レポート（PDF）
-            </Link>
+            <NewsletterModal
+              label="ニュースレター登録"
+              source="newsletter_header"
+              buttonClassName="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold"
+              buttonStyle={{ backgroundColor: "#00338D", color: "#fff", border: "2px solid #00338D" }}
+            />
           </div>
         </div>
         <div style={{ backgroundColor: "var(--color-surface-container-low)" }}>
@@ -80,13 +80,12 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                href="/finops#pdf"
-                className="btn-cta text-xs"
-                style={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
-              >
-                無料レポート（PDF）
-              </Link>
+              <NewsletterModal
+                label="ニュースレター登録"
+                source="newsletter_footer"
+                buttonClassName="btn-cta text-xs"
+                buttonStyle={{ minHeight: 36, padding: "6px 16px", fontSize: "0.75rem" }}
+              />
               <Link
                 href="/sources"
                 className="text-xs font-medium no-underline hover:underline"

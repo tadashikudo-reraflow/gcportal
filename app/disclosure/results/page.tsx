@@ -29,7 +29,7 @@ type DisclosureResult = {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   submitted: { label: "請求中",   color: "#2563EB", bg: "#DBEAFE" },
-  disclosed: { label: "開示済",   color: "#059669", bg: "#D1FAE5" },
+  disclosed: { label: "開示済",   color: "var(--color-success)", bg: "var(--color-success-bg)" },
   rejected:  { label: "不開示",   color: "#DC2626", bg: "#FEE2E2" },
 };
 
@@ -82,7 +82,7 @@ export default async function DisclosureResultsPage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "請求中",  value: inProgress.length, color: "#2563EB" },
-          { label: "開示済",  value: disclosed.length,  color: "#059669" },
+          { label: "開示済",  value: disclosed.length,  color: "var(--color-success)" },
           { label: "不開示",  value: rejected.length,   color: "#DC2626" },
         ].map((kpi) => (
           <div key={kpi.label} className="rounded-xl p-4 text-center"
@@ -110,9 +110,15 @@ export default async function DisclosureResultsPage() {
           {/* 開示済 */}
           {disclosed.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
-                ✅ 開示済 ({disclosed.length}件)
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+                  開示済
+                </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded"
+                  style={{ backgroundColor: "var(--color-success-bg)", color: "var(--color-success)" }}>
+                  {disclosed.length}件
+                </span>
+              </div>
               {disclosed.map((r) => (
                 <ResultCard key={r.id} r={r} />
               ))}
@@ -122,9 +128,15 @@ export default async function DisclosureResultsPage() {
           {/* 請求中 */}
           {inProgress.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
-                ⏳ 請求中 ({inProgress.length}件)
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+                  請求中
+                </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded"
+                  style={{ backgroundColor: "#DBEAFE", color: "#2563EB" }}>
+                  {inProgress.length}件
+                </span>
+              </div>
               {inProgress.map((r) => (
                 <ResultCard key={r.id} r={r} />
               ))}
@@ -134,9 +146,15 @@ export default async function DisclosureResultsPage() {
           {/* 不開示 */}
           {rejected.length > 0 && (
             <section className="space-y-3">
-              <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
-                ✕ 不開示 ({rejected.length}件)
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+                  不開示
+                </h2>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded"
+                  style={{ backgroundColor: "#FEE2E2", color: "#DC2626" }}>
+                  {rejected.length}件
+                </span>
+              </div>
               <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
                 不開示の決定自体も重要な情報です。経緯と理由を記事で報告します。
               </p>

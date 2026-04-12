@@ -535,9 +535,8 @@ export default function SubscribersPage() {
                 <input
                   type="checkbox"
                   checked={isSelected}
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={() => toggleOne(lead.id)}
-                  style={{ cursor: "pointer", width: 16, height: 16 }}
+                  onChange={() => {/* row onClick handles toggle */}}
+                  style={{ cursor: "pointer", width: 16, height: 16, pointerEvents: "none" }}
                 />
                 <p style={{ fontSize: 14, color: "#111111", wordBreak: "break-all", margin: 0 }}>
                   {lead.email}
