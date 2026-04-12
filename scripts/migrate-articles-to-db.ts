@@ -161,9 +161,12 @@ async function main() {
       execSync(
         `cd ${path.join(process.env.HOME ?? "", "workspace/pj/digital-go-jp-rag")} && source .venv/bin/activate && python3 -c "
 from openpyxl import load_workbook
-import re
+import glob, os, re
 
-xlsx = '${process.env.GDRIVE_WORKSPACE ?? "/Users/tadashikudo/Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace"}/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx'
+_pattern = '${process.env.GDRIVE_WORKSPACE ?? "/Users/tadashikudo/Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace"}/contents/PJ19/gcportal_kw_planner_v*.xlsx'
+_files = sorted(glob.glob(_pattern), key=os.path.getmtime, reverse=True)
+xlsx = _files[0] if _files else None
+if not xlsx: raise FileNotFoundError('KWプランナーXLSXが見つかりません: ' + _pattern)
 wb = load_workbook(xlsx)
 ws = wb.active
 slugs = set(${JSON.stringify(files.map((f: string) => f.replace(/\\.md$/, "")))})
