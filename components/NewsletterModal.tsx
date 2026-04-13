@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackNewsletterSignup } from "@/lib/gtag";
 
 const ORG_OPTIONS = [
   { value: "municipality", label: "自治体職員" },
@@ -49,6 +50,7 @@ export default function NewsletterModal({
         setError(err.error || "登録に失敗しました");
         return;
       }
+      trackNewsletterSignup(source, orgType);
       setDone(true);
     } catch {
       setError("処理に失敗しました。もう一度お試しください。");
