@@ -31,6 +31,13 @@ const ALL_CARDS: NavCard[] = [
     desc: "期限延長が認められた自治体の一覧を確認",
   },
   {
+    href: "/compare",
+    badge: "3社比較",
+    badgeStyle: { backgroundColor: "#E0F2FE", color: "#0369A1" },
+    title: "ダッシュボード比較",
+    desc: "GCInsightと総務省・デジタル庁の機能・データを比較",
+  },
+  {
     href: "/finops",
     badge: "FinOps",
     badgeStyle: { backgroundColor: "#FCE4EC", color: "#AD1457" },
