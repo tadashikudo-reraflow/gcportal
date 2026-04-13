@@ -11,9 +11,40 @@ import Breadcrumb from "@/components/Breadcrumb";
 // ISR: インフラシェアデータは静的だが念のため1日キャッシュ
 export const revalidate = 86400;
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "ガバメントクラウドでGCPを使うと割引はありますか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "GCP（Google Cloud Platform）ではCommitted Use Discounts（CUD）が適用可能です。Compute Engineリソースへの1年コミットで約37%、3年コミットで約55%の割引となります。ガバメントクラウドはデジタル庁が一括調達するため、自治体は直接GCPと契約せずにこの割引を享受できます。ただしGCPのシェアは全体の約1%未満で、AWS（97%）と比較すると採用自治体は限られています。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "ガバメントクラウドでAWSとGCPのコストはどちらが安いですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "自治体標準システム規模でのTCO比較では、GCPはAWSを約10%下回る水準（AWS=100に対しGCP=90）です。ただしOCI（55）やさくら（70）はさらに低コストです。コスト以外の観点では、OCIは全サービス一括割引・円建て請求でFinOps管理がしやすく、さくらは国産で円安リスク・データ主権リスクがありません。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "ガバメントクラウドの割引はどのCSPが最もお得ですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "割引率だけで見るとAWS（Savings Plans最大55%）とAzure（最大60%）が高水準です。ただしOCIは年間総額コミット型で全サービスに自由配分できるため柔軟性が高く、実質コストはAWSの約55%水準です。さくらは円建て固定のため為替変動リスクがなく予算管理が容易です。自治体調達では割引率だけでなく通貨・コミット形式・データ主権も考慮が必要です。",
+      },
+    },
+  ],
+};
+
 export const metadata: Metadata = {
-  title: "ガバクラ比較（AWS/Azure/GCP/OCI/さくら）| ガバメントクラウド移行状況ダッシュボード",
-  description: "AWS 97%寡占の実態。認定5クラウド（AWS/Azure/GCP/OCI/さくら）のシェア・コスト・対応ベンダーを徹底比較。",
+  title: "ガバクラ割引比較（AWS/Azure/GCP/OCI/さくら）コスト・割引モデル徹底比較",
+  description: "GCP CUD最大37%・AWS Savings Plans最大55%・OCI全サービス共通割引——ガバメントクラウド認定5CSPの割引率・コスト・データ主権リスクを自治体担当者向けに徹底比較。",
   alternates: { canonical: "/cloud" },
 };
 
@@ -100,6 +131,11 @@ export default async function CloudPage() {
   }
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
     <div className="space-y-6">
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "ガバメントクラウド比較" }]} />
@@ -483,5 +519,6 @@ export default async function CloudPage() {
       <PageNavCards exclude="/cloud" />
       <RelatedArticles cluster={CLUSTERS.tech} />
     </div>
+    </>
   );
 }
