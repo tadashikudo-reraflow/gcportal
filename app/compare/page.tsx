@@ -139,7 +139,7 @@ export default function ComparePage() {
         {/* GCInsight ヒーローカード（差別化） */}
         <div
           className="card p-5"
-          style={{ borderLeft: "4px solid #00338D", backgroundColor: "var(--color-surface)" }}
+          style={{ border: "2px solid #00338D", backgroundColor: "var(--color-surface)" }}
         >
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="space-y-1.5 flex-1 min-w-0">
@@ -160,14 +160,14 @@ export default function ComparePage() {
             <div className="flex sm:flex-col gap-2 flex-shrink-0">
               <Link
                 href="/costs"
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-center whitespace-nowrap"
+                className="text-xs font-semibold px-3 rounded-lg text-center whitespace-nowrap flex items-center justify-center min-h-[44px]"
                 style={{ backgroundColor: "#00338D", color: "#fff" }}
               >
                 コスト比較を見る
               </Link>
               <Link
                 href="/"
-                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-center whitespace-nowrap"
+                className="text-xs font-semibold px-3 rounded-lg text-center whitespace-nowrap flex items-center justify-center min-h-[44px]"
                 style={{ border: "1px solid #00338D", color: "#00338D" }}
               >
                 ダッシュボードへ
@@ -209,7 +209,14 @@ export default function ComparePage() {
               </div>
               <p className="text-sm font-bold leading-snug" style={{ color: "var(--color-text-primary)" }}>{t.name}</p>
               <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{t.desc}</p>
-              <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold hover:underline" style={{ color: t.color }}>
+              <a
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs font-semibold hover:underline inline-flex items-center py-2"
+                style={{ color: t.color }}
+                aria-label={`${t.name}（外部サイト、新しいタブで開きます）`}
+              >
                 外部サイトへ ↗
               </a>
             </div>
@@ -304,11 +311,11 @@ export default function ComparePage() {
         </p>
 
         {/* ナビゲーション */}
-        <div className="flex items-center justify-between pt-1">
-          <Link href="/cloud" className="text-sm font-semibold hover:underline" style={{ color: "var(--color-brand-secondary)" }}>
+        <div className="flex items-center justify-between">
+          <Link href="/cloud" className="text-sm font-semibold hover:underline py-3 inline-block" style={{ color: "var(--color-brand-secondary)" }}>
             ← ガバクラ比較
           </Link>
-          <Link href="/articles" className="text-sm font-semibold hover:underline" style={{ color: "var(--color-brand-secondary)" }}>
+          <Link href="/articles" className="text-sm font-semibold hover:underline py-3 inline-block" style={{ color: "var(--color-brand-secondary)" }}>
             コラム →
           </Link>
         </div>

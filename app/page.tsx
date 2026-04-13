@@ -289,6 +289,14 @@ export default function DashboardPage() {
             <span className="explore-card-title">導入パッケージ</span>
             <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
           </Link>
+
+          <Link href="/compare" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#E0F2FE", color: "#0369A1" }}>
+              比較
+            </span>
+            <span className="explore-card-title">ダッシュボード比較</span>
+            <span className="explore-card-desc">GCInsightと総務省・デジタル庁の機能・データを3社で比較</span>
+          </Link>
         </div>
       </div>
 
