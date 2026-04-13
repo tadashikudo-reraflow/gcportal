@@ -335,6 +335,10 @@ def generate_cover_image(article):
         print(f"  ✅ カバー画像: {X_ARTICLE_W}×{X_ARTICLE_H}px (5:2)")
     except Exception as e:
         print(f"  ⚠️  Gemini生成失敗: {e}")
+        # 生成失敗でも保存済みファイルがあれば（前回の部分成功など）流用する
+        if cover_path.exists():
+            print(f"  ℹ️  既存ファイルにフォールバック (id{article_id})")
+            return f"id{article_id}/cover.png"
         return None
 
     return f"id{article_id}/cover.png"
@@ -503,24 +507,22 @@ def process_article(article, no_push=False, open_browser=True):
     print(f"📋 ペーストHTML生成: {paste_path}")
 
     # Supabase x_paste_ready フラグをセット＋cover_image URL更新
-    # cover_fname が None（Gemini失敗）でも既存ファイルがあればそちらを使う
-    if cover_fname is None:
-        fallback_path = PUBLIC_X_IMGS / f"id{article['id']}" / "cover.png"
-        if fallback_path.exists():
-            cover_fname = f"id{article['id']}/cover.png"
-            print(f"  ℹ️  cover_fname fallback: 既存ファイルを使用 ({cover_fname})")
-    cover_image_url = f"{SITE_URL}/images/x-articles/{cover_fname}" if cover_fname else None
-    try:
-        mark_paste_ready(article["id"], cover_image_url)
-        print(f"  ✅ Supabase x_paste_ready=true 更新済み")
-        if cover_image_url:
-            print(f"  ✅ Supabase cover_image={cover_image_url} 更新済み")
-        else:
-            print(f"  ⚠️  cover_image は更新されていません（カバー画像なし）")
-    except Exception as e:
-        # DB更新失敗はジョブ失敗として扱う（握りつぶし禁止）
-        print(f"  ❌ Supabase更新失敗（x_paste_ready / cover_image が未更新）: {type(e).__name__}: {e}")
-        raise
+    # no_push=True は未デプロイ状態なので本番URLをDBに書かない
+    if no_push:
+        print(f"  ⏭  Supabase更新スキップ（no_push=True のため未デプロイURLを書かない）")
+    else:
+        cover_image_url = f"{SITE_URL}/images/x-articles/{cover_fname}" if cover_fname else None
+        try:
+            mark_paste_ready(article["id"], cover_image_url)
+            print(f"  ✅ Supabase x_paste_ready=true 更新済み")
+            if cover_image_url:
+                print(f"  ✅ Supabase cover_image={cover_image_url} 更新済み")
+            else:
+                print(f"  ⚠️  cover_image は更新されていません（カバー画像生成失敗）")
+        except Exception as e:
+            # DB更新失敗はジョブ失敗として扱う（握りつぶし禁止）
+            print(f"  ❌ Supabase更新失敗（x_paste_ready / cover_image が未更新）: {type(e).__name__}: {e}")
+            raise
 
     # Chrome で自動オープン（バッチ時はスキップ）
     if open_browser:
