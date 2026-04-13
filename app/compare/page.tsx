@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
+import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
 
 export const revalidate = 86400;
 
@@ -44,11 +45,11 @@ const faqJsonLd = {
 
 type Check = "yes" | "partial" | "no" | "planned";
 
-const CHECK_CONFIG: Record<Check, { label: string; color: string; bg: string }> = {
-  yes:     { label: "あり",  color: "#15803d", bg: "#f0fdf4" },
-  partial: { label: "一部",  color: "#92400e", bg: "#fffbeb" },
-  no:      { label: "なし",  color: "#6b7280", bg: "#f9fafb" },
-  planned: { label: "予定",  color: "#1d4ed8", bg: "#eff6ff" },
+const CHECK_CONFIG: Record<Check, { label: string; desc: string; color: string; bg: string }> = {
+  yes:     { label: "あり",  desc: "対応済み・公開中",   color: "#15803d", bg: "#f0fdf4" },
+  partial: { label: "一部",  desc: "限定的・条件付き対応", color: "#92400e", bg: "#fffbeb" },
+  no:      { label: "なし",  desc: "未対応・非公開",      color: "#4b5563", bg: "#f3f4f6" },
+  planned: { label: "予定",  desc: "開発・公開予定",      color: "#1d4ed8", bg: "#eff6ff" },
 };
 
 function Badge({ v }: { v: Check }) {
@@ -116,38 +117,9 @@ const COMPARE_ROWS: {
   },
 ];
 
-const TOOLS = [
-  {
-    id: "gcinsight",
-    name: "GCInsight",
-    label: "本サイト",
-    url: "/",
-    internal: true,
-    org: "民間（独自集計）",
-    color: "#00338D",
-    desc: "デジタル庁・総務省の公式データを取り込み、コスト試算・パッケージDB・開示請求データを独自追加した総合ダッシュボード。",
-  },
-  {
-    id: "mic",
-    name: "総務省標準化ダッシュボード",
-    label: "総務省",
-    url: "https://www.soumu.go.jp/main_sosiki/jichi_gyousei/c-gyousei/johoka/lgwan-asp/standard.html",
-    internal: false,
-    org: "総務省（公式）",
-    color: "#1d4ed8",
-    desc: "自治体の20業務標準化進捗を都道府県・市区町村別に公開。コスト情報・パッケージ詳細は含まない。",
-  },
-  {
-    id: "digital",
-    name: "デジタル庁 先行事業実績",
-    label: "デジタル庁",
-    url: "https://www.digital.go.jp/policies/local_governments/",
-    internal: false,
-    org: "デジタル庁（公式）",
-    color: "#0891b2",
-    desc: "ガバメントクラウド先行事業のシステム台帳・CSP別登録状況を公開。割引モデルや詳細コストは含まない。",
-  },
-];
+// 全項目のうちGCInsightが"yes"の割合
+const totalItems = COMPARE_ROWS.flatMap((s) => s.items).length;
+const gcinsightYes = COMPARE_ROWS.flatMap((s) => s.items).filter((r) => r.gcinsight === "yes").length;
 
 export default function ComparePage() {
   return (
@@ -164,43 +136,87 @@ export default function ComparePage() {
           <p className="page-subtitle">GCInsight・総務省・デジタル庁の機能・データを比較</p>
         </div>
 
-        {/* ツール概要カード */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {TOOLS.map((t) => (
+        {/* GCInsight ヒーローカード（差別化） */}
+        <div
+          className="card p-5"
+          style={{ borderLeft: "4px solid #00338D", backgroundColor: "var(--color-surface)" }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="space-y-1.5 flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: "#00338D18", color: "#00338D" }}>
+                  本サイト
+                </span>
+                <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: "#f0fdf4", color: "#15803d" }}>
+                  {gcinsightYes}/{totalItems}項目対応
+                </span>
+              </div>
+              <p className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>GCInsight</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                デジタル庁・総務省の公式データを取り込み、コスト試算・パッケージDB・開示請求データを独自追加した総合ダッシュボード。
+                自治体DX担当者・ITベンダー・コンサル向けに意思決定支援データを無料提供。
+              </p>
+            </div>
+            <div className="flex sm:flex-col gap-2 flex-shrink-0">
+              <Link
+                href="/costs"
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-center whitespace-nowrap"
+                style={{ backgroundColor: "#00338D", color: "#fff" }}
+              >
+                コスト比較を見る
+              </Link>
+              <Link
+                href="/"
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg text-center whitespace-nowrap"
+                style={{ border: "1px solid #00338D", color: "#00338D" }}
+              >
+                ダッシュボードへ
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* 競合2サービス（小さく横並び） */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[
+            {
+              id: "mic",
+              name: "総務省標準化ダッシュボード",
+              label: "総務省",
+              url: "https://www.soumu.go.jp/main_sosiki/jichi_gyousei/c-gyousei/johoka/lgwan-asp/standard.html",
+              org: "総務省（公式）",
+              color: "#1d4ed8",
+              desc: "自治体の20業務標準化進捗を都道府県・市区町村別に公開。コスト情報・パッケージ詳細は含まない。",
+            },
+            {
+              id: "digital",
+              name: "デジタル庁 先行事業実績",
+              label: "デジタル庁",
+              url: "https://www.digital.go.jp/policies/local_governments/",
+              org: "デジタル庁（公式）",
+              color: "#0891b2",
+              desc: "ガバメントクラウド先行事業のシステム台帳・CSP別登録状況を公開。割引モデルや詳細コストは含まない。",
+            },
+          ].map((t) => (
             <div key={t.id} className="card p-4 space-y-2">
               <div className="flex items-center gap-2">
-                <span
-                  className="text-xs font-bold px-2 py-0.5 rounded"
-                  style={{ backgroundColor: t.color + "18", color: t.color }}
-                >
+                <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: t.color + "18", color: t.color }}>
                   {t.label}
                 </span>
-                {t.org.includes("公式") && (
-                  <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "#f0fdf4", color: "#15803d" }}>
-                    公式
-                  </span>
-                )}
+                <span className="text-xs px-1.5 py-0.5 rounded" style={{ backgroundColor: "#f0fdf4", color: "#15803d" }}>
+                  公式
+                </span>
               </div>
-              <p className="text-sm font-bold leading-snug" style={{ color: "var(--color-text-primary)" }}>
-                {t.name}
-              </p>
-              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                {t.desc}
-              </p>
-              {t.internal ? (
-                <Link href={t.url} className="text-xs font-semibold hover:underline" style={{ color: t.color }}>
-                  サイトを見る →
-                </Link>
-              ) : (
-                <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold hover:underline" style={{ color: t.color }}>
-                  外部サイトへ ↗
-                </a>
-              )}
+              <p className="text-sm font-bold leading-snug" style={{ color: "var(--color-text-primary)" }}>{t.name}</p>
+              <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{t.desc}</p>
+              <a href={t.url} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold hover:underline" style={{ color: t.color }}>
+                外部サイトへ ↗
+              </a>
             </div>
           ))}
         </div>
 
-        {/* 比較テーブル */}
+        {/* 比較テーブル（モバイル横スクロール対応 + ARIA table semantics） */}
         {COMPARE_ROWS.map((section) => (
           <div key={section.category} className="card overflow-hidden">
             {/* セクションヘッダー */}
@@ -210,61 +226,76 @@ export default function ComparePage() {
               </h2>
             </div>
 
-            {/* ヘッダー行 */}
-            <div
-              className="grid px-4 py-2 border-b text-xs font-bold"
-              style={{
-                gridTemplateColumns: "1fr 4.5rem 4.5rem 4.5rem",
-                gap: "0.5rem",
-                color: "var(--color-text-muted)",
-                borderColor: "var(--color-border)",
-              }}
-            >
-              <span>機能・データ</span>
-              <span className="text-center" style={{ color: "#00338D" }}>GCInsight</span>
-              <span className="text-center" style={{ color: "#1d4ed8" }}>総務省</span>
-              <span className="text-center" style={{ color: "#0891b2" }}>デジタル庁</span>
-            </div>
-
-            {/* データ行 */}
-            {section.items.map((row, i) => (
+            {/* スクロールコンテナ */}
+            <div className="overflow-x-auto">
               <div
-                key={row.label}
-                className="grid px-4 py-2.5 items-center text-xs"
-                style={{
-                  gridTemplateColumns: "1fr 4.5rem 4.5rem 4.5rem",
-                  gap: "0.5rem",
-                  borderBottom: i < section.items.length - 1 ? "1px solid var(--color-border)" : undefined,
-                  borderColor: "var(--color-border)",
-                }}
+                role="table"
+                aria-label={`${section.category}の機能比較`}
+                style={{ minWidth: 380 }}
               >
-                <div>
-                  <span style={{ color: "var(--color-text-primary)" }}>{row.label}</span>
-                  {row.note && (
-                    <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{row.note}</p>
-                  )}
+                {/* ヘッダー行 */}
+                <div
+                  role="row"
+                  className="grid px-4 py-2 border-b text-xs font-bold"
+                  style={{
+                    gridTemplateColumns: "1fr 4.5rem 4.5rem 4.5rem",
+                    gap: "0.5rem",
+                    borderColor: "var(--color-border)",
+                  }}
+                >
+                  <span role="columnheader" style={{ color: "var(--color-text-muted)" }}>機能・データ</span>
+                  <span role="columnheader" className="text-center" style={{ color: "#00338D" }}>GCInsight</span>
+                  <span role="columnheader" className="text-center" style={{ color: "#1d4ed8" }}>総務省</span>
+                  <span role="columnheader" className="text-center" style={{ color: "#0891b2" }}>デジタル庁</span>
                 </div>
-                <div className="flex justify-center"><Badge v={row.gcinsight} /></div>
-                <div className="flex justify-center"><Badge v={row.mic} /></div>
-                <div className="flex justify-center"><Badge v={row.digital} /></div>
+
+                {/* データ行 */}
+                <div role="rowgroup">
+                  {section.items.map((row, i) => (
+                    <div
+                      key={row.label}
+                      role="row"
+                      className="grid px-4 py-2.5 items-center text-xs"
+                      style={{
+                        gridTemplateColumns: "1fr 4.5rem 4.5rem 4.5rem",
+                        gap: "0.5rem",
+                        borderBottom: i < section.items.length - 1 ? "1px solid var(--color-border)" : undefined,
+                      }}
+                    >
+                      <div role="cell">
+                        <span style={{ color: "var(--color-text-primary)" }}>{row.label}</span>
+                        {row.note && (
+                          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>{row.note}</p>
+                        )}
+                      </div>
+                      <div role="cell" className="flex justify-center"><Badge v={row.gcinsight} /></div>
+                      <div role="cell" className="flex justify-center"><Badge v={row.mic} /></div>
+                      <div role="cell" className="flex justify-center"><Badge v={row.digital} /></div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         ))}
 
-        {/* 凡例 */}
+        {/* 凡例（説明テキスト付き） */}
         <div className="card p-4">
           <h2 className="text-xs font-bold mb-3" style={{ color: "var(--color-text-secondary)" }}>凡例</h2>
-          <div className="flex flex-wrap gap-2">
-            {(Object.entries(CHECK_CONFIG) as [Check, typeof CHECK_CONFIG[Check]][]).map(([k, c]) => (
-              <div key={k} className="flex items-center gap-1.5">
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: c.color, backgroundColor: c.bg }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(Object.entries(CHECK_CONFIG) as [Check, typeof CHECK_CONFIG[Check]][]).map(([, c]) => (
+              <div key={c.label} className="flex items-start gap-2">
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0 mt-0.5" style={{ color: c.color, backgroundColor: c.bg }}>
                   {c.label}
                 </span>
+                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>{c.desc}</span>
               </div>
             ))}
           </div>
         </div>
+
+        {/* ニュースレター CTA */}
+        <ArticleNewsletterBanner />
 
         {/* 免責 */}
         <p className="text-xs px-1" style={{ color: "var(--color-text-muted)" }}>
