@@ -36,6 +36,7 @@ const NAV_GROUPS = [
       { href: "/timeline",   label: "スケジュール", desc: "" },
       { href: "/sources",    label: "出典", desc: "" },
       { href: "/disclosure", label: "開示請求", desc: "" },
+      { href: "/compare",    label: "ダッシュボード比較", desc: "" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
@@ -77,6 +78,7 @@ const DRAWER_SECTIONS = [
       { href: "/timeline",   label: "スケジュール" },
       { href: "/sources",    label: "出典" },
       { href: "/disclosure", label: "開示請求" },
+      { href: "/compare",    label: "ダッシュボード比較" },
     ],
   },
   {
