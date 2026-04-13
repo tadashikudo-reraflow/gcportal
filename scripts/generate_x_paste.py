@@ -586,12 +586,20 @@ def main():
             print("\n🚀 全PNG/カバー画像をまとめてgit push...")
             import subprocess as sp
             sp.run(["git", "-C", str(GCPORTAL_DIR), "add", "public/images/x-articles/"], check=True)
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"], check=True)
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "push"], check=True)
-            print("  ⏳ Vercelデプロイ完了まで約30秒お待ちください\n")
+            commit_r = sp.run(
+                ["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"],
+                capture_output=True, text=True,
+            )
+            if commit_r.returncode != 0 and "nothing to commit" in commit_r.stdout + commit_r.stderr:
+                print("  変更なし（既にプッシュ済み、画像はVercel上に存在）")
+            elif commit_r.returncode != 0:
+                print(f"  ⚠️  git commit 失敗: {commit_r.stderr.strip()}")
+            else:
+                sp.run(["git", "-C", str(GCPORTAL_DIR), "push"], check=True)
+                print("  ⏳ Vercelデプロイ完了まで約30秒お待ちください")
 
-            # git push 後に DB を一括更新
-            print("📝 Supabase DB 一括更新...")
+            # git push（または既存確認）後に DB を一括更新
+            print("\n📝 Supabase DB 一括更新...")
             for article_id, title, _, cover_image_url in results:
                 try:
                     mark_paste_ready(article_id, cover_image_url)
