@@ -841,7 +841,7 @@ export default async function CostsPage() {
         <p className="text-xs text-gray-400">
           個別の事例データは <a href="#cost-records" className="text-blue-500 hover:underline">コスト変化実績 ↑</a>
         </p>
-        <ReportLeadCta source="costs-r6" compact title="R6検証データを含むレポートをPDFで確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />
+        <ReportLeadCta source="costs-r6" compact title="R6検証データを含む詳細をまとめて確認" description="8団体の詳細比較とベンダー別の見方をまとめて確認できます。" />
       </div>
 
       {/* デジタル庁コスト管理ガイド */}
@@ -891,7 +891,7 @@ export default async function CostsPage() {
       <ReportLeadCta
         source="costs"
         compact
-        title="コスト比較の背景をPDFでまとめて確認"
+        title="コスト比較の背景をまとめて確認"
         description="ベンダー別の見方だけでなく、進捗や遅延構造まで含めて無料レポートで確認できます。"
       />
 

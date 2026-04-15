@@ -98,7 +98,7 @@ export default async function SchedulePage() {
       </div>
 
       <ScheduleClient data={data} />
-      <ReportLeadCta source="timeline" compact title="期限後の移行状況とコスト変化をPDFで確認" description="移行完了後に顕在化したコスト増加・遅延構造・対策をまとめた無料レポートです。" />
+      <ReportLeadCta source="timeline" compact title="期限後の移行状況とコスト変化をまとめて確認" description="移行完了後に顕在化したコスト増加・遅延構造・対策をまとめた無料レポートです。" />
     </div>
   );
 }
