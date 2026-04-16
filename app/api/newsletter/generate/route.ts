@@ -30,6 +30,18 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   return false;
 }
 
+// ----- 除外キーワード（全ソース共通） -----
+const EXCLUDE_KEYWORDS = [
+  // マイナンバー関連
+  "マイナンバー", "マイナカード", "マイナポイント", "マイナ保険証", "マイナポータル",
+  // サンリオキャラクター関連
+  "サンリオ", "ハローキティ", "キティ", "ポムポムプリン", "シナモロール", "マイメロ", "クロミ", "ぐでたま",
+];
+
+function isExcluded(title: string): boolean {
+  return EXCLUDE_KEYWORDS.some((kw) => title.includes(kw));
+}
+
 // ----- ニュース記事収集（複数ソース） -----
 interface NewsItem {
   title: string;
@@ -87,7 +99,7 @@ async function fetchNewsItems(): Promise<NewsItem[]> {
   } catch { /* スキップ */ }
 
   // デジタル庁 RSS（/rss/news.xml）
-  const digitalKeywords = ["ガバメント", "自治体", "標準化", "クラウド", "マイナ", "ガバクラ", "DX", "デジタル基盤"];
+  const digitalKeywords = ["ガバメント", "自治体", "標準化", "クラウド", "ガバクラ", "DX", "デジタル基盤"];
   try {
     const res = await fetch("https://www.digital.go.jp/rss/news.xml", {
       signal: AbortSignal.timeout(6000),
@@ -108,10 +120,11 @@ async function fetchNewsItems(): Promise<NewsItem[]> {
     }
   } catch { /* スキップ */ }
 
-  // 重複除去 + 最大6件
+  // 重複除去 + 除外フィルター + 最大6件
   const seen = new Set<string>();
   return results.filter(r => {
     if (!r.title || seen.has(r.url)) return false;
+    if (isExcluded(r.title)) return false;
     seen.add(r.url);
     return true;
   }).slice(0, 6);
@@ -231,6 +244,7 @@ async function searchNote(keywords: string[]): Promise<NoteArticle[]> {
       seen.add(r.url);
       return true;
     })
+    .filter((r) => !isExcluded(r.title))
     .filter((r) => RELEVANCE_KEYWORDS.some((kw) => r.title.includes(kw)))
     .sort((a, b) => b.likeCount - a.likeCount)
     .filter((a) => a.likeCount >= 3)
@@ -478,6 +492,7 @@ export async function POST(req: NextRequest) {
   const ragOfficial: Array<{ title: string; summary: string; url: string; source: string }> = [];
 
   for (const r of bodyData.ragNews ?? []) {
+    if (isExcluded(r.title)) continue;
     const item = { title: r.title, summary: r.summary, url: r.url, source: r.source };
     if (NEWS_SOURCES.has(r.source)) {
       ragNewsItems.push({ ...item, date: r.published_at?.slice(0, 10) });
