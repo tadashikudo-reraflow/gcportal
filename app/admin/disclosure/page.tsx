@@ -67,7 +67,7 @@ export default function AdminDisclosurePage() {
   const [editDisclosedAt,  setEditDisclosedAt]   = useState("");
 
   const getAuth = () => {
-    const pass = sessionStorage.getItem("admin_pass") ?? "";
+    const pass = localStorage.getItem("admin_pass") ?? "";
     return `Basic ${btoa(`:${pass}`)}`;
   };
 

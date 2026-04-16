@@ -34,14 +34,14 @@ function ComposeForm() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const getAuth = () => {
-    const pass = sessionStorage.getItem("admin_pass") ?? "";
+    const pass = localStorage.getItem("admin_pass") ?? "";
     return `Basic ${btoa(`:${pass}`)}`;
   };
 
   const ensurePass = () => {
-    if (!sessionStorage.getItem("admin_pass")) {
+    if (!localStorage.getItem("admin_pass")) {
       const p = window.prompt("管理者パスワード");
-      if (p) sessionStorage.setItem("admin_pass", p);
+      if (p) localStorage.setItem("admin_pass", p);
     }
   };
 
