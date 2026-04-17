@@ -51,6 +51,10 @@ OUT_DIR = Path(_gdrive) / "contents" / "PJ19" / "x_articles"
 XAI_KEY     = os.environ.get("XAI_API_KEY", "")
 GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "")
 
+# -- スキーマ切替（--schema karte で karte.articles を対象にする）--
+# main() で args.schema を読み込んだ後に _apply_schema() で更新する
+_SCHEMA = "public"  # default
+
 HEADERS = {
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
@@ -71,7 +75,43 @@ def _check_env():
         sys.exit(1)
 
 
+def _apply_schema(schema: str):
+    """スキーマを karte に切り替える。Supabase REST API ヘッダと OUT_DIR・PUBLIC_X_IMGS を更新する。"""
+    global _SCHEMA, OUT_DIR, HEADERS, PUBLIC_X_IMGS
+    _SCHEMA = schema
+    if schema != "public":
+        # Supabase PostgREST: Accept-Profile で読み取りスキーマ切替
+        HEADERS["Accept-Profile"] = schema
+        # PATCH/POST 用は呼び出し元で Content-Profile ヘッダを追加する
+        # OUT_DIR を karte 用に変更（Drive側）
+        OUT_DIR = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ30" / "x_articles"
+        # 画像保存先を karte 専用ディレクトリに変更（public/x-articles との ID衝突を防ぐ）
+        PUBLIC_X_IMGS = GCPORTAL_DIR / "public" / "images" / "karte-articles"
+
+
+def _img_url_base() -> str:
+    """Vercel上の画像URLパス（スキーマ別）を返す"""
+    return "karte-articles" if _SCHEMA == "karte" else "x-articles"
+
+
+def _rest_url() -> str:
+    """現在のスキーマに合った REST API エンドポイントを返す"""
+    # karte スキーマも /rest/v1/articles で OK（Accept-Profile ヘッダで切り替え）
+    return f"{SUPABASE_URL}/rest/v1/articles"
+
+
 def build_cta_html(slug: str) -> str:
+    if _SCHEMA == "karte":
+        # GCInsight Medical 向け CTA
+        return f"""
+<hr style="margin:40px 0; border:none; border-top:2px solid #e5e7eb;">
+<div style="background:#e8f5e9; border-radius:8px; padding:24px; font-size:16px; line-height:1.8;">
+  <p>🏥 電子カルテ標準化・情報共有サービスの最新情報を確認<br>
+  👉 <a href="{SITE_URL}/karte/">{SITE_URL}/karte/</a></p>
+  <p>📋 標準型電子カルテ・補助金・普及率に関する解説記事一覧<br>
+  👉 <a href="{SITE_URL}/karte/">{SITE_URL}/karte/</a></p>
+</div>
+"""
     return f"""
 <hr style="margin:40px 0; border:none; border-top:2px solid #e5e7eb;">
 <div style="background:#f0f7ff; border-radius:8px; padding:24px; font-size:16px; line-height:1.8;">
@@ -97,7 +137,7 @@ def get_article(article_id=None):
         params["is_published"] = "eq.true"
         params["x_paste_ready"] = "eq.false"
 
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/articles", headers=HEADERS, params=params)
+    r = requests.get(_rest_url(), headers=HEADERS, params=params)
     r.raise_for_status()
     data = r.json()
     return data[0] if data else None
@@ -111,7 +151,7 @@ def get_all_unready():
         "x_paste_ready": "eq.false",
         "order": "id.asc",
     }
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/articles", headers=HEADERS, params=params)
+    r = requests.get(_rest_url(), headers=HEADERS, params=params)
     r.raise_for_status()
     return r.json()
 
@@ -121,9 +161,17 @@ def mark_paste_ready(article_id, cover_image_url=None):
     payload = {"x_paste_ready": True}
     if cover_image_url:
         payload["cover_image"] = cover_image_url
+    patch_headers = {
+        **HEADERS,
+        "Content-Type": "application/json",
+        "Prefer": "return=minimal",
+    }
+    # karte スキーマへの書き込みは Content-Profile ヘッダが必要
+    if _SCHEMA != "public":
+        patch_headers["Content-Profile"] = _SCHEMA
     r = requests.patch(
-        f"{SUPABASE_URL}/rest/v1/articles",
-        headers={**HEADERS, "Content-Type": "application/json", "Prefer": "return=representation"},
+        _rest_url(),
+        headers=patch_headers,
         params={"id": f"eq.{article_id}"},
         json=payload,
     )
@@ -370,8 +418,9 @@ def generate_cover_image(article):
 def git_push(slug):
     """新規PNGをコミット＆プッシュ（Vercel自動デプロイ）"""
     print("🚀 git push → Vercel デプロイ...")
+    img_subdir = f"public/images/{_img_url_base()}/"
     cmds = [
-        ["git", "add", "public/images/x-articles/"],
+        ["git", "add", img_subdir],
         ["git", "commit", "-m", f"feat: X Article images for {slug}"],
         ["git", "push"],
     ]
@@ -397,7 +446,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
     # figure置換
     for block, fname in zip(blocks, figure_filenames):
-        img_url = f"{SITE_URL}/images/x-articles/{fname}"
+        img_url = f"{SITE_URL}/images/{_img_url_base()}/{fname}"
         img_tag = f'<img src="{img_url}" alt="図解" style="max-width:100%;border-radius:8px;margin:16px 0;">'
         body = body.replace(block["placeholder"], img_tag)
 
@@ -405,7 +454,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
     body = re.sub(r'__FIGURE_\d+__', '', body)
 
     # カバー画像URL
-    cover_url = f"{SITE_URL}/images/x-articles/{cover_filename}" if cover_filename else ""
+    cover_url = f"{SITE_URL}/images/{_img_url_base()}/{cover_filename}" if cover_filename else ""
 
     # タイトル・リード
     title = article["title"]
@@ -529,7 +578,7 @@ def process_article(article, no_push=False, open_browser=True, skip_db=False):
     print(f"📋 ペーストHTML生成: {paste_path}")
 
     # Supabase x_paste_ready フラグをセット＋cover_image URL更新
-    cover_image_url = f"{SITE_URL}/images/x-articles/{cover_fname}" if cover_fname else None
+    cover_image_url = f"{SITE_URL}/images/{_img_url_base()}/{cover_fname}" if cover_fname else None
     if skip_db or no_push:
         # バッチモード(skip_db)または未デプロイ状態(no_push)はDB更新を呼び出し元に委譲
         reason = "skip_db=True" if skip_db else "no_push=True（未デプロイURLを書かない）"
@@ -564,7 +613,14 @@ def main():
     parser.add_argument("--id",      type=int, help="記事ID指定（省略時: 次の未生成）")
     parser.add_argument("--all",     action="store_true", help="未生成記事を全件一括処理")
     parser.add_argument("--no-push", action="store_true", help="git push をスキップ")
+    parser.add_argument("--schema",  default="public",
+                        help="Supabase スキーマ（default: public / karte: karte.articles）")
     args = parser.parse_args()
+
+    # スキーマ切替（karte 指定時はヘッダ・OUT_DIR を更新）
+    if args.schema != "public":
+        _apply_schema(args.schema)
+        print(f"📐 スキーマ: {args.schema}（OUT_DIR: {OUT_DIR}）")
 
     if args.all:
         # バッチモード: 全未生成記事を処理
@@ -585,7 +641,7 @@ def main():
         if not args.no_push:
             print("\n🚀 全PNG/カバー画像をまとめてgit push...")
             import subprocess as sp
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "add", "public/images/x-articles/"], check=True)
+            sp.run(["git", "-C", str(GCPORTAL_DIR), "add", f"public/images/{_img_url_base()}/"], check=True)
             commit_r = sp.run(
                 ["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"],
                 capture_output=True, text=True,
