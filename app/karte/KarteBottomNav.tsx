@@ -6,7 +6,7 @@ import { Home, BookOpen } from "lucide-react";
 
 const NAV_ITEMS = [
   { label: "記事一覧", icon: <Home size={20} />, href: "/karte" },
-  { label: "コラム", icon: <BookOpen size={20} />, href: "/columns" },
+  { label: "コラム", icon: <BookOpen size={20} />, href: "/karte" },
 ];
 
 export default function KarteBottomNav() {

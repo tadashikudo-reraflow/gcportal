@@ -4,7 +4,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getKarteArticleBySlug } from "@/lib/karte-articles";
 import MermaidRenderer from "@/components/MermaidRenderer";
-import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
+import KarteArticleNewsletterBanner from "@/components/KarteArticleNewsletterBanner";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BookOpen } from "lucide-react";
 
@@ -195,7 +195,7 @@ export default async function KarteArticlePage({ params }: Props) {
         </div>
       )}
 
-      <ArticleNewsletterBanner />
+      <KarteArticleNewsletterBanner />
 
       <div className="flex items-center justify-between pt-2">
         <Link
