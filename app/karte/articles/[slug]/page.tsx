@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
+
 import { notFound } from "next/navigation";
 import { getKarteArticleBySlug } from "@/lib/karte-articles";
 import MermaidRenderer from "@/components/MermaidRenderer";
@@ -105,18 +105,16 @@ export default async function KarteArticlePage({ params }: Props) {
         ]}
       />
 
-      {article.coverImage && (
-        <div className="card overflow-hidden">
-          <Image
-            src={article.coverImage}
-            alt={article.title}
-            width={1200}
-            height={630}
-            className="w-full h-auto"
-            priority
-          />
-        </div>
-      )}
+      <div className="card overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`/og?${jsonLdOgParams.toString()}`}
+          alt={article.title}
+          width={1200}
+          height={630}
+          className="w-full h-auto"
+        />
+      </div>
 
       <div className="card p-6 space-y-4">
         {article.tags?.length > 0 && (

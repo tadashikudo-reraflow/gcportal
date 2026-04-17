@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   電子カルテ:         { bg: "#e8f5e9", text: "#2e7d32" },
@@ -19,13 +18,25 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   解説:               { bg: "#e0f7fa", text: "#00695c" },
 };
 
-function ArticlePlaceholder({ title }: { title: string }) {
+function ArticleOgThumbnail({ title, description, author }: { title: string; description?: string; author?: string }) {
+  const params = new URLSearchParams({
+    title,
+    subtitle: description || "GCInsight for 電子カルテ標準化",
+    type: "article",
+    site: "karte",
+    ...(author ? { author } : {}),
+  });
   return (
-    <div className="w-full flex items-center justify-center"
-      style={{ aspectRatio: "5/2", background: "linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%)" }}>
-      <span className="text-white text-sm font-bold px-6 text-center leading-snug opacity-80">
-        {title.length > 30 ? title.slice(0, 30) + "…" : title}
-      </span>
+    <div className="w-full overflow-hidden" style={{ aspectRatio: "5/2" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`/og?${params.toString()}`}
+        alt={title}
+        width={600}
+        height={240}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        loading="lazy"
+      />
     </div>
   );
 }
@@ -107,18 +118,14 @@ export default function KarteArticlesClient({ articles }: { articles: Article[] 
           {filtered.map((article) => (
             <Link key={article.slug} href={`/karte/${article.slug}`}
               className="article-card group">
-              {article.coverImage ? (
-                <div className="w-full overflow-hidden bg-[#EEF4FB]" style={{ aspectRatio: "5/2" }}>
-                  <Image src={article.coverImage} alt={article.title}
-                    width={600} height={240}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                </div>
-              ) : (
-                <ArticlePlaceholder title={article.title} />
-              )}
+              <ArticleOgThumbnail
+                title={article.title}
+                description={article.description}
+                author={article.author}
+              />
               <div className="p-6 flex flex-col gap-3 flex-1">
-                <h2 className={`text-base font-bold leading-snug group-hover:underline ${article.coverImage ? "sr-only" : ""}`}
-                  style={article.coverImage ? {} : { color: "var(--color-text-primary)" }}>{article.title}</h2>
+                <h2 className="text-base font-bold leading-snug group-hover:underline"
+                  style={{ color: "var(--color-text-primary)" }}>{article.title}</h2>
                 {article.description && (
                   <p className="text-sm leading-relaxed line-clamp-3"
                     style={{ color: "var(--color-text-secondary)" }}>{article.description}</p>
