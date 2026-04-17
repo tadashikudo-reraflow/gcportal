@@ -27,13 +27,13 @@ function ArticleOgThumbnail({ title, description, author }: { title: string; des
     ...(author ? { author } : {}),
   });
   return (
-    <div className="w-full overflow-hidden" style={{ aspectRatio: "5/2" }}>
+    <div className="w-full overflow-hidden" style={{ aspectRatio: "40/21" }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/og?${params.toString()}`}
         alt={title}
-        width={600}
-        height={240}
+        width={1200}
+        height={630}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         loading="lazy"
       />
