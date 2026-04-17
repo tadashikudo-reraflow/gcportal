@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const ORG_OPTIONS = [
+const DEFAULT_ORG_OPTIONS = [
   { value: "municipality", label: "自治体職員" },
   { value: "it_vendor", label: "IT企業・SIer" },
   { value: "consultant", label: "コンサル・シンクタンク" },
@@ -11,11 +11,16 @@ const ORG_OPTIONS = [
   { value: "other", label: "その他" },
 ];
 
+interface OrgOption { value: string; label: string; }
+
 interface Props {
   label?: React.ReactNode;
   source?: string;
   buttonStyle?: React.CSSProperties;
   buttonClassName?: string;
+  title?: string;
+  description?: string;
+  orgOptions?: OrgOption[];
 }
 
 export default function NewsletterModal({
@@ -23,6 +28,9 @@ export default function NewsletterModal({
   source = "newsletter_modal",
   buttonStyle,
   buttonClassName,
+  title = "ガバクラ・自治体DXの最新動向を週1でお届け",
+  description = "自治体職員・ITベンダー・コンサル向け。登録特典として会員限定レポートをプレゼント。いつでも解除できます。",
+  orgOptions = DEFAULT_ORG_OPTIONS,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -160,10 +168,10 @@ export default function NewsletterModal({
                   無料ニュースレター
                 </p>
                 <h2 style={{ fontSize: "1.125rem", fontWeight: 800, color: "#111827", marginBottom: 6 }}>
-                  ガバクラ・自治体DXの最新動向を週1でお届け
+                  {title}
                 </h2>
                 <p style={{ fontSize: "0.8125rem", color: "#6b7280", lineHeight: 1.6, marginBottom: 20 }}>
-                  自治体職員・ITベンダー・コンサル向け。登録特典として会員限定レポートをプレゼント。いつでも解除できます。
+                  {description}
                 </p>
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -200,7 +208,7 @@ export default function NewsletterModal({
                     }}
                   >
                     <option value="">ご所属を選択</option>
-                    {ORG_OPTIONS.map((opt) => (
+                    {orgOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
