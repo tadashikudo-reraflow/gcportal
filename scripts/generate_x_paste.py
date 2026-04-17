@@ -41,7 +41,12 @@ GCPORTAL_DIR   = Path(__file__).parent.parent  # gcportal/
 SCRIPTS_DIR    = GCPORTAL_DIR / "scripts"
 PUBLIC_IMGS    = GCPORTAL_DIR / "public" / "images" / "articles"
 PUBLIC_X_IMGS  = GCPORTAL_DIR / "public" / "images" / "x-articles"
-OUT_DIR        = Path(os.path.expandvars("$GDRIVE_WORKSPACE")) / "contents" / "PJ19" / "x_articles"
+
+_gdrive = os.environ.get("GDRIVE_WORKSPACE", "")
+if not _gdrive or _gdrive == "$GDRIVE_WORKSPACE":
+    # フォールバック: 標準パスを使用
+    _gdrive = str(Path.home() / "Library/CloudStorage/GoogleDrive-tadashi.kudo@reraflow.com/マイドライブ/drive-workspace")
+OUT_DIR = Path(_gdrive) / "contents" / "PJ19" / "x_articles"
 
 XAI_KEY     = os.environ.get("XAI_API_KEY", "")
 GEMINI_KEY  = os.environ.get("GEMINI_API_KEY", "")
@@ -54,6 +59,20 @@ HEADERS = {
     "apikey": SUPABASE_KEY,
     "Authorization": f"Bearer {SUPABASE_KEY}",
 }
+
+
+def _check_env():
+    """必須環境変数の事前チェック — 処理途中で失敗する前に早期終了"""
+    missing = []
+    if not SUPABASE_KEY:
+        missing.append("SUPABASE_SERVICE_ROLE_KEY")
+    if not GEMINI_KEY:
+        missing.append("GEMINI_API_KEY")
+    if missing:
+        print(f"❌ 必須環境変数が未設定です: {', '.join(missing)}")
+        print("   実行前に以下を実行してください:")
+        print("   set -a && source .env.local && set +a")
+        sys.exit(1)
 
 
 def _apply_schema(schema: str):
@@ -157,6 +176,9 @@ def mark_paste_ready(article_id, cover_image_url=None):
         json=payload,
     )
     r.raise_for_status()
+    updated = r.json()
+    if not updated:
+        raise RuntimeError(f"mark_paste_ready: id={article_id} に一致する行が見つかりません（0行更新）")
 
 # ── HTML前処理 ────────────────────────────────────────────────────
 
@@ -383,6 +405,10 @@ def generate_cover_image(article):
         print(f"  ✅ カバー画像: {X_ARTICLE_W}×{X_ARTICLE_H}px (5:2)")
     except Exception as e:
         print(f"  ⚠️  Gemini生成失敗: {e}")
+        # 生成失敗でも保存済みファイルがあれば（前回の部分成功など）流用する
+        if cover_path.exists():
+            print(f"  ℹ️  既存ファイルにフォールバック (id{article_id})")
+            return f"id{article_id}/cover.png"
         return None
 
     return f"id{article_id}/cover.png"
@@ -484,7 +510,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
 # ── メイン ───────────────────────────────────────────────────────
 
-def process_article(article, no_push=False, open_browser=True):
+def process_article(article, no_push=False, open_browser=True, skip_db=False):
     """1記事分のHTML生成処理"""
     slug  = article["slug"]
     title = article["title"]
@@ -552,14 +578,23 @@ def process_article(article, no_push=False, open_browser=True):
     print(f"📋 ペーストHTML生成: {paste_path}")
 
     # Supabase x_paste_ready フラグをセット＋cover_image URL更新
-    try:
-        cover_image_url = f"{SITE_URL}/images/{_img_url_base()}/{cover_fname}" if cover_fname else None
-        mark_paste_ready(article["id"], cover_image_url)
-        print(f"  ✅ Supabase x_paste_ready=true 更新済み")
-        if cover_image_url:
-            print(f"  ✅ Supabase cover_image={cover_image_url} 更新済み")
-    except Exception as e:
-        print(f"  ⚠️  Supabase更新失敗（カラム未作成の可能性）: {e}")
+    cover_image_url = f"{SITE_URL}/images/{_img_url_base()}/{cover_fname}" if cover_fname else None
+    if skip_db or no_push:
+        # バッチモード(skip_db)または未デプロイ状態(no_push)はDB更新を呼び出し元に委譲
+        reason = "skip_db=True" if skip_db else "no_push=True（未デプロイURLを書かない）"
+        print(f"  ⏭  Supabase更新スキップ（{reason}）")
+    else:
+        try:
+            mark_paste_ready(article["id"], cover_image_url)
+            print(f"  ✅ Supabase x_paste_ready=true 更新済み")
+            if cover_image_url:
+                print(f"  ✅ Supabase cover_image={cover_image_url} 更新済み")
+            else:
+                print(f"  ⚠️  cover_image は更新されていません（カバー画像生成失敗）")
+        except Exception as e:
+            # DB更新失敗はジョブ失敗として扱う（握りつぶし禁止）
+            print(f"  ❌ Supabase更新失敗（x_paste_ready / cover_image が未更新）: {type(e).__name__}: {e}")
+            raise
 
     # Chrome で自動オープン（バッチ時はスキップ）
     if open_browser:
@@ -568,10 +603,12 @@ def process_article(article, no_push=False, open_browser=True):
         print(f"   Chromeが開いたら Cmd+A → Cmd+C → X Articlesで Cmd+V")
         print(f"   カバー画像は別途アップロード: {cover_fname}")
 
-    return paste_path
+    return paste_path, cover_image_url
 
 
 def main():
+    _check_env()  # 必須env var を早期チェック（処理途中で401になる前に止める）
+
     parser = argparse.ArgumentParser(description="X Articles ペーストHTML生成")
     parser.add_argument("--id",      type=int, help="記事ID指定（省略時: 次の未生成）")
     parser.add_argument("--all",     action="store_true", help="未生成記事を全件一括処理")
@@ -592,22 +629,44 @@ def main():
             print("✅ 全件のX HTML生成済みです。")
             return
         print(f"🔄 {len(articles)}本を一括処理します...\n")
-        results = []
+        results = []  # (article_id, title, paste_path, cover_image_url)
         for article in articles:
-            paste_path = process_article(article, no_push=True, open_browser=False)
-            results.append((article["id"], article["title"], paste_path))
+            # 個別git push・DB更新はスキップ（まとめて後でやる）
+            paste_path, cover_image_url = process_article(
+                article, no_push=True, open_browser=False, skip_db=True
+            )
+            results.append((article["id"], article["title"], paste_path, cover_image_url))
 
         # まとめてgit push
         if not args.no_push:
             print("\n🚀 全PNG/カバー画像をまとめてgit push...")
             import subprocess as sp
             sp.run(["git", "-C", str(GCPORTAL_DIR), "add", f"public/images/{_img_url_base()}/"], check=True)
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"], check=True)
-            sp.run(["git", "-C", str(GCPORTAL_DIR), "push"], check=True)
-            print("  ⏳ Vercelデプロイ完了まで約30秒お待ちください\n")
+            commit_r = sp.run(
+                ["git", "-C", str(GCPORTAL_DIR), "commit", "-m", f"feat: X Article images batch ({len(articles)} articles)"],
+                capture_output=True, text=True,
+            )
+            if commit_r.returncode != 0 and "nothing to commit" in commit_r.stdout + commit_r.stderr:
+                print("  変更なし（既にプッシュ済み、画像はVercel上に存在）")
+            elif commit_r.returncode != 0:
+                print(f"  ⚠️  git commit 失敗: {commit_r.stderr.strip()}")
+            else:
+                sp.run(["git", "-C", str(GCPORTAL_DIR), "push"], check=True)
+                print("  ⏳ Vercelデプロイ完了まで約30秒お待ちください")
+
+            # git push（または既存確認）後に DB を一括更新
+            print("\n📝 Supabase DB 一括更新...")
+            for article_id, title, _, cover_image_url in results:
+                try:
+                    mark_paste_ready(article_id, cover_image_url)
+                    print(f"  ✅ [{article_id}] x_paste_ready=true / cover_image 更新済み")
+                except Exception as e:
+                    print(f"  ❌ [{article_id}] DB更新失敗: {type(e).__name__}: {e}")
+        else:
+            print("  ⏭  git push スキップのため DB更新もスキップ")
 
         print(f"\n✅ {len(results)}本の処理完了:")
-        for article_id, title, paste_path in results:
+        for article_id, title, paste_path, _ in results:
             print(f"  [{article_id}] {title}")
             print(f"       → {paste_path}")
         return

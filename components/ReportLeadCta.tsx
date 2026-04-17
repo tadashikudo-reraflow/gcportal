@@ -7,14 +7,16 @@ type Props = {
   compact?: boolean;
 };
 
-function openPdfModal() {
-  window.dispatchEvent(new CustomEvent("openPdfModal"));
+function openNewsletterModal(source: string) {
+  window.dispatchEvent(
+    new CustomEvent("openLeadModal", { detail: { source: `newsletter_${source}` } })
+  );
 }
 
 export default function ReportLeadCta({
   source,
-  title = "無料レポートで全体像をまとめて確認",
-  description = "全国1,741自治体の進捗、コスト、遅延構造を1本に整理したPDFです。メールアドレスとご所属の入力で受け取れます。",
+  title = "ガバメントクラウド最新動向をメールでお届け",
+  description = "総務省・デジタル庁の動向、全国1,741自治体の移行進捗、ベンダー動向を毎週まとめてお届けします。",
   compact = false,
 }: Props) {
   if (compact) {
@@ -25,7 +27,7 @@ export default function ReportLeadCta({
       >
         <div>
           <p className="text-xs font-semibold" style={{ color: "#1d4ed8" }}>
-            無料レポート（PDF）
+            ニュースレター登録（無料）
           </p>
           <p className="mt-1 text-sm font-semibold" style={{ color: "#111827" }}>
             {title}
@@ -36,11 +38,11 @@ export default function ReportLeadCta({
         </div>
         <button
           type="button"
-          onClick={openPdfModal}
+          onClick={() => openNewsletterModal(source)}
           className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
           style={{ backgroundColor: "#1d4ed8", color: "#ffffff", border: "none", cursor: "pointer" }}
         >
-          PDFを受け取る
+          無料で登録する
         </button>
       </div>
     );
@@ -54,7 +56,7 @@ export default function ReportLeadCta({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold" style={{ color: "#1d4ed8" }}>
-            無料レポート（PDF）
+            ニュースレター登録（無料）
           </p>
           <h2 className="mt-2 text-xl font-bold" style={{ color: "#111827" }}>
             {title}
@@ -64,9 +66,9 @@ export default function ReportLeadCta({
           </p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             {[
-              "全国1,741自治体の進捗整理",
-              "コスト増の構造と打ち手",
-              "社内共有しやすいPDF形式",
+              "週次でデータ更新情報を配信",
+              "政策・ベンダー動向の分析",
+              "登録者限定レポートあり",
             ].map((item) => (
               <span
                 key={item}
@@ -82,11 +84,11 @@ export default function ReportLeadCta({
         <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[240px]">
           <button
             type="button"
-            onClick={openPdfModal}
+            onClick={() => openNewsletterModal(source)}
             className="inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-semibold"
             style={{ backgroundColor: "#1d4ed8", color: "#ffffff", border: "none", cursor: "pointer" }}
           >
-            無料でPDFを受け取る
+            無料でニュースレターに登録する
           </button>
           <p className="text-xs text-center" style={{ color: "#475569" }}>
             入力はメールアドレスとご所属のみ

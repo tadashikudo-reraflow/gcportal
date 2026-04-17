@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import FinopsClient from "./FinopsClient";
 import FinopsLoading from "./loading";
 import { getArticlesByTags, type ArticleMeta } from "@/lib/articles";
+import PageNavCards from "@/components/PageNavCards";
 
 export const revalidate = 86400;
 
@@ -88,6 +89,7 @@ export default async function FinopsPage() {
       <Suspense fallback={<FinopsLoading />}>
         <FinopsClient articles={finopsArticles.slice(0, 3)} />
       </Suspense>
+      <PageNavCards exclude="/finops" />
     </>
   );
 }

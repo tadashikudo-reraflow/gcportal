@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackNewsletterSignup } from "@/lib/gtag";
 import { Mail } from "lucide-react";
 
 const ORG_OPTIONS = [
@@ -37,6 +38,7 @@ export default function ArticleNewsletterBanner() {
         setError(d.error ?? "登録に失敗しました");
         return;
       }
+      trackNewsletterSignup("newsletter_article", orgType);
       setDone(true);
     } catch {
       setError("処理に失敗しました。もう一度お試しください。");

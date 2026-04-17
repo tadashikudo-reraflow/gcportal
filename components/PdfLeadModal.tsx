@@ -3,17 +3,27 @@
 import { useEffect, useState } from "react";
 import PdfLeadForm from "@/components/PdfLeadForm";
 
-/** グローバルPDFリードモーダル。
- *  window.dispatchEvent(new CustomEvent("openPdfModal")) で任意の場所から開ける。
- *  RootShell に1回だけ配置する。
+/** グローバルニュースレター登録モーダル。
+ *  window.dispatchEvent(new CustomEvent("openLeadModal", { detail: { source: "newsletter_xxx" } }))
+ *  で任意の場所から開ける。RootShell に1回だけ配置する。
  */
 export default function PdfLeadModal() {
   const [open, setOpen] = useState(false);
+  const [source, setSource] = useState("newsletter_modal");
 
   useEffect(() => {
-    const handler = () => setOpen(true);
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ source?: string }>).detail;
+      if (detail?.source) setSource(detail.source);
+      setOpen(true);
+    };
+    window.addEventListener("openLeadModal", handler);
+    // 後方互換: 旧 openPdfModal イベント
     window.addEventListener("openPdfModal", handler);
-    return () => window.removeEventListener("openPdfModal", handler);
+    return () => {
+      window.removeEventListener("openLeadModal", handler);
+      window.removeEventListener("openPdfModal", handler);
+    };
   }, []);
 
   if (!open) return null;
@@ -33,7 +43,7 @@ export default function PdfLeadModal() {
         >
           ✕
         </button>
-        <PdfLeadForm source="modal" />
+        <PdfLeadForm source={source} mode="newsletter" />
       </div>
     </div>
   );

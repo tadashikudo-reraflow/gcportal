@@ -10,6 +10,7 @@ GCInsight → X Articles 投稿ステータス管理
   python3 x_article_publisher.py --dry-run # 次の記事の内容確認のみ
 """
 
+import glob
 import os
 import sys
 import json
@@ -24,9 +25,16 @@ SUPABASE_URL = "https://msbwmfggvtyexvhmlifn.supabase.co"
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SITE_URL = "https://gcinsight.jp"
 PDF_URL = "https://gcinsight.jp/report?from=nav"
-KW_PLANNER_PATH = os.path.expandvars(
-    "$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v9_20260331.xlsx"
-)
+
+def _latest_kw_planner() -> str:
+    """更新日時順で最新のKWプランナーを返す（バージョン番号に依存しない）"""
+    pattern = os.path.expandvars("$GDRIVE_WORKSPACE/contents/PJ19/gcportal_kw_planner_v*.xlsx")
+    files = sorted(glob.glob(pattern), key=os.path.getmtime, reverse=True)
+    if not files:
+        raise FileNotFoundError(f"KWプランナーXLSXが見つかりません: {pattern}")
+    return files[0]
+
+KW_PLANNER_PATH = os.environ.get("KW_PLANNER_PATH", _latest_kw_planner())
 README_PATH = os.path.expandvars(
     "$GDRIVE_WORKSPACE/../../../マイドライブ/ObsidianVault/01_Projects/Products/PJ19_GCInsight/README.md"
 )

@@ -133,6 +133,37 @@ export default function DashboardPage() {
         totalSystems={migrationStats.total_systems}
       />
 
+      {/* ========== 差別化ストリップ（ThreeMetrics直後） ========== */}
+      <div
+        className="card p-4"
+        style={{ borderLeft: "4px solid #00338D" }}
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex-1 space-y-1.5">
+            <p className="text-xs font-bold" style={{ color: "#00338D" }}>
+              民間唯一の総合GCダッシュボード — 22機能中18項目に対応
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {["CSPコスト試算", "パッケージDB", "開示請求データ", "FinOps分析"].map((f) => (
+                <span key={f} className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#00338D18", color: "#00338D" }}>
+                  {f}
+                </span>
+              ))}
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: "#f3f4f6", color: "#4b5563" }}>
+                総務省・デジタル庁にはない独自機能
+              </span>
+            </div>
+          </div>
+          <Link
+            href="/compare"
+            className="text-xs font-semibold px-4 py-2.5 rounded-lg whitespace-nowrap text-center"
+            style={{ backgroundColor: "#00338D", color: "#fff" }}
+          >
+            機能比較を見る →
+          </Link>
+        </div>
+      </div>
+
       {/* ========== ニュースレター登録バナー ========== */}
       <NewsletterBanner />
 
@@ -288,6 +319,14 @@ export default function DashboardPage() {
             </span>
             <span className="explore-card-title">導入パッケージ</span>
             <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
+          </Link>
+
+          <Link href="/compare" className="explore-card col-span-2 sm:col-span-1" style={{ padding: "1.25rem 1.5rem" }}>
+            <span className="explore-card-badge" style={{ backgroundColor: "#00338D18", color: "#00338D" }}>
+              22機能比較
+            </span>
+            <span className="explore-card-title" style={{ fontSize: "1rem" }}>GCInsight vs 総務省 vs デジタル庁</span>
+            <span className="explore-card-desc">コスト試算・パッケージDB・開示請求データなど独自機能を3サービスで比較</span>
           </Link>
         </div>
       </div>

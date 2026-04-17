@@ -49,7 +49,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/adoption",       destination: "/packages", permanent: true },
-      { source: "/compare",        destination: "/progress", permanent: true },
       { source: "/cost-reduction", destination: "/finops",   permanent: true },
       { source: "/report",         destination: "/finops",   permanent: true },
       // 旧進捗ページ → /progress 統合

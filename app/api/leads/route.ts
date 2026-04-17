@@ -123,6 +123,63 @@ async function sendPdfEmail({
   }
 }
 
+/** 最新の送信済みニュースレターを新規登録者に配信 */
+async function sendLatestNewsletter({
+  email,
+  leadId,
+}: {
+  email: string;
+  leadId: number;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return;
+
+  const supabase = getSupabase();
+  const { data: campaign } = await supabase
+    .from("campaigns")
+    .select("id, subject, body_html")
+    .eq("status", "sent")
+    .order("sent_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!campaign?.body_html) return;
+
+  // 配信停止フッターを追加（HMAC署名付きURL）
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return;
+  const token = crypto
+    .createHmac("sha256", secret)
+    .update(String(leadId))
+    .digest("hex");
+  const unsubscribeUrl = `${BASE_URL}/api/unsubscribe?token=${token}&lid=${leadId}`;
+  const footer = `<div style="margin-top:48px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#9ca3af;">
+  <p>配信停止は<a href="${unsubscribeUrl}" style="color:#6b7280;">こちら</a>からお願いします。</p>
+  <p>© 2026 GCInsight | <a href="https://reraflow.com/contact/" style="color:#6b7280;">お問い合わせ</a></p>
+</div>`;
+  const bodyHtml = campaign.body_html.includes("</body>")
+    ? campaign.body_html.replace("</body>", `${footer}</body>`)
+    : campaign.body_html + footer;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "GCInsight編集部 <noreply@gcinsight.jp>",
+      to: email,
+      subject: campaign.subject,
+      html: bodyHtml,
+    }),
+  });
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    console.error("sendLatestNewsletter error:", res.status, JSON.stringify(errBody));
+  }
+}
+
 /** Resend: ニュースレター登録ウェルカムメール */
 async function sendNewsletterWelcomeEmail({ email }: { email: string }) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -296,14 +353,20 @@ export async function POST(req: NextRequest) {
     // ソース別メール分岐: newsletter系はウェルカムメール / それ以外はPDF配信
     const isNewsletterSource = effectiveSource.startsWith("newsletter");
 
+    // ユーザーへのメール: newsletter系はウェルカムメール＋最新号 / それ以外はPDF配信
+    const emailTasks = isNewsletterSource
+      ? [
+          sendNewsletterWelcomeEmail({ email }),
+          sendLatestNewsletter({ email, leadId: data.id }),
+        ]
+      : [sendPdfEmail({ email, trackingUrl })];
+
     // 通知: Slack / 管理者メール / Telegram + ユーザーメール（並列実行）
     await Promise.allSettled([
       notifySlack({ email, orgType, source: effectiveSource }),
       notifyEmail({ email, orgType, source: effectiveSource }),
       notifyTelegram({ email, orgType, source: effectiveSource }),
-      isNewsletterSource
-        ? sendNewsletterWelcomeEmail({ email })
-        : sendPdfEmail({ email, trackingUrl }),
+      ...emailTasks,
     ]);
 
     return NextResponse.json({ success: true, lead: data });

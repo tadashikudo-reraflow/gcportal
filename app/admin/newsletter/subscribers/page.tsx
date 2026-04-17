@@ -51,7 +51,7 @@ export default function SubscribersPage() {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
 
   const getAuth = () => {
-    const pass = sessionStorage.getItem("admin_pass") ?? "";
+    const pass = localStorage.getItem("admin_pass") ?? "";
     return `Basic ${btoa(`:${pass}`)}`;
   };
 
@@ -216,7 +216,7 @@ export default function SubscribersPage() {
   };
 
   const handleExport = () => {
-    const pass = sessionStorage.getItem("admin_pass") ?? "";
+    const pass = localStorage.getItem("admin_pass") ?? "";
     const auth = btoa(`:${pass}`);
     const params = new URLSearchParams({ auth });
     if (siteFilter === "karte")     params.set("site", "karte");
