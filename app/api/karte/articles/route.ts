@@ -158,20 +158,22 @@ export async function PATCH(req: NextRequest) {
 
 /**
  * GET /api/karte/articles — 公開記事一覧（外部連携用）
- * karte スキーマはanon key未設定のためadmin clientを使用
+ * karte スキーマはanon key未設定のためadmin clientを使用。
+ * admin clientはRLSを迂回するため、is_published=true フィルタが唯一の公開境界線。
  */
 export async function GET() {
   let supabase;
   try {
     supabase = getSupabaseAdmin();
-  } catch (e: unknown) {
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  } catch {
+    // 内部エラー詳細は外部に露出しない
+    return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
   }
 
   const { data } = await supabase
     .from("articles")
     .select("slug, title, description, date, tags, author, is_published")
-    .eq("is_published", true)
+    .eq("is_published", true)  // ← admin clientのためRLS非依存。このフィルタを削除しないこと
     .order("date", { ascending: false });
 
   return NextResponse.json({ articles: data ?? [] });
