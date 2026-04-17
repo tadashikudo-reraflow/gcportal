@@ -4,14 +4,14 @@ function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  ).schema("karte");
 }
 
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  ).schema("karte");
 }
 
 export type KarteArticleMeta = {
@@ -36,7 +36,6 @@ export async function getAllKarteArticles(): Promise<KarteArticleMeta[]> {
     .from("articles")
     .select("slug, title, description, date, tags, author, cover_image")
     .eq("is_published", true)
-    .eq("category", "karte")
     .order("date", { ascending: false });
 
   if (!data) return [];
@@ -60,7 +59,6 @@ export async function getKarteArticleBySlug(slug: string): Promise<KarteArticle 
     .select("slug, title, description, date, tags, author, cover_image, content, sources")
     .eq("slug", slug)
     .eq("is_published", true)
-    .eq("category", "karte")
     .single();
 
   if (!data) return null;
@@ -86,7 +84,6 @@ export async function getAllKarteArticlesAdmin(): Promise<
   const { data } = await supabase
     .from("articles")
     .select("id, slug, title, description, date, tags, author, cover_image, is_published")
-    .eq("category", "karte")
     .order("date", { ascending: false });
 
   if (!data) return [];
