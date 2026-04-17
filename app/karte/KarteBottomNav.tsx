@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { Home, BookOpen } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "記事一覧", icon: <Home size={20} />, href: "/karte" },
-  { label: "コラム", icon: <BookOpen size={20} />, href: "/karte" },
+  { label: "ホーム", icon: <Home size={20} />, href: "/karte" },
+  { label: "解説記事", icon: <BookOpen size={20} />, href: "/karte/articles" },
 ];
 
 export default function KarteBottomNav() {
@@ -20,7 +20,7 @@ export default function KarteBottomNav() {
       <div className="flex h-full">
         {NAV_ITEMS.map((item) => {
           const isActive =
-            pathname === item.href || (item.href !== "/karte" && pathname.startsWith(item.href));
+            pathname === item.href || (item.href !== "/karte" && pathname.startsWith(item.href + "/"));
           return (
             <Link
               key={item.href}

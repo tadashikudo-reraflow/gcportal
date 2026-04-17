@@ -53,7 +53,7 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
 
             <div className="flex items-center gap-3">
               <Link
-                href="/karte"
+                href="/karte/articles"
                 className="text-sm font-medium no-underline hover:underline hidden sm:inline"
                 style={{ color: "#2e7d32" }}
               >
@@ -92,7 +92,7 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
             </div>
             <div className="flex items-center gap-4">
               <Link
-                href="/karte"
+                href="/karte/articles"
                 className="text-xs font-medium no-underline hover:underline"
                 style={{ color: "#2e7d32" }}
               >

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const circumference = 2 * Math.PI * radius;
   const progress = rateValue !== null ? (rateValue / 100) * circumference : 0;
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     (
       <div
         style={{
@@ -288,4 +288,12 @@ export async function GET(req: NextRequest) {
       height: 630,
     },
   );
+
+  return new Response(imageResponse.body, {
+    status: 200,
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400",
+    },
+  });
 }
