@@ -12,15 +12,29 @@ type Lead = {
 };
 
 const ORG_LABELS: Record<string, string> = {
+  // GCInsight（ガバメントクラウド）
   municipality: "自治体職員",
   it_vendor: "IT企業・SIer",
   consultant: "コンサル・シンクタンク",
   politician: "議員・議員事務所",
   media: "メディア・研究者",
+  // karte（電子カルテ標準化）
+  hospital_staff: "病院・クリニック職員",
+  medical_it: "医療IT・HISベンダー",
+  hospital_mgmt: "病院経営・事務管理",
+  researcher: "研究者・学術機関",
+  // 共通
   other: "その他",
 };
 
 type TabType = "all" | "active" | "unsubscribed";
+type SiteFilter = "all" | "gcinsight" | "karte";
+
+const SITE_OPTIONS: { key: SiteFilter; label: string; color: string }[] = [
+  { key: "all",       label: "全サイト",                color: "#374151" },
+  { key: "gcinsight", label: "GCInsight（ガバクラ）",    color: "#0057B8" },
+  { key: "karte",     label: "karte（電子カルテ）",      color: "#2e7d32" },
+];
 
 export default function SubscribersPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -28,6 +42,7 @@ export default function SubscribersPage() {
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
   const [tab, setTab] = useState<TabType>("active");
+  const [siteFilter, setSiteFilter] = useState<SiteFilter>("all");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [actionMsg, setActionMsg] = useState("");
   const [showImport, setShowImport] = useState(false);
@@ -72,8 +87,15 @@ export default function SubscribersPage() {
     return Object.entries(counts).filter(([, ids]) => ids.length > 1);
   })();
 
+  // サイトフィルター
+  const siteFiltered = leads.filter((l) => {
+    if (siteFilter === "karte")     return l.source?.startsWith("karte_") ?? false;
+    if (siteFilter === "gcinsight") return !(l.source?.startsWith("karte_") ?? false);
+    return true;
+  });
+
   // タブフィルター
-  const tabFiltered = leads.filter((l) => {
+  const tabFiltered = siteFiltered.filter((l) => {
     if (tab === "active") return !l.unsubscribed;
     if (tab === "unsubscribed") return !!l.unsubscribed;
     return true;
@@ -196,7 +218,10 @@ export default function SubscribersPage() {
   const handleExport = () => {
     const pass = localStorage.getItem("admin_pass") ?? "";
     const auth = btoa(`:${pass}`);
-    window.location.href = `/api/newsletter/subscribers/export?auth=${encodeURIComponent(auth)}`;
+    const params = new URLSearchParams({ auth });
+    if (siteFilter === "karte")     params.set("site", "karte");
+    if (siteFilter === "gcinsight") params.set("site", "gcinsight");
+    window.location.href = `/api/newsletter/subscribers/export?${params}`;
   };
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
@@ -409,6 +434,38 @@ export default function SubscribersPage() {
           </button>
         </div>
       )}
+
+      {/* サイトフィルター */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        {SITE_OPTIONS.map((opt) => {
+          const count = leads.filter((l) => {
+            if (opt.key === "karte")     return l.source?.startsWith("karte_") ?? false;
+            if (opt.key === "gcinsight") return !(l.source?.startsWith("karte_") ?? false);
+            return true;
+          }).length;
+          const active = siteFilter === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => { setSiteFilter(opt.key); setSelected(new Set()); }}
+              style={{
+                fontSize: 13,
+                fontWeight: active ? 700 : 400,
+                color: active ? "#fff" : opt.color,
+                backgroundColor: active ? opt.color : "transparent",
+                border: `1.5px solid ${opt.color}`,
+                borderRadius: 20,
+                padding: "4px 14px",
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {opt.label}
+              <span style={{ marginLeft: 6, fontSize: 12, opacity: 0.85 }}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* タブ */}
       <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb", marginBottom: 16 }}>
