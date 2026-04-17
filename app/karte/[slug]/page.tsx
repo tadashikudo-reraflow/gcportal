@@ -143,7 +143,7 @@ export default async function KarteArticlePage({ params }: Props) {
       </div>
 
       <MermaidRenderer
-        html={article.contentHtml}
+        html={article.contentHtml.replace(/^<h1[^>]*>[\s\S]*?<\/h1>\s*/, "")}
         className="card p-6 prose-article"
       />
 

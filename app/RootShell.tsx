@@ -13,9 +13,10 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   const isEmbed = pathname.startsWith("/embed");
+  const isKarte = pathname.startsWith("/karte");
 
-  if (isAdmin || isEmbed) {
-    // admin / embed 配下はそれぞれの layout.tsx に完全に委譲するため、
+  if (isAdmin || isEmbed || isKarte) {
+    // admin / embed / karte 配下はそれぞれの layout.tsx に完全に委譲するため、
     // ヘッダー・フッター・max-w ラッパーをすべてスキップ
     return <>{children}</>;
   }

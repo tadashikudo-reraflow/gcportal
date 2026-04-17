@@ -31,7 +31,8 @@ export type KarteArticle = KarteArticleMeta & {
 
 /** 公開済みカルテ記事の一覧（日付降順） */
 export async function getAllKarteArticles(): Promise<KarteArticleMeta[]> {
-  const supabase = getSupabase();
+  // karte スキーマはanon読み取り未設定のためadminクライアントを使用（サーバーサイドのみ）
+  const supabase = getSupabaseAdmin();
   const { data } = await supabase
     .from("articles")
     .select("slug, title, description, date, tags, author, cover_image")
@@ -53,7 +54,8 @@ export async function getAllKarteArticles(): Promise<KarteArticleMeta[]> {
 
 /** slug で1記事取得 */
 export async function getKarteArticleBySlug(slug: string): Promise<KarteArticle | null> {
-  const supabase = getSupabase();
+  // karte スキーマはanon読み取り未設定のためadminクライアントを使用（サーバーサイドのみ）
+  const supabase = getSupabaseAdmin();
   const { data } = await supabase
     .from("articles")
     .select("slug, title, description, date, tags, author, cover_image, content, sources")
