@@ -7,11 +7,13 @@ export type BreadcrumbItem = {
 
 type Props = {
   items: BreadcrumbItem[];
+  homeHref?: string;
+  homeLabel?: string;
 };
 
 const BASE_URL = "https://gcinsight.jp";
 
-export default function Breadcrumb({ items }: Props) {
+export default function Breadcrumb({ items, homeHref = "/", homeLabel = "ホーム" }: Props) {
   // BreadcrumbList 構造化データ
   const jsonLd = {
     "@context": "https://schema.org",
@@ -20,8 +22,8 @@ export default function Breadcrumb({ items }: Props) {
       {
         "@type": "ListItem",
         position: 1,
-        name: "ホーム",
-        item: BASE_URL,
+        name: homeLabel,
+        item: `${BASE_URL}${homeHref === "/" ? "" : homeHref}`,
       },
       ...items.map((item, i) => ({
         "@type": "ListItem",
@@ -40,8 +42,8 @@ export default function Breadcrumb({ items }: Props) {
       />
       <ol className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
         <li>
-          <Link href="/" className="hover:underline" style={{ color: "var(--color-brand-primary)" }}>
-            ホーム
+          <Link href={homeHref} className="hover:underline" style={{ color: "var(--color-brand-primary)" }}>
+            {homeLabel}
           </Link>
         </li>
         {items.map((item, i) => (

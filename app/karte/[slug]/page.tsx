@@ -86,8 +86,9 @@ export default async function KarteArticlePage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
       <Breadcrumb
+        homeHref="/karte"
+        homeLabel="電子カルテ標準化"
         items={[
-          { label: "電子カルテ標準化 解説記事", href: "/karte" },
           { label: article.title },
         ]}
       />

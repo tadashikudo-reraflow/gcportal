@@ -1,4 +1,5 @@
 import Link from "next/link";
+import KarteBottomNav from "./KarteBottomNav";
 
 export default function KarteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -43,8 +44,8 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
                 <p className="font-bold text-base sm:text-lg leading-tight" style={{ color: "#2e7d32" }}>
                   GCInsight
                 </p>
-                <p className="hidden sm:block text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
-                  電子カルテ標準化
+                <p className="hidden sm:block text-xs mt-0.5 font-medium" style={{ color: "#2e7d32" }}>
+                  for 電子カルテ標準化
                 </p>
               </div>
             </Link>
@@ -64,6 +65,9 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-14 sm:pb-6">
         {children}
       </main>
+
+      {/* モバイルボトムナビ */}
+      <KarteBottomNav />
 
       {/* フッター */}
       <footer className="mt-12 border-t-2 border-[var(--color-border)] bg-[var(--color-card)]">
