@@ -10,6 +10,33 @@ export async function GET(req: NextRequest) {
     searchParams.get("subtitle") || "ガバメントクラウド移行ダッシュボード";
   const rate = searchParams.get("rate"); // e.g. "0.65" or "65"
   const type = searchParams.get("type") || "default";
+  const site = searchParams.get("site") || "gcinsight"; // "gcinsight" | "karte"
+  const author = searchParams.get("author"); // e.g. "GCInsight Medical編集部"
+
+  // サイト別テーマ
+  const theme = site === "karte"
+    ? {
+        bg: "linear-gradient(135deg, #1b5e20 0%, #0a3118 100%)",
+        accent: "#86efac",
+        logoGradient: "linear-gradient(135deg, #4ade80, #16a34a)",
+        logoName: "GCInsight",
+        logoSub: "for 電子カルテ標準化",
+        footerRight: "電子カルテ標準化・医療DX 実務情報メディア",
+        titleSize: (len: number) => len > 25 ? "52px" : "64px",
+        subtitleSize: "26px",
+        logoSize: "28px",
+      }
+    : {
+        bg: "linear-gradient(135deg, #002D72 0%, #001440 100%)",
+        accent: "#7FB8E6",
+        logoGradient: "linear-gradient(135deg, #4A90E2, #7FB8E6)",
+        logoName: "GCInsight",
+        logoSub: null,
+        footerRight: "全国1,741自治体のガバメントクラウド移行進捗を可視化",
+        titleSize: (len: number) => len > 30 ? "36px" : "48px",
+        subtitleSize: "22px",
+        logoSize: "24px",
+      };
 
   // Parse rate for progress ring
   let rateValue: number | null = null;
@@ -35,7 +62,7 @@ export async function GET(req: NextRequest) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          background: "linear-gradient(135deg, #002D72 0%, #001440 100%)",
+          background: theme.bg,
           fontFamily: '"Noto Sans JP", sans-serif',
           position: "relative",
           overflow: "hidden",
@@ -89,7 +116,7 @@ export async function GET(req: NextRequest) {
                   width: "40px",
                   height: "40px",
                   borderRadius: "8px",
-                  background: "linear-gradient(135deg, #4A90E2, #7FB8E6)",
+                  background: theme.logoGradient,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -100,22 +127,29 @@ export async function GET(req: NextRequest) {
               >
                 G
               </div>
-              <span
-                style={{
-                  fontSize: "24px",
-                  fontWeight: 800,
-                  color: "#ffffff",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                GCInsight
-              </span>
+              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                <span
+                  style={{
+                    fontSize: theme.logoSize,
+                    fontWeight: 800,
+                    color: "#ffffff",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {theme.logoName}
+                </span>
+                {theme.logoSub && (
+                  <span style={{ fontSize: "13px", color: theme.accent, fontWeight: 500 }}>
+                    {theme.logoSub}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Title */}
             <h1
               style={{
-                fontSize: title.length > 30 ? "36px" : "48px",
+                fontSize: theme.titleSize(title.length),
                 fontWeight: 800,
                 color: "#ffffff",
                 lineHeight: 1.3,
@@ -128,8 +162,8 @@ export async function GET(req: NextRequest) {
             {/* Subtitle */}
             <p
               style={{
-                fontSize: "22px",
-                color: "#7FB8E6",
+                fontSize: theme.subtitleSize,
+                color: theme.accent,
                 marginTop: "16px",
                 lineHeight: 1.5,
               }}
@@ -242,7 +276,7 @@ export async function GET(req: NextRequest) {
                 <span
                   style={{
                     fontSize: "12px",
-                    color: "#7FB8E6",
+                    color: theme.accent,
                     marginTop: "2px",
                   }}
                 >
@@ -263,22 +297,23 @@ export async function GET(req: NextRequest) {
             backgroundColor: "rgba(0,0,0,0.3)",
           }}
         >
-          <span
-            style={{
-              fontSize: "16px",
-              color: "#7FB8E6",
-              fontWeight: 500,
-            }}
-          >
-            gcinsight.jp
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <span style={{ fontSize: "16px", color: theme.accent, fontWeight: 500 }}>
+              gcinsight.jp
+            </span>
+            {author && (
+              <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", fontWeight: 400 }}>
+                ✍ {author}
+              </span>
+            )}
+          </div>
           <span
             style={{
               fontSize: "14px",
-              color: "rgba(127,184,230,0.6)",
+              color: "rgba(255,255,255,0.4)",
             }}
           >
-            全国1,741自治体のガバメントクラウド移行進捗を可視化
+            {theme.footerRight}
           </span>
         </div>
       </div>
