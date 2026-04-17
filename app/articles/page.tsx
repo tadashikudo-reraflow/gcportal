@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "ガバメントクラウド・自治体標準化システムに関するコラム・解説記事の一覧。移行コスト・特定移行認定・遅延リスクなど自治体DX推進担当者向けの実務情報。",
   alternates: { canonical: "/articles" },
 };
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function ArticlesPage() {
   const articles = await getAllArticles();
