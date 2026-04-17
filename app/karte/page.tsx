@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/karte" },
 };
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export default async function KarteLandingPage() {
   const articles = await getAllKarteArticles();

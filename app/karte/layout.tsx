@@ -62,6 +62,16 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
               <NewsletterModal
                 label="ニュースレター登録"
                 source="karte_newsletter_header"
+                title="電子カルテ標準化・医療DXの最新情報を週1でお届け"
+                description="医療従事者・医療IT担当者・病院経営者向け。標準型電子カルテ・補助金・FHIR等の実務情報を配信。いつでも解除できます。"
+                orgOptions={[
+                  { value: "hospital_staff", label: "病院・クリニック職員" },
+                  { value: "medical_it", label: "医療IT・HISベンダー" },
+                  { value: "hospital_mgmt", label: "病院経営・事務管理" },
+                  { value: "consultant", label: "コンサル・シンクタンク" },
+                  { value: "researcher", label: "研究者・学術機関" },
+                  { value: "other", label: "その他" },
+                ]}
                 buttonClassName="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold"
                 buttonStyle={{ backgroundColor: "#2e7d32", color: "#fff", border: "2px solid #2e7d32" }}
               />

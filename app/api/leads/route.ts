@@ -13,11 +13,18 @@ function generatePdfTrackingUrl(leadId: number): string | null {
 }
 
 const ORGANIZATION_TYPES = [
+  // GCInsight（ガバメントクラウド）
   "municipality",
   "it_vendor",
   "consultant",
   "politician",
   "media",
+  // karte（電子カルテ標準化）
+  "hospital_staff",
+  "medical_it",
+  "hospital_mgmt",
+  "researcher",
+  // 共通
   "other",
 ] as const;
 
@@ -30,11 +37,18 @@ function getSupabase() {
 }
 
 const ORG_LABELS: Record<string, string> = {
+  // GCInsight（ガバメントクラウド）
   municipality: "自治体職員",
   it_vendor: "IT企業・SIer",
   consultant: "コンサル・シンクタンク",
   politician: "議員・議員事務所",
   media: "メディア・研究者",
+  // karte（電子カルテ標準化）
+  hospital_staff: "病院・クリニック職員",
+  medical_it: "医療IT・HISベンダー",
+  hospital_mgmt: "病院経営・事務管理",
+  researcher: "研究者・学術機関",
+  // 共通
   other: "その他",
 };
 
