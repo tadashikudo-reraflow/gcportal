@@ -18,10 +18,14 @@ const TAG_COLORS: Record<string, { bg: string; text: string }> = {
   解説:               { bg: "#e0f7fa", text: "#00695c" },
 };
 
-function ArticleOgThumbnail({ title, description, author }: { title: string; description?: string; author?: string }) {
+function ArticleOgThumbnail({ title, tags, author }: { title: string; tags?: string[]; author?: string }) {
+  // カード用サムネイルはタグ（最大3つ）を短いサブタイトルとして使う
+  const subtitle = tags && tags.length > 0
+    ? tags.slice(0, 3).join(" · ")
+    : "電子カルテ標準化";
   const params = new URLSearchParams({
     title,
-    subtitle: description || "GCInsight for 電子カルテ標準化",
+    subtitle,
     type: "article",
     site: "karte",
     ...(author ? { author } : {}),
@@ -120,7 +124,7 @@ export default function KarteArticlesClient({ articles }: { articles: Article[] 
               className="article-card group">
               <ArticleOgThumbnail
                 title={article.title}
-                description={article.description}
+                tags={article.tags}
                 author={article.author}
               />
               <div className="p-6 flex flex-col gap-3 flex-1">
