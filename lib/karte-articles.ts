@@ -48,7 +48,7 @@ export async function getAllKarteArticles(): Promise<KarteArticleMeta[]> {
     date: a.date ?? "",
     tags: a.tags ?? [],
     author: a.author,
-    coverImage: a.cover_image ?? undefined,
+    coverImage: undefined, // cover_imageは使用しない（OG URLをサムネとして使用）
   }));
 }
 
@@ -72,8 +72,8 @@ export async function getKarteArticleBySlug(slug: string): Promise<KarteArticle 
     date: data.date ?? "",
     tags: data.tags ?? [],
     author: data.author,
-    coverImage: data.cover_image ?? undefined,
-    contentHtml: data.content ?? "",
+    coverImage: undefined, // cover_imageは使用しない（OG URLをサムネとして使用）
+    contentHtml: (data.content ?? "").replace(/^<h1[^>]*>[\s\S]*?<\/h1>\s*/, ""),
     sources: data.sources ?? [],
   };
 }
@@ -98,7 +98,7 @@ export async function getAllKarteArticlesAdmin(): Promise<
     date: a.date ?? "",
     tags: a.tags ?? [],
     author: a.author,
-    coverImage: a.cover_image ?? undefined,
+    coverImage: undefined, // cover_imageは使用しない（OG URLをサムネとして使用）
     is_published: a.is_published ?? false,
   }));
 }
