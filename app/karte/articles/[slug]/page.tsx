@@ -8,7 +8,7 @@ import KarteArticleNewsletterBanner from "@/components/KarteArticleNewsletterBan
 import Breadcrumb from "@/components/Breadcrumb";
 import { BookOpen } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/karte/articles" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function KartePage() {
   const articles = await getAllKarteArticles();
