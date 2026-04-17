@@ -17,16 +17,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = await getKarteArticleBySlug(slug);
   if (!article) return { title: "記事が見つかりません" };
 
-  const ogImages = article.coverImage
-    ? [{ url: article.coverImage, width: 1200, height: 630, alt: article.title }]
-    : [
-        {
-          url: `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent(article.description || "GCInsight for 電子カルテ標準化")}&type=article`,
-          width: 1200,
-          height: 630,
-          alt: article.title,
-        },
-      ];
+  const ogParams = new URLSearchParams({
+    title: article.title,
+    subtitle: article.description || "GCInsight for 電子カルテ標準化",
+    type: "article",
+    site: "karte",
+    ...(article.author ? { author: article.author } : {}),
+  });
+  const ogImages = [
+    {
+      url: `/og?${ogParams.toString()}`,
+      width: 1200,
+      height: 630,
+      alt: article.title,
+    },
+  ];
 
   return {
     title: `${article.title} | GCInsight for 電子カルテ標準化`,
@@ -68,6 +73,13 @@ export default async function KarteArticlePage({ params }: Props) {
   const article = await getKarteArticleBySlug(slug);
   if (!article) notFound();
 
+  const jsonLdOgParams = new URLSearchParams({
+    title: article.title,
+    subtitle: article.description || "GCInsight for 電子カルテ標準化",
+    type: "article",
+    site: "karte",
+    ...(article.author ? { author: article.author } : {}),
+  });
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -76,7 +88,7 @@ export default async function KarteArticlePage({ params }: Props) {
     datePublished: article.date,
     author: { "@type": "Organization", name: article.author ?? "GCInsight Medical編集部" },
     publisher: { "@type": "Organization", name: "GCInsight for 電子カルテ標準化" },
-    ...(article.coverImage ? { image: article.coverImage } : {}),
+    image: `https://gcinsight.jp/og?${jsonLdOgParams.toString()}`,
   };
 
   return (
