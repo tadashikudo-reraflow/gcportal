@@ -1,5 +1,6 @@
 import Link from "next/link";
 import KarteBottomNav from "./KarteBottomNav";
+import NewsletterModal from "@/components/NewsletterModal";
 
 export default function KarteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -50,13 +51,21 @@ export default function KarteLayout({ children }: { children: React.ReactNode })
               </div>
             </Link>
 
-            <Link
-              href="/"
-              className="text-xs font-medium no-underline hover:underline"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              ガバクラダッシュボードへ →
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/karte"
+                className="text-sm font-medium no-underline hover:underline hidden sm:inline"
+                style={{ color: "#2e7d32" }}
+              >
+                コラム
+              </Link>
+              <NewsletterModal
+                label="ニュースレター登録"
+                source="karte_newsletter_header"
+                buttonClassName="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold"
+                buttonStyle={{ backgroundColor: "#2e7d32", color: "#fff", border: "2px solid #2e7d32" }}
+              />
+            </div>
           </div>
         </div>
       </header>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getAllKarteArticles } from "@/lib/karte-articles";
-import Breadcrumb from "@/components/Breadcrumb";
 import KarteArticlesClient from "./KarteArticlesClient";
 
 export const metadata: Metadata = {
@@ -17,7 +16,6 @@ export default async function KartePage() {
 
   return (
     <div className="space-y-6">
-      <Breadcrumb items={[{ label: "電子カルテ標準化 解説記事" }]} />
       <div className="pb-2">
         <h1 className="page-title">電子カルテ標準化 解説記事</h1>
         <p className="page-subtitle">標準型電子カルテ・情報共有サービス・補助金・医療DXに関する実務情報</p>
