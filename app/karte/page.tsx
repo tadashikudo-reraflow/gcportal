@@ -4,7 +4,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import KarteArticlesClient from "./KarteArticlesClient";
 
 export const metadata: Metadata = {
-  title: "電子カルテ標準化 解説記事｜GCInsight Medical",
+  title: "電子カルテ標準化 解説記事｜GCInsight for 電子カルテ標準化",
   description:
     "電子カルテ標準化・情報共有サービス・標準型電子カルテ・補助金・普及率に関する解説記事の一覧。医療機関・クリニックのDX推進担当者向け実務情報。",
   alternates: { canonical: "/karte" },

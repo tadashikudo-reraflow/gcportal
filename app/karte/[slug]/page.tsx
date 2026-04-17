@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? [{ url: article.coverImage, width: 1200, height: 630, alt: article.title }]
     : [
         {
-          url: `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent(article.description || "GCInsight Medical 記事")}&type=article`,
+          url: `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent(article.description || "GCInsight for 電子カルテ標準化")}&type=article`,
           width: 1200,
           height: 630,
           alt: article.title,
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ];
 
   return {
-    title: `${article.title} | 電子カルテ標準化ガイド｜GCInsight Medical`,
+    title: `${article.title} | GCInsight for 電子カルテ標準化`,
     description: article.description,
     alternates: { canonical: `/karte/${slug}` },
     openGraph: {
@@ -74,8 +74,8 @@ export default async function KarteArticlePage({ params }: Props) {
     headline: article.title,
     description: article.description,
     datePublished: article.date,
-    author: { "@type": "Organization", name: article.author ?? "GCInsight Medical 編集部" },
-    publisher: { "@type": "Organization", name: "GCInsight Medical" },
+    author: { "@type": "Organization", name: article.author ?? "GCInsight Medical編集部" },
+    publisher: { "@type": "Organization", name: "GCInsight for 電子カルテ標準化" },
     ...(article.coverImage ? { image: article.coverImage } : {}),
   };
 
