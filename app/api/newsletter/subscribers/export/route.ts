@@ -49,16 +49,27 @@ export async function GET(req: NextRequest) {
   }
 
   const supabase = getSupabase();
-  const { data, error } = await supabase
+  const site = req.nextUrl.searchParams.get("site"); // "karte" | "gcinsight" | null
+
+  let query = supabase
     .from("leads")
     .select("id, email, organization_type, source, unsubscribed, created_at")
     .order("created_at", { ascending: false });
+
+  if (site === "karte") {
+    query = query.like("source", "karte_%");
+  } else if (site === "gcinsight") {
+    query = query.not("source", "like", "karte_%");
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   const rows = data ?? [];
+  const siteSuffix = site ? `-${site}` : "";
   const header = ["id", "email", "organization_type", "source", "unsubscribed", "created_at"];
   const csvLines = [
     header.join(","),
@@ -80,7 +91,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="subscribers-${dateStr}.csv"`,
+      "Content-Disposition": `attachment; filename="subscribers${siteSuffix}-${dateStr}.csv"`,
     },
   });
 }
