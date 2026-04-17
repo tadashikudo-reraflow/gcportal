@@ -158,12 +158,15 @@ export async function PATCH(req: NextRequest) {
 
 /**
  * GET /api/karte/articles — 公開記事一覧（外部連携用）
+ * karte スキーマはanon key未設定のためadmin clientを使用
  */
 export async function GET() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  ).schema("karte");
+  let supabase;
+  try {
+    supabase = getSupabaseAdmin();
+  } catch (e: unknown) {
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+  }
 
   const { data } = await supabase
     .from("articles")
