@@ -214,7 +214,7 @@ export default function NewsletterPage() {
 
           {/* フォーム */}
           <div style={{ maxWidth: 620 }}>
-            <NewsletterBanner />
+            <NewsletterBanner source="newsletter_lp" />
           </div>
 
           {/* 対象読者バッジ */}
@@ -656,7 +656,7 @@ export default function NewsletterPage() {
               padding: "1.25rem",
             }}
           >
-            <NewsletterBanner />
+            <NewsletterBanner source="newsletter_lp" />
           </div>
 
           {/* 対象読者一覧 */}

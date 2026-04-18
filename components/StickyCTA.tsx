@@ -98,8 +98,7 @@ export default function StickyCTA() {
       <div aria-hidden={!visible} style={wrapperStyle}>
         <div style={innerStyle}>
           <div className="max-w-lg mx-auto flex items-center gap-3">
-            <p style={{ fontSize: "0.8125rem", color: "#4b5563", flexShrink: 0, display: "none" }}
-              className="sm:block">
+            <p className="hidden sm:block" style={{ fontSize: "0.8125rem", color: "#4b5563", flexShrink: 0 }}>
               毎週金曜、5分でガバクラの今週をキャッチアップ。
             </p>
             <NewsletterModal
