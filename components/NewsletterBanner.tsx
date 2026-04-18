@@ -33,8 +33,8 @@ export default function NewsletterBanner() {
         body: JSON.stringify({ email, organization_type: orgType, source: "newsletter_homepage" }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "登録に失敗しました");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || `登録に失敗しました（${res.status}）`);
         return;
       }
       trackNewsletterSignup("newsletter_homepage", orgType);
@@ -62,10 +62,10 @@ export default function NewsletterBanner() {
           無料ニュースレター — 毎週金曜配信
         </p>
         <p className="font-bold text-base leading-snug" style={{ color: "#1E3A5F" }}>
-          デジタル庁の移行データが更新されたら即お知らせ。自治体DX実務ダイジェスト。
+          月曜の会議前に、ガバクラの週次サマリを5分で。
         </p>
         <p className="text-xs mt-1" style={{ color: "#4B6A8A" }}>
-          自治体職員・SIer担当者・コンサルが読む週1まとめ。スパムなし、いつでも解除可。
+          デジタル庁データ更新・ベンダー動向・コスト分析を1通に凝縮。自治体職員・SIer・コンサル向け。スパムなし。
         </p>
       </div>
       <form onSubmit={handleSubmit} className="px-6 pb-5 space-y-2">

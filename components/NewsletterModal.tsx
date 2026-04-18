@@ -29,7 +29,7 @@ export default function NewsletterModal({
   source = "newsletter_modal",
   buttonStyle,
   buttonClassName,
-  title = "デジタル庁の移行データが更新されたら即お知らせ。毎週金曜配信。",
+  title = "毎週金曜、ガバクラの「今週の動き」を5分で。",
   description = "自治体職員・SIer担当者・コンサルが読む実務ダイジェスト。登録特典として会員限定レポートをプレゼント。いつでも解除できます。",
   orgOptions = DEFAULT_ORG_OPTIONS,
 }: Props) {
@@ -54,8 +54,8 @@ export default function NewsletterModal({
         body: JSON.stringify({ email, organization_type: orgType, source }),
       });
       if (!res.ok) {
-        const err = await res.json();
-        setError(err.error || "登録に失敗しました");
+        const err = await res.json().catch(() => ({}));
+        setError(err.error || `登録に失敗しました（${res.status}）`);
         return;
       }
       trackNewsletterSignup(source, orgType);

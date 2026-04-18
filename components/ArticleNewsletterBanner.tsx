@@ -34,8 +34,8 @@ export default function ArticleNewsletterBanner() {
         body: JSON.stringify({ email, organization_type: orgType, source: "newsletter_article" }),
       });
       if (!res.ok) {
-        const d = await res.json();
-        setError(d.error ?? "登録に失敗しました");
+        const d = await res.json().catch(() => ({}));
+        setError(d.error ?? `登録に失敗しました（${res.status}）`);
         return;
       }
       trackNewsletterSignup("newsletter_article", orgType);
@@ -68,7 +68,7 @@ export default function ArticleNewsletterBanner() {
           </p>
         </div>
         <p className="font-bold text-sm leading-snug" style={{ color: "#1E3A5F" }}>
-          この記事のような情報を週1でお届け。デジタル庁データ更新も即通知。
+          この記事の続報・関連データを見逃さない。週1・5分のガバクラ週報。
         </p>
       </div>
       <form onSubmit={handleSubmit} className="px-5 pb-4 space-y-2">

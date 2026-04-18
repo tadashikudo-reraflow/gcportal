@@ -24,16 +24,24 @@ export default function XWelcomeBanner() {
     }
   }, []);
 
-  if (!visible) return null;
-
   function dismiss() {
     sessionStorage.setItem(SESSION_KEY, "1");
     setVisible(false);
   }
 
+  useEffect(() => {
+    if (!visible) return;
+    const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") dismiss(); };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [visible]);
+
+  if (!visible) return null;
+
   return (
     <div
-      role="banner"
+      role="region"
+      aria-label="Xからの訪問者向け案内"
       className="w-full px-3 py-2.5 flex items-center justify-between gap-3 flex-wrap"
       style={{
         backgroundColor: "#0f1629",
