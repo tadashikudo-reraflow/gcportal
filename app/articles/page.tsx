@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description:
     "ガバメントクラウド・自治体標準化システムに関するコラム・解説記事の一覧。移行コスト・特定移行認定・遅延リスクなど自治体DX推進担当者向けの実務情報。",
   alternates: { canonical: "/articles" },
+  // 一覧ページは個別記事とカニバリゼーションを起こすため noindex（内部ナビ専用）
+  // 個別記事 /articles/[slug] は各自 generateMetadata で index 許可
+  robots: { index: false, follow: true },
 };
 export const revalidate = 3600;
 
