@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import standardizationData from "@/public/data/standardization.json";
 import NewsletterModal from "./NewsletterModal";
 import { Search } from "lucide-react";
@@ -23,6 +23,8 @@ export default function StickyCTA() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const isNewsletterPage = pathname === "/newsletter";
 
   // スクロール30%超でフェードイン
   useEffect(() => {
@@ -71,30 +73,65 @@ export default function StickyCTA() {
     }
   }
 
+  const wrapperStyle: React.CSSProperties = {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 40,
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(8px)",
+    transition: "opacity 0.25s ease, transform 0.25s ease",
+    pointerEvents: visible ? "auto" : "none",
+  };
+
+  const innerStyle: React.CSSProperties = {
+    backgroundColor: "#fff",
+    borderTop: "1px solid var(--color-border)",
+    boxShadow: "0 -4px 16px rgba(0,0,0,0.08)",
+    padding: "10px 16px",
+  };
+
+  /* ── /newsletter 専用: 検索なし・フル幅ニュースレターCTA ── */
+  if (isNewsletterPage) {
+    return (
+      <div aria-hidden={!visible} style={wrapperStyle}>
+        <div style={innerStyle}>
+          <div className="max-w-lg mx-auto flex items-center gap-3">
+            <p style={{ fontSize: "0.8125rem", color: "#4b5563", flexShrink: 0, display: "none" }}
+              className="sm:block">
+              毎週金曜、5分でガバクラの今週をキャッチアップ。
+            </p>
+            <NewsletterModal
+              label="無料で登録する →"
+              source="newsletter_stickycta_lp"
+              buttonStyle={{
+                display: "block",
+                width: "100%",
+                minHeight: 44,
+                padding: "0 20px",
+                backgroundColor: "#1E40AF",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.9375rem",
+                borderRadius: 8,
+                whiteSpace: "nowrap",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ── 通常ページ: 検索 + ニュースレターボタン（SM以上のみ表示） ── */
   return (
     <div
       aria-hidden={!visible}
       className="hidden sm:block"
-      style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 40,
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(8px)",
-        transition: "opacity 0.25s ease, transform 0.25s ease",
-        pointerEvents: visible ? "auto" : "none",
-      }}
+      style={wrapperStyle}
     >
-      <div
-        style={{
-          backgroundColor: "#fff",
-          borderTop: "1px solid var(--color-border)",
-          boxShadow: "0 -4px 16px rgba(0,0,0,0.08)",
-          padding: "10px 16px",
-        }}
-      >
+      <div style={innerStyle}>
         <div
           className="max-w-2xl mx-auto flex items-center gap-3"
           ref={containerRef}

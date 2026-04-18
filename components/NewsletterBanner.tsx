@@ -1,24 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useId } from "react";
 import { trackNewsletterSignup } from "@/lib/gtag";
+import {
+  ORG_OPTIONS,
+  submitNewsletter,
+  HEADLINE_VARIANTS,
+  getOrAssignVariant,
+  type HeadlineVariant,
+} from "@/lib/newsletter";
 
-const ORG_OPTIONS = [
-  { value: "municipality", label: "自治体職員" },
-  { value: "it_vendor", label: "IT企業・SIer" },
-  { value: "consultant", label: "コンサル・シンクタンク" },
-  { value: "politician", label: "議員・議員事務所" },
-  { value: "media", label: "メディア・研究者" },
-  { value: "other", label: "その他" },
-];
+export default function NewsletterBanner({ source = "newsletter_homepage" }: { source?: string }) {
+  const id = useId();
+  const emailId = `email-${id}`;
+  const orgId = `org-${id}`;
+  const errorId = `error-${id}`;
 
-export default function NewsletterBanner() {
   const [email, setEmail] = useState("");
   const [orgType, setOrgType] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
+  const [variant, setVariant] = useState<HeadlineVariant>("B"); // SSR-safe default
 
+  useEffect(() => {
+    setVariant(getOrAssignVariant());
+  }, []);
+
+  const { headline, sub } = HEADLINE_VARIANTS[variant];
   const canSubmit = email.includes("@") && !loading;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -27,20 +36,11 @@ export default function NewsletterBanner() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, organization_type: orgType, source: "newsletter_homepage" }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setError(err.error || `登録に失敗しました（${res.status}）`);
-        return;
-      }
-      trackNewsletterSignup("newsletter_homepage", orgType);
+      await submitNewsletter({ email, orgType, source });
+      trackNewsletterSignup(source, orgType, variant);
       setDone(true);
-    } catch {
-      setError("処理に失敗しました。もう一度お試しください。");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "処理に失敗しました。もう一度お試しください。");
     } finally {
       setLoading(false);
     }
@@ -62,34 +62,45 @@ export default function NewsletterBanner() {
           無料ニュースレター — 毎週金曜配信
         </p>
         <p className="font-bold text-base leading-snug" style={{ color: "#1E3A5F" }}>
-          月曜の会議前に、ガバクラの週次サマリを5分で。
+          {headline}
         </p>
         <p className="text-xs mt-1" style={{ color: "#4B6A8A" }}>
-          デジタル庁データ更新・ベンダー動向・コスト分析を1通に凝縮。自治体職員・SIer・コンサル向け。スパムなし。
+          {sub}自治体職員・SIer・コンサル向け。スパムなし。
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="px-6 pb-5 space-y-2">
+      <form onSubmit={handleSubmit} className="px-6 pb-5 space-y-2" aria-label="ニュースレター登録フォーム">
         <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="email"
-            placeholder="メールアドレス"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="flex-1 px-4 py-2.5 rounded-lg text-sm outline-none text-gray-900"
-            style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff" }}
-          />
-          <select
-            value={orgType}
-            onChange={(e) => setOrgType(e.target.value)}
-            className="sm:w-44 px-3 py-2.5 rounded-lg text-sm outline-none text-gray-700"
-            style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff" }}
-          >
-            <option value="">ご所属（任意）</option>
-            {ORG_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+          <div className="flex-1 flex flex-col gap-1">
+            <label htmlFor={emailId} className="sr-only">メールアドレス</label>
+            <input
+              id={emailId}
+              type="email"
+              placeholder="メールアドレス"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              aria-required="true"
+              aria-describedby={error ? errorId : undefined}
+              className="px-4 py-2.5 rounded-lg text-sm outline-none text-gray-900"
+              style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff" }}
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor={orgId} className="sr-only">ご所属（任意）</label>
+            <select
+              id={orgId}
+              value={orgType}
+              onChange={(e) => setOrgType(e.target.value)}
+              aria-label="ご所属（任意）"
+              className="sm:w-44 px-3 py-2.5 rounded-lg text-sm outline-none text-gray-700"
+              style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff" }}
+            >
+              <option value="">ご所属（任意）</option>
+              {ORG_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
           <button
             type="submit"
             disabled={!canSubmit}
@@ -99,7 +110,11 @@ export default function NewsletterBanner() {
             {loading ? "処理中..." : "無料で登録 →"}
           </button>
         </div>
-        {error && <p className="text-red-500 text-xs">{error}</p>}
+        {error && (
+          <p id={errorId} role="alert" aria-live="polite" className="text-red-500 text-xs">
+            {error}
+          </p>
+        )}
         <p className="text-xs" style={{ color: "#6B7280" }}>
           ※登録情報はニュースレター配信のみに使用します。スパムなし。
         </p>

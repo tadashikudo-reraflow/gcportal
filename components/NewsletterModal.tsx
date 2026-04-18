@@ -1,18 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useId } from "react";
 import { trackNewsletterSignup } from "@/lib/gtag";
+import { ORG_OPTIONS, submitNewsletter, type OrgOption } from "@/lib/newsletter";
 
-const DEFAULT_ORG_OPTIONS = [
-  { value: "municipality", label: "自治体職員" },
-  { value: "it_vendor", label: "IT企業・SIer" },
-  { value: "consultant", label: "コンサル・シンクタンク" },
-  { value: "politician", label: "議員・議員事務所" },
-  { value: "media", label: "メディア・研究者" },
-  { value: "other", label: "その他" },
-];
-
-interface OrgOption { value: string; label: string; }
+const DEFAULT_ORG_OPTIONS: OrgOption[] = [...ORG_OPTIONS];
 
 interface Props {
   label?: React.ReactNode;
@@ -33,6 +25,11 @@ export default function NewsletterModal({
   description = "自治体職員・SIer担当者・コンサルが読む実務ダイジェスト。登録特典として会員限定レポートをプレゼント。いつでも解除できます。",
   orgOptions = DEFAULT_ORG_OPTIONS,
 }: Props) {
+  const id = useId();
+  const emailId = `email-${id}`;
+  const orgId = `org-${id}`;
+  const errorId = `error-${id}`;
+
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [orgType, setOrgType] = useState("");
@@ -48,20 +45,11 @@ export default function NewsletterModal({
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, organization_type: orgType, source }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        setError(err.error || `登録に失敗しました（${res.status}）`);
-        return;
-      }
+      await submitNewsletter({ email, orgType, source });
       trackNewsletterSignup(source, orgType);
       setDone(true);
-    } catch {
-      setError("処理に失敗しました。もう一度お試しください。");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "処理に失敗しました。もう一度お試しください。");
     } finally {
       setLoading(false);
     }
@@ -178,8 +166,12 @@ export default function NewsletterModal({
 
                 <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <input
+                    id={emailId}
                     type="email"
                     placeholder="メールアドレス"
+                    aria-label="メールアドレス"
+                    aria-required="true"
+                    aria-describedby={error ? errorId : undefined}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -195,8 +187,10 @@ export default function NewsletterModal({
                     }}
                   />
                   <select
+                    id={orgId}
                     value={orgType}
                     onChange={(e) => setOrgType(e.target.value)}
+                    aria-label="ご所属（任意）"
                     style={{
                       width: "100%",
                       padding: "10px 14px",
@@ -232,7 +226,7 @@ export default function NewsletterModal({
                     {loading ? "処理中..." : "無料で登録 →"}
                   </button>
                   {error && (
-                    <p style={{ fontSize: "0.8125rem", color: "#dc2626" }}>{error}</p>
+                    <p id={errorId} role="alert" aria-live="polite" style={{ fontSize: "0.8125rem", color: "#dc2626" }}>{error}</p>
                   )}
                   <p style={{ fontSize: "0.75rem", color: "#9ca3af", textAlign: "center" }}>
                     登録情報はニュースレター配信のみに使用します。スパムなし。
