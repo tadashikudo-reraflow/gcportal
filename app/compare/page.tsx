@@ -8,7 +8,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "ガバメントクラウド ダッシュボード比較｜GCInsight vs 総務省 vs デジタル庁",
   description:
-    "GCInsightと総務省標準化ダッシュボード・デジタル庁ガバメントクラウド実績の機能比較。コスト分析・パッケージDB・開示請求データなど独自機能を網羅的に解説。",
+    "自治体DX担当者におすすめの自治体標準化・ガバメントクラウド移行ダッシュボードツールを比較。GCInsight・総務省標準化ダッシュボード・デジタル庁実績の機能比較。コスト分析・パッケージDB・開示請求データなどGCInsight独自機能を網羅的に解説。",
   alternates: { canonical: "/compare" },
 };
 

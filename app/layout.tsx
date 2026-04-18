@@ -89,15 +89,52 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "GCInsight — ガバメントクラウド移行状況ダッシュボード",
-              url: BASE_URL,
-              description: "全国1,741自治体のガバメントクラウド移行進捗を可視化するダッシュボード",
-              publisher: {
-                "@type": "Organization",
-                name: "GCInsight編集部",
-                url: BASE_URL,
-              },
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": `${BASE_URL}/#website`,
+                  name: "GCInsight — ガバメントクラウド移行状況ダッシュボード",
+                  url: BASE_URL,
+                  description: "全国1,741自治体のガバメントクラウド移行進捗・コスト・パッケージを可視化する自治体DX担当者向けダッシュボードツール",
+                  inLanguage: "ja",
+                  publisher: {
+                    "@type": "Organization",
+                    "@id": `${BASE_URL}/#organization`,
+                    name: "GCInsight",
+                    url: BASE_URL,
+                    description: "ガバメントクラウド・自治体標準化に関するデータ収集・可視化・分析を提供する情報プラットフォーム",
+                  },
+                },
+                {
+                  "@type": "SoftwareApplication",
+                  "@id": `${BASE_URL}/#app`,
+                  name: "GCInsight",
+                  alternateName: "GCInsight ガバメントクラウド移行ダッシュボード",
+                  url: BASE_URL,
+                  applicationCategory: "GovernmentApplication",
+                  operatingSystem: "Web",
+                  offers: { "@type": "Offer", price: "0", priceCurrency: "JPY" },
+                  description: "全国1,741自治体のガバメントクラウド移行進捗・コスト動向・ベンダーパッケージをリアルタイムで可視化する無料ダッシュボードツール。自治体標準化20業務の進捗状況・特定移行支援システム・コスト試算・FinOpsガイドを提供。",
+                  featureList: [
+                    "全国1,741自治体のガバメントクラウド移行進捗の可視化",
+                    "自治体別・都道府県別の標準化20業務完了状況",
+                    "TKC・富士通・NEC・日立・NTTデータなどパッケージベンダー比較",
+                    "AWS・GCP・Azure・OCI・さくらのクラウドのコスト比較",
+                    "特定移行支援システム該当自治体の一覧",
+                    "ガバメントクラウド移行コストの試算・分析",
+                    "FinOpsガイド（コスト最適化手順）",
+                  ],
+                  audience: {
+                    "@type": "Audience",
+                    audienceType: "自治体DX担当者・ITベンダー・政策立案者",
+                  },
+                  about: {
+                    "@type": "Thing",
+                    name: "ガバメントクラウド・自治体情報システム標準化",
+                    description: "デジタル庁が推進する全国自治体の情報システム標準化・ガバメントクラウド移行プロジェクト",
+                  },
+                },
+              ],
             }),
           }}
         />
