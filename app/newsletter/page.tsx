@@ -303,7 +303,126 @@ export default function NewsletterPage() {
       </section>
 
       {/* ============================================================
-          Section 3: バリュー（4点）
+          Section 3: サンプル号（ダミー）— ペイン直後に証拠を見せる
+          ============================================================ */}
+      <section style={{ marginBottom: "1.5rem" }}>
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+          }}
+        >
+          {/* サンプルヘッダー */}
+          <div
+            style={{
+              background: "var(--color-section-bg)",
+              borderBottom: "1px solid var(--color-border)",
+              padding: "1.25rem 1.75rem",
+            }}
+          >
+            <p
+              className="text-xs font-semibold uppercase tracking-widest mb-1"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              サンプル号 — 登録前に内容を確認できます
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <span
+                className="font-bold"
+                style={{ fontSize: "0.9375rem", color: "var(--color-brand-primary)" }}
+              >
+                GCInsight ガバクラ週報 {SAMPLE_ISSUE.number}
+              </span>
+              <span
+                style={{
+                  fontSize: "0.8125rem",
+                  color: "var(--color-text-muted)",
+                }}
+              >
+                {SAMPLE_ISSUE.date}
+              </span>
+            </div>
+            <p
+              className="font-semibold mt-1"
+              style={{
+                fontSize: "0.9375rem",
+                color: "var(--color-text-primary)",
+                lineHeight: 1.5,
+              }}
+            >
+              件名: {SAMPLE_ISSUE.subject}
+            </p>
+          </div>
+
+          {/* サンプル本文 */}
+          <div className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+            {SAMPLE_ISSUE.items.map((item, i) => (
+              <div key={i} style={{ padding: "1.25rem 1.75rem" }}>
+                <div className="flex items-start gap-3">
+                  <div style={{ flexShrink: 0, paddingTop: 2 }}>
+                    <span
+                      className="text-xs font-bold px-2 py-0.5 rounded-full"
+                      style={{
+                        background: item.tagColor,
+                        color: item.tagText,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {item.tag}
+                    </span>
+                  </div>
+                  <div>
+                    <h4
+                      className="font-bold mb-1"
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "var(--color-text-primary)",
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {item.title}
+                    </h4>
+                    <p
+                      style={{
+                        fontSize: "0.8125rem",
+                        color: "var(--color-text-secondary)",
+                        lineHeight: 1.75,
+                        margin: 0,
+                      }}
+                    >
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* サンプルフッター */}
+          <div
+            style={{
+              background: "var(--color-section-bg)",
+              borderTop: "1px solid var(--color-border)",
+              padding: "1rem 1.75rem",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--color-text-muted)",
+                margin: 0,
+              }}
+            >
+              ※ これはサンプル号です。実際のニュースレターは毎週金曜日に配信されます。登録解除はワンクリックで可能です。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================
+          Section 4: バリュー（4点）— サンプル後に抽象的裏付けを提示
           ============================================================ */}
       <section
         style={{
@@ -419,121 +538,45 @@ export default function NewsletterPage() {
       </section>
 
       {/* ============================================================
-          Section 4: サンプル号（ダミー）
+          Section 4.5: 運営者情報 — CTA直前の信頼担保
           ============================================================ */}
-      <section style={{ marginBottom: "1.5rem" }}>
-        <div
-          style={{
-            background: "#FFFFFF",
-            borderRadius: 16,
-            overflow: "hidden",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-          }}
+      <section
+        style={{
+          background: "var(--color-section-bg)",
+          borderRadius: 16,
+          padding: "1.5rem 2rem",
+          marginBottom: "1.5rem",
+          border: "1px solid var(--color-border)",
+        }}
+      >
+        <p
+          className="text-xs font-semibold uppercase tracking-widest mb-3"
+          style={{ color: "var(--color-text-muted)" }}
         >
-          {/* サンプルヘッダー */}
-          <div
-            style={{
-              background: "var(--color-section-bg)",
-              borderBottom: "1px solid var(--color-border)",
-              padding: "1.25rem 1.75rem",
-            }}
-          >
-            <p
-              className="text-xs font-semibold uppercase tracking-widest mb-1"
-              style={{ color: "var(--color-text-muted)" }}
-            >
-              サンプル号 — 登録前に内容を確認できます
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
+          このニュースレターについて
+        </p>
+        <div className="space-y-2">
+          {[
+            { label: "運営", value: "GCInsight（全国1,741自治体のガバメントクラウド移行ダッシュボード）" },
+            { label: "データ出典", value: "デジタル庁「移行状況」「標準化対応状況」公表データ + 総務省自治行政局・各ベンダー公式発表" },
+            { label: "編集", value: "工藤匡史（元日本オラクル / 外資IT PM。自治体クラウド実装支援）" },
+            { label: "方針", value: "政策・技術・コストの3軸でデジタル庁・総務省の一次ソースを参照して要約しています。PR記事・広告掲載はありません。" },
+          ].map((row) => (
+            <div key={row.label} className="flex gap-3 items-start">
               <span
-                className="font-bold"
-                style={{ fontSize: "0.9375rem", color: "var(--color-brand-primary)" }}
+                className="flex-shrink-0 text-xs font-semibold"
+                style={{ color: "var(--color-text-muted)", minWidth: "4.5rem" }}
               >
-                GCInsight ガバクラ週報 {SAMPLE_ISSUE.number}
+                {row.label}
               </span>
               <span
-                style={{
-                  fontSize: "0.8125rem",
-                  color: "var(--color-text-muted)",
-                }}
+                className="text-xs leading-relaxed"
+                style={{ color: "var(--color-text-secondary)" }}
               >
-                {SAMPLE_ISSUE.date}
+                {row.value}
               </span>
             </div>
-            <p
-              className="font-semibold mt-1"
-              style={{
-                fontSize: "0.9375rem",
-                color: "var(--color-text-primary)",
-                lineHeight: 1.5,
-              }}
-            >
-              件名: {SAMPLE_ISSUE.subject}
-            </p>
-          </div>
-
-          {/* サンプル本文 */}
-          <div className="divide-y" style={{ borderColor: "var(--color-border)" }}>
-            {SAMPLE_ISSUE.items.map((item, i) => (
-              <div key={i} style={{ padding: "1.25rem 1.75rem" }}>
-                <div className="flex items-start gap-3">
-                  <div style={{ flexShrink: 0, paddingTop: 2 }}>
-                    <span
-                      className="text-xs font-bold px-2 py-0.5 rounded-full"
-                      style={{
-                        background: item.tagColor,
-                        color: item.tagText,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {item.tag}
-                    </span>
-                  </div>
-                  <div>
-                    <h4
-                      className="font-bold mb-1"
-                      style={{
-                        fontSize: "0.875rem",
-                        color: "var(--color-text-primary)",
-                        lineHeight: 1.45,
-                      }}
-                    >
-                      {item.title}
-                    </h4>
-                    <p
-                      style={{
-                        fontSize: "0.8125rem",
-                        color: "var(--color-text-secondary)",
-                        lineHeight: 1.75,
-                        margin: 0,
-                      }}
-                    >
-                      {item.body}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* サンプルフッター */}
-          <div
-            style={{
-              background: "var(--color-section-bg)",
-              borderTop: "1px solid var(--color-border)",
-              padding: "1rem 1.75rem",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "0.75rem",
-                color: "var(--color-text-muted)",
-                margin: 0,
-              }}
-            >
-              ※ これはサンプル号です。実際のニュースレターは毎週金曜日に配信されます。登録解除はワンクリックで可能です。
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
