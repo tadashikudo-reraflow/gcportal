@@ -20,7 +20,7 @@ export default function ArticleNewsletterBanner() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
-  const canSubmit = email.includes("@") && orgType && !loading;
+  const canSubmit = email.includes("@") && !loading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -64,11 +64,11 @@ export default function ArticleNewsletterBanner() {
         <div className="flex items-center gap-2 mb-1">
           <Mail size={15} style={{ color: "#3B82F6" }} aria-hidden="true" />
           <p className="text-xs font-bold uppercase tracking-wide" style={{ color: "#3B82F6" }}>
-            無料ニュースレター
+            無料ニュースレター — 毎週金曜
           </p>
         </div>
         <p className="font-bold text-sm leading-snug" style={{ color: "#1E3A5F" }}>
-          ガバクラ・自治体DXの最新動向を週1でお届け
+          この記事のような情報を週1でお届け。デジタル庁データ更新も即通知。
         </p>
       </div>
       <form onSubmit={handleSubmit} className="px-5 pb-4 space-y-2">
@@ -85,11 +85,10 @@ export default function ArticleNewsletterBanner() {
           <select
             value={orgType}
             onChange={(e) => setOrgType(e.target.value)}
-            required
             className="sm:w-40 px-3 py-2 rounded-lg text-sm outline-none"
             style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff", color: "#374151" }}
           >
-            <option value="">ご所属</option>
+            <option value="">ご所属（任意）</option>
             {ORG_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}

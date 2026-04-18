@@ -29,8 +29,8 @@ export default function NewsletterModal({
   source = "newsletter_modal",
   buttonStyle,
   buttonClassName,
-  title = "ガバクラ・自治体DXの最新動向を週1でお届け",
-  description = "自治体職員・ITベンダー・コンサル向け。登録特典として会員限定レポートをプレゼント。いつでも解除できます。",
+  title = "デジタル庁の移行データが更新されたら即お知らせ。毎週金曜配信。",
+  description = "自治体職員・SIer担当者・コンサルが読む実務ダイジェスト。登録特典として会員限定レポートをプレゼント。いつでも解除できます。",
   orgOptions = DEFAULT_ORG_OPTIONS,
 }: Props) {
   const [open, setOpen] = useState(false);
@@ -40,7 +40,7 @@ export default function NewsletterModal({
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
-  const canSubmit = email.includes("@") && orgType && !loading;
+  const canSubmit = email.includes("@") && !loading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -197,7 +197,6 @@ export default function NewsletterModal({
                   <select
                     value={orgType}
                     onChange={(e) => setOrgType(e.target.value)}
-                    required
                     style={{
                       width: "100%",
                       padding: "10px 14px",
@@ -209,7 +208,7 @@ export default function NewsletterModal({
                       backgroundColor: "#fff",
                     }}
                   >
-                    <option value="">ご所属を選択</option>
+                    <option value="">ご所属（任意）</option>
                     {orgOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}

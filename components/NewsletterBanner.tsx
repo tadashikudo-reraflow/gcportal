@@ -19,7 +19,7 @@ export default function NewsletterBanner() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState("");
 
-  const canSubmit = email.includes("@") && orgType && !loading;
+  const canSubmit = email.includes("@") && !loading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,13 +59,13 @@ export default function NewsletterBanner() {
     <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#EFF6FF", border: "1px solid #BFDBFE" }}>
       <div className="px-6 pt-5 pb-4">
         <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: "#3B82F6" }}>
-          無料ニュースレター
+          無料ニュースレター — 毎週金曜配信
         </p>
         <p className="font-bold text-base leading-snug" style={{ color: "#1E3A5F" }}>
-          ガバクラ・自治体DXの最新動向を週1でお届け
+          デジタル庁の移行データが更新されたら即お知らせ。自治体DX実務ダイジェスト。
         </p>
         <p className="text-xs mt-1" style={{ color: "#4B6A8A" }}>
-          自治体職員・ITベンダー・コンサル向け。いつでも解除できます。
+          自治体職員・SIer担当者・コンサルが読む週1まとめ。スパムなし、いつでも解除可。
         </p>
       </div>
       <form onSubmit={handleSubmit} className="px-6 pb-5 space-y-2">
@@ -82,11 +82,10 @@ export default function NewsletterBanner() {
           <select
             value={orgType}
             onChange={(e) => setOrgType(e.target.value)}
-            required
             className="sm:w-44 px-3 py-2.5 rounded-lg text-sm outline-none text-gray-700"
             style={{ fontSize: 15, border: "1px solid #BFDBFE", backgroundColor: "#fff" }}
           >
-            <option value="">ご所属</option>
+            <option value="">ご所属（任意）</option>
             {ORG_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
