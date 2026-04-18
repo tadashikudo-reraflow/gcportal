@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import { useUXTracker } from "@/hooks/useUXTracker";
 import StickyCTA from "@/components/StickyCTA";
 import NewsletterModal from "@/components/NewsletterModal";
+import XWelcomeBanner from "@/components/XWelcomeBanner";
 
 export default function RootShell({ children }: { children: React.ReactNode }) {
   useUXTracker();
@@ -57,6 +58,9 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
           <NavBar />
         </div>
       </header>
+
+      {/* X（Twitter）流入時のウェルカムバナー — 1セッション1回だけ表示 */}
+      <XWelcomeBanner />
 
       {/* メインコンテンツ */}
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-14 sm:pb-6">

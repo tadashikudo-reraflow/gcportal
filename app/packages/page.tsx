@@ -16,18 +16,46 @@ import Breadcrumb from "@/components/Breadcrumb";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較【2026年4月】",
-  description: "TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのガバメントクラウド対応パッケージを自治体標準化20業務別に比較。各ベンダーの採用自治体数・クラウド基盤・クラウド対応確認状況を一覧で確認できます。",
+  title: "ガバメントクラウド対応パッケージ比較｜TKC・富士通・NEC・日立・NTTデータ 採用自治体数・選び方【2026年】",
+  description: "TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのガバメントクラウド対応パッケージを標準化20業務別に比較。採用自治体数・クラウド基盤（AWS/GCP/Azure）・共同利用の有無を一覧で確認。自治体担当者向けの選び方ガイド付き。",
   alternates: { canonical: "/packages" },
   openGraph: {
-    title: "ガバメントクラウド対応パッケージ一覧｜TKC・富士通・NEC・日立 導入自治体数で比較",
-    description: "自治体標準化20業務のパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータ等の採用自治体数・クラウドプラットフォームを網羅。",
+    title: "ガバメントクラウド対応パッケージ比較｜TKC・富士通・NEC・日立 採用自治体数【2026年】",
+    description: "自治体標準化20業務のパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータ等の採用自治体数・クラウドプラットフォームと選び方ガイドを網羅。",
   },
 };
 
 type MunicipalityPackageWithPackage = MunicipalityPackageRow & {
   packages?: Package & { vendors?: Vendor };
 };
+
+// FAQ共通データ（JSX表示とFAQPage JSON-LDの単一ソース）
+const FAQ_ITEMS = [
+  {
+    q: "ガバメントクラウド対応パッケージとは何ですか？",
+    a: "デジタル庁が定めた「自治体情報システムの標準化・共通化」に準拠し、ガバメントクラウド（AWS・GCP・Azure・OCI・さくらのクラウド）上で稼働することが確認されたシステムパッケージです。住民基本台帳や税務など20業務が対象で、全国の自治体に移行が求められています（2026年度以降は運用フェーズへ移行）。",
+  },
+  {
+    q: "TKCと富士通Japanはどちらが多くの自治体に採用されていますか？",
+    a: "GCInsightのデータベースに基づく採用団体数ランキングで確認できます。上記「ベンダー 採用団体ランキング」セクションをご覧ください。2026年4月時点の実績を反映しています。",
+  },
+  {
+    q: "自分の自治体が使っているパッケージを調べられますか？",
+    a: "はい。このページ上部の「自治体名で検索」から市区町村名を入力すると、当該自治体の導入パッケージ一覧を確認できます。都道府県・人口規模での横断比較は「進捗で比較」ページをご利用ください。",
+  },
+  {
+    q: "COKAS-R・RKKCS などのパッケージはどのベンダーですか？",
+    a: "COKAS-Rは株式会社両備システムズが提供するガバメントクラウド対応パッケージです。RKKCSは株式会社リコーが提供しており、九州・西日本の自治体への採用が多い製品です。いずれも業務別パッケージ一覧からご確認いただけます。",
+  },
+  {
+    q: "パッケージ移行にかかるコストはどのくらいですか？",
+    a: "自治体規模やベンダー、業務数によって大きく異なりますが、中規模自治体（人口10万人程度）で数千万〜数億円規模の初期費用がかかるケースが報告されています。「コスト試算」ページではGCInsightが集計した自治体別のコスト動向を確認できます。",
+  },
+  {
+    q: "デジタル庁の「適合確認」とパッケージ一覧の違いは何ですか？",
+    a: "デジタル庁の適合確認は、パッケージが標準仕様書に準拠していることを公式に認定したリストです。GCInsightのパッケージ一覧は適合確認情報に加え、採用自治体数・クラウド基盤・共同利用の有無など実運用データを組み合わせた独自のデータベースです。",
+  },
+] as const;
 
 export default async function PackagesPage() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -97,7 +125,7 @@ export default async function PackagesPage() {
       <div className="pb-2">
         <h1 className="page-title">ガバメントクラウド対応パッケージ・ベンダー一覧</h1>
         <p className="page-subtitle">
-          自治体標準化20業務に対応したパッケージをベンダー別に掲載。TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのクラウド対応状況と採用自治体数を比較できます。2026年3月移行期限に向けた最新情報を随時更新。
+          自治体標準化20業務に対応したパッケージをベンダー別に比較。TKC・富士通・NEC・日立・NTTデータなど主要ベンダーのクラウド対応状況・採用自治体数・クラウド基盤（AWS/GCP/Azure/OCI）を一覧で確認できます。標準移行完了後の2026年度運用フェーズに向けた最新情報を随時更新。
         </p>
         {/* ファーストビューKPIバー */}
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
@@ -191,6 +219,49 @@ export default async function PackagesPage() {
         </p>
       </div>
 
+      {/* パッケージ選定ガイドセクション */}
+      <div className="card p-5">
+        <h2 className="text-sm font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <span className="w-1 h-5 rounded-full inline-block flex-shrink-0" style={{ backgroundColor: "var(--color-gov-primary)" }} />
+          ガバメントクラウド対応パッケージの選び方
+        </h2>
+        <p className="text-xs mb-4 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+          自治体がパッケージを選定する際に確認すべき4つのポイントです。
+        </p>
+        <div className="space-y-3">
+          {[
+            {
+              num: "01",
+              title: "クラウド基盤の適合性",
+              body: "ガバメントクラウドはAWS・GCP・Azure・OCI・さくらのクラウドの5基盤が認定されています。自治体の既存インフラや調達方針に合わせてベンダーのクラウド基盤を確認しましょう。AWSシェアが約97%と圧倒的ですが、2026年度からさくらのクラウドも加わり選択肢が広がりました。",
+            },
+            {
+              num: "02",
+              title: "共同利用（マルチテナント）の有無",
+              body: "共同利用型パッケージは複数自治体でインフラを共有するため、単独型より運用コストを抑えられます。TKC・NEC・日立・NTTデータは共同利用に対応。規模の小さい自治体ほど共同利用型を選ぶ傾向があります。",
+            },
+            {
+              num: "03",
+              title: "採用自治体数と実績",
+              body: "採用自治体数が多いパッケージはノウハウの蓄積や移行支援体制が充実しています。同規模・同都道府県の自治体での採用実績も参考にしてください。上記「ベンダー採用団体ランキング」で最新の実績を確認できます。",
+            },
+            {
+              num: "04",
+              title: "20業務の対応範囲",
+              body: "標準化対象の20業務すべてに対応しているベンダーは限られます。既存システムのベンダーが未対応の業務については、別ベンダーのパッケージを組み合わせる「マルチベンダー構成」も選択肢です。上記「業務別パッケージ一覧」で業務ごとの対応状況を確認できます。",
+            },
+          ].map((item) => (
+            <div key={item.num} className="flex gap-3" style={{ borderBottom: "1px solid #f1f5f9", paddingBottom: "0.75rem" }}>
+              <span className="flex-shrink-0 text-xs font-black tabular-nums" style={{ color: "var(--color-brand-primary)", minWidth: "1.5rem" }}>{item.num}</span>
+              <div>
+                <p className="text-xs font-semibold mb-1" style={{ color: "var(--color-text-primary)" }}>{item.title}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>{item.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* FAQセクション */}
       <div className="card p-5">
         <h2 className="text-sm font-bold mb-4 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
@@ -198,66 +269,31 @@ export default async function PackagesPage() {
           よくある質問
         </h2>
         <div className="space-y-4">
-          <div>
-            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Q. ガバメントクラウド対応パッケージとは何ですか？
-            </p>
-            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              A. デジタル庁が定めた「自治体情報システムの標準化・共通化」に準拠し、ガバメントクラウド（AWS・GCP・Azure・OCI・さくらのクラウド）上で稼働することが確認されたシステムパッケージです。住民基本台帳や税務など20業務が対象で、2026年3月までに全国の自治体が移行を求められています。
-            </p>
-          </div>
-          <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Q. TKCと富士通Japanはどちらが多くの自治体に採用されていますか？
-            </p>
-            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              A. GCInsightのデータベースに基づく採用団体数ランキングで確認できます。上記「ベンダー 採用団体ランキング」セクションをご覧ください。2026年4月時点の実績を反映しています。
-            </p>
-          </div>
-          <div style={{ borderTop: "1px solid #f1f5f9", paddingTop: "1rem" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-              Q. 自分の自治体が使っているパッケージを調べられますか？
-            </p>
-            <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-              A. はい。このページ上部の「自治体名で検索」から市区町村名を入力すると、当該自治体の導入パッケージ一覧を確認できます。都道府県・人口規模での横断比較は「進捗で比較」ページをご利用ください。
-            </p>
-          </div>
+          {FAQ_ITEMS.map((item, i) => (
+            <div key={i} style={i > 0 ? { borderTop: "1px solid #f1f5f9", paddingTop: "1rem" } : {}}>
+              <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                Q. {item.q}
+              </p>
+              <p className="text-xs mt-1.5 leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+                A. {item.a}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* FAQ JSON-LD */}
+      {/* FAQ JSON-LD — FAQ_ITEMS と共通ソースで自動同期 */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "ガバメントクラウド対応パッケージとは何ですか？",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "デジタル庁が定めた「自治体情報システムの標準化・共通化」に準拠し、ガバメントクラウド（AWS・GCP・Azure・OCI・さくらのクラウド）上で稼働することが確認されたシステムパッケージです。住民基本台帳や税務など20業務が対象で、2026年3月までに全国の自治体が移行を求められています。"
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "TKCと富士通Japanはどちらが多くの自治体に採用されていますか？",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "GCInsightのデータベースに基づく採用団体数ランキングで確認できます。ベンダー採用団体ランキングセクションで2026年4月時点の最新実績を確認できます。"
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "自分の自治体が使っているパッケージを調べられますか？",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "はい。ページ上部の「自治体名で検索」から市区町村名を入力すると、当該自治体の導入パッケージ一覧を確認できます。都道府県・人口規模での横断比較は「進捗で比較」ページをご利用ください。"
-                }
-              }
-            ]
+            "mainEntity": FAQ_ITEMS.map((item) => ({
+              "@type": "Question",
+              "name": item.q,
+              "acceptedAnswer": { "@type": "Answer", "text": item.a },
+            })),
           })
         }}
       />
