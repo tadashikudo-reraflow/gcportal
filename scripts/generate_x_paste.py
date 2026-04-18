@@ -349,16 +349,32 @@ def validate_article_urls(article: dict) -> list:
 X_ARTICLE_W, X_ARTICLE_H = 1500, 600   # 5:2 — サイト表示・X投稿の両方で使用
 
 def _build_prompt(title, context):
-    """5:2カバー画像プロンプト生成"""
+    """5:2カバー画像プロンプト生成（クリーンデザイン）"""
+    topic_hint = context.replace("Tags:", "").replace("Summary:", "").strip()[:120]
     return (
-        f"Create an infographic illustration for a Japanese government cloud (ガバメントクラウド) article. "
-        f"Very wide banner: width is 2.5× the height (5:2). Title top-center, illustration fills bottom area horizontally. "
-        f"TITLE: render this exact Japanese text once at the top, large bold dark navy font, do NOT repeat or truncate: 「{title}」 "
-        f"ILLUSTRATION (isometric 3D style): visually represent the article topic. {context}. "
-        f"Choose from: Japanese municipal buildings, cloud servers, documents/checklists, security shields, "
-        f"network connections, dashboards, officials/people, bar charts, gear icons — pick what fits the topic. "
-        f"Add short Japanese labels on key elements. "
-        f"STYLE: White background, deep navy (#1a3a5c) and sky blue (#4a90d9), professional infographic, no borders."
+        f"Create a clean, minimal editorial banner image for a Japanese government technology media article. "
+        f"Format: 5:2 wide banner (1500×600px). "
+        f""
+        f"LAYOUT: Two-zone horizontal split. "
+        f"LEFT 60%: Dark navy solid background (#001440). "
+        f"  - Title text: 「{title}」 in large bold white sans-serif, centered vertically, 2–3 lines max. "
+        f"  - Below title: small sky-blue text 'GCInsight' as site label. "
+        f"RIGHT 40%: Slightly lighter navy (#002D72). "
+        f"  - ONE single large flat icon filling ~70% of this zone, sky blue (#7FB8E6) on dark bg. "
+        f"  - Icon topic: {topic_hint}. "
+        f"  - Choose exactly ONE icon from: cloud shape, shield, certificate/stamp, "
+        f"    building silhouette, network nodes diagram, bar chart, server rack. "
+        f"  - Flat 2D vector style. No 3D, no isometric, no shadows, no gradients on icon. "
+        f""
+        f"STRICT RULES: "
+        f"  - NO text labels or annotations on the illustration. "
+        f"  - NO people, characters, or human figures. "
+        f"  - NO multiple small icons scattered around — one dominant icon only. "
+        f"  - Thin vertical sky-blue (#7FB8E6) divider line between the two zones. "
+        f""
+        f"STYLE: Professional editorial. Think NHK graphics or Nikkei digital. "
+        f"High contrast white-on-navy. Extremely clean. Zero clutter. "
+        f"Color palette: #001440 (bg-dark), #002D72 (bg-light), #7FB8E6 (accent), #ffffff (text)."
     )
 
 
