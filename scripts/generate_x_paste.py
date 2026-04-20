@@ -61,12 +61,12 @@ HEADERS = {
 }
 
 
-def _check_env():
+def _check_env(skip_gemini=False):
     """必須環境変数の事前チェック — 処理途中で失敗する前に早期終了"""
     missing = []
     if not SUPABASE_KEY:
         missing.append("SUPABASE_SERVICE_ROLE_KEY")
-    if not GEMINI_KEY:
+    if not skip_gemini and not GEMINI_KEY:
         missing.append("GEMINI_API_KEY")
     if missing:
         print(f"❌ 必須環境変数が未設定です: {', '.join(missing)}")
@@ -526,7 +526,7 @@ def build_paste_html(article, body_html_with_phs, blocks, figure_filenames, cove
 
 # ── メイン ───────────────────────────────────────────────────────
 
-def process_article(article, no_push=False, open_browser=True, skip_db=False):
+def process_article(article, no_push=False, open_browser=True, skip_db=False, no_cover=False):
     """1記事分のHTML生成処理"""
     slug  = article["slug"]
     title = article["title"]
@@ -572,8 +572,16 @@ def process_article(article, no_push=False, open_browser=True, skip_db=False):
     else:
         print(f"  ✅ 外部URL {len(url_results)}件 すべてOK")
 
-    # カバー画像生成（Grok+HTML+Playwright）
-    cover_fname = generate_cover_image(article)
+    # カバー画像生成（--no-cover 時はテンプレ生成済みを流用）
+    if no_cover:
+        article_id = article["id"]
+        cover_path = PUBLIC_X_IMGS / f"id{article_id}" / "cover.png"
+        cover_fname = f"id{article_id}/cover.png"
+        if not cover_path.exists():
+            print(f"  ⚠️  --no-cover 指定ですがカバー画像が存在しません: {cover_path}")
+            print(f"       先に generate-cover-images.mjs --x-article {article['slug']} を実行してください")
+    else:
+        cover_fname = generate_cover_image(article)
 
     # Drive側にもカバーをコピー
     cover_src = PUBLIC_X_IMGS / f"id{article['id']}" / "cover.png"
@@ -623,15 +631,15 @@ def process_article(article, no_push=False, open_browser=True, skip_db=False):
 
 
 def main():
-    _check_env()  # 必須env var を早期チェック（処理途中で401になる前に止める）
-
     parser = argparse.ArgumentParser(description="X Articles ペーストHTML生成")
     parser.add_argument("--id",      type=int, help="記事ID指定（省略時: 次の未生成）")
     parser.add_argument("--all",     action="store_true", help="未生成記事を全件一括処理")
-    parser.add_argument("--no-push", action="store_true", help="git push をスキップ")
+    parser.add_argument("--no-push",  action="store_true", help="git push をスキップ")
+    parser.add_argument("--no-cover", action="store_true", help="Geminiカバー画像生成をスキップ（generate-cover-images.mjs実行済み前提）")
     parser.add_argument("--schema",  default="public",
                         help="Supabase スキーマ（default: public / karte: karte.articles）")
     args = parser.parse_args()
+    _check_env(skip_gemini=args.no_cover)  # 必須env var を早期チェック（--no-cover時はGEMINI_API_KEY不要）
 
     # スキーマ切替（karte 指定時はヘッダ・OUT_DIR を更新）
     if args.schema != "public":
@@ -693,7 +701,7 @@ def main():
         print("✅ X HTML未生成記事はありません。" if not args.id else "❌ 記事が見つかりません")
         sys.exit(0 if not args.id else 1)
 
-    process_article(article, no_push=args.no_push, open_browser=True)
+    process_article(article, no_push=args.no_push, open_browser=True, no_cover=args.no_cover)
 
 if __name__ == "__main__":
     main()
