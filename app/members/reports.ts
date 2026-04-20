@@ -12,9 +12,23 @@ export type MemberReport = {
   sections: { heading: string; body: string }[];
 };
 
-export const LATEST_SLUG = "gc-replatform-2026-04";
+export const LATEST_SLUG = "gc-standard-spec-checklist";
 
 export const REPORTS: Record<string, MemberReport> = {
+  "gc-standard-spec-checklist": {
+    slug: "gc-standard-spec-checklist",
+    title: "自治体標準化対象20業務×標準仕様書 対応チェックリスト完全版",
+    subtitle: "標準化対象20業務の全リスト・省庁別標準仕様書入手ガイド・フェーズ別実務チェックリスト。2026年3月移行支援期間終了前に確認すべき全項目",
+    publishedAt: "2026-04-20",
+    sections: [],
+  },
+  "gc-fisa-data-sovereignty": {
+    slug: "gc-fisa-data-sovereignty",
+    title: "住民情報は米国政府が見られる？FISA 702条とガバメントクラウドの不都合な真実",
+    subtitle: "FISA 702条・EO 12333・CLOUD法・ガグオーダーの4つの壁を解説。外資CSP vs さくらのクラウドのリスク比較と、自治体担当者が今すぐできる対策チェックリスト",
+    publishedAt: "2026-04-20",
+    sections: [],
+  },
   "gc-replatform-2026-04": {
     slug: "gc-replatform-2026-04",
     title: "GCASガイドReplatformノウハウ完全版：4クラウド対応の移行実務ガイド【2026年4月号】",
