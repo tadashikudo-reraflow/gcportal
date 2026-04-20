@@ -43,6 +43,42 @@ function pickCategory(tags) {
   return { label: "ガバメントクラウド", icon: "☁️", accent: "#0066FF" };
 }
 
+// カテゴリ別右パネルSVGアイコン
+function _xArticleIcon(tags) {
+  const buildingTags = ["自治体標準化", "遅延", "2026年問題", "議会", "標準化", "コスト"];
+  const useBuilding = buildingTags.some(t => tags.includes(t));
+
+  if (useBuilding) {
+    // ビル/庁舎アイコン
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="160" height="192">
+      <rect x="30" y="40" width="140" height="190" rx="6" fill="#7FB8E6"/>
+      <rect x="50" y="20" width="100" height="30" rx="4" fill="#7FB8E6"/>
+      <rect x="52" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="86" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="120" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="52" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="86" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="120" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="52" y="156" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="120" y="156" width="28" height="28" rx="3" fill="#0D2570"/>
+      <rect x="80" y="160" width="40" height="70" rx="4" fill="#0D2570"/>
+    </svg>`;
+  }
+
+  // クラウドアイコン（デフォルト: AWS・移行・解説系）
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="240" height="176">
+    <path fill="#7FB8E6"
+      d="M232 176H72C42 176 18 152 18 122C18 95 38 72 65 66
+         C65 64 65 62 65 60C65 30 90 6 120 6
+         C144 6 164 20 174 42
+         C182 36 192 32 204 32
+         C236 32 262 58 262 90
+         C262 93 262 96 261 99
+         C278 107 288 124 288 143
+         C288 162 272 176 252 176Z"/>
+  </svg>`;
+}
+
 function buildHTML(article, opts = {}) {
   const cat = pickCategory(article.tags ?? []);
   const parts = article.title.split("｜");
@@ -54,6 +90,10 @@ function buildHTML(article, opts = {}) {
 
   // X Articles: govcloud-aws-monopoly-risk と同じ二分割レイアウト（左:テキスト / 右:クラウドアイコン）
   if (opts?.xArticle) {
+    // 文字数に応じてフォントサイズを動的調整（タイトルオーバーフロー防止）
+    const titleLen = mainTitle.length;
+    const fontSize = titleLen <= 14 ? 62 : titleLen <= 22 ? 52 : titleLen <= 30 ? 44 : 38;
+
     return `<!DOCTYPE html>
 <html>
 <head>
@@ -72,98 +112,62 @@ function buildHTML(article, opts = {}) {
   /* 左パネル: テキスト (63%) */
   .left {
     width: 63%;
-    background: linear-gradient(160deg, #001540 0%, #002272 60%, #002D8A 100%);
-    padding: 52px 64px;
+    background: #0A1F5C;
+    padding: 48px 60px;
     display: flex; flex-direction: column; justify-content: space-between;
-    position: relative; overflow: hidden;
-  }
-  .left::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 56px 56px;
-    pointer-events: none;
+    overflow: hidden;
   }
 
-  .badge {
-    position: relative; z-index: 1;
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 24px;
-    padding: 8px 20px;
-    font-size: 20px; font-weight: 700;
-    color: rgba(255,255,255,0.9);
+  .title-block {
+    flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+    min-height: 0;
   }
 
-  .title-area {
-    position: relative; z-index: 1;
-    flex: 1; display: flex; flex-direction: column; justify-content: center;
-    gap: 14px; padding: 16px 0;
-  }
-  .accent-line {
-    width: 48px; height: 3px;
-    background: rgba(255,255,255,0.5); border-radius: 2px;
-  }
   .main-title {
-    font-size: 52px; font-weight: 900;
-    color: #FFFFFF; line-height: 1.35;
+    font-size: ${fontSize}px; font-weight: 900;
+    color: #FFFFFF; line-height: 1.3;
     letter-spacing: -0.5px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    word-break: keep-all; overflow-wrap: break-word;
+    overflow-wrap: break-word; word-break: break-word;
+    overflow: hidden;
   }
   .sub-title {
-    font-size: 20px; font-weight: 500;
+    font-size: 22px; font-weight: 500;
     color: rgba(255,255,255,0.65); line-height: 1.4;
+    margin-top: 12px;
+    overflow: hidden;
   }
 
   .hashtag {
-    position: relative; z-index: 1;
-    font-size: 22px; font-weight: 700;
-    color: rgba(255,255,255,0.6);
+    font-size: 24px; font-weight: 700;
+    color: rgba(160,195,240,0.85);
     letter-spacing: 0.5px;
+    flex-shrink: 0;
+    padding-top: 20px;
   }
 
-  /* 右パネル: クラウドアイコン (37%) */
+  /* 右パネル: カテゴリアイコン (37%) */
   .right {
     width: 37%;
-    background: linear-gradient(160deg, #002272 0%, #003399 100%);
-    border-left: 2px solid rgba(255,255,255,0.15);
+    background: #0D2570;
+    border-left: 2px solid rgba(255,255,255,0.12);
     display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
   }
-  .cloud-wrap { opacity: 0.85; }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="left">
-    <div class="badge">
-      <span>${cat.icon}</span>
-      <span>${cat.label}</span>
-    </div>
-    <div class="title-area">
-      <div class="accent-line"></div>
+    <div class="title-block">
       <div class="main-title">${mainTitle}</div>
       ${subTitle ? `<div class="sub-title">${subTitle}</div>` : ""}
     </div>
-    <div class="hashtag">#GCInsight</div>
+    <div class="hashtag">GCInsight</div>
   </div>
   <div class="right">
-    <div class="cloud-wrap">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 200" width="220" height="157">
-        <path fill="#7FB8E6"
-          d="M218 160H68C40 160 18 138 18 110C18 85 36 64 60 59
-             C60 57 60 55 60 53C60 26 82 4 109 4
-             C130 4 148 17 156 36
-             C163 31 172 28 182 28
-             C210 28 232 50 232 79
-             C232 82 232 84 231 87
-             C246 94 256 110 256 128
-             C256 146 239 160 218 160Z"/>
-      </svg>
-    </div>
+    ${_xArticleIcon(article.tags ?? [])}
   </div>
 </div>
 </body>
