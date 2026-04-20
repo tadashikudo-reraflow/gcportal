@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { getAllKarteArticles } from "@/lib/karte-articles";
 import KarteArticlesClient from "./KarteArticlesClient";
