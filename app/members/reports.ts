@@ -15,6 +15,20 @@ export type MemberReport = {
 export const LATEST_SLUG = "gc-standard-spec-checklist";
 
 export const REPORTS: Record<string, MemberReport> = {
+  "gc-aws-savings-plans": {
+    slug: "gc-aws-savings-plans",
+    title: "AWS Savings Plans、自治体は本当に「得」しているか——罠3つと円安リスク、OCI移行判断フロー完全版",
+    subtitle: "Use-it-or-lose-it・サービス境界問題・円安の3つの罠を解説。SP失効防止チェックリスト30項目とOCI移行判断フロー6ステップ付き",
+    publishedAt: "2026-04-20",
+    sections: [],
+  },
+  "gc-cloud-cost-finops": {
+    slug: "gc-cloud-cost-finops",
+    title: "ガバメントクラウド移行で「コスト2倍」になる自治体と「1.6億削減」する自治体——何が分かれ目なのか",
+    subtitle: "97%がコスト増を見込む中、1.6億削減した自治体と1.1億増加した自治体の具体的な差異。デジタル庁331件30%削減のFinOps4ステップと実践チェックリスト10項目",
+    publishedAt: "2026-04-20",
+    sections: [],
+  },
   "gc-standard-spec-checklist": {
     slug: "gc-standard-spec-checklist",
     title: "自治体標準化対象20業務×標準仕様書 対応チェックリスト完全版",
