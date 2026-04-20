@@ -12,9 +12,16 @@ export type MemberReport = {
   sections: { heading: string; body: string }[];
 };
 
-export const LATEST_SLUG = "gc-finops-2026-04";
+export const LATEST_SLUG = "gc-replatform-2026-04";
 
 export const REPORTS: Record<string, MemberReport> = {
+  "gc-replatform-2026-04": {
+    slug: "gc-replatform-2026-04",
+    title: "GCASガイドReplatformノウハウ完全版：4クラウド対応の移行実務ガイド【2026年4月号】",
+    subtitle: "2026年4月一斉公開のReplatform16ページを解説。運用マネージドサービス化・オブジェクトストレージ化・RDB移行・クラウドサービス活用の4カテゴリを自治体視点でまとめた",
+    publishedAt: "2026-04-20",
+    sections: [],
+  },
   "gc-finops-2026-04": {
     slug: "gc-finops-2026-04",
     title: "ガバクラ移行後コスト削減 実践レポート【2026年4月号】",

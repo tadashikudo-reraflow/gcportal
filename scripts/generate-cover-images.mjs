@@ -109,20 +109,49 @@ function buildHTML(article, opts = {}) {
     overflow: hidden;
   }
 
+  /* ノイズテクスチャ用SVGフィルタ */
+  .noise-layer {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.045; mix-blend-mode: overlay;
+  }
+
   /* 左パネル: テキスト (63%) */
   .left {
     width: 63%;
-    background: #0A1F5C;
+    background:
+      radial-gradient(ellipse 70% 55% at 15% 35%, rgba(72,128,255,0.22) 0%, transparent 65%),
+      linear-gradient(155deg, #0F2565 0%, #071540 60%, #060F2E 100%);
     padding: 48px 60px;
     display: flex; flex-direction: column; justify-content: space-between;
-    overflow: hidden;
+    overflow: hidden; position: relative;
+  }
+
+  /* 左端アクセントライン */
+  .left::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(to bottom,
+      rgba(120,180,255,0.9) 0%,
+      rgba(80,140,255,0.5) 50%,
+      rgba(60,110,220,0.15) 100%);
+  }
+
+  /* 上端ハイライト */
+  .left::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right,
+      rgba(140,190,255,0.6) 0%,
+      rgba(100,160,255,0.2) 60%,
+      transparent 100%);
   }
 
   .title-block {
     flex: 1;
     display: flex; flex-direction: column; justify-content: center;
-    overflow: hidden;
-    min-height: 0;
+    overflow: hidden; min-height: 0;
+    position: relative; z-index: 1;
   }
 
   .main-title {
@@ -131,35 +160,48 @@ function buildHTML(article, opts = {}) {
     letter-spacing: -0.5px;
     overflow-wrap: break-word; word-break: break-word;
     overflow: hidden;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
   }
   .sub-title {
     font-size: 22px; font-weight: 500;
     color: rgba(255,255,255,0.65); line-height: 1.4;
-    margin-top: 12px;
-    overflow: hidden;
+    margin-top: 12px; overflow: hidden;
   }
 
   .hashtag {
     font-size: 24px; font-weight: 700;
-    color: rgba(160,195,240,0.85);
+    color: rgba(140,190,255,0.9);
     letter-spacing: 0.5px;
-    flex-shrink: 0;
-    padding-top: 20px;
+    flex-shrink: 0; padding-top: 20px;
+    position: relative; z-index: 1;
   }
 
   /* 右パネル: カテゴリアイコン (37%) */
   .right {
     width: 37%;
-    background: #0D2570;
-    border-left: 2px solid rgba(255,255,255,0.12);
+    background:
+      radial-gradient(ellipse 70% 70% at 50% 55%, rgba(50,90,200,0.45) 0%, transparent 70%),
+      linear-gradient(160deg, #0D2270 0%, #091850 100%);
+    border-left: 1px solid rgba(100,160,255,0.2);
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
+    flex-shrink: 0; position: relative; overflow: hidden;
   }
+
+  /* 右パネルノイズ */
+  .right::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04; mix-blend-mode: overlay;
+  }
+
+  .icon-wrap { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="left">
+    <div class="noise-layer"></div>
     <div class="title-block">
       <div class="main-title">${mainTitle}</div>
       ${subTitle ? `<div class="sub-title">${subTitle}</div>` : ""}
@@ -167,7 +209,7 @@ function buildHTML(article, opts = {}) {
     <div class="hashtag">GCInsight</div>
   </div>
   <div class="right">
-    ${_xArticleIcon(article.tags ?? [])}
+    <div class="icon-wrap">${_xArticleIcon(article.tags ?? [])}</div>
   </div>
 </div>
 </body>
