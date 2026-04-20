@@ -49,8 +49,8 @@ function _xArticleIcon(tags) {
   const useBuilding = buildingTags.some(t => tags.includes(t));
 
   if (useBuilding) {
-    // ビル/庁舎アイコン
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="160" height="192">
+    // ビル/庁舎アイコン（右パネル555×600に対して幅60%・高64%）
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="360" height="432">
       <rect x="30" y="40" width="140" height="190" rx="6" fill="#7FB8E6"/>
       <rect x="50" y="20" width="100" height="30" rx="4" fill="#7FB8E6"/>
       <rect x="52" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
@@ -65,8 +65,8 @@ function _xArticleIcon(tags) {
     </svg>`;
   }
 
-  // クラウドアイコン（デフォルト: AWS・移行・解説系）
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="240" height="176">
+  // クラウドアイコン（右パネル555×600に対して幅80%・高55%）
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="540" height="396">
     <path fill="#7FB8E6"
       d="M232 176H72C42 176 18 152 18 122C18 95 38 72 65 66
          C65 64 65 62 65 60C65 30 90 6 120 6
@@ -92,7 +92,7 @@ function buildHTML(article, opts = {}) {
   if (opts?.xArticle) {
     // 文字数に応じてフォントサイズを動的調整（タイトルオーバーフロー防止）
     const titleLen = mainTitle.length;
-    const fontSize = titleLen <= 14 ? 62 : titleLen <= 22 ? 52 : titleLen <= 30 ? 44 : 38;
+    const fontSize = titleLen <= 14 ? 86 : titleLen <= 20 ? 78 : titleLen <= 28 ? 74 : titleLen <= 36 ? 70 : titleLen <= 44 ? 64 : 58;
 
     return `<!DOCTYPE html>
 <html>
