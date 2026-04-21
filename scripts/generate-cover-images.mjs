@@ -49,33 +49,57 @@ function _xArticleIcon(tags) {
   const useBuilding = buildingTags.some(t => tags.includes(t));
 
   if (useBuilding) {
-    // ビル/庁舎アイコン（右パネル555×600に対して幅60%・高64%）
+    // ビル/庁舎アイコン（グラデーション + 窓ガラス質感）
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="360" height="432">
-      <rect x="30" y="40" width="140" height="190" rx="6" fill="#7FB8E6"/>
-      <rect x="50" y="20" width="100" height="30" rx="4" fill="#7FB8E6"/>
-      <rect x="52" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="86" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="120" y="72" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="52" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="86" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="120" y="114" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="52" y="156" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="120" y="156" width="28" height="28" rx="3" fill="#0D2570"/>
-      <rect x="80" y="160" width="40" height="70" rx="4" fill="#0D2570"/>
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
+          <stop offset="0%" stop-color="#C0DCF2"/>
+          <stop offset="50%" stop-color="#7FB8E6"/>
+          <stop offset="100%" stop-color="#4E8BBF"/>
+        </linearGradient>
+        <linearGradient id="bh" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+      </defs>
+      <rect x="30" y="40" width="140" height="190" rx="6" fill="url(#bg)"/>
+      <rect x="30" y="40" width="140" height="190" rx="6" fill="url(#bh)"/>
+      <rect x="50" y="20" width="100" height="30" rx="4" fill="url(#bg)"/>
+      <rect x="52" y="72" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="86" y="72" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="120" y="72" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="52" y="114" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="86" y="114" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="120" y="114" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="52" y="156" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="120" y="156" width="28" height="28" rx="3" fill="rgba(8,22,72,0.72)"/>
+      <rect x="80" y="160" width="40" height="70" rx="4" fill="rgba(8,22,72,0.80)"/>
     </svg>`;
   }
 
-  // クラウドアイコン（右パネル555×600に対して幅80%・高55%）
+  // クラウドアイコン（グラデーション + ハイライト）
+  const cloudPath = `M232 176H72C42 176 18 152 18 122C18 95 38 72 65 66
+     C65 64 65 62 65 60C65 30 90 6 120 6
+     C144 6 164 20 174 42
+     C182 36 192 32 204 32
+     C236 32 262 58 262 90
+     C262 93 262 96 261 99
+     C278 107 288 124 288 143
+     C288 162 272 176 252 176Z`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="540" height="396">
-    <path fill="#7FB8E6"
-      d="M232 176H72C42 176 18 152 18 122C18 95 38 72 65 66
-         C65 64 65 62 65 60C65 30 90 6 120 6
-         C144 6 164 20 174 42
-         C182 36 192 32 204 32
-         C236 32 262 58 262 90
-         C262 93 262 96 261 99
-         C278 107 288 124 288 143
-         C288 162 272 176 252 176Z"/>
+    <defs>
+      <linearGradient id="cg" x1="0.2" y1="0" x2="0.8" y2="1">
+        <stop offset="0%" stop-color="#BDD9F0"/>
+        <stop offset="55%" stop-color="#7FB8E6"/>
+        <stop offset="100%" stop-color="#4E8BBF"/>
+      </linearGradient>
+      <radialGradient id="ch" cx="35%" cy="28%" r="45%">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.30)"/>
+        <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+      </radialGradient>
+    </defs>
+    <path fill="url(#cg)" d="${cloudPath}"/>
+    <path fill="url(#ch)" d="${cloudPath}"/>
   </svg>`;
 }
 
@@ -93,6 +117,7 @@ function buildHTML(article, opts = {}) {
     // 文字数に応じてフォントサイズを動的調整（タイトルオーバーフロー防止）
     const titleLen = mainTitle.length;
     const fontSize = titleLen <= 14 ? 86 : titleLen <= 20 ? 78 : titleLen <= 28 ? 74 : titleLen <= 36 ? 70 : titleLen <= 44 ? 64 : 58;
+    const letterSpacing = fontSize >= 74 ? '-2.5px' : fontSize >= 64 ? '-1.5px' : '-0.5px';
 
     return `<!DOCTYPE html>
 <html>
@@ -106,7 +131,15 @@ function buildHTML(article, opts = {}) {
   .card {
     width: ${W}px; height: ${H}px;
     display: flex; flex-direction: row;
-    overflow: hidden;
+    overflow: hidden; position: relative;
+  }
+
+  /* ③ 下端アクセントバー */
+  .card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px; z-index: 20;
+    background: linear-gradient(to right,
+      #5B9FE8 0%, #7FC4F5 35%, #A8D8FA 55%, rgba(120,180,240,0.3) 100%);
   }
 
   /* ノイズテクスチャ用SVGフィルタ */
@@ -156,11 +189,11 @@ function buildHTML(article, opts = {}) {
 
   .main-title {
     font-size: ${fontSize}px; font-weight: 900;
-    color: #FFFFFF; line-height: 1.3;
-    letter-spacing: -0.5px;
+    color: #FFFFFF; line-height: 1.28;
+    letter-spacing: ${letterSpacing};
     overflow-wrap: break-word; word-break: break-word;
     overflow: hidden;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 40px rgba(60,120,255,0.15);
   }
   .sub-title {
     font-size: 22px; font-weight: 500;
@@ -169,20 +202,28 @@ function buildHTML(article, opts = {}) {
   }
 
   .hashtag {
-    font-size: 24px; font-weight: 700;
-    color: rgba(140,190,255,0.9);
-    letter-spacing: 0.5px;
+    font-size: 26px; font-weight: 700;
+    color: rgba(140,195,255,0.95);
+    letter-spacing: 1.5px;
     flex-shrink: 0; padding-top: 20px;
     position: relative; z-index: 1;
   }
+  /* ④ GCInsight 下線アクセント */
+  .hashtag::after {
+    content: '';
+    display: block; width: 52px; height: 2px;
+    background: linear-gradient(to right, rgba(120,180,255,0.8), rgba(100,160,255,0.1));
+    border-radius: 1px; margin-top: 8px;
+  }
 
-  /* 右パネル: カテゴリアイコン (37%) */
+  /* 右パネル: カテゴリアイコン (37%) — ② グロー強化 */
   .right {
     width: 37%;
     background:
-      radial-gradient(ellipse 70% 70% at 50% 55%, rgba(50,90,200,0.45) 0%, transparent 70%),
+      radial-gradient(ellipse 65% 60% at 52% 52%, rgba(90,155,240,0.60) 0%, rgba(50,90,200,0.25) 45%, transparent 70%),
+      radial-gradient(ellipse 90% 80% at 50% 50%, rgba(30,60,160,0.40) 0%, transparent 80%),
       linear-gradient(160deg, #0D2270 0%, #091850 100%);
-    border-left: 1px solid rgba(100,160,255,0.2);
+    border-left: 1px solid rgba(100,160,255,0.25);
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; position: relative; overflow: hidden;
   }
