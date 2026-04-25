@@ -29,6 +29,7 @@ export type ArticleMeta = {
 export type Article = ArticleMeta & {
   contentHtml: string;
   sources?: { url: string; title: string; org: string; accessed?: string }[];
+  updatedAt?: string;
 };
 
 /** 全公開記事のメタ情報を日付降順で取得（Supabase） */
@@ -135,5 +136,6 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     coverImage: data.cover_image,
     contentHtml: data.content ?? "",
     sources: data.sources ?? [],
+    updatedAt: data.updated_at ?? undefined,
   };
 }

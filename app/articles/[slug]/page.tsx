@@ -126,9 +126,12 @@ export default async function ArticlePage({ params }: Props) {
             {article.description}
           </p>
         )}
-        <div className="flex items-center gap-4 text-xs pt-2 border-t border-gray-100"
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pt-2 border-t border-gray-100"
           style={{ color: "var(--color-text-muted)" }}>
-          {article.date && <span>{article.date}</span>}
+          {article.date && <span>公開: {article.date}</span>}
+          {article.updatedAt && article.updatedAt.slice(0, 10) !== article.date?.slice(0, 10) && (
+            <span>最終更新: {article.updatedAt.slice(0, 10)}</span>
+          )}
           {article.author && <span>{article.author}</span>}
         </div>
       </div>
@@ -179,6 +182,22 @@ export default async function ArticlePage({ params }: Props) {
           </ol>
         </div>
       )}
+
+      {/* 執筆者プロフィール */}
+      <div className="card p-5 flex items-start gap-4">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+          style={{ backgroundColor: "#00338D18", color: "#00338D" }}>
+          GC
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+            {article.author ?? "GCInsight編集部"}
+          </p>
+          <p className="text-xs leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+            ガバメントクラウド・自治体標準化を専門に調査するリサーチチーム。デジタル庁・総務省公表データを一次資料として継続的に分析し、自治体DX担当者・ITベンダー向けに実務情報を提供しています。
+          </p>
+        </div>
+      </div>
 
       {(() => {
         const cluster = getClusterForTags(article.tags ?? []);
