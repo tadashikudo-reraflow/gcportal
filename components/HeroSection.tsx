@@ -88,9 +88,9 @@ export default function HeroSection({
         </p>
 
         <h1 className="hero-headline">
-          全国{totalMunicipalities.toLocaleString()}自治体の
+          <span className="hero-headline-accent">ガバメントクラウド移行</span>
           <br />
-          <span className="hero-headline-accent">ガバクラ移行</span>を可視化
+          全国{totalMunicipalities.toLocaleString()}自治体の進捗ダッシュボード
         </h1>
 
         <p className="hero-sub">

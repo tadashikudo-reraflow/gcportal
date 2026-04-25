@@ -19,12 +19,12 @@ import { Municipality } from "@/lib/types";
 
 export const metadata: Metadata = {
   title:
-    "ガバメントクラウド移行ダッシュボード｜1,741自治体の進捗・コスト・遅延を可視化｜GCInsight",
-  description: `移行完了わずか${data.summary.completed_count}団体（3.7%）、コスト平均2.3倍。全国1,741自治体のガバメントクラウド移行進捗・コスト・遅延リスクをリアルタイム可視化する無料ダッシュボード。`,
+    "ガバメントクラウド移行 進捗ダッシュボード｜全国1,741自治体・20業務をリアルタイム可視化｜GCInsight",
+  description: `全国1,741自治体×20業務のガバメントクラウド移行進捗、特定移行支援システム認定状況（935団体）、ベンダー別CSPシェアを公開。総務省・デジタル庁データ準拠の民間唯一の総合ダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
-    title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
-    description: `システム移行率38.4%・全20業務完了は${data.summary.completed_count}団体（3.7%）。1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
+    title: "GCInsight — ガバメントクラウド移行 全国進捗ダッシュボード",
+    description: `全20業務完了は${data.summary.completed_count}団体（3.7%）、特定移行支援認定935団体。全国1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
     images: [
       {
         url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`移行完了 ${data.summary.completed_count} / 1,741自治体`)}&rate=${data.summary.completed_count / data.summary.total}`,
@@ -275,26 +275,26 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {/* 主要2枚: 大カード（col-span-2） */}
           <Link
-            href="/progress?status=critical"
+            href="/tokutei"
             className="explore-card col-span-2 sm:col-span-1"
             style={{ padding: "1.25rem 1.5rem" }}
           >
-            <span className="explore-card-badge" style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}>
-              {riskMunis.length}件
+            <span className="explore-card-badge" style={{ backgroundColor: "#F1F5F9", color: "#334155" }}>
+              {TOKUTEI_OFFICIAL}団体
             </span>
-            <span className="explore-card-title" style={{ fontSize: "1rem" }}>遅延リスク自治体</span>
-            <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
+            <span className="explore-card-title" style={{ fontSize: "1rem" }}>特定移行支援 認定一覧</span>
+            <span className="explore-card-desc">移行期限の延長が認められた自治体の認定状況・条件を確認</span>
           </Link>
 
           <NewsletterExploreCard />
 
           {/* 残り4枚: 小カード */}
-          <Link href="/progress" className="explore-card">
-            <span className="explore-card-badge" style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}>
-              比較
+          <Link href="/progress?status=critical" className="explore-card">
+            <span className="explore-card-badge" style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}>
+              {riskMunis.length}件
             </span>
-            <span className="explore-card-title">自治体を比較</span>
-            <span className="explore-card-desc">人口帯・都道府県で類似団体の進捗をベンチマーク</span>
+            <span className="explore-card-title">遅延リスク自治体</span>
+            <span className="explore-card-desc">進捗50%未満の自治体を地域・人口帯で絞り込む</span>
           </Link>
 
           <Link href="/costs" className="explore-card">
@@ -303,14 +303,6 @@ export default function DashboardPage() {
             </span>
             <span className="explore-card-title">コスト増の要因</span>
             <span className="explore-card-desc">ベンダー別コスト比較と高騰の背景を分析</span>
-          </Link>
-
-          <Link href="/finops" className="explore-card">
-            <span className="explore-card-badge" style={{ backgroundColor: "#CCFBF1", color: "#0f766e" }}>
-              FinOps
-            </span>
-            <span className="explore-card-title">コスト最適化</span>
-            <span className="explore-card-desc">同規模自治体との比較でコスト適正水準を確認</span>
           </Link>
 
           <Link href="/packages" className="explore-card">
