@@ -258,7 +258,8 @@ function buildHTML(article, opts = {}) {
   }
 
   // OGP モード (1200×630): 従来の単一パネルレイアウト
-  const fontSize = 58;
+  const titleLen = mainTitle.length;
+  const fontSize = titleLen <= 16 ? 58 : titleLen <= 24 ? 52 : titleLen <= 32 ? 46 : titleLen <= 40 ? 42 : 38;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -300,7 +301,7 @@ function buildHTML(article, opts = {}) {
   .main-title {
     font-size: ${fontSize}px; font-weight: 900; color: #FFFFFF;
     line-height: 1.35; letter-spacing: -0.5px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3); word-break: keep-all;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3); word-break: break-word; overflow-wrap: break-word;
   }
   .sub-title { font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.4; }
   .bottom { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
