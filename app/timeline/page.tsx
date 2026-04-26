@@ -18,6 +18,29 @@ export const metadata: Metadata = {
   alternates: { canonical: "/timeline" },
 };
 
+const timelineFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "ガバメントクラウドの移行期限はいつですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "原則として2025年度末（2026年3月）が移行期限です。ただし技術的・運用的に困難な自治体は「特定移行支援システム」として期限が延長されています。約935団体が特定移行支援に該当し、引き続き移行作業を継続しています。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "ガバメントクラウド移行に関する直近の重要なスケジュールは？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "2026年のガバメントクラウド関連の主要イベントには、特定移行支援システムの経過観察・各自治体の移行継続・デジタル庁による進捗報告などが含まれます。GCInsightのタイムラインページでデジタル庁・総務省・厚労省等の最新動向を時系列で確認できます。",
+      },
+    },
+  ],
+};
+
 export interface ScheduleEvent {
   date: string;
   status: "done" | "upcoming";
@@ -91,6 +114,7 @@ export default async function SchedulePage() {
 
   return (
     <div className="space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(timelineFaqJsonLd) }} />
       <Breadcrumb items={[{ label: "スケジュール" }]} />
       <div>
         <h1 className="page-title">ガバクラ関連スケジュール</h1>
