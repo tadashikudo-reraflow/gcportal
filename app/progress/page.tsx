@@ -19,6 +19,45 @@ export const metadata: Metadata = {
   alternates: { canonical: "/progress" },
 };
 
+const progressFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "ガバメントクラウド移行の進捗状況はどこで確認できますか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "GCInsightのダッシュボードで全国1,741自治体×20業務の移行進捗をリアルタイムで確認できます。都道府県別・人口帯別・業務別にフィルタリング可能で、総務省・デジタル庁公表データに基づいています。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "特定移行支援システムとは何ですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "特定移行支援システムとは、技術的・運用的な理由でガバメントクラウドへの移行が困難とデジタル庁が認定した自治体・システムです。2026年3月時点で約935団体が該当し、期限延長のうえ移行継続中のステータスです。「遅延」や「未対応」とは異なります。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "自治体システム標準化の期限はいつですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "原則として2025年度末（2026年3月）が移行期限でしたが、特定移行支援システムに該当する自治体は期限が延長されています。デジタル庁の2026年2月公表資料によると、標準化対象34,592システムのうち約25.9%が特定移行支援システムに該当する見込みです。",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "自治体の標準化完了率はどのくらいですか？",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "2026年4月時点で全20業務すべて完了した自治体は1,741団体中わずか約3.7%にとどまっています。移行率（進捗中含む）はシステム全体で38.4%程度です。都道府県・業務別の詳細はGCInsightの進捗ダッシュボードで確認できます。",
+      },
+    },
+  ],
+};
+
 /* ──────────────────── Types (exported for ProgressClient) ──────────────────── */
 
 export interface ProgressVendor {
@@ -196,6 +235,7 @@ export default async function ProgressPage() {
 
   return (
     <div className="space-y-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(progressFaqJsonLd) }} />
       <Breadcrumb items={[{ label: "進捗ダッシュボード" }]} />
       <div className="pb-4">
         <h1 className="page-title">標準化進捗ダッシュボード</h1>

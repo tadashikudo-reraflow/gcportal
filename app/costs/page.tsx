@@ -285,9 +285,9 @@ export default async function CostsPage() {
       {/* パンくず + ページヘッダー */}
       <Breadcrumb items={[{ label: "コスト効果分析" }]} />
       <div className="border-b border-gray-200 pb-4">
-        <h1 className="page-title">コスト効果分析</h1>
+        <h1 className="page-title">ガバメントクラウド移行コスト分析</h1>
         <p className="page-subtitle">
-          標準化移行に伴うコスト変化を、実績と比較表で整理
+          先行8自治体の実測データで分かる移行コストの実態と削減策
         </p>
         {/* ヒーローKPIバー — 目標vs実態の対比を強調 */}
         <div className="mt-4 space-y-2" role="region" aria-label="コスト変化サマリー">
