@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
-    description: `システム移行率38.4%・全20業務完了は${data.summary.completed_count}団体（3.7%）。1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
+    description: `システム移行率38.4%・全20業務完了は${data.summary.completed_count}団体（${(data.summary.completed_count / data.summary.total * 100).toFixed(1)}%）。1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
     images: [
       {
         url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`移行完了 ${data.summary.completed_count} / 1,741自治体`)}&rate=${data.summary.completed_count / data.summary.total}`,
