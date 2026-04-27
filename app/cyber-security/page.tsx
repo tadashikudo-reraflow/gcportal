@@ -5,6 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import RelatedArticles from "@/components/RelatedArticles";
 import NewsletterBanner from "@/components/NewsletterBanner";
 import CountdownBanner from "./CountdownBanner";
+import { PUBCOMMENT_DEADLINE, calcRemaining } from "./deadline";
 import { CLUSTERS } from "@/lib/clusters";
 
 export const metadata: Metadata = {
@@ -32,26 +33,26 @@ const TIMELINE_ITEMS = [
     date: "2026年4月21日",
     label: "パブリックコメント開始",
     desc: "内閣官房 国家サイバー統括室（NCO）がパブコメ受付を開始",
-    status: "done",
+    status: "done" as const,
   },
   {
     date: "2026年5月17日",
     label: "パブコメ締め切り",
     desc: "意見提出の受付終了（23:59）",
-    status: "active",
+    status: "active" as const,
     link: "https://public-comment.e-gov.go.jp/pcm/detail?CLASSNAME=PCMMSTDETAIL&id=060260421&Mode=0",
   },
   {
     date: "2026年10月（予定）",
     label: "重要インフラ統一基準 施行",
     desc: "サイバーセキュリティ基本法改正に基づく統一基準が発効。各政府機関は実施計画の策定へ",
-    status: "upcoming",
+    status: "upcoming" as const,
   },
   {
     date: "2027年夏（目処）",
     label: "各分野 実施計画 策定",
     desc: "政府・行政サービス分野（地方公共団体含む）の実施計画が確定",
-    status: "upcoming",
+    status: "upcoming" as const,
   },
 ];
 
@@ -105,6 +106,16 @@ const PDCA_STEPS = [
 ];
 
 export default function CyberSecurityPage() {
+  const serverNow = Date.now();
+  const isDeadlinePassed = serverNow >= PUBCOMMENT_DEADLINE.getTime();
+  const initialRemaining = calcRemaining(serverNow);
+
+  const effectiveTimeline = TIMELINE_ITEMS.map((item) =>
+    isDeadlinePassed && item.status === "active"
+      ? { ...item, status: "done" as const, link: undefined }
+      : item
+  );
+
   return (
     <div className="space-y-8">
       <Breadcrumb items={[{ label: "重要インフラ統一基準" }]} />
@@ -149,7 +160,7 @@ export default function CyberSecurityPage() {
         />
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: 720 }}>
-          <CountdownBanner />
+          <CountdownBanner initial={initialRemaining} />
 
           <h1
             style={{
@@ -173,26 +184,44 @@ export default function CyberSecurityPage() {
           </p>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            <Link
-              href="https://public-comment.e-gov.go.jp/pcm/detail?CLASSNAME=PCMMSTDETAIL&id=060260421&Mode=0"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "10px 18px",
-                borderRadius: 8,
-                backgroundColor: "#F5B500",
-                color: "#00205F",
-                fontWeight: 700,
-                fontSize: "0.875rem",
-                textDecoration: "none",
-              }}
-            >
-              パブコメを提出する
-              <ExternalLink size={14} />
-            </Link>
+            {!isDeadlinePassed ? (
+              <Link
+                href="https://public-comment.e-gov.go.jp/pcm/detail?CLASSNAME=PCMMSTDETAIL&id=060260421&Mode=0"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  backgroundColor: "#F5B500",
+                  color: "#00205F",
+                  fontWeight: 700,
+                  fontSize: "0.875rem",
+                  textDecoration: "none",
+                }}
+              >
+                パブコメを提出する
+                <ExternalLink size={14} />
+              </Link>
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 18px",
+                  borderRadius: 8,
+                  backgroundColor: "rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.5)",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                }}
+              >
+                パブコメ受付終了（5月17日）
+              </span>
+            )}
             <Link
               href="/articles"
               style={{
@@ -261,10 +290,10 @@ export default function CyberSecurityPage() {
       <section className="card" style={{ padding: "24px 28px" }}>
         <h2 className="section-title" style={{ marginBottom: 20 }}>対応タイムライン</h2>
         <ol style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 0 }}>
-          {TIMELINE_ITEMS.map((item, i) => (
+          {effectiveTimeline.map((item, i) => (
             <li key={i} style={{ display: "flex", gap: 16, position: "relative" }}>
               {/* 縦線 */}
-              {i < TIMELINE_ITEMS.length - 1 && (
+              {i < effectiveTimeline.length - 1 && (
                 <div
                   aria-hidden
                   style={{
