@@ -258,6 +258,18 @@ export const DATA_SOURCES: Record<string, DataSource> = {
     confidence: "official",
     updateCycle: "adhoc",
   },
+  "digital-cho-dashboard-guidebook-2026": {
+    id: "digital-cho-dashboard-guidebook-2026",
+    name: "ダッシュボードデザイン実践ガイドブック 活用事例集（2026年4月）",
+    org: "デジタル庁",
+    url: "https://www.digital.go.jp/resources/dashboard-guidebook",
+    description: "2026年4月22日公開。行政データの可視化・ダッシュボード設計の活用事例集。Japan Dashboard・政策データ可視化施策と連動。自治体のデータ利活用推進の参考資料。",
+    category: "government",
+    lastAccessed: "2026-04-27",
+    dataMonth: "2026-04",
+    confidence: "official",
+    updateCycle: "reference",
+  },
   "gcas-modernization-guide-2026-04": {
     id: "gcas-modernization-guide-2026-04",
     name: "GCASガイド マネージドサービス活用実践ガイド（2026年4月公開）",
@@ -583,7 +595,7 @@ export const DATA_SOURCES: Record<string, DataSource> = {
 // --- ページ → ソースID マッピング ---
 
 export const PAGE_SOURCES: Record<string, string[]> = {
-  dashboard: ["soumu-progress-excel", "digital-cho-tokutei"],
+  dashboard: ["soumu-progress-excel", "digital-cho-tokutei", "digital-cho-dashboard-guidebook-2026"],
   costs:     ["digital-cho-senkou-tco", "chukakushi-survey-2025", "digital-cho-cost-measures-detail", "cas-digital-gyozai-wt3", "digital-cho-tca-2022", "grok-web-survey", "vendor-press"],
   costReduction: ["digital-cho-cost-measures-2025-06", "digital-cho-senkou-tco", "chukakushi-survey-2025", "oracle-network-pricing", "aws-ec2-pricing", "azure-bandwidth-pricing", "sakura-cloud-pricing", "gcas-modernization-guide-2026-04"],
   cloud:     ["digital-cho-senkou-infra", "applic-products", "oracle-tco", "gartner-iaas", "vendor-press", "grok-web-survey", "digital-cho-vendor-verification-r6", "digital-cho-vendor-verification-r6-data", "lgsys-conformance-gokaku", "doj-fisa702", "pclob-fisa702-report", "french-senate-microsoft-2025", "gcas-gov-rules-google-oci-2026-04"],
