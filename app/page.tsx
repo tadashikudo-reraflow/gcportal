@@ -22,18 +22,22 @@ const _total = data?.summary?.total ?? 0;
 const _completed = data?.summary?.completed_count ?? 0;
 const completionRate = _total > 0 ? (_completed / _total) * 100 : 0;
 const completionRateStr = completionRate.toFixed(1);
+// migrationStats由来（ハードコード排除。月次データ更新で自動反映）
+const _sysRateStr = ((migrationStats?.completion_rate ?? 0) * 100).toFixed(1);
+const _costMulti = migrationStats?.cost_multiplier_avg ?? 2.3;
+const _totalMuni = (migrationStats?.total_municipalities ?? 1741).toLocaleString("en-US");
 
 export const metadata: Metadata = {
   title:
-    "ガバメントクラウド移行ダッシュボード｜1,741自治体の進捗・コスト・遅延を可視化｜GCInsight",
-  description: `移行完了わずか${_completed}団体（${completionRateStr}%）、コスト平均2.3倍。全国1,741自治体のガバメントクラウド移行進捗・コスト・遅延リスクをリアルタイム可視化する無料ダッシュボード。`,
+    `ガバメントクラウド移行ダッシュボード｜${_totalMuni}自治体の進捗・コスト・遅延を可視化｜GCInsight`,
+  description: `移行完了わずか${_completed}団体（${completionRateStr}%）、コスト平均${_costMulti}倍。全国${_totalMuni}自治体のガバメントクラウド移行進捗・コスト・遅延リスクをリアルタイム可視化する無料ダッシュボード。`,
   alternates: { canonical: "/" },
   openGraph: {
     title: "GC Insight — 全国ガバメントクラウド移行ダッシュボード",
-    description: `システム移行率38.4%・全20業務完了は${_completed}団体（${completionRateStr}%）。1,741自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
+    description: `システム移行率${_sysRateStr}%・全20業務完了は${_completed}団体（${completionRateStr}%）。${_totalMuni}自治体のガバメントクラウド移行進捗をリアルタイム可視化。`,
     images: [
       {
-        url: `/og?title=${encodeURIComponent("全国1,741自治体の「現在地」と「遅延リスク」を可視化")}&subtitle=${encodeURIComponent(`移行完了 ${_completed} / 1,741自治体`)}&rate=${_total > 0 ? _completed / _total : 0}`,
+        url: `/og?title=${encodeURIComponent(`全国${_totalMuni}自治体の「現在地」と「遅延リスク」を可視化`)}&subtitle=${encodeURIComponent(`移行完了 ${_completed} / ${_totalMuni}自治体`)}&rate=${_total > 0 ? _completed / _total : 0}`,
         width: 1200,
         height: 630,
       },
