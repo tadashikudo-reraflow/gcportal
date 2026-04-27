@@ -13,31 +13,38 @@ const NAV_GROUPS = [
     href: "/",
   },
   {
-    label: "コスト比較",
-    short: "コスト",
-    href: "/costs",
-  },
-  {
-    label: "ガバクラ比較",
-    short: "比較",
-    href: "/cloud",
-  },
-  {
     label: "進捗",
     short: "進捗",
     href: "/progress",
   },
   {
-    label: "調べる",
-    short: "調べる",
+    label: "コスト",
+    short: "コスト",
     children: [
-      { href: "/cyber-security", label: "🛡 統一基準（新）", desc: "" },
-      { href: "/standards",  label: "標準仕様書", desc: "" },
-      { href: "/packages",   label: "パッケージ", desc: "" },
-      { href: "/timeline",   label: "スケジュール", desc: "" },
-      { href: "/sources",    label: "出典", desc: "" },
-      { href: "/disclosure", label: "開示請求", desc: "" },
-      { href: "/compare",    label: "ダッシュボード比較", desc: "" },
+      { href: "/costs",  label: "コスト試算",    desc: "自治体規模別の移行コストを試算" },
+      { href: "/cloud",  label: "ガバクラ比較",  desc: "AWS/Azure/GCP/OCI/さくら 割引・シェア比較" },
+      { href: "/finops", label: "FinOps最適化",  desc: "移行後コスト削減の実践手順" },
+    ],
+  },
+  {
+    label: "制度・仕様",
+    short: "仕様",
+    children: [
+      { href: "/standards",     label: "標準仕様書",           desc: "20業務の標準仕様書・適合確認一覧" },
+      { href: "/packages",      label: "パッケージ",           desc: "ベンダー別対応パッケージ比較" },
+      { href: "/timeline",      label: "スケジュール",         desc: "標準化・移行の法定スケジュール" },
+      { href: "/cyber-security", label: "🛡 統一基準（新）",  desc: "重要インフラ統一セキュリティ基準" },
+      { href: "/mesh",          label: "🔗 公共サービスメッシュ", desc: "自治体内情報活用サービスの全体像" },
+    ],
+  },
+  {
+    label: "データ活用",
+    short: "データ",
+    children: [
+      { href: "/businesses", label: "業務別分析",         desc: "標準化20業務ごとの進捗・ベンダー状況" },
+      { href: "/compare",    label: "ダッシュボード比較", desc: "自治体・都道府県のベンチマーク比較" },
+      { href: "/disclosure", label: "開示請求",           desc: "情報公開請求で入手した一次資料" },
+      { href: "/sources",    label: "出典",               desc: "データソース・参照元一覧" },
     ],
   },
   { label: "コラム", short: "コラム", href: "/articles" },
@@ -55,32 +62,35 @@ const DRAWER_SECTIONS = [
   {
     title: "メニュー",
     items: [
-      { href: "/", label: "ホーム" },
-    ],
-  },
-  {
-    title: "コスト・比較",
-    items: [
-      { href: "/costs",    label: "コスト比較" },
-      { href: "/cloud",    label: "ガバクラ比較" },
-    ],
-  },
-  {
-    title: "進捗",
-    items: [
+      { href: "/",         label: "ホーム" },
       { href: "/progress", label: "進捗ダッシュボード" },
     ],
   },
   {
-    title: "調べる",
+    title: "コスト",
     items: [
-      { href: "/cyber-security", label: "🛡 重要インフラ統一基準（新）" },
-      { href: "/standards",  label: "標準仕様書" },
-      { href: "/packages",   label: "パッケージ" },
-      { href: "/timeline",   label: "スケジュール" },
-      { href: "/sources",    label: "出典" },
-      { href: "/disclosure", label: "開示請求" },
+      { href: "/costs",  label: "コスト試算" },
+      { href: "/cloud",  label: "ガバクラ比較" },
+      { href: "/finops", label: "FinOps最適化" },
+    ],
+  },
+  {
+    title: "制度・仕様",
+    items: [
+      { href: "/standards",      label: "標準仕様書" },
+      { href: "/packages",       label: "パッケージ" },
+      { href: "/timeline",       label: "スケジュール" },
+      { href: "/cyber-security", label: "🛡 統一基準（新）" },
+      { href: "/mesh",           label: "🔗 公共サービスメッシュ" },
+    ],
+  },
+  {
+    title: "データ活用",
+    items: [
+      { href: "/businesses", label: "業務別分析" },
       { href: "/compare",    label: "ダッシュボード比較" },
+      { href: "/disclosure", label: "開示請求" },
+      { href: "/sources",    label: "出典" },
     ],
   },
   {

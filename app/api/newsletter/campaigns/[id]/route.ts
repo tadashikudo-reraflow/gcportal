@@ -87,7 +87,6 @@ export async function PATCH(
   if (body.status === "scheduled" || body.status === "draft") {
     updates.status = body.status;
   }
-  updates.updated_at = new Date().toISOString();
 
   const supabase = getSupabase();
   const { data, error } = await supabase

@@ -101,6 +101,9 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex flex-wrap gap-4 mt-4 pt-3 border-t border-[var(--color-border)]">
+            <Link href="/about" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
+              GCInsightについて
+            </Link>
             <Link href="/privacy" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
               プライバシーポリシー
             </Link>

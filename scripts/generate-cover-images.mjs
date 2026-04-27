@@ -257,8 +257,11 @@ function buildHTML(article, opts = {}) {
 </html>`;
   }
 
-  // OGP モード (1200×630): 従来の単一パネルレイアウト
-  const fontSize = 58;
+  // OGP モード (1200×630): X記事と同じ二分割レイアウト（左:テキスト / 右:アイコン）
+  const titleLen = mainTitle.length;
+  const fontSize = titleLen <= 14 ? 68 : titleLen <= 20 ? 62 : titleLen <= 28 ? 58 : titleLen <= 36 ? 52 : titleLen <= 44 ? 48 : 44;
+  const letterSpacing = fontSize >= 58 ? '-2px' : fontSize >= 48 ? '-1px' : '0px';
+
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -267,72 +270,138 @@ function buildHTML(article, opts = {}) {
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { width: ${W}px; height: ${H}px; font-family: 'Noto Sans JP', sans-serif; overflow: hidden; }
+
   .card {
     width: ${W}px; height: ${H}px;
-    background: linear-gradient(135deg, #001F54 0%, #002D72 40%, #003D99 100%);
-    display: flex; flex-direction: column; justify-content: space-between;
-    padding: 56px 64px 48px; position: relative; overflow: hidden;
+    display: flex; flex-direction: row;
+    overflow: hidden; position: relative;
   }
-  .card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 60px 60px; pointer-events: none;
-  }
+
   .card::after {
-    content: ''; position: absolute; top: -120px; right: -80px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, ${cat.accent}22 0%, transparent 70%);
-    border-radius: 50%; pointer-events: none;
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 4px; z-index: 20;
+    background: linear-gradient(to right,
+      #5B9FE8 0%, #7FC4F5 35%, #A8D8FA 55%, rgba(120,180,240,0.3) 100%);
   }
-  .top { position: relative; z-index: 1; }
+
+  .noise-layer {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.045; mix-blend-mode: overlay;
+  }
+
+  .left {
+    width: 63%;
+    background:
+      radial-gradient(ellipse 70% 55% at 15% 35%, rgba(72,128,255,0.22) 0%, transparent 65%),
+      linear-gradient(155deg, #0F2565 0%, #071540 60%, #060F2E 100%);
+    padding: 44px 52px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    overflow: hidden; position: relative;
+  }
+
+  .left::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(to bottom,
+      rgba(120,180,255,0.9) 0%,
+      rgba(80,140,255,0.5) 50%,
+      rgba(60,110,220,0.15) 100%);
+  }
+
+  .left::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right,
+      rgba(140,190,255,0.6) 0%,
+      rgba(100,160,255,0.2) 60%,
+      transparent 100%);
+  }
+
   .badge {
-    display: inline-flex; align-items: center; gap: 10px;
+    display: inline-flex; align-items: center; gap: 8px;
     background: ${cat.accent}33; border: 1px solid ${cat.accent}88;
-    border-radius: 28px; padding: 10px 24px;
-    font-size: 22px; font-weight: 700; color: ${cat.accent};
+    border-radius: 24px; padding: 8px 20px;
+    font-size: 20px; font-weight: 700; color: ${cat.accent};
+    position: relative; z-index: 1; align-self: flex-start;
   }
-  .title-section {
-    position: relative; z-index: 1; flex: 1;
-    display: flex; flex-direction: column; justify-content: center; gap: 16px;
+
+  .title-block {
+    flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden; min-height: 0;
+    position: relative; z-index: 1;
+    padding: 16px 0;
   }
-  .accent-line { width: 64px; height: 4px; background: ${cat.accent}; border-radius: 2px; margin-bottom: 4px; }
+
   .main-title {
-    font-size: ${fontSize}px; font-weight: 900; color: #FFFFFF;
-    line-height: 1.35; letter-spacing: -0.5px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3); word-break: keep-all;
+    font-size: ${fontSize}px; font-weight: 900;
+    color: #FFFFFF; line-height: 1.28;
+    letter-spacing: ${letterSpacing};
+    overflow-wrap: break-word; word-break: break-word;
+    overflow: hidden;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.5), 0 0 40px rgba(60,120,255,0.15);
   }
-  .sub-title { font-size: 22px; font-weight: 500; color: rgba(255,255,255,0.7); line-height: 1.4; }
-  .bottom { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; }
-  .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-text { font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 1px; }
-  .brand-sub { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.5); }
-  .tags { display: flex; gap: 10px; }
-  .tag { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px; padding: 6px 18px; font-size: 17px; color: rgba(255,255,255,0.75); }
+  .sub-title {
+    font-size: 20px; font-weight: 500;
+    color: rgba(255,255,255,0.65); line-height: 1.4;
+    margin-top: 10px; overflow: hidden;
+  }
+
+  .bottom-bar {
+    display: flex; align-items: center; gap: 10px;
+    position: relative; z-index: 1;
+  }
+  .brand-name {
+    font-size: 22px; font-weight: 700;
+    color: rgba(140,195,255,0.95); letter-spacing: 1px;
+  }
+  .tags { display: flex; gap: 8px; margin-left: auto; }
+  .tag {
+    background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 16px; padding: 4px 14px;
+    font-size: 15px; color: rgba(255,255,255,0.70);
+  }
+
+  .right {
+    width: 37%;
+    background:
+      radial-gradient(ellipse 65% 60% at 52% 52%, rgba(90,155,240,0.60) 0%, rgba(50,90,200,0.25) 45%, transparent 70%),
+      radial-gradient(ellipse 90% 80% at 50% 50%, rgba(30,60,160,0.40) 0%, transparent 80%),
+      linear-gradient(160deg, #0D2270 0%, #091850 100%);
+    border-left: 1px solid rgba(100,160,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; position: relative; overflow: hidden;
+  }
+
+  .right::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.04; mix-blend-mode: overlay;
+  }
+
+  .icon-wrap { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="top">
+  <div class="left">
+    <div class="noise-layer"></div>
     <span class="badge"><span>${cat.icon}</span>${cat.label}</span>
-  </div>
-  <div class="title-section">
-    <div class="accent-line"></div>
-    <div class="main-title">${mainTitle}</div>
-    ${subTitle ? `<div class="sub-title">${subTitle}</div>` : ""}
-  </div>
-  <div class="bottom">
-    <div class="brand">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="48" height="42"><path d="M155 128H48C25 128 8 110 8 88C8 68 22 52 42 48C42 47 42 46 42 44C42 22 60 4 82 4C100 4 114 15 122 30C128 26 135 24 143 24C164 24 182 42 182 64C182 66 182 68 181 70C192 76 198 87 198 100C198 116 184 128 166 128" stroke="white" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" fill="none"/><text x="56" y="108" font-family="Arial,sans-serif" font-size="60" font-weight="800" fill="white" letter-spacing="-2">GC</text></svg>
-      <div>
-        <div class="brand-text">GCInsight</div>
-        <div class="brand-sub">ガバメントクラウド移行状況ダッシュボード</div>
+    <div class="title-block">
+      <div class="main-title">${mainTitle}</div>
+      ${subTitle ? `<div class="sub-title">${subTitle}</div>` : ""}
+    </div>
+    <div class="bottom-bar">
+      <span class="brand-name">GCInsight</span>
+      <div class="tags">
+        ${(article.tags ?? []).slice(0, 3).map(t => `<span class="tag">#${t}</span>`).join("")}
       </div>
     </div>
-    <div class="tags">
-      ${(article.tags ?? []).slice(0, 3).map(t => `<span class="tag">#${t}</span>`).join("")}
-    </div>
+  </div>
+  <div class="right">
+    <div class="icon-wrap">${_xArticleIcon(article.tags ?? [])}</div>
   </div>
 </div>
 </body>

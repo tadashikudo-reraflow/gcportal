@@ -1,19 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { calcRemaining } from "./deadline";
 
-const DEADLINE = new Date("2026-05-17T23:59:59+09:00");
-
-function calcRemaining() {
-  const diff = DEADLINE.getTime() - Date.now();
-  if (diff <= 0) return null;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  return { days, hours };
-}
-
-export default function CountdownBanner() {
-  const [remaining, setRemaining] = useState<{ days: number; hours: number } | null>(null);
+export default function CountdownBanner({
+  initial,
+}: {
+  initial: { days: number; hours: number } | null;
+}) {
+  const [remaining, setRemaining] = useState(initial);
 
   useEffect(() => {
     setRemaining(calcRemaining());
