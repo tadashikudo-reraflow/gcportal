@@ -425,7 +425,7 @@ export default async function MeshPage() {
           <div className="space-y-3">
             {faqJsonLd.mainEntity.map((item) => (
               <details
-                key={item.acceptedAnswer.text.slice(0, 30)}
+                key={item.name}
                 style={{
                   borderRadius: 8,
                   border: "1px solid var(--color-border)",
