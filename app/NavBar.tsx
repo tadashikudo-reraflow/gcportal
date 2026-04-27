@@ -32,6 +32,7 @@ const NAV_GROUPS = [
     short: "調べる",
     children: [
       { href: "/cyber-security", label: "🛡 統一基準（新）", desc: "" },
+      { href: "/mesh",       label: "🔗 公共サービスメッシュ", desc: "" },
       { href: "/standards",  label: "標準仕様書", desc: "" },
       { href: "/packages",   label: "パッケージ", desc: "" },
       { href: "/timeline",   label: "スケジュール", desc: "" },
@@ -75,6 +76,7 @@ const DRAWER_SECTIONS = [
     title: "調べる",
     items: [
       { href: "/cyber-security", label: "🛡 重要インフラ統一基準（新）" },
+      { href: "/mesh",       label: "🔗 公共サービスメッシュ" },
       { href: "/standards",  label: "標準仕様書" },
       { href: "/packages",   label: "パッケージ" },
       { href: "/timeline",   label: "スケジュール" },
