@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
       // 旧進捗ページ → /progress 統合
       { source: "/prefectures",              destination: "/progress",                    permanent: true },
       { source: "/prefectures/:prefecture",  destination: "/progress?pref=:prefecture",   permanent: true },
-      { source: "/municipalities/:prefecture/:city", destination: "/progress?pref=:prefecture&city=:city", permanent: true },
+      // /municipalities/:prefecture/:city は独立ページとして復活（財政プロフィール追加済み）
       { source: "/benchmark",                destination: "/progress",                    permanent: true },
       { source: "/risks",                    destination: "/progress?status=critical",    permanent: true },
       { source: "/tokutei",                  destination: "/progress?status=tokutei",     permanent: true },
