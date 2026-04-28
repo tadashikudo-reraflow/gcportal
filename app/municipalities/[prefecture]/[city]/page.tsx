@@ -64,10 +64,10 @@ const CLOUD_MAP: Record<string, { label: string; color: string }> = {
 };
 
 function CloudBadge({ cloud }: { cloud: string | null }) {
-  if (!cloud) return <span className="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-100 rounded">不明</span>;
+  if (!cloud) return <span className="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 rounded">不明</span>;
   const info = CLOUD_MAP[cloud] ?? { label: cloud, color: "#64748B" };
   return (
-    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+    <span className="text-xs font-bold px-1.5 py-0.5 rounded"
       style={{ backgroundColor: `${info.color}20`, color: info.color }}>
       {info.label}
     </span>
@@ -77,7 +77,7 @@ function CloudBadge({ cloud }: { cloud: string | null }) {
 function VendorChip({ vendorName, cloud }: { vendorName: string; cloud: string | null }) {
   const info = cloud ? (CLOUD_MAP[cloud] ?? { color: "#64748B" }) : null;
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border"
+    <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border"
       style={{
         borderColor: info ? `${info.color}40` : "#e2e8f0",
         backgroundColor: info ? `${info.color}08` : "#f8fafc",
@@ -105,7 +105,7 @@ function formatFiscalScale(n: number | null): string {
 }
 
 function FiscalStrengthBar({ value }: { value: number | null }) {
-  if (!value) return <span className="text-gray-400 text-sm">—</span>;
+  if (!value) return <span className="text-gray-500 text-sm">—</span>;
   const pct = Math.min(value * 100, 150);
   const color = value >= 1.0 ? "#378445" : value >= 0.5 ? "#1D4ED8" : "#d97706";
   return (
@@ -114,7 +114,7 @@ function FiscalStrengthBar({ value }: { value: number | null }) {
       <div className="flex-1 max-w-[80px] h-2 rounded-full overflow-hidden bg-gray-100">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
-      <span className="text-[10px] text-gray-400">
+      <span className="text-xs text-gray-500">
         {value >= 1.0 ? "不交付" : value >= 0.5 ? "普通" : "要支援"}
       </span>
     </div>
@@ -126,7 +126,7 @@ function RatioBadge({ value, thresholds, unit = "%" }: {
   thresholds: [number, number]; // [warn, danger]
   unit?: string;
 }) {
-  if (value === null) return <span className="text-gray-400 text-sm">—</span>;
+  if (value === null) return <span className="text-gray-500 text-sm">—</span>;
   const [warn, danger] = thresholds;
   const color = value >= danger ? "#b91c1c" : value >= warn ? "#d97706" : "#378445";
   return (
@@ -280,13 +280,13 @@ export default async function MunicipalityDetailPage({ params }: Props) {
 
       {/* 財政プロフィール */}
       {hasFinanceData && (
-        <div className="card p-5">
+        <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+            <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
               財政プロフィール
             </h2>
             {dataYear && (
-              <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                 総務省 {dataYear}年度
               </span>
             )}
@@ -295,7 +295,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
           <dl className="grid grid-cols-3 gap-4 mb-4">
             {population && (
               <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">人口</dt>
+                <dt className="text-xs text-gray-500 mb-0.5">人口</dt>
                 <dd className="text-base font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
                   {formatPopulation(population)}
                 </dd>
@@ -303,7 +303,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
             )}
             {stdFiscal && (
               <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">標準財政規模</dt>
+                <dt className="text-xs text-gray-500 mb-0.5">標準財政規模</dt>
                 <dd className="text-base font-bold tabular-nums" style={{ color: "var(--color-text-primary)" }}>
                   {formatFiscalScale(stdFiscal)}
                 </dd>
@@ -311,7 +311,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
             )}
             {agingRate !== null && (
               <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">高齢化率</dt>
+                <dt className="text-xs text-gray-500 mb-0.5">高齢化率</dt>
                 <dd><RatioBadge value={agingRate} thresholds={[25, 35]} /></dd>
               </div>
             )}
@@ -329,25 +329,25 @@ export default async function MunicipalityDetailPage({ params }: Props) {
             <dl className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-3 border-t border-gray-100">
               {fiscalStrength !== null && (
                 <div>
-                  <dt className="text-[11px] text-gray-400 mb-1">財政力指数</dt>
+                  <dt className="text-xs text-gray-500 mb-1">財政力指数</dt>
                   <dd><FiscalStrengthBar value={fiscalStrength} /></dd>
                 </div>
               )}
               {currentExpenditureRatio !== null && (
                 <div>
-                  <dt className="text-[11px] text-gray-400 mb-0.5">経常収支比率</dt>
+                  <dt className="text-xs text-gray-500 mb-0.5">経常収支比率</dt>
                   <dd><RatioBadge value={currentExpenditureRatio} thresholds={[90, 100]} /></dd>
                 </div>
               )}
               {realDebtRatio !== null && (
                 <div>
-                  <dt className="text-[11px] text-gray-400 mb-0.5">実質公債費比率</dt>
+                  <dt className="text-xs text-gray-500 mb-0.5">実質公債費比率</dt>
                   <dd><RatioBadge value={realDebtRatio} thresholds={[10, 18]} /></dd>
                 </div>
               )}
               {futureBurdenRatio !== null && (
                 <div>
-                  <dt className="text-[11px] text-gray-400 mb-0.5">将来負担比率</dt>
+                  <dt className="text-xs text-gray-500 mb-0.5">将来負担比率</dt>
                   <dd><RatioBadge value={futureBurdenRatio} thresholds={[100, 150]} /></dd>
                 </div>
               )}
@@ -357,11 +357,11 @@ export default async function MunicipalityDetailPage({ params }: Props) {
       )}
 
       {/* 主な採用ベンダー */}
-      <div className="card p-5">
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+      <div className="card p-6">
+        <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           主な採用ベンダー
           {hasVendorData && (
-            <span className="text-xs font-normal ml-2 text-gray-400">業務別に異なる場合があります</span>
+            <span className="text-xs font-normal ml-2 text-gray-500">業務別に異なる場合があります</span>
           )}
         </h2>
         {hasVendorData ? (
@@ -369,34 +369,34 @@ export default async function MunicipalityDetailPage({ params }: Props) {
             {vendorSummary.map((v) => (
               <div key={v.vendorName} className="flex items-center gap-1.5">
                 <VendorChip vendorName={v.vendorName} cloud={v.cloud} />
-                {v.count > 0 && <span className="text-[10px] text-gray-400">{v.count}業務</span>}
+                {v.count > 0 && <span className="text-xs text-gray-500">{v.count}業務</span>}
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-400">採用ベンダー情報は現時点では未収録です。</p>
+          <p className="text-sm text-gray-500">採用ベンダー情報は現時点では未収録です。</p>
         )}
       </div>
 
       {/* 20業務の進捗率 */}
       <div className="card overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100">
-          <p className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
             20業務 手続き進捗率
-            <span className="text-xs font-normal ml-2 text-gray-400">進捗率 昇順</span>
+            <span className="text-xs font-normal ml-2 text-gray-500">進捗率 昇順</span>
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200" style={{ backgroundColor: "#f8fafc" }}>
-                <th className="text-left px-4 py-2 text-gray-400 font-medium">業務</th>
+                <th className="text-left px-4 py-2 text-gray-500 font-medium">業務</th>
                 {hasVendorData && (
-                  <th className="text-left px-4 py-2 text-gray-400 font-medium hidden md:table-cell">ベンダー</th>
+                  <th className="text-left px-4 py-2 text-gray-500 font-medium hidden md:table-cell">ベンダー</th>
                 )}
-                <th className="text-right px-4 py-2 text-gray-400 font-medium">進捗率</th>
-                <th className="text-right px-4 py-2 text-gray-400 font-medium hidden md:table-cell">全国平均</th>
-                <th className="text-center px-4 py-2 text-gray-400 font-medium w-16">状態</th>
+                <th className="text-right px-4 py-2 text-gray-500 font-medium">進捗率</th>
+                <th className="text-right px-4 py-2 text-gray-500 font-medium hidden md:table-cell">全国平均</th>
+                <th className="text-center px-4 py-2 text-gray-500 font-medium w-16">状態</th>
               </tr>
             </thead>
             <tbody>
@@ -412,7 +412,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
                         {vendor ? (
                           <VendorChip vendorName={vendor.vendorName} cloud={vendor.cloud} />
                         ) : (
-                          <span className="text-[10px] text-gray-300">—</span>
+                          <span className="text-xs text-gray-300">—</span>
                         )}
                       </td>
                     )}
@@ -433,7 +433,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-center">
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full whitespace-nowrap"
                         style={{ color: getStatusColor(biz.rate), backgroundColor: `${getStatusColor(biz.rate)}15` }}>
                         {getStatusLabel(biz.rate)}
                       </span>
@@ -448,8 +448,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
 
       {/* 同県の他自治体 */}
       {samePrefCities.length > 0 && (
-        <div className="card p-5">
-          <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <div className="card p-6">
+          <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
             {prefName}の他の自治体
           </h2>
           <div className="flex flex-wrap gap-2">

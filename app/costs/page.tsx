@@ -293,11 +293,11 @@ export default async function CostsPage() {
         <div className="mt-4 space-y-2" role="region" aria-label="コスト変化サマリー">
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-xl p-3 bg-green-50 border border-green-200 flex flex-col gap-1">
-              <span className="text-2xl sm:text-3xl font-black tabular-nums text-green-600 leading-none">−30%</span>
+              <span className="text-3xl sm:text-4xl font-black tabular-nums text-green-600 leading-none">−30%</span>
               <span className="text-xs text-green-700 leading-tight">政府目標（R4）</span>
             </div>
             <div className="rounded-xl p-3 bg-red-50 border border-red-200 flex flex-col gap-1">
-              <span className="text-2xl sm:text-3xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
+              <span className="text-3xl sm:text-4xl font-black tabular-nums text-red-600 leading-none">+{avgPct}%</span>
               <span className="text-xs text-red-700 leading-tight">実態平均（中核市）</span>
             </div>
           </div>
@@ -358,8 +358,8 @@ export default async function CostsPage() {
       </PdfCTAButton>
 
       {/* ⑦ コストギャップ */}
-      <div id="cost-gap" className="card p-5">
-        <h2 className="text-sm font-bold mb-4" style={{ color: "var(--color-gov-primary)" }}>
+      <div id="cost-gap" className="card p-6">
+        <h2 className="text-base font-bold mb-4" style={{ color: "var(--color-gov-primary)" }}>
           目標と実態のギャップ
         </h2>
 
@@ -451,20 +451,20 @@ export default async function CostsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 flex-wrap">
                     <span className="text-xs font-semibold text-gray-800">{item.label}</span>
-                    <span className="text-[11px] font-bold tabular-nums" style={{ color: item.color }}>{item.pct}</span>
+                    <span className="text-xs font-bold tabular-nums" style={{ color: item.color }}>{item.pct}</span>
                   </div>
-                  <p className="text-[11px] text-gray-500 leading-relaxed mt-0.5">{item.note}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed mt-0.5">{item.note}</p>
                 </div>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-gray-400 mt-3">※ 比率は中核市市長会調査・デジタル庁R6検証事業・総務省地方財政調査をもとにした推計。自治体規模・ベンダーにより大きく異なる。</p>
+          <p className="text-xs text-gray-400 mt-3">※ 比率は中核市市長会調査・デジタル庁R6検証事業・総務省地方財政調査をもとにした推計。自治体規模・ベンダーにより大きく異なる。</p>
         </div>
       </div>
 
       {/* コスト変化実績（カード形式） */}
-      <div id="cost-records" className="card p-5">
-        <h2 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
+      <div id="cost-records" className="card p-6">
+        <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-gov-primary)" }}>
           コスト変化実績
         </h2>
         {costs.length > 0 ? (
@@ -521,17 +521,17 @@ export default async function CostsPage() {
                 cloud: "さくら・国内",
                 share: "〜1%",
                 costRange: "試算中",
-                badge: "bg-purple-100 text-purple-700",
+                badge: "bg-blue-50 text-blue-800",
                 note: "2026年に政府認定取得済み。競合圧力による価格抑制効果に期待。",
               },
             ].map((item) => (
               <div key={item.cloud} className="rounded-md border border-gray-200 bg-white px-3 py-2">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${item.badge}`}>{item.cloud}</span>
-                  <span className="text-[10px] text-gray-400">シェア {item.share}</span>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${item.badge}`}>{item.cloud}</span>
+                  <span className="text-xs text-gray-400">シェア {item.share}</span>
                 </div>
                 <p className="text-xs font-bold text-gray-800 mb-0.5">コスト比 {item.costRange}</p>
-                <p className="text-[11px] text-gray-500 leading-relaxed">{item.note}</p>
+                <p className="text-xs text-gray-500 leading-relaxed">{item.note}</p>
               </div>
             ))}
           </div>
@@ -539,9 +539,9 @@ export default async function CostsPage() {
       </div>
 
       {/* R6検証事業 団体別コスト比較（図解） */}
-      <div id="r6-verification" className="card p-5">
+      <div id="r6-verification" className="card p-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-sm font-bold" style={{ color: "var(--color-gov-primary)" }}>
+          <h2 className="text-base font-bold" style={{ color: "var(--color-gov-primary)" }}>
             R6検証事業 — 8団体のコスト比較
           </h2>
           <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">2026年3月27日公開</span>
@@ -573,15 +573,15 @@ export default async function CostsPage() {
               { label: "比較基準", r6: "現行継続との比較", survey: "移行前実費との比較" },
             ].map(({ label, r6, survey }) => (
               <div key={label} className="rounded-lg p-2 text-center" style={{ backgroundColor: "#fff8ed" }}>
-                <p className="text-[11px] font-bold mb-1.5" style={{ color: "#92400e" }}>{label}</p>
+                <p className="text-xs font-bold mb-1.5" style={{ color: "#92400e" }}>{label}</p>
                 <div className="space-y-1">
                   <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#dbeafe" }}>
-                    <p className="text-[10px] font-semibold text-blue-700">R6検証</p>
-                    <p className="text-[10px] text-blue-600 leading-tight">{r6}</p>
+                    <p className="text-xs font-semibold text-blue-700">R6検証</p>
+                    <p className="text-xs text-blue-600 leading-tight">{r6}</p>
                   </div>
                   <div className="rounded px-1 py-0.5" style={{ backgroundColor: "#fee2e2" }}>
-                    <p className="text-[10px] font-semibold text-red-700">中核市調査</p>
-                    <p className="text-[10px] text-red-600 leading-tight">{survey}</p>
+                    <p className="text-xs font-semibold text-red-700">中核市調査</p>
+                    <p className="text-xs text-red-600 leading-tight">{survey}</p>
                   </div>
                 </div>
               </div>
@@ -610,7 +610,7 @@ export default async function CostsPage() {
                   <span className="text-xs font-bold text-gray-800 truncate flex-1 min-w-0">{d.name}</span>
                   <span className={`text-xs px-1.5 py-0.5 rounded font-medium flex-shrink-0 whitespace-nowrap ${
                     d.csp === "AWS" ? "bg-orange-100 text-orange-700"
-                    : d.csp === "AWS+OCI" ? "bg-purple-100 text-purple-700"
+                    : d.csp === "AWS+OCI" ? "bg-yellow-100 text-yellow-800"
                     : "bg-blue-100 text-blue-700"
                   }`}>{d.csp}</span>
                   <span className={`text-sm font-black tabular-nums flex-shrink-0 ${rateColor}`}>
@@ -645,8 +645,8 @@ export default async function CostsPage() {
 
       {/* 費用按分・ベンダー・最適化 */}
         {/* 費用按分方式の比較 — 縦リスト */}
-        <div id="cost-allocation" className="card p-5">
-          <h3 className="text-sm font-bold mb-0.5" style={{ color: "var(--color-text-primary)" }}>
+        <div id="cost-allocation" className="card p-6">
+          <h3 className="text-base font-bold mb-0.5" style={{ color: "var(--color-text-primary)" }}>
             共同利用の費用 — どう割り勘するか？
           </h3>
           <p className="text-xs mb-4" style={{ color: "var(--color-text-muted)" }}>
@@ -689,8 +689,8 @@ export default async function CostsPage() {
         </div>
 
         {/* R6検証事業 参画ベンダー — 検証テーマ別 */}
-        <div id="vendor-participation" className="mt-4 card p-5">
-          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <div id="vendor-participation" className="mt-4 card p-6">
+          <h3 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
             R6検証事業 参画ベンダー（20社）— 検証テーマ別
           </h3>
           <div className="space-y-3">
@@ -711,9 +711,9 @@ export default async function CostsPage() {
               },
               {
                 theme: "技術深掘",
-                color: "#5b21b6",
-                bg: "#f5f3ff",
-                border: "#ddd6fe",
+                color: "#0f766e",
+                bg: "#f0fdfa",
+                border: "#99f6e4",
                 vendors: ["NEC", "NTTデータ", "RKKコンピューターサービス", "GCC"],
               },
               {
@@ -747,9 +747,9 @@ export default async function CostsPage() {
         </div>
 
         {/* クラウド最適化の知見 */}
-        <div className="mt-4 card p-5">
+        <div className="mt-4 card p-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
+            <h3 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
               ガバメントクラウド コスト最適化の知見（R6検証事業）
             </h3>
             <a href="/articles?tag=finops" className="text-xs font-medium no-underline hover:underline flex-shrink-0" style={{ color: "var(--color-brand-primary)" }}>
@@ -793,13 +793,13 @@ export default async function CostsPage() {
         </div>
 
         {/* 公式資料リンク */}
-        <div className="card p-5">
+        <div className="card p-6">
           <p className="text-xs font-semibold text-gray-500 mb-2">公式資料</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* デジタル庁資料 */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <LayoutTemplate size={9} aria-hidden="true" />
+              <p className="text-xs font-semibold text-gray-500 tracking-wide mb-1.5 flex items-center gap-1">
+                <LayoutTemplate size={12} aria-hidden="true" />
                 デジタル庁資料
               </p>
               <div className="flex flex-col gap-1.5">
@@ -818,8 +818,8 @@ export default async function CostsPage() {
             </div>
             {/* R6検証事業 */}
             <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5 flex items-center gap-1">
-                <ClipboardCheck size={9} aria-hidden="true" />
+              <p className="text-xs font-semibold text-gray-500 tracking-wide mb-1.5 flex items-center gap-1">
+                <ClipboardCheck size={12} aria-hidden="true" />
                 R6検証事業
               </p>
               <div className="flex flex-col gap-1.5">
@@ -845,7 +845,7 @@ export default async function CostsPage() {
       </div>
 
       {/* デジタル庁コスト管理ガイド */}
-      <div id="cost-measures" className="card p-5">
+      <div id="cost-measures" className="card p-6">
         <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
           コスト対策 — デジタル庁の支援策
         </h3>

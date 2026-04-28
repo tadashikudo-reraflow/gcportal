@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllArticles } from "@/lib/articles";
 import Breadcrumb from "@/components/Breadcrumb";
 import ContentTabNav from "@/components/ContentTabNav";
+import PageHeader from "@/components/PageHeader";
 import ArticlesClient from "./ArticlesClient";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ const THEMES = [
     desc: "CSP5社比較・パッケージ選定・認定状況",
     href: "/articles/gc-vendor-selection-guide-2026",
     badge: "ベンダー",
-    badgeStyle: { backgroundColor: "#F3E8FF", color: "#6B21A8" },
+    badgeStyle: { backgroundColor: "#FEF9C3", color: "#92400E" },
     tags: ["ベンダー", "比較", "クラウド"],
   },
   {
@@ -64,10 +65,10 @@ export default async function ArticlesPage() {
   return (
     <div className="space-y-6">
       <Breadcrumb items={[{ label: "コラム・解説記事" }]} />
-      <div className="pb-2">
-        <h1 className="page-title">ガバメントクラウド 実務記事ライブラリ</h1>
-        <p className="page-subtitle">費用・ベンダー・自治体事例・移行ノウハウ — 4テーマ {articles.length}本</p>
-      </div>
+      <PageHeader
+        title="ガバメントクラウド 実務記事ライブラリ"
+        subtitle={`費用・ベンダー・自治体事例・移行ノウハウ — 4テーマ ${articles.length}本`}
+      />
       <ContentTabNav />
 
       {/* ========== テーマ別ナビ（上段） ========== */}

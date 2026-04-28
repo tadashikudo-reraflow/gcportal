@@ -120,7 +120,7 @@ export default function DashboardPage() {
   const sortedBusinesses = [...businesses].sort((a, b) => b.avg_rate - a.avg_rate);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {/* ========== Hero セクション ========== */}
       <HeroSection
         remainingDays={remainingDays}
@@ -199,7 +199,7 @@ export default function DashboardPage() {
       {/* ========== ステータス分布バー（クリック可能） ========== */}
       <div className="status-bar-card">
         <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-sm lg:text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
             全 {TOTAL.toLocaleString()} 自治体の移行ステータス
           </h2>
           <Link href="/progress?status=tokutei" className="text-xs lg:text-sm font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                 <span className="text-xs lg:text-sm" style={{ color: "var(--color-text-secondary)" }}>
                   {s.label}
                 </span>
-                <span className="text-[10px] lg:text-xs" style={{ color: "var(--color-text-muted)" }}>
+                <span className="text-xs lg:text-xs" style={{ color: "var(--color-text-muted)" }}>
                   {s.sub}
                 </span>
               </Link>
@@ -255,7 +255,7 @@ export default function DashboardPage() {
 
         {/* Footnote（赤バナー廃止・amber footnoteに格下げ） */}
         <p
-          className="mt-3 text-[11px] px-3 py-1.5 rounded-lg"
+          className="mt-3 text-xs px-3 py-1.5 rounded-lg"
           style={{ color: "#78350f", backgroundColor: "#fef3c7" }}
         >
           ※ <GlossaryTooltip term="手続き進捗率">手続き進捗率</GlossaryTooltip>は移行完了を意味しません
@@ -316,7 +316,7 @@ export default function DashboardPage() {
           </Link>
 
           <Link href="/packages" className="explore-card">
-            <span className="explore-card-badge" style={{ backgroundColor: "#F3E8FF", color: "#6B21A8" }}>
+            <span className="explore-card-badge" style={{ backgroundColor: "#FEF9C3", color: "#92400E" }}>
               パッケージ
             </span>
             <span className="explore-card-title">導入パッケージ</span>

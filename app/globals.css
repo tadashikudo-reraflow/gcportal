@@ -52,6 +52,17 @@
 
   --line-height-heading: 1.4;
   --line-height-body: 1.8;
+
+  /* ========== Typography Scale - 統一版 ========== */
+  --text-h1: 1.75rem;          /* 28px - ページタイトル */
+  --text-h2: 1.125rem;         /* 18px - セクション見出し */
+  --text-h3: 1rem;             /* 16px - サブセクション */
+  --text-body: 1rem;           /* 16px - 本文 */
+  --text-sm: 0.875rem;         /* 14px - 補助テキスト */
+  --text-xs: 0.75rem;          /* 12px - 最小（これ未満禁止） */
+  --text-kpi-hero: 3rem;       /* 48px - 主役KPI */
+  --text-kpi-main: 1.5rem;     /* 24px - セクションKPI */
+  --text-kpi-sub: 1rem;        /* 16px - 補助KPI */
 }
 
 /* ========== セマンティックエイリアス ========== */
@@ -354,9 +365,18 @@ h1, h2, h3, h4, h5, h6 {
   .kpi-card-tokutei  { background: #f5f3ff; }
   .kpi-card-primary  { background: #eff6ff; }
 
-  /* ========== scrollbar-none ========== */
-  .scrollbar-none { scrollbar-width: none; }
-  .scrollbar-none::-webkit-scrollbar { display: none; }
+  /* ========== セクション見出し（統一） ========== */
+  .section-title {
+    font-size: var(--text-h2);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+  .section-title-sm {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
 
   /* ========== テーブル行ホバー ========== */
   .table-row-hover:hover {
@@ -408,6 +428,8 @@ h1, h2, h3, h4, h5, h6 {
   }
   .scrollbar-none::-webkit-scrollbar {
     display: none;
+    width: 0;
+    height: 0;
   }
 
   /* ========== モバイル最適化 ========== */
@@ -491,7 +513,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0.75rem;
 }
 .hero-headline {
-  font-size: clamp(2.25rem, 4vw, 4.5rem);
+  font-size: clamp(2.25rem, 3.2vw, 3.5rem);
   font-weight: 800;
   color: var(--color-text-primary);
   line-height: 1.25;

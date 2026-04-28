@@ -46,13 +46,13 @@ function VendorChip({
         {vendor.name}
         {vendor.cloud && (
           <span
-            className="text-[10px] rounded px-1"
+            className="text-xs rounded px-1"
             style={{ backgroundColor: cloudColor, color: "#fff" }}
           >
             {vendor.cloud}
           </span>
         )}
-        <span className="text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+        <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
           ({vendor.businesses.length}業務) {open ? "▲" : "▼"}
         </span>
       </button>
@@ -61,7 +61,7 @@ function VendorChip({
           {vendor.businesses.map((b) => (
             <span
               key={b}
-              className="text-[10px] px-1.5 py-0.5 rounded"
+              className="text-xs px-1.5 py-0.5 rounded"
               style={{
                 backgroundColor: "var(--color-surface-variant)",
                 color: "var(--color-text-secondary)",
@@ -151,7 +151,7 @@ function ComparePanel({
   return (
     <div className="card p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold" style={{ color: "var(--color-gov-primary,#002D72)" }}>
+        <h3 className="text-base font-bold" style={{ color: "var(--color-gov-primary,#002D72)" }}>
           自治体比較 ({munis.length}件)
         </h3>
         <button onClick={onClear} className="text-xs" style={{ color: "var(--color-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
@@ -384,7 +384,7 @@ function FilterBar({
 
         {/* ステータス */}
         <div>
-          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+          <p className="text-xs font-semibold mb-1 tracking-wide"
              style={{ color: "var(--color-text-muted)" }}>ステータス</p>
           <div className="flex flex-wrap gap-1.5">
             {statusOptions.map((o) => (
@@ -395,7 +395,7 @@ function FilterBar({
 
         {/* 人口帯 */}
         <div>
-          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+          <p className="text-xs font-semibold mb-1 tracking-wide"
              style={{ color: "var(--color-text-muted)" }}>人口帯</p>
           <div className="flex flex-wrap gap-1.5">
             {popOptions.map((o) => (
@@ -406,7 +406,7 @@ function FilterBar({
 
         {/* クラウド */}
         <div>
-          <p className="text-[10px] font-semibold mb-1 tracking-wide uppercase"
+          <p className="text-xs font-semibold mb-1 tracking-wide"
              style={{ color: "var(--color-text-muted)" }}>クラウド</p>
           <div className="flex flex-wrap gap-1.5">
             {cloudOptions.map((o) => (
@@ -485,7 +485,7 @@ function NationalOverview({
       )}
 
       {/* KPI Cards — 危機を先頭に */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           {
             key: "critical",
@@ -531,11 +531,11 @@ function NationalOverview({
               <div className="text-xs mb-1" style={{ color: "var(--color-text-secondary)" }}>
                 {kpi.label}
               </div>
-              <div className="text-2xl font-bold" style={{ color: kpi.color }}>
+              <div className="text-3xl font-bold tabular-nums" style={{ color: kpi.color }}>
                 {kpi.value}
               </div>
               {kpi.sub && (
-                <div className="text-[10px] mt-1" style={{ color: "var(--color-text-muted)" }}>
+                <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
                   {kpi.sub}
                 </div>
               )}
@@ -545,7 +545,7 @@ function NationalOverview({
               <div className="text-xs mb-1" style={{ color: "var(--color-text-secondary)" }}>
                 {kpi.label}
               </div>
-              <div className="text-2xl font-bold" style={{ color: kpi.color }}>
+              <div className="text-3xl font-bold tabular-nums" style={{ color: kpi.color }}>
                 {kpi.value}
               </div>
             </div>
@@ -584,7 +584,7 @@ function NationalOverview({
                 </span>
               </div>
               <ProgressBar rate={p.avg_rate} />
-              <div className="flex gap-2 mt-1 text-[10px]" style={{ color: "var(--color-text-muted)" }}>
+              <div className="flex gap-2 mt-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
                 <span>{p.count}団体</span>
                 {p.critical > 0 && (
                   <span style={{ color: "var(--color-error)" }}>危機{p.critical}</span>
@@ -813,7 +813,7 @@ function PrefectureDetail({
                     {pct(m.overall_rate)}
                   </span>
                 </div>
-                <div className="flex gap-2 mt-1 text-[10px] sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
+                <div className="flex gap-2 mt-1 text-xs sm:text-xs" style={{ color: "var(--color-text-muted)" }}>
                   <span>{POP_LABELS[m.popBand] ?? m.popBand}</span>
                   {m.vendors.length > 0 && (
                     <span className="truncate">{m.vendors[0].name}{m.vendors.length > 1 ? ` 他${m.vendors.length - 1}社` : ""}</span>
@@ -955,7 +955,7 @@ function MunicipalityDetail({
       {/* 財政プロフィール（5年スパークライン） */}
       {fiscalHistory.length > 0 && (
         <div className="card p-4">
-          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary, #002D72)" }}>
+          <h3 className="text-base font-bold mb-3" style={{ color: "var(--color-gov-primary, #002D72)" }}>
             財政プロフィール
           </h3>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
@@ -1020,7 +1020,7 @@ function MunicipalityDetail({
                   {pct(rate ?? 0)}
                 </span>
                 <span
-                  className="text-[10px] font-mono w-14 text-right flex-shrink-0"
+                  className="text-xs font-mono w-14 text-right flex-shrink-0"
                   style={{
                     color:
                       diff >= 0
@@ -1035,7 +1035,7 @@ function MunicipalityDetail({
             );
           })}
         </div>
-        <div className="mt-2 text-[10px] text-right" style={{ color: "var(--color-text-muted)" }}>
+        <div className="mt-2 text-xs text-right" style={{ color: "var(--color-text-muted)" }}>
           右端の数値は全国平均との差（ポイント）
         </div>
       </div>
@@ -1210,7 +1210,7 @@ function ProgressInner({ data }: { data: ProgressData }) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <FilterBar
         status={filterStatus}
         setStatus={setFilterStatus}

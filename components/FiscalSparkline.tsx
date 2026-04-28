@@ -33,7 +33,7 @@ export default function FiscalSparkline({ label, unit = "%", history, thresholds
   const trendArrow = Math.abs(delta) < 0.05 ? "→" : (delta > 0 ? "↑" : "↓");
 
   // SVG sparkline path
-  const W = 120, H = 36, PAD = 3;
+  const W = 120, H = 48, PAD = 4;
   const values = history.map(p => p.value ?? null);
   const nonNull = values.filter((v): v is number => v !== null);
   const min = Math.min(...nonNull);
@@ -70,14 +70,21 @@ export default function FiscalSparkline({ label, unit = "%", history, thresholds
         <span className="font-bold tabular-nums text-sm" style={{ color }}>{displayValue}</span>
         <span className="text-[10px] font-medium" style={{ color: trendColor }}>{trendArrow}</span>
       </dd>
-      <svg width={W} height={H} className="overflow-visible">
+      <svg
+        width="100%"
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        className="overflow-visible"
+        style={{ minWidth: '80px', maxWidth: '160px' }}
+      >
         <path d={d} fill="none" stroke="#e5e7eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         <path d={d} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.85" />
         {lastPt && (
           <circle cx={lastPt.x} cy={lastPt.y} r="2.5" fill={color} />
         )}
       </svg>
-      <div className="flex justify-between text-[9px] text-gray-300" style={{ width: W }}>
+      <div className="flex justify-between text-[9px] text-gray-300" style={{ maxWidth: 160 }}>
         {history.map(p => <span key={p.year}>{String(p.year).slice(2)}</span>)}
       </div>
     </div>
