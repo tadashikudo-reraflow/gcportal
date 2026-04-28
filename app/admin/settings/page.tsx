@@ -14,7 +14,6 @@ export default function SettingsPage() {
     { label: "GA4 Measurement ID", value: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID },
     // 認証
     { label: "Admin Password", value: process.env.ADMIN_PASSWORD, mask: true },
-    { label: "GCInsight Admin Key", value: process.env.GCINSIGHT_ADMIN_KEY, mask: true },
     { label: "Cron Secret", value: process.env.CRON_SECRET, mask: true },
     // Supabase
     { label: "Supabase URL", value: process.env.NEXT_PUBLIC_SUPABASE_URL },
@@ -23,17 +22,10 @@ export default function SettingsPage() {
     // メール配信
     { label: "Resend APIキー", value: process.env.RESEND_API_KEY, mask: true },
     { label: "通知メール先 (NOTIFY_EMAIL)", value: process.env.NOTIFY_EMAIL },
-    // Note コミュニティ
-    { label: "Note CTA 表示", value: process.env.NOTE_CTA_ENABLED ?? "false" },
-    { label: "Note URL", value: process.env.NOTE_URL },
-    // X API
-    { label: "X Bearer Token", value: process.env.X_BEARER_TOKEN, mask: true },
-    // Resend Webhook
     { label: "Resend Webhook Secret", value: process.env.RESEND_WEBHOOK_SECRET, mask: true },
     // 通知
     { label: "Telegram Bot Token", value: process.env.TELEGRAM_BOT_TOKEN, mask: true },
     { label: "Telegram Chat ID", value: process.env.TELEGRAM_CHAT_ID },
-    { label: "Slack Webhook URL", value: process.env.SLACK_WEBHOOK_URL, mask: true },
   ];
 
   function display(item: EnvItem): { text: string; set: boolean } {
