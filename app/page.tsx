@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Activity } from "lucide-react";
 import data from "@/public/data/standardization.json";
 import tokuteiData from "@/public/data/tokutei_municipalities.json";
 import migrationStats from "@/public/data/migration_stats.json";
@@ -198,8 +199,9 @@ export default function DashboardPage() {
 
       {/* ========== ステータス分布バー（クリック可能） ========== */}
       <div className="status-bar-card">
-        <div className="flex items-baseline justify-between mb-3">
-          <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+            <Activity size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
             全 {TOTAL.toLocaleString()} 自治体の移行ステータス
           </h2>
           <Link href="/progress?status=tokutei" className="text-xs lg:text-sm font-medium no-underline hover:underline" style={{ color: "var(--color-brand-primary)" }}>

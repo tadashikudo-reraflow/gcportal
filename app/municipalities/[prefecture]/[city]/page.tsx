@@ -8,6 +8,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
 import { normalizeBusiness } from "@/lib/businessAlias";
 import FiscalSparkline from "@/components/FiscalSparkline";
+import { TrendingUp, ClipboardCheck, Server, MapPin } from "lucide-react";
 
 type Props = { params: Promise<{ prefecture: string; city: string }> };
 
@@ -282,7 +283,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
       {hasFinanceData && (
         <div className="card p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+            <h2 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+              <TrendingUp size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
               財政プロフィール
             </h2>
             {dataYear && (
@@ -358,7 +360,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
 
       {/* 主な採用ベンダー */}
       <div className="card p-6">
-        <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+        <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+          <Server size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
           主な採用ベンダー
           {hasVendorData && (
             <span className="text-xs font-normal ml-2 text-gray-500">業務別に異なる場合があります</span>
@@ -381,7 +384,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
       {/* 20業務の進捗率 */}
       <div className="card overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100">
-          <p className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
+          <p className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+            <ClipboardCheck size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
             20業務 手続き進捗率
             <span className="text-xs font-normal ml-2 text-gray-500">進捗率 昇順</span>
           </p>
@@ -449,7 +453,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
       {/* 同県の他自治体 */}
       {samePrefCities.length > 0 && (
         <div className="card p-6">
-          <h2 className="text-base font-bold mb-3" style={{ color: "var(--color-text-primary)" }}>
+          <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-text-primary)" }}>
+            <MapPin size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
             {prefName}の他の自治体
           </h2>
           <div className="flex flex-wrap gap-2">

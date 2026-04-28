@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import FiscalSparkline from "@/components/FiscalSparkline";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, BarChart2, TrendingUp } from "lucide-react";
 import JapanMap from "@/components/JapanMap";
 import type {
   ProgressData,
@@ -151,7 +151,8 @@ function ComparePanel({
   return (
     <div className="card p-4 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-bold" style={{ color: "var(--color-gov-primary,#002D72)" }}>
+        <h3 className="text-base font-bold flex items-center gap-2" style={{ color: "var(--color-gov-primary,#002D72)" }}>
+          <BarChart2 size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
           自治体比較 ({munis.length}件)
         </h3>
         <button onClick={onClear} className="text-xs" style={{ color: "var(--color-text-muted)", background: "none", border: "none", cursor: "pointer" }}>
@@ -955,7 +956,8 @@ function MunicipalityDetail({
       {/* 財政プロフィール（5年スパークライン） */}
       {fiscalHistory.length > 0 && (
         <div className="card p-4">
-          <h3 className="text-base font-bold mb-3" style={{ color: "var(--color-gov-primary, #002D72)" }}>
+          <h3 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: "var(--color-gov-primary, #002D72)" }}>
+            <TrendingUp size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)" }} />
             財政プロフィール
           </h3>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">

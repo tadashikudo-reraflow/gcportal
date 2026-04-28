@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { Map as MapIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // --- Types ---
@@ -157,10 +158,7 @@ export default function JapanMap({ prefectures, onPrefClick }: JapanMapProps) {
         className="text-sm lg:text-base font-bold mb-4 flex items-center gap-2"
         style={{ color: "var(--color-text-primary)" }}
       >
-        <span
-          className="w-1 h-5 rounded-full inline-block flex-shrink-0"
-          style={{ backgroundColor: "var(--color-brand-primary)" }}
-        />
+        <MapIcon size={16} aria-hidden="true" style={{ color: "var(--color-brand-primary)", flexShrink: 0 }} />
         日本地図（都道府県カルトグラム）
       </h2>
       <p className="text-xs lg:text-sm mb-4" style={{ color: "var(--color-text-muted)" }}>
