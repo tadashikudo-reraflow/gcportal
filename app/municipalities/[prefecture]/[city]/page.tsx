@@ -147,10 +147,18 @@ export default async function MunicipalityDetailPage({ params }: Props) {
     .sort((a, b) => ((b.overall_rate as number) ?? 0) - ((a.overall_rate as number) ?? 0))
     .slice(0, 6);
 
-  // Supabaseから財政プロフィール＋ベンダー情報を一括取得
-  const { data: muniRecord } = await supabase
+  // Supabaseからid取得（ベンダー情報に必須・常に存在するカラムのみ）
+  const { data: muniBase } = await supabase
     .from("municipalities")
-    .select("id, population, standard_fiscal_scale, fiscal_strength, financial_data_year")
+    .select("id")
+    .eq("prefecture", prefName)
+    .eq("city", cityName)
+    .single();
+
+  // 財政プロフィール（DBマイグレーション後に追加されるカラム・失敗しても影響しない）
+  const { data: muniFinance } = await supabase
+    .from("municipalities")
+    .select("population, standard_fiscal_scale, fiscal_strength, financial_data_year")
     .eq("prefecture", prefName)
     .eq("city", cityName)
     .single();
@@ -158,11 +166,11 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   const vendorByBusiness: Record<string, { vendorName: string; cloud: string | null }> = {};
   const vendorsWithoutBusiness: { vendorName: string; cloud: string | null }[] = [];
 
-  if (muniRecord) {
+  if (muniBase) {
     const { data: pkgRows } = await supabase
       .from("municipality_packages")
       .select(`business, packages ( package_name, vendors ( name, cloud_platform ) )`)
-      .eq("municipality_id", muniRecord.id);
+      .eq("municipality_id", muniBase.id);
 
     if (pkgRows) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -192,10 +200,10 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   const vendorSummary = Object.values(vendorSummaryMap).sort((a, b) => b.count - a.count);
   const hasVendorData = vendorSummary.length > 0;
 
-  const population = muniRecord?.population ?? null;
-  const stdFiscal = muniRecord?.standard_fiscal_scale ?? null;
-  const fiscalStrength = muniRecord?.fiscal_strength ?? null;
-  const dataYear = muniRecord?.financial_data_year ?? null;
+  const population = muniFinance?.population ?? null;
+  const stdFiscal = muniFinance?.standard_fiscal_scale ?? null;
+  const fiscalStrength = muniFinance?.fiscal_strength ?? null;
+  const dataYear = muniFinance?.financial_data_year ?? null;
   const hasFinanceData = population || stdFiscal || fiscalStrength;
 
   return (
