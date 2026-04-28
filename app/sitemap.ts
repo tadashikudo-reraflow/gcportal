@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles } from "@/lib/articles";
+import data from "@/public/data/standardization.json";
+import type { Municipality } from "@/lib/types";
 
 const BASE_URL = "https://gcinsight.jp";
 
@@ -43,5 +45,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...articlePages];
+  const municipalities = data.municipalities as Municipality[];
+  const municipalityPages: MetadataRoute.Sitemap = municipalities.map((m) => ({
+    url: `${BASE_URL}/municipalities/${encodeURIComponent(m.prefecture)}/${encodeURIComponent(m.city)}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
+  return [...staticPages, ...articlePages, ...municipalityPages];
 }
