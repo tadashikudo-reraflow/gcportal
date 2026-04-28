@@ -120,6 +120,21 @@ function FiscalStrengthBar({ value }: { value: number | null }) {
   );
 }
 
+function RatioBadge({ value, thresholds, unit = "%" }: {
+  value: number | null;
+  thresholds: [number, number]; // [warn, danger]
+  unit?: string;
+}) {
+  if (value === null) return <span className="text-gray-400 text-sm">—</span>;
+  const [warn, danger] = thresholds;
+  const color = value >= danger ? "#b91c1c" : value >= warn ? "#d97706" : "#378445";
+  return (
+    <span className="font-bold tabular-nums text-sm" style={{ color }}>
+      {value.toFixed(1)}{unit}
+    </span>
+  );
+}
+
 export default async function MunicipalityDetailPage({ params }: Props) {
   const { prefecture, city } = await params;
   const prefName = decodeURIComponent(prefecture);
@@ -158,7 +173,7 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   // 財政プロフィール（DBマイグレーション後に追加されるカラム・失敗しても影響しない）
   const { data: muniFinance } = await supabase
     .from("municipalities")
-    .select("population, standard_fiscal_scale, fiscal_strength, financial_data_year")
+    .select("population, standard_fiscal_scale, fiscal_strength, financial_data_year, aging_rate, current_expenditure_ratio, real_debt_ratio, future_burden_ratio")
     .eq("prefecture", prefName)
     .eq("city", cityName)
     .single();
@@ -204,7 +219,11 @@ export default async function MunicipalityDetailPage({ params }: Props) {
   const stdFiscal = muniFinance?.standard_fiscal_scale ?? null;
   const fiscalStrength = muniFinance?.fiscal_strength ?? null;
   const dataYear = muniFinance?.financial_data_year ?? null;
-  const hasFinanceData = population || stdFiscal || fiscalStrength;
+  const agingRate = muniFinance?.aging_rate ?? null;
+  const currentExpenditureRatio = muniFinance?.current_expenditure_ratio ?? null;
+  const realDebtRatio = muniFinance?.real_debt_ratio ?? null;
+  const futureBurdenRatio = muniFinance?.future_burden_ratio ?? null;
+  const hasFinanceData = population || stdFiscal || fiscalStrength || agingRate || currentExpenditureRatio;
 
   return (
     <div className="space-y-6">
@@ -270,6 +289,30 @@ export default async function MunicipalityDetailPage({ params }: Props) {
               <div>
                 <dt className="text-[11px] text-gray-400 mb-1">財政力指数</dt>
                 <dd><FiscalStrengthBar value={fiscalStrength} /></dd>
+              </div>
+            )}
+            {agingRate !== null && (
+              <div>
+                <dt className="text-[11px] text-gray-400 mb-0.5">高齢化率</dt>
+                <dd><RatioBadge value={agingRate} thresholds={[25, 35]} /></dd>
+              </div>
+            )}
+            {currentExpenditureRatio !== null && (
+              <div>
+                <dt className="text-[11px] text-gray-400 mb-0.5">経常収支比率</dt>
+                <dd><RatioBadge value={currentExpenditureRatio} thresholds={[90, 100]} /></dd>
+              </div>
+            )}
+            {realDebtRatio !== null && (
+              <div>
+                <dt className="text-[11px] text-gray-400 mb-0.5">実質公債費比率</dt>
+                <dd><RatioBadge value={realDebtRatio} thresholds={[10, 18]} /></dd>
+              </div>
+            )}
+            {futureBurdenRatio !== null && (
+              <div>
+                <dt className="text-[11px] text-gray-400 mb-0.5">将来負担比率</dt>
+                <dd><RatioBadge value={futureBurdenRatio} thresholds={[100, 150]} /></dd>
               </div>
             )}
           </dl>
