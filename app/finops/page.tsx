@@ -8,11 +8,11 @@ import PageNavCards from "@/components/PageNavCards";
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド コスト削減30%の実践手順【2026年最新】FinOps完全ガイド｜GCInsight",
+  title: "移行後に費用が2倍になった自治体が見落としていたFinOps：ガバメントクラウドのコスト管理入門",
   description:
     "移行後コスト平均2.3倍・最大5.7倍の現実。検証環境の夜間停止で60%削減、基盤再選定で30%削減——自治体規模別の具体的な打ち手を無料PDFで公開。935団体の実績データ付き。",
   openGraph: {
-    title: "ガバメントクラウド コスト削減30%の実践手順【2026年最新】FinOps完全ガイド｜GCInsight",
+    title: "移行後に費用が2倍になった自治体が見落としていたFinOps：ガバメントクラウドのコスト管理入門",
     description:
       "移行後コスト平均2.3倍・最大5.7倍。検証環境夜間停止で60%削減、基盤再選定で30%削減の具体策を自治体規模別に解説。無料PDF付き。",
     images: [
