@@ -708,9 +708,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (min-width: 1024px) {
   .three-metrics-donut {
-    transform: scale(1.4);
-    transform-origin: center center;
-    margin: 1rem 0;
+    width: 168px;
+    height: 168px;
+    margin: 1rem auto;
+  }
+  .three-metrics-donut svg {
+    width: 168px;
+    height: 168px;
   }
 }
 .three-metrics-card {
@@ -1004,7 +1008,10 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
 }
 .prose-article table {
+  display: block;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
   font-size: 0.875rem;
   margin: 0;

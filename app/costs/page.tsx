@@ -752,9 +752,9 @@ export default async function CostsPage() {
             <h3 className="text-base font-bold" style={{ color: "var(--color-text-primary)" }}>
               ガバメントクラウド コスト最適化の知見（R6検証事業）
             </h3>
-            <a href="/articles?tag=finops" className="text-xs font-medium no-underline hover:underline flex-shrink-0" style={{ color: "var(--color-brand-primary)" }}>
+            <Link href="/articles?tag=finops" className="text-xs font-medium no-underline hover:underline flex-shrink-0" style={{ color: "var(--color-brand-primary)" }}>
               詳細コラムを読む →
-            </a>
+            </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
