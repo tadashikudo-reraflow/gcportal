@@ -7,11 +7,10 @@ import PageHeader from "@/components/PageHeader";
 import ArticlesClient from "./ArticlesClient";
 
 export const metadata: Metadata = {
-  title: "ガバメントクラウド・自治体標準化 実務記事ライブラリ｜GCInsight",
+  title: "ガバメントクラウド 実務記事ライブラリ（47本）｜費用・ベンダー・移行事例を網羅｜GCInsight",
   description:
-    "ガバメントクラウド・自治体標準化に関する実務記事を費用・ベンダー選定・自治体事例・移行ノウハウの4テーマで整理。自治体DX担当者・ITベンダー向け46本の解説記事。",
+    "ガバメントクラウド移行の費用構造・ベンダー選定・遅延実態・特定移行支援制度を解説する実務記事47本。自治体DX担当者・ITベンダーが知るべき最新情報を1741自治体のデータとともに提供。",
   alternates: { canonical: "/articles" },
-  robots: { index: false, follow: true },
 };
 export const revalidate = 3600;
 

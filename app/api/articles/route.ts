@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
  * PATCH /api/articles — 公開状態・カバー画像等を更新（content上書き防止）
  *
  * Headers: Authorization: Bearer <ADMIN_PASSWORD>
- * Body JSON: { slug: string, is_published: boolean, cover_image?: string, x_paste_ready?: boolean }
+ * Body JSON: { slug: string, is_published?: boolean, cover_image?: string, x_paste_ready?: boolean, title?: string, description?: string }
  */
 export async function PATCH(req: NextRequest) {
   const auth = req.headers.get("authorization");
@@ -119,9 +119,9 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { slug, is_published, cover_image, x_paste_ready } = await req.json();
-  if (!slug || typeof is_published !== "boolean") {
-    return NextResponse.json({ error: "slug and is_published are required" }, { status: 400 });
+  const { slug, is_published, cover_image, x_paste_ready, title, description } = await req.json();
+  if (!slug) {
+    return NextResponse.json({ error: "slug is required" }, { status: 400 });
   }
 
   const supabase = createClient(
@@ -129,10 +129,13 @@ export async function PATCH(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // content は除外し、指定されたフィールドのみ更新
-  const updateData: Record<string, unknown> = { is_published, updated_at: new Date().toISOString() };
+  // content/content_html は除外し、指定されたフィールドのみ更新
+  const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (typeof is_published === "boolean") updateData.is_published = is_published;
   if (cover_image !== undefined) updateData.cover_image = cover_image;
   if (x_paste_ready !== undefined) updateData.x_paste_ready = x_paste_ready;
+  if (title !== undefined) updateData.title = title;
+  if (description !== undefined) updateData.description = description;
 
   const { data, error } = await supabase
     .from("articles")
@@ -151,7 +154,7 @@ export async function PATCH(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     article: data,
-    message: is_published ? `記事「${slug}」を公開しました` : `記事「${slug}」を下書きに戻しました`,
+    message: `記事「${slug}」を更新しました`,
   });
 }
 
