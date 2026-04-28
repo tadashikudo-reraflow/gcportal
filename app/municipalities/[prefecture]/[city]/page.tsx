@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import Breadcrumb from "@/components/Breadcrumb";
 import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
 import { normalizeBusiness } from "@/lib/businessAlias";
+import FiscalSparkline from "@/components/FiscalSparkline";
 
 type Props = { params: Promise<{ prefecture: string; city: string }> };
 
@@ -178,6 +179,28 @@ export default async function MunicipalityDetailPage({ params }: Props) {
     .eq("city", cityName)
     .single();
 
+  // 財政時系列履歴（5年分）
+  const { data: fiscalHistory } = muniBase
+    ? await supabase
+        .from("municipality_fiscal_history")
+        .select("fiscal_year, fiscal_strength, current_expenditure_ratio, real_debt_ratio, future_burden_ratio")
+        .eq("municipality_id", muniBase.id)
+        .order("fiscal_year", { ascending: true })
+    : { data: null };
+
+  const ALL_YEARS = [2020, 2021, 2022, 2023, 2024];
+  function makeHistory(field: "fiscal_strength" | "current_expenditure_ratio" | "real_debt_ratio" | "future_burden_ratio") {
+    return ALL_YEARS.map(y => ({
+      year: y,
+      value: (fiscalHistory?.find(r => r.fiscal_year === y)?.[field] as number | null) ?? null,
+    }));
+  }
+  const fiscalStrengthHistory    = makeHistory("fiscal_strength");
+  const cerHistory               = makeHistory("current_expenditure_ratio");
+  const rdrHistory               = makeHistory("real_debt_ratio");
+  const fbrHistory               = makeHistory("future_burden_ratio");
+  const hasHistory = (fiscalHistory?.length ?? 0) > 0;
+
   const vendorByBusiness: Record<string, { vendorName: string; cloud: string | null }> = {};
   const vendorsWithoutBusiness: { vendorName: string; cloud: string | null }[] = [];
 
@@ -268,7 +291,8 @@ export default async function MunicipalityDetailPage({ params }: Props) {
               </span>
             )}
           </div>
-          <dl className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {/* 静的指標: 人口・標準財政規模・高齢化率 */}
+          <dl className="grid grid-cols-3 gap-4 mb-4">
             {population && (
               <div>
                 <dt className="text-[11px] text-gray-400 mb-0.5">人口</dt>
@@ -285,37 +309,50 @@ export default async function MunicipalityDetailPage({ params }: Props) {
                 </dd>
               </div>
             )}
-            {fiscalStrength !== null && (
-              <div>
-                <dt className="text-[11px] text-gray-400 mb-1">財政力指数</dt>
-                <dd><FiscalStrengthBar value={fiscalStrength} /></dd>
-              </div>
-            )}
             {agingRate !== null && (
               <div>
                 <dt className="text-[11px] text-gray-400 mb-0.5">高齢化率</dt>
                 <dd><RatioBadge value={agingRate} thresholds={[25, 35]} /></dd>
               </div>
             )}
-            {currentExpenditureRatio !== null && (
-              <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">経常収支比率</dt>
-                <dd><RatioBadge value={currentExpenditureRatio} thresholds={[90, 100]} /></dd>
-              </div>
-            )}
-            {realDebtRatio !== null && (
-              <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">実質公債費比率</dt>
-                <dd><RatioBadge value={realDebtRatio} thresholds={[10, 18]} /></dd>
-              </div>
-            )}
-            {futureBurdenRatio !== null && (
-              <div>
-                <dt className="text-[11px] text-gray-400 mb-0.5">将来負担比率</dt>
-                <dd><RatioBadge value={futureBurdenRatio} thresholds={[100, 150]} /></dd>
-              </div>
-            )}
           </dl>
+
+          {/* 時系列スパークライン: 財政4指標 */}
+          {hasHistory ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3 pt-3 border-t border-gray-100">
+              <FiscalSparkline label="財政力指数" unit="index" history={fiscalStrengthHistory} thresholds={[0.5, 1.0]} higherIsBetter />
+              <FiscalSparkline label="経常収支比率" history={cerHistory} thresholds={[90, 100]} />
+              <FiscalSparkline label="実質公債費比率" history={rdrHistory} thresholds={[10, 18]} />
+              <FiscalSparkline label="将来負担比率" history={fbrHistory} thresholds={[100, 150]} />
+            </div>
+          ) : (
+            <dl className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-3 border-t border-gray-100">
+              {fiscalStrength !== null && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 mb-1">財政力指数</dt>
+                  <dd><FiscalStrengthBar value={fiscalStrength} /></dd>
+                </div>
+              )}
+              {currentExpenditureRatio !== null && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 mb-0.5">経常収支比率</dt>
+                  <dd><RatioBadge value={currentExpenditureRatio} thresholds={[90, 100]} /></dd>
+                </div>
+              )}
+              {realDebtRatio !== null && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 mb-0.5">実質公債費比率</dt>
+                  <dd><RatioBadge value={realDebtRatio} thresholds={[10, 18]} /></dd>
+                </div>
+              )}
+              {futureBurdenRatio !== null && (
+                <div>
+                  <dt className="text-[11px] text-gray-400 mb-0.5">将来負担比率</dt>
+                  <dd><RatioBadge value={futureBurdenRatio} thresholds={[100, 150]} /></dd>
+                </div>
+              )}
+            </dl>
+          )}
         </div>
       )}
 
