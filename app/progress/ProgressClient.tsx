@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo, useState, useCallback, Suspense } from "react";
+import { useMemo, useState, useCallback, useEffect, Suspense } from "react";
+import { supabase } from "@/lib/supabase";
+import FiscalSparkline from "@/components/FiscalSparkline";
 import { AlertTriangle } from "lucide-react";
 import JapanMap from "@/components/JapanMap";
 import type {
@@ -867,6 +868,43 @@ function MunicipalityDetail({
 
   const st = getStatus(muni);
 
+  type FiscalRow = {
+    fiscal_year: number;
+    fiscal_strength: number | null;
+    current_expenditure_ratio: number | null;
+    real_debt_ratio: number | null;
+    future_burden_ratio: number | null;
+  };
+  const [fiscalHistory, setFiscalHistory] = useState<FiscalRow[]>([]);
+  useEffect(() => {
+    setFiscalHistory([]);
+    let cancelled = false;
+    (async () => {
+      const { data: base } = await supabase
+        .from("municipalities")
+        .select("id")
+        .eq("prefecture", muni.prefecture)
+        .eq("city", muni.city)
+        .single();
+      if (!base || cancelled) return;
+      const { data } = await supabase
+        .from("municipality_fiscal_history")
+        .select("fiscal_year, fiscal_strength, current_expenditure_ratio, real_debt_ratio, future_burden_ratio")
+        .eq("municipality_id", base.id)
+        .order("fiscal_year", { ascending: true });
+      if (!cancelled) setFiscalHistory(data ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, [muni.prefecture, muni.city]);
+
+  const ALL_YEARS = [2020, 2021, 2022, 2023, 2024];
+  function makeHistory(field: keyof Omit<FiscalRow, "fiscal_year">) {
+    return ALL_YEARS.map(y => ({
+      year: y,
+      value: (fiscalHistory.find(r => r.fiscal_year === y)?.[field] as number | null) ?? null,
+    }));
+  }
+
   return (
     <>
       <button
@@ -890,13 +928,6 @@ function MunicipalityDetail({
             >
               {muni.city}
             </h2>
-            <Link
-              href={`/municipalities/${encodeURIComponent(muni.prefecture)}/${encodeURIComponent(muni.city)}`}
-              className="text-xs mt-0.5 inline-flex items-center gap-0.5 hover:underline"
-              style={{ color: "var(--color-brand-primary)" }}
-            >
-              財政プロフィール →
-            </Link>
           </div>
           <div className="text-right">
             <div
@@ -920,6 +951,21 @@ function MunicipalityDetail({
           </span>
         </div>
       </div>
+
+      {/* 財政プロフィール（5年スパークライン） */}
+      {fiscalHistory.length > 0 && (
+        <div className="card p-4">
+          <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-gov-primary, #002D72)" }}>
+            財政プロフィール
+          </h3>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <FiscalSparkline label="財政力指数" unit="index" history={makeHistory("fiscal_strength")} thresholds={[0.5, 1.0]} higherIsBetter />
+            <FiscalSparkline label="経常収支比率" history={makeHistory("current_expenditure_ratio")} thresholds={[90, 100]} />
+            <FiscalSparkline label="実質公債費比率" history={makeHistory("real_debt_ratio")} thresholds={[10, 18]} />
+            <FiscalSparkline label="将来負担比率" history={makeHistory("future_burden_ratio")} thresholds={[100, 150]} />
+          </div>
+        </div>
+      )}
 
       {/* Vendor Summary */}
       {muni.vendors.length > 0 && (
