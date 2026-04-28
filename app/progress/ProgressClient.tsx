@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, Suspense } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -889,6 +890,13 @@ function MunicipalityDetail({
             >
               {muni.city}
             </h2>
+            <Link
+              href={`/municipalities/${encodeURIComponent(muni.prefecture)}/${encodeURIComponent(muni.city)}`}
+              className="text-xs mt-0.5 inline-flex items-center gap-0.5 hover:underline"
+              style={{ color: "var(--color-brand-primary)" }}
+            >
+              財政プロフィール →
+            </Link>
           </div>
           <div className="text-right">
             <div
