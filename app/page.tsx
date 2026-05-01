@@ -17,6 +17,7 @@ import Callout from "@/components/Callout";
 import { PAGE_SOURCES } from "@/lib/sources";
 import { COST_CONSTANTS } from "@/lib/constants";
 import { Municipality } from "@/lib/types";
+import { STATUS_COLORS } from "@/lib/statusColor";
 
 // 完了率: ゼロ除算・null安全。SSRでデータ取得失敗時も NaN/Infinity を出さない
 const _total = data?.summary?.total ?? 0;
@@ -129,12 +130,72 @@ export default function DashboardPage() {
         totalMunicipalities={TOTAL}
         completeCount={completeCount}
         tokuteiCount={TOKUTEI_OFFICIAL}
-        systemRate={migrationStats.completion_rate ?? 0}
         dataMonth={summary.data_month}
         municipalities={allMunis}
       />
 
-      {/* ========== 3指標比較ウィジェット（ヒーロー直下） ========== */}
+      {/* ========== KPI ストリップ（Hero直下 - 3指標を大きく） ========== */}
+      <div className="grid grid-cols-3 gap-px" style={{ backgroundColor: "var(--color-border)" }}>
+        {[
+          {
+            value: `${completeCount}`,
+            unit: "団体",
+            label: "全業務完了",
+            sub: `${((completeCount / TOTAL) * 100).toFixed(1)}%`,
+            href: "/progress?status=completed",
+            color: STATUS_COLORS.complete.bg,
+          },
+          {
+            value: TOKUTEI_OFFICIAL.toLocaleString(),
+            unit: "団体",
+            label: "特定移行",
+            sub: "期限延長認定",
+            href: "/tokutei",
+            color: STATUS_COLORS.tokutei.bg,
+          },
+          {
+            value: `${((migrationStats.completion_rate ?? 0) * 100).toFixed(1)}`,
+            unit: "%",
+            label: "システム移行率",
+            sub: `${migrationStats.completed_systems?.toLocaleString() ?? "—"} システム`,
+            href: "/progress",
+            color: STATUS_COLORS.ontrack.bg,
+          },
+        ].map((kpi) => (
+          <Link
+            key={kpi.label}
+            href={kpi.href}
+            className="no-underline flex flex-col items-center justify-center py-4 px-2 text-center hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: "var(--color-card-bg)" }}
+          >
+            <span
+              className="tabular-nums leading-none font-extrabold"
+              style={{
+                fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+                color: kpi.color,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {kpi.value}
+              <span style={{ fontSize: "1rem", fontWeight: 700 }}>{kpi.unit}</span>
+            </span>
+            <span
+              className="text-xs mt-1 font-semibold"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              {kpi.label}
+            </span>
+            <span
+              className="text-[10px] mt-0.5"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              {kpi.sub}
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      {/* ========== 3指標比較ウィジェット（KPIストリップ直下） ========== */}
       <ThreeMetricsWidget
         completeRate={completeCount / TOTAL}
         systemRate={migrationStats.completion_rate}
@@ -176,10 +237,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ========== ニュースレター登録バナー ========== */}
-      <NewsletterBanner />
-
-      {/* ========== 日本地図ヒートマップ（ThreeMetrics直後） ========== */}
+      {/* ========== 日本地図ヒートマップ（差別化ストリップ直後） ========== */}
       <div>
         {/* 都道府県ドロップダウン */}
         <div className="flex items-center gap-3 mb-4">
@@ -270,6 +328,9 @@ export default function DashboardPage() {
         businesses={sortedBusinesses}
         total={TOTAL}
       />
+
+      {/* ========== ニュースレター登録バナー（BusinessCards直後に移動） ========== */}
+      <NewsletterBanner />
 
       {/* ========== 初見者向け「特定移行」ガイド ========== */}
       <Callout variant="info">

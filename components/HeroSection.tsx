@@ -17,25 +17,22 @@ type HeroProps = {
   totalMunicipalities: number;
   completeCount: number;
   tokuteiCount: number;
-  systemRate: number; // 0〜1 のシステム移行率
   dataMonth: string;
   municipalities?: Municipality[];
 };
 
 export default function HeroSection({
-  remainingDays,
-  deadline,
+  // remainingDays/deadline/tokuteiCount は将来の再利用のため型定義に残す
+  remainingDays: _remainingDays,
+  deadline: _deadline,
   totalMunicipalities,
-  completeCount,
-  tokuteiCount,
-  systemRate,
+  completeCount: _completeCount,
+  tokuteiCount: _tokuteiCount,
   dataMonth,
   municipalities = [],
 }: HeroProps) {
   const [year, month] = dataMonth.split("-");
   const formattedMonth = `${year}年${parseInt(month)}月`;
-  const completePct = ((completeCount / totalMunicipalities) * 100).toFixed(1);
-  const systemRatePct = (systemRate * 100).toFixed(1);
 
   // --- 検索ボックス状態 ---
   const [query, setQuery] = useState("");
@@ -96,59 +93,8 @@ export default function HeroSection({
           全国{totalMunicipalities.toLocaleString()}自治体の進捗ダッシュボード
         </h1>
 
-        <p className="hero-sub">
-          全20業務完了はわずか
-          <strong>
-            {completeCount}団体（{completePct}%）
-          </strong>
-          。業務別・自治体別に進捗とリスクを追跡。
-        </p>
-
-        {/* ファーストビュー数値バッジ — スクロール前にデータを見せる */}
-        <div className="grid grid-cols-3 gap-2 mt-4 mb-1" role="list" aria-label="主要指標サマリー">
-          <Link
-            href="/progress?status=completed"
-            className="no-underline rounded-xl px-3 py-2.5 flex flex-col items-center text-center hover:opacity-80 transition-opacity"
-            style={{ backgroundColor: "rgba(55,132,69,0.08)", border: "1px solid rgba(55,132,69,0.2)" }}
-            role="listitem"
-          >
-            <span className="text-lg font-bold tabular-nums leading-tight" style={{ color: "#378445" }}>
-              {completePct}%
-            </span>
-            <span className="text-[10px] mt-0.5 leading-tight" style={{ color: "#4b6a5a" }}>
-              全業務完了
-            </span>
-          </Link>
-          <Link
-            href="/tokutei"
-            className="no-underline rounded-xl px-3 py-2.5 flex flex-col items-center text-center hover:opacity-80 transition-opacity"
-            style={{ backgroundColor: "rgba(100,116,139,0.08)", border: "1px solid rgba(100,116,139,0.2)" }}
-            role="listitem"
-          >
-            <span className="text-lg font-bold tabular-nums leading-tight" style={{ color: "#475569" }}>
-              {tokuteiCount.toLocaleString()}
-            </span>
-            <span className="text-[10px] mt-0.5 leading-tight" style={{ color: "#64748b" }}>
-              特定移行団体
-            </span>
-          </Link>
-          <Link
-            href="/progress"
-            className="no-underline rounded-xl px-3 py-2.5 flex flex-col items-center text-center hover:opacity-80 transition-opacity"
-            style={{ backgroundColor: "rgba(29,78,216,0.08)", border: "1px solid rgba(29,78,216,0.2)" }}
-            role="listitem"
-          >
-            <span className="text-lg font-bold tabular-nums leading-tight" style={{ color: "#1d4ed8" }}>
-              {systemRatePct}%
-            </span>
-            <span className="text-[10px] mt-0.5 leading-tight" style={{ color: "#3b5fae" }}>
-              システム移行率
-            </span>
-          </Link>
-        </div>
-
         {/* #1 自治体名検索ボックス */}
-        <div ref={containerRef} className="hero-search-wrap">
+        <div ref={containerRef} className="hero-search-wrap" style={{ marginTop: "1.5rem" }}>
           <div className="relative flex items-center">
             <span
               className="absolute left-3.5 pointer-events-none"

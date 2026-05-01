@@ -8,47 +8,38 @@ import { X, Menu, ChevronDown } from "lucide-react";
 // 目的別ナビゲーション構造
 const NAV_GROUPS = [
   {
-    label: "ホーム",
-    short: "TOP",
-    href: "/",
-  },
-  {
     label: "進捗",
     short: "進捗",
     href: "/progress",
   },
   {
-    label: "コスト",
-    short: "コスト",
+    label: "分析",
+    short: "分析",
     children: [
-      { href: "/costs",  label: "コスト試算",    desc: "自治体規模別の移行コストを試算" },
-      { href: "/cloud",  label: "ガバクラ比較",  desc: "AWS/Azure/GCP/OCI/さくら 割引・シェア比較" },
-      { href: "/finops", label: "FinOps最適化",  desc: "移行後コスト削減の実践手順" },
+      { href: "/businesses", label: "業務別分析",    desc: "標準化20業務ごとの進捗・ベンダー状況" },
+      { href: "/costs",      label: "コスト試算",    desc: "自治体規模別の移行コストを試算" },
+      { href: "/cloud",      label: "クラウド比較",  desc: "AWS/Azure/GCP/OCI/さくら 割引・シェア比較" },
     ],
   },
   {
-    label: "制度・仕様",
-    short: "仕様",
+    label: "制度",
+    short: "制度",
     children: [
-      { href: "/standards",     label: "標準仕様書",           desc: "20業務の標準仕様書・適合確認一覧" },
-      { href: "/packages",      label: "パッケージ",           desc: "ベンダー別対応パッケージ比較" },
-      { href: "/timeline",      label: "スケジュール",         desc: "標準化・移行の法定スケジュール" },
-      { href: "/cyber-security", label: "🛡 統一基準（新）",  desc: "重要インフラ統一セキュリティ基準" },
-      { href: "/mesh",          label: "🔗 公共サービスメッシュ", desc: "自治体内情報活用サービスの全体像" },
+      { href: "/standards",  label: "標準仕様書",    desc: "20業務の標準仕様書・適合確認一覧" },
+      { href: "/packages",   label: "パッケージ",    desc: "ベンダー別対応パッケージ比較" },
+      { href: "/timeline",   label: "スケジュール",  desc: "標準化・移行の法定スケジュール" },
     ],
   },
   {
-    label: "データ活用",
-    short: "データ",
-    children: [
-      { href: "/businesses", label: "業務別分析",         desc: "標準化20業務ごとの進捗・ベンダー状況" },
-      { href: "/compare",    label: "ダッシュボード比較", desc: "自治体・都道府県のベンチマーク比較" },
-      { href: "/disclosure", label: "開示請求",           desc: "情報公開請求で入手した一次資料" },
-      { href: "/sources",    label: "出典",               desc: "データソース・参照元一覧" },
-    ],
+    label: "コラム",
+    short: "コラム",
+    href: "/articles",
   },
-  { label: "コラム", short: "コラム", href: "/articles" },
-  { label: "会員限定", short: "会員", href: "/members" },
+  {
+    label: "会員",
+    short: "会員",
+    href: "/members",
+  },
 ] as const;
 
 type NavGroup = (typeof NAV_GROUPS)[number];
@@ -60,43 +51,32 @@ function isGroupWithChildren(g: NavGroup): g is NavGroup & { children: ReadonlyA
 // モバイルドロワー用: 全ナビゲーション情報（セクション分け）
 const DRAWER_SECTIONS = [
   {
-    title: "メニュー",
+    title: "メインメニュー",
     items: [
       { href: "/",         label: "ホーム" },
       { href: "/progress", label: "進捗ダッシュボード" },
     ],
   },
   {
-    title: "コスト",
+    title: "分析",
     items: [
-      { href: "/costs",  label: "コスト試算" },
-      { href: "/cloud",  label: "ガバクラ比較" },
-      { href: "/finops", label: "FinOps最適化" },
+      { href: "/businesses", label: "業務別分析" },
+      { href: "/costs",      label: "コスト試算" },
+      { href: "/cloud",      label: "クラウド比較" },
     ],
   },
   {
     title: "制度・仕様",
     items: [
-      { href: "/standards",      label: "標準仕様書" },
-      { href: "/packages",       label: "パッケージ" },
-      { href: "/timeline",       label: "スケジュール" },
-      { href: "/cyber-security", label: "🛡 統一基準（新）" },
-      { href: "/mesh",           label: "🔗 公共サービスメッシュ" },
+      { href: "/standards",  label: "標準仕様書" },
+      { href: "/packages",   label: "パッケージ" },
+      { href: "/timeline",   label: "スケジュール" },
     ],
   },
   {
-    title: "データ活用",
+    title: "コンテンツ",
     items: [
-      { href: "/businesses", label: "業務別分析" },
-      { href: "/compare",    label: "ダッシュボード比較" },
-      { href: "/disclosure", label: "開示請求" },
-      { href: "/sources",    label: "出典" },
-    ],
-  },
-  {
-    title: "その他",
-    items: [
-      { href: "/articles", label: "コラム" },
+      { href: "/articles", label: "コラム・解説記事" },
       { href: "/members",  label: "会員限定レポート" },
     ],
   },
