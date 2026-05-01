@@ -44,19 +44,19 @@ const LINK_MAP: Record<string, [string, string][]> = {
   "digital-agency-gennai-govcloud-dx": [
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
-    ["gc-admin-data-release-guide-2026", "行政データ民間開放ガイド2026"],
+    ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
   "govcloud-migration-report-2026-analysis": [
     ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
-    ["gc-admin-data-release-guide-2026", "行政データ民間開放ガイド2026"],
+    ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
   "lg-system-conformance-approved-products-2026": [
     ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
-    ["gc-admin-data-release-guide-2026", "行政データ民間開放ガイド2026"],
+    ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
-  "gc-admin-data-release-guide-2026": [
+  "administrative-data-open-private-sector-2026": [
     ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
