@@ -150,7 +150,7 @@ export default function DashboardPage() {
             unit: "団体",
             label: "特定移行",
             sub: "期限延長認定",
-            href: "/tokutei",
+            href: "/progress?status=tokutei",
             color: STATUS_COLORS.tokutei.bg,
           },
           {
@@ -349,7 +349,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {/* 主要2枚: 大カード（col-span-2） */}
           <Link
-            href="/tokutei"
+            href="/progress?status=tokutei"
             className="explore-card col-span-2 sm:col-span-1"
             style={{ padding: "1.25rem 1.5rem" }}
           >
