@@ -5,6 +5,7 @@ import { useMemo, useState, useCallback, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import FiscalSparkline from "@/components/FiscalSparkline";
 import { AlertTriangle, BarChart2, TrendingUp } from "lucide-react";
+import ReportLeadCta from "@/components/ReportLeadCta";
 import JapanMap from "@/components/JapanMap";
 import type {
   ProgressData,
@@ -1262,12 +1263,20 @@ function ProgressInner({ data }: { data: ProgressData }) {
           onToggleCompare={toggleCompare}
         />
       ) : (
-        <NationalOverview
-          data={data}
-          prefectures={filteredPrefs}
-          onSelectPref={(pref) => navigate({ pref, city: "" })}
-          onFilterChange={(status) => setFilterStatus(status)}
-        />
+        <>
+          <NationalOverview
+            data={data}
+            prefectures={filteredPrefs}
+            onSelectPref={(pref) => navigate({ pref, city: "" })}
+            onFilterChange={(status) => setFilterStatus(status)}
+          />
+          <ReportLeadCta
+            source="progress_mid"
+            compact
+            title="全国進捗データを毎週メールでお届け"
+            description="ベンダー動向・コスト変化・遅延リスク情報を週次まとめ配信。登録無料。"
+          />
+        </>
       )}
     </div>
   );

@@ -9,6 +9,7 @@ import { CLUSTERS } from "@/lib/clusters";
 import SourceAttribution from "@/components/SourceAttribution";
 import { PAGE_SOURCES } from "@/lib/sources";
 import ReportLeadCta from "@/components/ReportLeadCta";
+import NewsletterBanner from "@/components/NewsletterBanner";
 
 export const revalidate = 3600;
 
@@ -259,13 +260,16 @@ export default async function ProgressPage() {
         </p>
       </div>
 
+      {/* 上部CTA — ダッシュボード閲覧者への先行案内 */}
+      <NewsletterBanner source="newsletter_progress_top" />
+
       <ProgressClient data={data} />
 
       <SourceAttribution
         sourceIds={PAGE_SOURCES.prefectures ?? []}
         pageId="progress"
       />
-      <ReportLeadCta source="progress" compact title="進捗・コスト・遅延の全体像をまとめて確認" description="全国1,741自治体の移行状況、コスト変化、遅延構造をまとめた無料レポートです。" />
+      <ReportLeadCta source="progress_bottom" title="このデータを毎週メールでお届けします" description="全国1,741自治体の移行動向・ベンダー情報・コスト最新データを週次まとめ。自治体職員・SIer・コンサル向け無料ニュースレター。" />
       <RelatedArticles cluster={CLUSTERS.risk} />
     </div>
   );
