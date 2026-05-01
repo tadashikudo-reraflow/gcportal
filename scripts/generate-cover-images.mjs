@@ -420,21 +420,40 @@ async function main() {
   const mode = xArticle ? "X Articles (1500×600, 5:2)" : "OGP (1200×630)";
 
   // 1. Fetch articles
-  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  let query = supabase
-    .from("articles")
-    .select("id, slug, title, description, tags")
-    .eq("is_published", true)
-    .order("id", { ascending: true });
-
-  if (targetSlug) {
-    query = query.eq("slug", targetSlug);
-  }
-
-  const { data: articles, error } = await query;
-  if (error) {
-    console.error("Supabase error:", error.message);
-    process.exit(1);
+  // Supabase SDK fallback: sb_secret_ 形式のキーはJWT非対応のため、gcinsight.jp/api/articles からフェッチ
+  let articles;
+  try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    let query = supabase
+      .from("articles")
+      .select("id, slug, title, description, tags")
+      .eq("is_published", true)
+      .order("id", { ascending: true });
+    if (targetSlug) query = query.eq("slug", targetSlug);
+    const { data, error } = await query;
+    if (error) throw new Error(error.message);
+    articles = data;
+  } catch (e) {
+    // Fallback: gcinsight.jp API経由
+    console.warn("Supabase SDK error, falling back to gcinsight.jp API:", e.message);
+    const { default: https } = await import("https");
+    articles = await new Promise((resolve, reject) => {
+      const opts = {
+        hostname: "gcinsight.jp", path: "/api/articles", method: "GET",
+        headers: { "Authorization": "Bearer " + (process.env.ADMIN_PASSWORD ?? "") }
+      };
+      https.request(opts, r => {
+        let d = ""; r.on("data", c => d += c);
+        r.on("end", () => {
+          try {
+            const obj = JSON.parse(d);
+            const arr = obj.articles || obj;
+            const filtered = targetSlug ? arr.filter(a => a.slug === targetSlug) : arr;
+            resolve(filtered);
+          } catch(err) { reject(err); }
+        });
+      }).end();
+    });
   }
 
   console.log(`📸 ${articles.length} 記事のカバー画像を生成します [${mode}]...\n`);
