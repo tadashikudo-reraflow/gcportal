@@ -46,7 +46,7 @@ function LoginForm() {
         {/* ロゴ */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <Link href="/" style={{ textDecoration: "none" }}>
-            <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "#00338D" }}>GC Insight</span>
+            <span style={{ fontSize: "1.25rem", fontWeight: 800, color: "#00338D" }}>GCInsight</span>
           </Link>
         </div>
 

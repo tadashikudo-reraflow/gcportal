@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "利用規約・免責事項｜GC Insight",
-  description: "GC Insightの利用規約・免責事項。データの正確性、著作権、引用ルールについて。",
+  title: "利用規約・免責事項｜GCInsight",
+  description: "GCInsightの利用規約・免責事項。データの正確性、著作権、引用ルールについて。",
   alternates: { canonical: "/terms" },
 };
 
@@ -21,7 +21,7 @@ export default function TermsPage() {
         <div>
           <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>1. サイトの目的</h2>
           <p className="text-sm leading-7" style={{ color: "var(--color-text-secondary)" }}>
-            当サイト「GC Insight」は、デジタル庁・総務省等が公表するガバメントクラウド移行関連データを独自に集計・可視化し、情報提供を行うことを目的としています。
+            当サイト「GCInsight」は、デジタル庁・総務省等が公表するガバメントクラウド移行関連データを独自に集計・可視化し、情報提供を行うことを目的としています。
           </p>
           <div className="mt-3 rounded-lg px-4 py-3" style={{ backgroundColor: "#fef2f2", border: "1px solid #fecaca" }}>
             <p className="text-sm font-semibold" style={{ color: "#991b1b" }}>
@@ -61,7 +61,7 @@ export default function TermsPage() {
             当サイトのコンテンツ（テキスト、グラフ、図表等）の著作権は運営者に帰属します。引用の際は以下のルールに従ってください。
           </p>
           <ul className="list-disc pl-5 space-y-1.5 text-sm mt-3" style={{ color: "var(--color-text-secondary)" }}>
-            <li>出典として「GC Insight（gcinsight.jp）」を明記してください</li>
+            <li>出典として「GCInsight（gcinsight.jp）」を明記してください</li>
             <li>内容の改変を伴う引用は禁止します</li>
             <li>商用利用の場合は事前にお問い合わせください</li>
           </ul>

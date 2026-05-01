@@ -9,6 +9,7 @@ import StickyCTA from "@/components/StickyCTA";
 import NewsletterModal from "@/components/NewsletterModal";
 import XWelcomeBanner from "@/components/XWelcomeBanner";
 
+
 export default function RootShell({ children }: { children: React.ReactNode }) {
   useUXTracker();
   const pathname = usePathname();
@@ -38,7 +39,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </div>
               <div>
                 <h1 className="font-bold text-base sm:text-lg leading-tight" style={{ color: "#00338D" }}>
-                  GC Insight
+                  GCInsight
                 </h1>
                 <p className="hidden sm:block text-xs mt-0.5" style={{ color: "var(--color-text-secondary)" }}>
                   ガバメントクラウド移行状況ダッシュボード
@@ -46,12 +47,6 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
               </div>
             </Link>
 
-            <NewsletterModal
-              label="ニュースレター登録"
-              source="newsletter_header"
-              buttonClassName="hidden sm:inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold"
-              buttonStyle={{ backgroundColor: "#00338D", color: "#fff", border: "2px solid #00338D" }}
-            />
           </div>
         </div>
         <div style={{ backgroundColor: "var(--color-surface-container-low)" }}>
@@ -78,7 +73,7 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                GC Insight
+                GCInsight
               </p>
               <p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
                 総務省・デジタル庁公表データに基づく移行状況の可視化サイト
@@ -110,8 +105,11 @@ export default function RootShell({ children }: { children: React.ReactNode }) {
             <Link href="/terms" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
               利用規約・免責事項
             </Link>
+            <Link href="/disclosure" className="text-xs no-underline hover:underline" style={{ color: "var(--color-text-muted)" }}>
+              情報開示請求
+            </Link>
             <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              &copy; 2026 GC Insight
+              &copy; 2026 GCInsight
             </span>
           </div>
         </div>

@@ -49,8 +49,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/adoption",       destination: "/packages", permanent: true },
-      { source: "/cost-reduction", destination: "/finops",   permanent: true },
-      { source: "/report",         destination: "/finops",   permanent: true },
+      { source: "/cost-reduction", destination: "/articles", permanent: true },
+      { source: "/report",         destination: "/articles", permanent: true },
+      // 廃止ページ → 最適な代替ページへ301
+      { source: "/finops",         destination: "/articles", permanent: true },
+      { source: "/cyber-security", destination: "/articles", permanent: true },
+      { source: "/mesh",           destination: "/articles", permanent: true },
+      { source: "/compare",        destination: "/progress", permanent: true },
       // 旧進捗ページ → /progress 統合
       { source: "/prefectures",              destination: "/progress",                    permanent: true },
       { source: "/prefectures/:prefecture",  destination: "/progress?pref=:prefecture",   permanent: true },

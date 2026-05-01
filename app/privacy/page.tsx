@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "プライバシーポリシー｜GC Insight",
-  description: "GC Insightのプライバシーポリシー。アクセス解析・Cookie利用・個人情報の取り扱いについて。",
+  title: "プライバシーポリシー｜GCInsight",
+  description: "GCInsightのプライバシーポリシー。アクセス解析・Cookie利用・個人情報の取り扱いについて。",
   alternates: { canonical: "/privacy" },
 };
 
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
         <div>
           <h2 className="text-lg font-bold mb-2" style={{ color: "var(--color-text-primary)" }}>1. 運営者情報</h2>
           <p className="text-sm leading-7" style={{ color: "var(--color-text-secondary)" }}>
-            本サイト「GC Insight」（以下「当サイト」）は、ガバメントクラウド移行に関する公表データの可視化を目的として運営しています。
+            本サイト「GCInsight」（以下「当サイト」）は、ガバメントクラウド移行に関する公表データの可視化を目的として運営しています。
           </p>
         </div>
 

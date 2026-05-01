@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const rateParam = avgRate != null ? `&rate=${(avgRate * 100).toFixed(1)}` : "";
   const ogUrl = `https://gcinsight.jp/og?title=${encodeURIComponent(businessName)}&subtitle=${encodeURIComponent("業務別 自治体進捗一覧")}&type=business${rateParam}`;
   return {
-    title: `${businessName} 自治体別進捗一覧 | GC Insight`,
+    title: `${businessName} 自治体別進捗一覧 | GCInsight`,
     description: `${businessName}のガバメントクラウド移行 手続き進捗率を全国自治体別に一覧表示。遅延自治体・危機レベルを可視化。`,
     alternates: { canonical: `/businesses/${encodeURIComponent(businessName)}` },
     openGraph: {
