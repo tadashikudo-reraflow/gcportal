@@ -31,18 +31,11 @@ const ALL_CARDS: NavCard[] = [
     desc: "期限延長が認められた自治体の一覧を確認",
   },
   {
-    href: "/compare",
-    badge: "3社比較",
-    badgeStyle: { backgroundColor: "#E0F2FE", color: "#0369A1" },
-    title: "ダッシュボード比較",
-    desc: "GCInsightと総務省・デジタル庁の機能・データを比較",
-  },
-  {
-    href: "/finops",
+    href: "/articles?tag=FinOps",
     badge: "FinOps",
     badgeStyle: { backgroundColor: "#FCE4EC", color: "#AD1457" },
-    title: "FinOps コスト最適化",
-    desc: "コスト2.3倍→3割削減の打ち手と無料診断PDF",
+    title: "FinOps・コスト最適化",
+    desc: "コスト削減の打ち手・RI活用・SaaS化の解説記事",
   },
   {
     href: "/costs",
