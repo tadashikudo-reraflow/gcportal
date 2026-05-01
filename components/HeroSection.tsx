@@ -215,9 +215,11 @@ export default function HeroSection({
             buttonClassName="btn-cta-primary w-full sm:w-auto"
           />
           {/* セカンダリ: ghost/text（モバイルはBottomNavから遷移できるため非表示） */}
-          <Link href="/articles" className="btn-ghost hidden sm:inline-flex">
-            コラム・解説を読む
-          </Link>
+          <span className="hidden sm:inline-flex">
+            <Link href="/articles" className="btn-ghost">
+              コラム・解説を読む
+            </Link>
+          </span>
         </div>
       </div>
     </section>
