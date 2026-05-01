@@ -123,8 +123,56 @@ export default function StickyCTA() {
     );
   }
 
+  /* ── モバイル専用: NLボタンのみ（BottomNavの上、56px） ── */
+  const mobileStyle: React.CSSProperties = {
+    position: "fixed",
+    bottom: 56, // BottomNav height
+    left: 0,
+    right: 0,
+    zIndex: 40,
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(4px)",
+    transition: "opacity 0.25s ease, transform 0.25s ease",
+    pointerEvents: visible ? "auto" : "none",
+  };
+
+  const mobileInnerStyle: React.CSSProperties = {
+    backgroundColor: "#1E40AF",
+    boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
+    padding: "10px 16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  };
+
   /* ── 通常ページ: 検索 + ニュースレターボタン（SM以上のみ表示） ── */
   return (
+    <>
+      {/* モバイル専用スティッキーNLバー */}
+      <div aria-hidden={!visible} className="block sm:hidden" style={mobileStyle}>
+        <div style={mobileInnerStyle}>
+          <p style={{ color: "#fff", fontSize: "0.8125rem", fontWeight: 600, margin: 0, lineHeight: 1.3 }}>
+            移行データを毎週お届け
+          </p>
+          <NewsletterModal
+            label="無料で登録 →"
+            source="newsletter_mobile_sticky"
+            buttonStyle={{
+              minHeight: 40,
+              padding: "0 18px",
+              backgroundColor: "#fff",
+              color: "#1E40AF",
+              fontWeight: 700,
+              fontSize: "0.8125rem",
+              borderRadius: 8,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+            }}
+          />
+        </div>
+      </div>
+
     <div
       aria-hidden={!visible}
       className="hidden sm:block"
@@ -246,5 +294,6 @@ export default function StickyCTA() {
         </div>
       </div>
     </div>
+    </>
   );
 }

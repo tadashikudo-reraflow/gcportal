@@ -168,8 +168,8 @@ export default function HeroSection({
             source="newsletter_hero"
             buttonClassName="btn-cta-primary"
           />
-          {/* セカンダリ: ghost/text */}
-          <Link href="/articles" className="btn-ghost">
+          {/* セカンダリ: ghost/text（モバイルはBottomNavから遷移できるため非表示） */}
+          <Link href="/articles" className="btn-ghost hidden sm:inline-flex">
             コラム・解説を読む
           </Link>
         </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Activity, FileText } from "lucide-react";
+import { Home, Activity, BookOpen } from "lucide-react";
 
 const BOTTOM_NAV_ITEMS = [
   {
@@ -16,9 +16,9 @@ const BOTTOM_NAV_ITEMS = [
     href: "/progress",
   },
   {
-    label: "レポート",
-    icon: <FileText size={20} />,
-    href: "/finops",
+    label: "記事",
+    icon: <BookOpen size={20} />,
+    href: "/articles",
   },
 ];
 
