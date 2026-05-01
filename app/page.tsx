@@ -129,6 +129,7 @@ export default function DashboardPage() {
         totalMunicipalities={TOTAL}
         completeCount={completeCount}
         tokuteiCount={TOKUTEI_OFFICIAL}
+        systemRate={migrationStats.completion_rate ?? 0}
         dataMonth={summary.data_month}
         municipalities={allMunis}
       />
