@@ -872,11 +872,11 @@ export default async function CostsPage() {
           </li>
         </ul>
         <Link
-          href="/finops"
+          href="/articles?tag=FinOps"
           className="inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold"
           style={{ backgroundColor: "#0f766e", color: "#ffffff", textDecoration: "none" }}
         >
-          FinOps コスト最適化ハブ →
+          FinOps・コスト削減の解説記事 →
         </Link>
       </div>
 

@@ -228,11 +228,11 @@ export default function DashboardPage() {
             </div>
           </div>
           <Link
-            href="/compare"
+            href="/about"
             className="text-xs font-semibold px-4 py-2.5 rounded-lg whitespace-nowrap text-center"
             style={{ backgroundColor: "#00338D", color: "#fff" }}
           >
-            機能比較を見る →
+            GCInsightについて →
           </Link>
         </div>
       </div>
@@ -387,12 +387,12 @@ export default function DashboardPage() {
             <span className="explore-card-desc">ベンダー別の採用状況と自治体数を一覧で確認</span>
           </Link>
 
-          <Link href="/compare" className="explore-card col-span-2 sm:col-span-1" style={{ padding: "1.25rem 1.5rem" }}>
+          <Link href="/articles" className="explore-card col-span-2 sm:col-span-1" style={{ padding: "1.25rem 1.5rem" }}>
             <span className="explore-card-badge" style={{ backgroundColor: "#00338D18", color: "#00338D" }}>
-              22機能比較
+              コラム
             </span>
-            <span className="explore-card-title" style={{ fontSize: "1rem" }}>GCInsight vs 総務省 vs デジタル庁</span>
-            <span className="explore-card-desc">コスト試算・パッケージDB・開示請求データなど独自機能を3サービスで比較</span>
+            <span className="explore-card-title" style={{ fontSize: "1rem" }}>ガバクラ移行 解説記事</span>
+            <span className="explore-card-desc">FinOps・コスト・標準化スケジュール・ベンダー動向を専門家視点で解説</span>
           </Link>
         </div>
       </div>
