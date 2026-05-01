@@ -11,6 +11,9 @@ type Municipality = {
   city: string;
 };
 
+// BottomNav height の単一ソース（StickyCTA の bottom 値と同期）
+const BOTTOM_NAV_H = 56;
+
 // standardization.json の municipalities 配列を型安全に取得
 const ALL_MUNICIPALITIES: Municipality[] = (
   (standardizationData as { municipalities?: Municipality[] }).municipalities ?? []
@@ -82,7 +85,6 @@ export default function StickyCTA() {
     opacity: visible ? 1 : 0,
     transform: visible ? "translateY(0)" : "translateY(8px)",
     transition: "opacity 0.25s ease, transform 0.25s ease",
-    pointerEvents: visible ? "auto" : "none",
   };
 
   const innerStyle: React.CSSProperties = {
@@ -95,7 +97,7 @@ export default function StickyCTA() {
   /* ── /newsletter 専用: 検索なし・フル幅ニュースレターCTA ── */
   if (isNewsletterPage) {
     return (
-      <div aria-hidden={!visible} style={wrapperStyle}>
+      <div inert={!visible} style={wrapperStyle}>
         <div style={innerStyle}>
           <div className="max-w-lg mx-auto flex items-center gap-3">
             <p className="hidden sm:block" style={{ fontSize: "0.8125rem", color: "#4b5563", flexShrink: 0 }}>
@@ -123,22 +125,22 @@ export default function StickyCTA() {
     );
   }
 
-  /* ── モバイル専用: NLボタンのみ（BottomNavの上、56px） ── */
+  /* ── モバイル専用: NLボタンのみ（BottomNavの上） ── */
   const mobileStyle: React.CSSProperties = {
     position: "fixed",
-    bottom: 56, // BottomNav height
+    bottom: BOTTOM_NAV_H,
     left: 0,
     right: 0,
     zIndex: 40,
     opacity: visible ? 1 : 0,
     transform: visible ? "translateY(0)" : "translateY(4px)",
     transition: "opacity 0.25s ease, transform 0.25s ease",
-    pointerEvents: visible ? "auto" : "none",
   };
 
   const mobileInnerStyle: React.CSSProperties = {
     backgroundColor: "#1E40AF",
     boxShadow: "0 -2px 8px rgba(0,0,0,0.15)",
+    borderBottom: "1px solid rgba(255,255,255,0.15)",
     padding: "10px 16px",
     display: "flex",
     alignItems: "center",
@@ -150,10 +152,10 @@ export default function StickyCTA() {
   return (
     <>
       {/* モバイル専用スティッキーNLバー */}
-      <div aria-hidden={!visible} className="block sm:hidden" style={mobileStyle}>
+      <div inert={!visible} className="block sm:hidden" style={mobileStyle}>
         <div style={mobileInnerStyle}>
           <p style={{ color: "#fff", fontSize: "0.8125rem", fontWeight: 600, margin: 0, lineHeight: 1.3 }}>
-            移行データを毎週お届け
+            全1,741自治体の最新移行状況を毎週お届け
           </p>
           <NewsletterModal
             label="無料で登録 →"
@@ -173,127 +175,128 @@ export default function StickyCTA() {
         </div>
       </div>
 
-    <div
-      aria-hidden={!visible}
-      className="hidden sm:block"
-      style={wrapperStyle}
-    >
-      <div style={innerStyle}>
-        <div
-          className="max-w-2xl mx-auto flex items-center gap-3"
-          ref={containerRef}
-        >
-          {/* 検索ボックス */}
-          <div className="relative flex-1">
-            <span
-              className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: "var(--color-text-muted)" }}
-              aria-hidden
-            >
-              <Search size={16} aria-hidden="true" />
-            </span>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setShowSuggestions(true);
-              }}
-              onFocus={() => query.trim().length >= 1 && setShowSuggestions(true)}
-              onKeyDown={handleKeyDown}
-              placeholder="自治体を検索"
-              autoComplete="off"
-              style={{
-                width: "100%",
-                minHeight: 44,
-                paddingLeft: "2.25rem",
-                paddingRight: "0.75rem",
-                paddingTop: "0.5rem",
-                paddingBottom: "0.5rem",
-                borderRadius: 8,
-                border: "1.5px solid var(--color-border)",
-                fontSize: "16px", /* iOS Safariズーム防止 */
-                outline: "none",
-                color: "var(--color-text-primary)",
-                backgroundColor: "#fff",
-              }}
-              aria-label="自治体名を検索"
-            />
-
-            {/* ドロップダウン（上方向に開く） */}
-            {showSuggestions && suggestions.length > 0 && (
-              <ul
-                style={{
-                  position: "absolute",
-                  bottom: "calc(100% + 4px)",
-                  left: 0,
-                  right: 0,
-                  zIndex: 50,
-                  backgroundColor: "#fff",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: 8,
-                  boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
-                  overflow: "hidden",
-                  listStyle: "none",
-                  margin: 0,
-                  padding: 0,
-                }}
-                role="listbox"
+      <div
+        inert={!visible}
+        className="hidden sm:block"
+        style={wrapperStyle}
+      >
+        <div style={innerStyle}>
+          <div
+            className="max-w-2xl mx-auto flex items-center gap-3"
+            ref={containerRef}
+          >
+            {/* 検索ボックス */}
+            <div className="relative flex-1">
+              <span
+                className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                style={{ color: "var(--color-text-muted)" }}
+                aria-hidden
               >
-                {suggestions.map((m) => (
-                  <li key={`${m.prefecture}-${m.city}`} role="option">
-                    <button
-                      style={{
-                        width: "100%",
-                        textAlign: "left",
-                        padding: "10px 14px",
-                        fontSize: "16px", /* iOS Safariズーム防止 */
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        color: "var(--color-text-primary)",
-                      }}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelect(m);
-                      }}
-                    >
-                      <span style={{ color: "var(--color-text-muted)", fontSize: "0.75rem" }}>
-                        {m.prefecture}
-                      </span>
-                      <span style={{ fontWeight: 600 }}>{m.city}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+                <Search size={16} aria-hidden="true" />
+              </span>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => query.trim().length >= 1 && setShowSuggestions(true)}
+                onKeyDown={handleKeyDown}
+                placeholder="自治体を検索"
+                autoComplete="off"
+                style={{
+                  width: "100%",
+                  minHeight: 44,
+                  paddingLeft: "2.25rem",
+                  paddingRight: "0.75rem",
+                  paddingTop: "0.5rem",
+                  paddingBottom: "0.5rem",
+                  borderRadius: 8,
+                  border: "1.5px solid var(--color-border)",
+                  fontSize: "16px", /* iOS Safariズーム防止 */
+                  outline: "none",
+                  color: "var(--color-text-primary)",
+                  backgroundColor: "#fff",
+                }}
+                aria-label="自治体名を検索"
+              />
 
-          {/* ニュースレター登録ボタン */}
-          <NewsletterModal
-            label="無料登録"
-            source="newsletter_stickycta"
-            buttonStyle={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 44,
-              padding: "0 16px",
-              backgroundColor: "#00338D",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "0.8125rem",
-              borderRadius: 8,
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-            }}
-          />
+              {/* ドロップダウン（上方向に開く） */}
+              {showSuggestions && suggestions.length > 0 && (
+                <ul
+                  style={{
+                    position: "absolute",
+                    bottom: "calc(100% + 4px)",
+                    left: 0,
+                    right: 0,
+                    zIndex: 10,
+                    backgroundColor: "#fff",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 8,
+                    boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
+                    overflow: "hidden",
+                    listStyle: "none",
+                    margin: 0,
+                    padding: 0,
+                  }}
+                  role="listbox"
+                >
+                  {suggestions.map((m) => (
+                    <li key={`${m.prefecture}-${m.city}`} role="option">
+                      <button
+                        className="hover:bg-gray-100 transition-colors"
+                        style={{
+                          width: "100%",
+                          textAlign: "left",
+                          padding: "10px 14px",
+                          fontSize: "16px", /* iOS Safariズーム防止 */
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "var(--color-text-primary)",
+                        }}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelect(m);
+                        }}
+                      >
+                        <span style={{ color: "var(--color-text-muted)", fontSize: "0.75rem" }}>
+                          {m.prefecture}
+                        </span>
+                        <span style={{ fontWeight: 600 }}>{m.city}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* ニュースレター登録ボタン */}
+            <NewsletterModal
+              label="無料登録"
+              source="newsletter_stickycta"
+              buttonStyle={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 44,
+                padding: "0 16px",
+                backgroundColor: "#00338D",
+                color: "#fff",
+                fontWeight: 700,
+                fontSize: "0.8125rem",
+                borderRadius: 8,
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
+            />
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

@@ -39,7 +39,7 @@ export default function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 no-underline"
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 no-underline min-w-[44px]"
               style={{
                 color: isActive ? "var(--color-brand-primary)" : "var(--color-text-muted)",
                 minHeight: 44,

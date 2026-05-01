@@ -1339,3 +1339,11 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.875em;
   color: #374151;
 }
+
+/* アクセシビリティ: モーション低減設定 */
+@media (prefers-reduced-motion: reduce) {
+  .sticky-cta-wrapper,
+  [style*="transition: opacity 0.25s"] {
+    transition: none !important;
+  }
+}

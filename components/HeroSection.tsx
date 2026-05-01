@@ -166,7 +166,7 @@ export default function HeroSection({
           <NewsletterModal
             label={<><Mail size={16} aria-hidden="true" style={{ marginRight: 6 }} />ニュースレターに登録（無料）</>}
             source="newsletter_hero"
-            buttonClassName="btn-cta-primary"
+            buttonClassName="btn-cta-primary w-full sm:w-auto"
           />
           {/* セカンダリ: ghost/text（モバイルはBottomNavから遷移できるため非表示） */}
           <Link href="/articles" className="btn-ghost hidden sm:inline-flex">
