@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
 
   const tables = [
     { name: "schedule_events", cols: "date, title, org, created_at, source" },
-    { name: "newsletter_subscribers", cols: "id, email, created_at, status" },
-    { name: "disclosure_requests", cols: "id, title, created_at, updated_at" },
+    { name: "leads", cols: "id, email, organization_type, source, created_at, unsubscribed" },
+    { name: "disclosure_requests", cols: "id, topic, category, municipality, status, created_at, submitted_at" },
+    { name: "campaigns", cols: "id, subject, status, created_at, sent_at, sent_count" },
+    { name: "email_events", cols: "id, event_type, email, created_at" },
   ];
 
   for (const t of tables) {
