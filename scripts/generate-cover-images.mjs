@@ -435,11 +435,15 @@ async function main() {
     articles = data;
   } catch (e) {
     // Fallback: gcinsight.jp API経由
+    // Bearer認証で未公開記事も含めて取得（gc-article Step 11-Aで公開前カバー画像生成のため必須）
     console.warn("Supabase SDK error, falling back to gcinsight.jp API:", e.message);
     const { default: https } = await import("https");
+    const apiPath = targetSlug
+      ? `/api/articles?slug=${encodeURIComponent(targetSlug)}`
+      : "/api/articles";
     articles = await new Promise((resolve, reject) => {
       const opts = {
-        hostname: "gcinsight.jp", path: "/api/articles", method: "GET",
+        hostname: "gcinsight.jp", path: apiPath, method: "GET",
         headers: { "Authorization": "Bearer " + (process.env.ADMIN_PASSWORD ?? "") }
       };
       https.request(opts, r => {
@@ -448,7 +452,18 @@ async function main() {
           try {
             const obj = JSON.parse(d);
             const arr = obj.articles || obj;
+            // 念のためクライアント側でも slug フィルタ（旧APIへのフォールバック互換）
             const filtered = targetSlug ? arr.filter(a => a.slug === targetSlug) : arr;
+            // id 欠損チェック: 旧バージョンAPIだと id が含まれない → idundefined フォルダ生成事故防止
+            const missingId = filtered.filter(a => a.id === undefined || a.id === null);
+            if (missingId.length > 0) {
+              const slugs = missingId.map(a => a.slug).join(", ");
+              reject(new Error(
+                `API response missing 'id' field for ${missingId.length} article(s) [${slugs}]. ` +
+                `Deploy latest /api/articles route (id must be in SELECT).`
+              ));
+              return;
+            }
             resolve(filtered);
           } catch(err) { reject(err); }
         });

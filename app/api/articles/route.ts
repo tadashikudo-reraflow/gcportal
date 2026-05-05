@@ -159,18 +159,53 @@ export async function PATCH(req: NextRequest) {
 }
 
 /**
- * GET /api/articles — 公開記事一覧（外部連携用）
+ * GET /api/articles — 記事一覧
+ *
+ * デフォルト: 公開記事のみ・anonキー使用（外部連携用）
+ *
+ * Bearer <ADMIN_PASSWORD> 認証時:
+ *   - 未公開記事も含めて全件返却（service_roleキー使用）
+ *   - クエリパラメータ ?slug=... で特定記事をフィルタ可能
+ *   - クエリパラメータ ?include_unpublished=false で公開記事のみに制限可能
+ *   → scripts/generate-cover-images.mjs 等の自動化ツール向け
+ *
+ * いずれの場合も SELECT に `id` を含む（自動化ツールでid別フォルダ作成のため）
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = req.headers.get("authorization");
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const isAdmin = !!adminPassword && auth === `Bearer ${adminPassword}`;
+
+  const url = new URL(req.url);
+  const slugFilter = url.searchParams.get("slug");
+  const includeUnpublishedParam = url.searchParams.get("include_unpublished");
+  // 管理者リクエストはデフォルトで未公開も含む。明示的に "false" 指定時のみ公開のみ。
+  const includeUnpublished =
+    isAdmin && includeUnpublishedParam !== "false";
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    isAdmin
+      ? process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      : process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  const { data } = await supabase
+
+  let query = supabase
     .from("articles")
-    .select("slug, title, description, date, tags, author, is_published")
-    .eq("is_published", true)
+    .select("id, slug, title, description, date, tags, author, is_published, cover_image")
     .order("date", { ascending: false });
+
+  if (!includeUnpublished) {
+    query = query.eq("is_published", true);
+  }
+  if (slugFilter) {
+    query = query.eq("slug", slugFilter);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   return NextResponse.json({ articles: data ?? [] });
 }
