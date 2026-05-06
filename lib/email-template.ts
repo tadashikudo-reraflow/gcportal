@@ -55,7 +55,7 @@ export interface NewsletterSections {
    * Tech Blog: Qiita・Zenn等のエンジニア・実務者の技術記事
    * officialNews と明確に区別する（公式≠UGC）
    */
-  relatedArticles?: Array<{ title: string; summary: string; url: string; source: string }>;
+  relatedArticles?: Array<{ title: string; summary: string; url: string; source: string; date?: string }>;
   /** GCInsight サイト内の今週新着記事（過去7日） */
   gcArticles?: Array<{ slug: string; title: string; description: string; date: string }>;
   authorName?: string;
@@ -279,6 +279,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
               </a>
               <span style="font-size:10px;font-weight:600;background:#ede9fe;color:#6d28d9;
                 padding:1px 6px;border-radius:2px;margin-left:6px;">${e(n.source)}</span>
+              ${n.date ? `<span style="font-size:10px;color:#94a3b8;margin-left:6px;">${e(n.date)}</span>` : ""}
             </td>
           </tr>
           <tr>
