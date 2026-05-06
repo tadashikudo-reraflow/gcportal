@@ -353,6 +353,8 @@ export async function POST(req: NextRequest) {
       url: string;
       source: string;
       published_at?: string;
+      /** date: published_at の別名。後方互換目的 (YYYY-MM-DD or RFC3339) */
+      date?: string;
     }>;
   } = {};
   try {
@@ -485,8 +487,27 @@ export async function POST(req: NextRequest) {
   // - メディア記事（朝日・毎日・日経・産経等）→ newsItems（今週のガバクラニュース）
   // - PR Times → newsItems（ガバクラニュース）
   // - その他（デジタル庁・総務省等公式）→ officialNews
-  const RELATED_SOURCES = new Set(["Qiita", "Zenn"]);
+  // Tech Blog（エンジニア・実務者の技術記事）— Qiita/Zenn + 主要企業Tech Blog
+  const RELATED_SOURCES = new Set([
+    "Qiita", "Zenn",
+    "AWS Builders Blog", "AWS ブログ", "AWS Blog",
+    "classmethod", "DevelopersIO",
+    "G-gen", "G-gen Tech Blog",
+    "GovTech東京", "GovTech Tokyo",
+    "NTT R&D", "IIJ Engineers Blog", "IIJ.io",
+    "さくらのナレッジ", "Sakura Knowledge",
+  ]);
   const NEWS_SOURCES = new Set(["PR Times", "朝日新聞", "毎日新聞", "日経新聞", "日経クロステック", "産経新聞", "読売新聞", "NHK"]);
+
+  // 鮮度フィルター: 14日より古い items は除外
+  const FRESHNESS_DAYS = 14;
+  const freshCutoff = new Date(Date.now() - FRESHNESS_DAYS * 24 * 60 * 60 * 1000);
+  function isFresh(dateStr: string | undefined): boolean {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return false;
+    return d >= freshCutoff;
+  }
 
   const ragNewsItems: typeof newsItems = [];
   const ragRelated: Array<{ title: string; summary: string; url: string; source: string }> = [];
@@ -494,11 +515,18 @@ export async function POST(req: NextRequest) {
 
   for (const r of bodyData.ragNews ?? []) {
     if (isExcluded(r.title)) continue;
+    // published_at もしくは date のどちらかを採用（後方互換）
+    const rawDate = r.published_at ?? r.date;
+    const dateStr = rawDate ? rawDate.slice(0, 10) : undefined;
+
+    // News / Tech Blog は 14日鮮度フィルター適用（officialNews は本数が少ないので除外）
     const item = { title: r.title, summary: r.summary, url: r.url, source: r.source };
     if (NEWS_SOURCES.has(r.source)) {
-      ragNewsItems.push({ ...item, date: r.published_at?.slice(0, 10) });
+      if (!isFresh(rawDate)) continue;
+      ragNewsItems.push({ ...item, date: dateStr });
     } else if (RELATED_SOURCES.has(r.source)) {
-      ragRelated.push(item);
+      if (!isFresh(rawDate)) continue;
+      ragRelated.push({ ...item, ...(dateStr ? { date: dateStr } as object : {}) });
     } else {
       ragOfficial.push(item);
     }
