@@ -32,7 +32,8 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
   // 3. Bearer token (Claude / 外部API)
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
-    if (token === process.env.GCINSIGHT_ADMIN_KEY) return true;
+    const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
+    if (token && adminKey && token === adminKey) return true;
   }
   return false;
 }

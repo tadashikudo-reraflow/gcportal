@@ -6,7 +6,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
-const ADMIN_KEY = process.env.GCINSIGHT_ADMIN_KEY || "";
+const ADMIN_KEY = process.env.GCINSIGHT_ADMIN_KEY;
+if (!ADMIN_KEY) {
+  throw new Error("GCINSIGHT_ADMIN_KEY is not configured");
+}
 
 function getSupabase() {
   return createClient(
@@ -26,8 +29,8 @@ interface NewEvent {
 
 export async function POST(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
-  const providedKey = authHeader?.replace("Bearer ", "") || "";
-  if (ADMIN_KEY && providedKey !== ADMIN_KEY) {
+  const providedKey = authHeader?.replace("Bearer ", "");
+  if (!providedKey || providedKey !== ADMIN_KEY) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

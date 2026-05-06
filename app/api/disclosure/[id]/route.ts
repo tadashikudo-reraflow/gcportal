@@ -15,7 +15,8 @@ async function checkAuth(req: NextRequest): Promise<boolean> {
     if (password === process.env.ADMIN_PASSWORD) return true;
   }
   if (authHeader?.startsWith("Bearer ")) {
-    if (authHeader.slice(7) === process.env.GCINSIGHT_ADMIN_KEY) return true;
+    const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
+    if (authHeader.slice(7) && adminKey && authHeader.slice(7) === adminKey) return true;
   }
   return false;
 }

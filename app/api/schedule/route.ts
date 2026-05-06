@@ -30,14 +30,15 @@ function isAuthorized(req: NextRequest): boolean {
   const expectedCron = process.env.CRON_SECRET;
   const adminKey = process.env.GCINSIGHT_ADMIN_KEY;
 
+  // ADR-2026-05-02: fail-closed — env未設定は認証拒否（fail-openに fallback しない）
+  if (!expectedCron && !adminKey) return false;
+
   const cronSecret = req.headers.get("x-cron-secret");
   if (cronSecret && expectedCron && cronSecret === expectedCron) return true;
 
   const bearer = req.headers.get("authorization")?.replace("Bearer ", "");
   if (bearer && expectedCron && bearer === expectedCron) return true;
   if (bearer && adminKey && bearer === adminKey) return true;
-
-  if (!expectedCron && !adminKey) return true;
 
   return false;
 }
