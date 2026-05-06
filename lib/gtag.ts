@@ -21,3 +21,41 @@ export function trackNewsletterSignup(source: string, orgType?: string, variant?
     ab_variant: variant ?? "none",
   });
 }
+
+/**
+ * CTA インプレッション（IntersectionObserver で表示確認時）
+ * @param source - CTA識別子（例: "newsletter_article_mid_<slug>"）
+ */
+export function trackCtaImpression(source: string) {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("event", "cta_impression", {
+    event_category: "engagement",
+    event_label: source,
+  });
+}
+
+/**
+ * CTA クリック（送信ボタン・リンク等のアクション）
+ * @param source - CTA識別子
+ * @param action - クリック種別（例: "submit", "view_municipality"）
+ */
+export function trackCtaClick(source: string, action: string) {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("event", "cta_click", {
+    event_category: "engagement",
+    event_label: source,
+    cta_action: action,
+  });
+}
+
+/**
+ * 自治体ページへのリンククリック専用イベント
+ * @param source - クリック元コンポーネント
+ */
+export function trackMunicipalityLinkClick(source: string) {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("event", "municipality_link_click", {
+    event_category: "engagement",
+    event_label: source,
+  });
+}
