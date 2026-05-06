@@ -6,6 +6,9 @@ import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 import matter from "gray-matter";
 
+// cover_image はブランチ非依存の絶対URLで保存する（feature branch preview でも表示される）
+const SITE_URL = "https://gcinsight.jp";
+
 /**
  * POST /api/articles — 記事作成（gc-article Agent / 外部ツール用）
  *
@@ -78,7 +81,7 @@ export async function POST(req: NextRequest) {
         tags,
         author,
         sources,
-        cover_image: cover_image ?? `/images/articles/${slug}.png`,
+        cover_image: cover_image ?? `${SITE_URL}/images/articles/${slug}.png`,
         is_published,
         updated_at: new Date().toISOString(),
       },
