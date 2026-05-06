@@ -52,7 +52,7 @@ export interface NewsletterSections {
   /** 公式情報: デジタル庁・総務省・ベンダー公式PRのみ */
   officialNews: Array<{ title: string; summary: string; url: string; source: string }>;
   /**
-   * 関連記事: Qiita・Zenn・PR Times等のUGC・技術記事・寄稿
+   * Tech Blog: Qiita・Zenn等のエンジニア・実務者の技術記事
    * officialNews と明確に区別する（公式≠UGC）
    */
   relatedArticles?: Array<{ title: string; summary: string; url: string; source: string }>;
@@ -265,7 +265,7 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
       </td>
     </tr>`).join("");
 
-  // ── 関連記事（Qiita・Zenn・PR Times等 UGC・技術記事） ───────────────────
+  // ── Tech Blog（Qiita・Zenn等 エンジニア技術記事） ───────────────────
   const relatedArticlesHtml = relatedArticles.map((n, i) => `
     <tr>
       <td style="padding:${i === 0 ? "10px" : "12px"} 0 12px 0;
@@ -487,11 +487,11 @@ export function renderNewsletterHtml(sections: NewsletterSections): string {
                 </td>
               </tr>` : ""}
 
-              <!-- 8. 関連記事（Qiita・Zenn・PR Times等） -->
+              <!-- 8. Tech Blog（Qiita・Zenn等） -->
               ${relatedArticles.length > 0 ? `
               <tr>
                 <td style="padding-bottom:8px;">
-                  ${sectionHeader("📖", "関連記事", "エンジニア・実務者によるQiita・Zenn等の技術記事です。")}
+                  ${sectionHeader("📖", "Tech Blog", "エンジニア・実務者によるQiita・Zennの技術記事です。")}
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">
                     ${relatedArticlesHtml}
                   </table>

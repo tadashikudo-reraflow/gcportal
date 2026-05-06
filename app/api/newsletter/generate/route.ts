@@ -523,6 +523,17 @@ export async function POST(req: NextRequest) {
       .map(n => ({ title: n.title, summary: n.summary, url: n.url, source: n.source }));
   }
 
+  // newsItems と officialNews の重複（URL一致）を newsItems 側から除外
+  // 同じデジタル庁公告がニュースと公式情報の両方に出てしまう問題を防ぐ
+  if (officialNews.length > 0) {
+    const officialUrls = new Set(officialNews.map(o => o.url));
+    for (let i = mergedNewsItems.length - 1; i >= 0; i--) {
+      if (officialUrls.has(mergedNewsItems[i].url)) {
+        mergedNewsItems.splice(i, 1);
+      }
+    }
+  }
+
   // 7. system_prompt生成
   const systemPrompt = config
     ? `あなたは「${config.author_name}」としてニュースレターを執筆します。
