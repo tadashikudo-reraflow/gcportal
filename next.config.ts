@@ -65,6 +65,8 @@ const nextConfig: NextConfig = {
       { source: "/tokutei",                  destination: "/progress?status=tokutei",     permanent: true },
       // govcloud-basics → govcloud-what-is-govcloud に統合（カニバリゼーション解消）
       { source: "/articles/govcloud-basics", destination: "/articles/govcloud-what-is-govcloud", permanent: true },
+      // 引き算SEO: 14d 327imp/0clicks の低品質ページを同テーマ最新記事に統合（2026-05-04 SEO週次レポート）
+      { source: "/articles/digital-cho-government-cloud", destination: "/articles/gc-data-column-migration-overview", permanent: true },
       // 旧 /karte/[slug] → /karte/articles/[slug] へ308リダイレクト（URL構造移行）
       { source: "/karte/:slug((?!articles)[^/]+)", destination: "/karte/articles/:slug", permanent: true },
     ];
