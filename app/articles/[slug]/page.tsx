@@ -8,8 +8,38 @@ import RelatedArticles from "@/components/RelatedArticles";
 import ArticleCTA from "@/components/ArticleCTA";
 import MermaidRenderer from "@/components/MermaidRenderer";
 import ArticleNewsletterBanner from "@/components/ArticleNewsletterBanner";
+import InlineNewsletterCTA from "@/components/InlineNewsletterCTA";
+import MunicipalityCTASection from "@/components/MunicipalityCTASection";
 import Breadcrumb from "@/components/Breadcrumb";
 import { BookOpen } from "lucide-react";
+
+/**
+ * 記事HTML内の `<h2 ...>` タグ位置を返す（出現順）。
+ * remark-html 出力では `<h2 id="...">...</h2>` の形式。
+ */
+function findH2Positions(html: string): number[] {
+  const positions: number[] = [];
+  const regex = /<h2[\s>]/gi;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(html)) !== null) {
+    positions.push(match.index);
+  }
+  return positions;
+}
+
+/**
+ * 記事HTMLを「2つ目の H2 直前」で分割する。
+ * H2 が3個未満なら null（分割しない＝CTA挿入しない）を返す。
+ */
+function splitAtSecondH2(html: string): { firstHalf: string; secondHalf: string } | null {
+  const positions = findH2Positions(html);
+  if (positions.length < 3) return null;
+  const splitIndex = positions[1]; // 2つ目の H2 の開始位置
+  return {
+    firstHalf: html.slice(0, splitIndex),
+    secondHalf: html.slice(splitIndex),
+  };
+}
 
 export const revalidate = 3600;
 
@@ -135,10 +165,31 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </div>
 
-      <MermaidRenderer
-        html={article.contentHtml}
-        className="card p-6 prose-article"
-      />
+      {(() => {
+        const split = splitAtSecondH2(article.contentHtml);
+        if (!split) {
+          // H2 が3個未満の短い記事は CTA を挿入せず、従来通り単一 MermaidRenderer
+          return (
+            <MermaidRenderer
+              html={article.contentHtml}
+              className="card p-6 prose-article"
+            />
+          );
+        }
+        return (
+          <>
+            <MermaidRenderer
+              html={split.firstHalf}
+              className="card p-6 pb-2 prose-article"
+            />
+            <InlineNewsletterCTA source={`newsletter_article_mid_${slug}`} />
+            <MermaidRenderer
+              html={split.secondHalf}
+              className="card p-6 pt-2 prose-article"
+            />
+          </>
+        );
+      })()}
 
       {/* 出典・参考文献 */}
       {article.sources && Array.isArray(article.sources) && article.sources.length > 0 && (
@@ -208,6 +259,8 @@ export default async function ArticlePage({ params }: Props) {
           </>
         );
       })()}
+
+      <MunicipalityCTASection source={`newsletter_article_municipality_${slug}`} />
 
       <ArticleNewsletterBanner />
 
