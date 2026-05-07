@@ -25,6 +25,9 @@ import remarkGfm from "remark-gfm";
 import remarkHtml from "remark-html";
 import { createClient } from "@supabase/supabase-js";
 
+// cover_image はブランチ非依存の絶対URLで保存する（feature branch preview でも表示される）
+const SITE_URL = "https://gcinsight.jp";
+
 /**
  * 記事MDの読み込み元:
  *   1. 環境変数 ARTICLES_DIR が設定されていればそちらを優先
@@ -105,7 +108,7 @@ async function main() {
       date: data.date ?? new Date().toISOString().slice(0, 10),
       tags: data.tags ?? [],
       author: data.author ?? "GCInsight編集部",
-      cover_image: data.coverImage ?? `/images/articles/${slug}.png`,
+      cover_image: data.coverImage ?? `${SITE_URL}/images/articles/${slug}.png`,
       is_published: true,
       sources: [],
     };
