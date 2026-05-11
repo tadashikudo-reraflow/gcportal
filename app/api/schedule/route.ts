@@ -214,6 +214,16 @@ export async function POST(req: NextRequest) {
   const events = currentEvents ?? [];
   const existingTitles = events.map((e) => e.title as string);
 
+  // suppression list 取得（過去に棄却したpending）
+  const { data: suppressions } = await supabase
+    .from("schedule_suppressions")
+    .select("title, org");
+  const normalizeT = (t: string) =>
+    t.normalize("NFKC").replace(/[【】「」（）\(\)\[\]　\s]+/g, "").toLowerCase();
+  const suppressedKeys = new Set(
+    (suppressions ?? []).map((s) => `${s.org}|${normalizeT(s.title as string)}`)
+  );
+
   // ── 2. 過去イベントの自動完了 ──
   const toComplete = events
     .filter((e) => e.date < today && e.status === "upcoming")
@@ -286,6 +296,9 @@ export async function POST(req: NextRequest) {
         if (title.length < 5) continue;
 
         if (isDuplicate(title, existingTitles)) continue;
+
+        // suppression list でフィルタ
+        if (suppressedKeys.has(`${target.org}|${normalizeT(title)}`)) continue;
 
         const confidence: "high" | "medium" | "low" =
           matchedKeywords.length >= 3 ? "high" : matchedKeywords.length >= 2 ? "medium" : "low";
