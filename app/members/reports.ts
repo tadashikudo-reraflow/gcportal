@@ -12,9 +12,16 @@ export type MemberReport = {
   sections: { heading: string; body: string }[];
 };
 
-export const LATEST_SLUG = "gc-standard-spec-checklist";
+export const LATEST_SLUG = "gc-failure-patterns-50";
 
 export const REPORTS: Record<string, MemberReport> = {
+  "gc-failure-patterns-50": {
+    slug: "gc-failure-patterns-50",
+    title: "ガバメントクラウド移行の失敗パターン50選——あなたの自治体は、いま何個踏んでいるか",
+    subtitle: "10カテゴリ×5パターン=50個の構造的罠を、デジタル庁中間報告・総務省事例・現場取材から整理。30項目セルフ診断チェックリスト・組み合わせ事故シナリオ3本・優先度TOP10付き",
+    publishedAt: "2026-05-11",
+    sections: [],
+  },
   "gc-aws-savings-plans": {
     slug: "gc-aws-savings-plans",
     title: "AWS Savings Plans、自治体は本当に「得」しているか——罠3つと円安リスク、OCI移行判断フロー完全版",
