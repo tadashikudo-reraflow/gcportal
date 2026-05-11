@@ -63,17 +63,30 @@ export async function POST(req: NextRequest) {
   const supabase = getSupabase();
   const today = new Date().toISOString().slice(0, 10);
 
-  // 既存タイトル取得（重複チェック用）
+  // タイトル正規化（全角/半角・空白・装飾の差を吸収）
+  const normalizeTitle = (t: string) =>
+    t
+      .normalize("NFKC")
+      .replace(/[【】「」（）\(\)\[\]　\s]+/g, "")
+      .toLowerCase();
+
+  // 既存イベントの複合キー (date|org|normalized_title) を取得
   const { data: existing } = await supabase
     .from("schedule_events")
-    .select("title");
-  const existingTitles = new Set((existing ?? []).map((e) => e.title as string));
+    .select("date, org, title, url");
+  const existingKeys = new Set(
+    (existing ?? []).map((e) => `${e.date}|${e.org}|${normalizeTitle(e.title as string)}`)
+  );
+  const existingUrls = new Set(
+    (existing ?? []).map((e) => e.url).filter((u): u is string => !!u)
+  );
 
   let addedCount = 0;
   let skippedCount = 0;
 
   for (const ev of body.events) {
-    if (existingTitles.has(ev.title)) {
+    const key = `${ev.date}|${ev.org}|${normalizeTitle(ev.title)}`;
+    if (existingKeys.has(key) || (ev.url && existingUrls.has(ev.url))) {
       skippedCount++;
       continue;
     }
@@ -90,7 +103,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!error) {
-      existingTitles.add(ev.title);
+      existingKeys.add(key);
+      if (ev.url) existingUrls.add(ev.url);
       addedCount++;
     }
   }
