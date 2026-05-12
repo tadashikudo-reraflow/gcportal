@@ -67,6 +67,24 @@ const nextConfig: NextConfig = {
       { source: "/articles/govcloud-basics", destination: "/articles/govcloud-what-is-govcloud", permanent: true },
       // 引き算SEO: 14d 327imp/0clicks の低品質ページを同テーマ最新記事に統合（2026-05-04 SEO週次レポート）
       { source: "/articles/digital-cho-government-cloud", destination: "/articles/gc-data-column-migration-overview", permanent: true },
+      // 2026-05-13 重複記事カニバリ解消（GSC 28d実績ベースで canonical 選定）
+      // さくらインターネット系: 6本 → sakura-gc-certified（1217imp/5.7位）に統合
+      { source: "/articles/sakura-gc-progress-2026",                  destination: "/articles/sakura-gc-certified", permanent: true },
+      { source: "/articles/sakura-govcloud-progress-2026",            destination: "/articles/sakura-gc-certified", permanent: true },
+      { source: "/articles/sakura-internet-government-cloud-certification", destination: "/articles/sakura-gc-certified", permanent: true },
+      { source: "/articles/sakura-cloud-government-cloud-merit",      destination: "/articles/sakura-gc-certified", permanent: true },
+      { source: "/articles/govcloud-sakura-certification-aws-monopoly", destination: "/articles/sakura-gc-certified", permanent: true },
+      { source: "/articles/gc-sakura",                                destination: "/articles/sakura-gc-certified", permanent: true },
+      // 政府AI源内: 2本 → digital-agency-ai-gennai-guide（5901imp/サイトNo.1記事）に統合
+      { source: "/articles/digital-agency-gennai-govcloud-dx",        destination: "/articles/digital-agency-ai-gennai-guide", permanent: true },
+      // 生成AIガイドライン: 2本 → digital-agency-generative-ai-guideline（2013imp）に統合
+      { source: "/articles/digital-agency-ai-guideline-2026-jichitai", destination: "/articles/digital-agency-generative-ai-guideline", permanent: true },
+      // 都道府県別完了率: 2本 → govcloud-prefecture-completion-rate（1222imp/4.4位）に統合
+      { source: "/articles/govcloud-prefecture-completion-rate-2026", destination: "/articles/govcloud-prefecture-completion-rate", permanent: true },
+      // フロントヤード改革: 2本 → frontyard-reform-guide-2026（209imp）に統合
+      { source: "/articles/frontyard-reform-5steps-2026",             destination: "/articles/frontyard-reform-guide-2026", permanent: true },
+      // 30%コスト削減: 2本 → govcloud-30percent-cost-reduction-reality（古い方）に統合
+      { source: "/articles/gc-cost-30percent-reduction-goal-verification", destination: "/articles/govcloud-30percent-cost-reduction-reality", permanent: true },
       // 旧 /karte/[slug] → /karte/articles/[slug] へ308リダイレクト（URL構造移行）
       { source: "/karte/:slug((?!articles)[^/]+)", destination: "/karte/articles/:slug", permanent: true },
     ];
