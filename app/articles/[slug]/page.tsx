@@ -44,10 +44,9 @@ function splitAtSecondH2(html: string): { firstHalf: string; secondHalf: string 
 export const revalidate = 3600;
 
 // カニバリゼーション対策: 特定記事のcanonicalを対応する固定ページに向ける
-const CANONICAL_OVERRIDES: Record<string, string> = {
-  // カニバリゼーション対策: 旧記事(03-31)→新記事(04-01)へcanonical
-  "govcloud-30percent-cost-reduction-reality": "/articles/gc-cost-30percent-reduction-goal-verification",
-};
+// 2026-05-13: 30%コスト系の override を削除（next.config.ts の redirect と
+// 逆向きに衝突していたため。統合方向は redirect 側に一本化）
+const CANONICAL_OVERRIDES: Record<string, string> = {};
 
 type Props = { params: Promise<{ slug: string }> };
 

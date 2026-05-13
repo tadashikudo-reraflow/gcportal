@@ -25,13 +25,14 @@ const LINK_MAP: Record<string, [string, string][]> = {
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
   ],
   "digital-agency-ai-gennai-guide": [
-    ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
+    ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
+    ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
   "sakura-gc-certified": [
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
   ],
   "gc-finops-guide": [
-    ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
+    ["digital-agency-ai-gennai-guide", "デジタル庁AI「源内」とは？政府AIの全容2026"],
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
   ],
   "gc-data-column-816-karakuri": [
@@ -40,24 +41,20 @@ const LINK_MAP: Record<string, [string, string][]> = {
   "gc-data-column-migration-overview": [
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
   ],
-  // 新4記事の相互リンク
-  "digital-agency-gennai-govcloud-dx": [
-    ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
-    ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
-    ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
-  ],
+  // 新4記事の相互リンク（2026-05-13: digital-agency-gennai-govcloud-dx は
+  // digital-agency-ai-gennai-guide に統合・redirect済のため key 削除）
   "govcloud-migration-report-2026-analysis": [
-    ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
+    ["digital-agency-ai-gennai-guide", "デジタル庁AI「源内」とは？政府AIの全容2026"],
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
     ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
   "lg-system-conformance-approved-products-2026": [
-    ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
+    ["digital-agency-ai-gennai-guide", "デジタル庁AI「源内」とは？政府AIの全容2026"],
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
     ["administrative-data-open-private-sector-2026", "行政データ民間開放ガイド2026"],
   ],
   "administrative-data-open-private-sector-2026": [
-    ["digital-agency-gennai-govcloud-dx", "源内×ガバメントクラウドDX活用事例"],
+    ["digital-agency-ai-gennai-guide", "デジタル庁AI「源内」とは？政府AIの全容2026"],
     ["govcloud-migration-report-2026-analysis", "2026年移行報告書の詳細分析"],
     ["lg-system-conformance-approved-products-2026", "適合確認済み製品一覧2026"],
   ],

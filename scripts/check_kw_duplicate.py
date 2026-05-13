@@ -83,23 +83,33 @@ def fetch_articles(env):
     return articles
 
 
-def embed(texts, api_key):
-    """OpenAI text-embedding-3-small で embedding 取得"""
+def embed(texts, api_key, max_retries=3):
+    """OpenAI text-embedding-3-small で embedding 取得（リトライ付き）"""
     import urllib.request
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/embeddings",
-        data=json.dumps({
-            "model": "text-embedding-3-small",
-            "input": texts,
-        }).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        body = json.loads(resp.read())
-    return [item["embedding"] for item in body["data"]]
+    import urllib.error
+    import time
+    last_err = None
+    for attempt in range(max_retries):
+        try:
+            req = urllib.request.Request(
+                "https://api.openai.com/v1/embeddings",
+                data=json.dumps({
+                    "model": "text-embedding-3-small",
+                    "input": texts,
+                }).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                body = json.loads(resp.read())
+            return [item["embedding"] for item in body["data"]]
+        except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError, TimeoutError) as e:
+            last_err = e
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)
+    raise RuntimeError(f"embed() failed after {max_retries} retries: {last_err}")
 
 
 def cos_sim(a, b):
@@ -109,46 +119,59 @@ def cos_sim(a, b):
     return dot / (na * nb) if na and nb else 0.0
 
 
-def gsc_rank_check(kw):
-    """GSC で当該KWでの既存記事ランキングを確認。
+def gsc_query_page_check(kw, candidate_slugs):
+    """GSC で page+query 両次元判定。
 
-    既存記事がすでに 1〜20位にいるなら新規記事不要 → skip推奨。
+    候補slug毎に --page /articles/<slug> で GSC クエリを取得し、
+    KW主要ワードがクエリに含まれかつ position<=15 なら canonical=その slug。
+
+    返り値:
+      None = GSC使用不可
+      {"matched_slug": "...", "matched_query": "...", "position": ..., "skip_recommended": True}
     """
     gsc_cli = Path.home() / "workspace/scripts/gsc_cli.py"
     if not gsc_cli.exists():
         return None
-    try:
-        r = subprocess.run(
-            ["python3", str(gsc_cli), "--mode", "queries", "--days", "28", "--limit", "500"],
-            capture_output=True, text=True, timeout=60,
-        )
-        if r.returncode != 0:
-            return None
-        # GSC出力: クリック  表示  CTR  順位  クエリ  (page列なし)
-        # --mode queries はクエリ単位なので KW 一致のもののみ抽出
-        for line in r.stdout.splitlines():
-            parts = line.split()
-            if len(parts) < 5:
+    kw_words = [w for w in kw.split() if len(w) >= 2]
+    if not kw_words:
+        return None
+    for slug in candidate_slugs[:5]:  # 上位5本のみチェック（コスト/時間制限）
+        page_path = f"/articles/{slug}"
+        try:
+            r = subprocess.run(
+                ["python3", str(gsc_cli), "--mode", "queries", "--days", "28",
+                 "--limit", "50", "--page", page_path],
+                capture_output=True, text=True, timeout=30,
+            )
+            if r.returncode != 0:
                 continue
-            try:
-                clicks = int(parts[0])
-                impressions = int(parts[1])
-                position = float(parts[3])
-            except ValueError:
-                continue
-            query = " ".join(parts[4:])
-            # KWの主要ワードがすべて含まれているかチェック
-            kw_words = [w for w in kw.split() if len(w) >= 2]
-            if all(w in query for w in kw_words) and position <= 20:
-                return {
-                    "matched_query": query,
-                    "position": position,
-                    "impressions": impressions,
-                    "clicks": clicks,
-                    "skip_recommended": position <= 15,
-                }
-    except Exception as e:
-        print(f"[WARN] GSC check failed: {e}", file=sys.stderr)
+            for line in r.stdout.splitlines():
+                parts = line.split()
+                if len(parts) < 5:
+                    continue
+                try:
+                    clicks = int(parts[0])
+                    impressions = int(parts[1])
+                    position = float(parts[3])
+                except ValueError:
+                    continue
+                query = " ".join(parts[4:])
+                # KW主要ワード全部 or stem が含まれるかチェック
+                def matches(q, word):
+                    return word in q or (len(word) >= 3 and word[:3] in q)
+                if all(matches(query, w) for w in kw_words) and position <= 20:
+                    return {
+                        "matched_slug": slug,
+                        "matched_page": page_path,
+                        "matched_query": query,
+                        "position": position,
+                        "impressions": impressions,
+                        "clicks": clicks,
+                        "skip_recommended": position <= 15,
+                    }
+        except Exception as e:
+            print(f"[WARN] GSC check failed for {slug}: {e}", file=sys.stderr)
+            continue
     return None
 
 
@@ -160,8 +183,12 @@ def main():
 
     env = load_env()
     api_key = env.get("OPENAI_API_KEY")
+    db_password = env.get("SUPABASE_DB_PASSWORD")
     if not api_key:
-        print("[ERROR] OPENAI_API_KEY not found in .env.local", file=sys.stderr)
+        print(json.dumps({"error": "OPENAI_API_KEY not found in .env.local", "exit": 3}), file=sys.stderr)
+        sys.exit(3)
+    if not db_password:
+        print(json.dumps({"error": "SUPABASE_DB_PASSWORD not found in .env.local", "exit": 3}), file=sys.stderr)
         sys.exit(3)
 
     articles = fetch_articles(env)
@@ -175,7 +202,8 @@ def main():
     kw_vec = embeddings[0]
 
     # KW を主要ワードに分解（2文字以上のトークン）+ 各トークンの2-3字stem
-    kw_tokens = [t for t in kw.split() if len(t) >= 2]
+    # 純数値/年号トークン（2026, 2025等）は除外（汎用すぎて偽陽性の原因）
+    kw_tokens = [t for t in kw.split() if len(t) >= 2 and not t.isdigit()]
 
     def token_variants(t):
         """日本語トークンの核ワード抽出: 完全形 + 先頭2字stem + 先頭3字stem"""
@@ -211,8 +239,9 @@ def main():
 
     is_duplicate = any(s["triggered"] for s in scored)
 
-    # GSC pre-check
-    gsc = gsc_rank_check(kw)
+    # GSC page+query 両次元 pre-check（embedding上位5本のみ照合）
+    candidate_slugs = [s["slug"] for s in scored[:5]]
+    gsc = gsc_query_page_check(kw, candidate_slugs)
 
     result = {
         "kw": kw,
@@ -231,4 +260,17 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        # 未捕捉例外は必ず exit 3 で返す。
+        # exit 1 (重複検知) と区別しないと SKILL.md 側が誤って KW をスキップする。
+        import traceback
+        print(json.dumps({
+            "error": f"{type(e).__name__}: {e}",
+            "exit": 3,
+            "traceback": traceback.format_exc().splitlines()[-5:],
+        }, ensure_ascii=False), file=sys.stderr)
+        sys.exit(3)
