@@ -1,0 +1,121 @@
+# PJ19 GCInsight Canonical Cluster Ledger
+#
+# 役割: check_kw_duplicate.py の L4 決定論ゲート。
+# 新規KWが既存のテーマクラスタに該当するなら、その canonical slug に統合（新規記事不要）。
+# embedding/GSC より前段で発火し、API コストゼロで重複検知できる。
+#
+# マッチロジック:
+#   各クラスタの match_required リスト内の全カテゴリで「KW に1つ以上の synonym 出現」を要求。
+#   match_required の全カテゴリが満たされたら → このクラスタの canonical に統合。
+#
+# 編集ルール:
+#   - 新しい canonical を作るときに本ファイルに必ずエントリ追加
+#   - 既存記事が redirect 統合されたら redirect先を canonical にする
+#   - synonym は表記揺れを網羅（漢字/英字/ローマ字/カタカナ/略称）
+
+clusters:
+
+  # --- 2026-05-13 重複統合済クラスタ ---
+
+  - canonical: sakura-gc-certified
+    description: "さくらインターネット ガバメントクラウド305要件全適合・認定"
+    match_required:
+      - [さくら, sakura, "さくらインターネット", "さくらのクラウド"]
+      - [ガバメントクラウド, govcloud, ガバクラ, ガバメント, gov-cloud, gc]
+
+  - canonical: digital-agency-ai-gennai-guide
+    description: "デジタル庁 政府AI源内（gennai）の概要・活用"
+    match_required:
+      - [源内, gennai]
+
+  - canonical: digital-agency-generative-ai-guideline
+    description: "デジタル庁 生成AIガイドライン（自治体向け）"
+    match_required:
+      - ["生成AI", "generative-ai", "AIガイドライン", "ai-guideline", "AI ガイドライン"]
+      - [デジタル庁, "digital-agency", 自治体, jichitai, 政府]
+
+  - canonical: govcloud-prefecture-completion-rate
+    description: "ガバメントクラウド 都道府県別完了率"
+    match_required:
+      - [都道府県, prefecture]
+      - [完了率, "completion-rate", 完了, 進捗率]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  - canonical: frontyard-reform-guide-2026
+    description: "フロントヤード改革 / 書かない窓口"
+    match_required:
+      - ["フロントヤード改革", frontyard, "フロントヤード", "書かない窓口", "書かないまどぐち"]
+
+  - canonical: govcloud-30percent-cost-reduction-reality
+    description: "政府目標「3割削減」の達成検証"
+    match_required:
+      - ["3割削減", "30%削減", "30percent", "三割削減", "30パーセント"]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  # --- 既存記事ベースの broad クラスタ（将来の重複生成防止）---
+
+  - canonical: govcloud-what-is-govcloud
+    description: "ガバメントクラウド入門・基礎・とは"
+    match_required:
+      - [ガバメントクラウド, govcloud, ガバクラ, ガバメント]
+      - [とは, "what-is", 基礎, basics, 入門, 仕組み, "とはなにか", "とは何", "わかりやすく"]
+
+  - canonical: govcloud-aws-guide
+    description: "ガバメントクラウド AWS特化"
+    match_required:
+      - [AWS, aws, "アマゾン", amazon]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  - canonical: gc-csp-comparison
+    description: "ガバメントクラウド CSP（AWS/Azure/OCI/GCP/さくら）比較"
+    match_required:
+      - [比較, "comparison", "比較表", vs, "対決"]
+      - [CSP, クラウド事業者, "クラウドベンダー"]
+
+  - canonical: gc-hiyo
+    description: "ガバメントクラウド 費用・コスト構造"
+    match_required:
+      - [費用, コスト, cost, 料金, 経費, "支出"]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+    # 注: コスト系は記事数が多いので exit 1 ではなく WARN 扱いにすべきかも
+
+  - canonical: gc-shared-vs-solo-guide
+    description: "共同利用 vs 単独利用"
+    match_required:
+      - [共同利用, 単独利用, "shared-vs-solo", multitenant, マルチテナント]
+
+  - canonical: gc-vendor-selection-guide-2026
+    description: "ガバメントクラウド ベンダー選定"
+    match_required:
+      - [ベンダー選定, "vendor-selection", "ベンダー 選び方", "ベンダー選び", "業者選定"]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  - canonical: gc-nintei
+    description: "ガバメントクラウド認定要件（305項目）"
+    match_required:
+      - [認定, "certification", "305項目", "305要件", "適合確認"]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  - canonical: gc-security
+    description: "ガバメントクラウド セキュリティ要件"
+    match_required:
+      - [セキュリティ, security, セキュリティ要件]
+      - [ガバメントクラウド, govcloud, ガバクラ]
+
+  - canonical: gc-delay-municipalities-2026
+    description: "自治体 標準化遅延・2026年問題"
+    match_required:
+      - [遅延, 失敗, 失敗事例, "間に合わない", "間に合わ"]
+      - [自治体, ガバメントクラウド, 標準化]
+
+  - canonical: standardization-vendor-list-2026
+    description: "自治体システム標準化ベンダー一覧"
+    match_required:
+      - [ベンダー, vendor]
+      - [一覧, list, ベンダー名]
+      - [標準化, "標準仕様", "standardization"]
+
+  - canonical: gcas-guide-complete-2026
+    description: "GCASガイド（デジタル庁公式）"
+    match_required:
+      - [GCAS, gcas, "GCASガイド"]

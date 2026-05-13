@@ -25,6 +25,7 @@ Output: JSON to stdout
 import os
 import sys
 import json
+import hashlib
 import subprocess
 from pathlib import Path
 
@@ -35,7 +36,11 @@ DUP_THRESHOLD = 0.75
 DUP_THRESHOLD_WITH_KEYWORD = 0.50
 TOP_N = 5
 
-ENV_LOCAL = Path(__file__).parent.parent / ".env.local"
+SCRIPT_DIR = Path(__file__).parent
+ENV_LOCAL = SCRIPT_DIR.parent / ".env.local"
+CLUSTERS_YAML = SCRIPT_DIR / "canonical_clusters.yaml"
+CACHE_DIR = SCRIPT_DIR.parent / ".cache"
+EMBEDDING_CACHE = CACHE_DIR / "article_embeddings.json"
 
 
 def load_env() -> dict:
@@ -110,6 +115,86 @@ def embed(texts, api_key, max_retries=3):
             if attempt < max_retries - 1:
                 time.sleep(2 ** attempt)
     raise RuntimeError(f"embed() failed after {max_retries} retries: {last_err}")
+
+
+def load_clusters():
+    """canonical_clusters.yaml をロード。失敗時は空リストを返す（致命的ではない）。"""
+    if not CLUSTERS_YAML.exists():
+        return []
+    try:
+        import yaml
+        with open(CLUSTERS_YAML, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return data.get("clusters", [])
+    except Exception as e:
+        print(f"[WARN] clusters load failed: {e}", file=sys.stderr)
+        return []
+
+
+def cluster_match(kw, clusters):
+    """L4: 決定論的クラスタ照合。
+
+    各 cluster.match_required の全カテゴリで「KW内に1つ以上の synonym 出現」を要求。
+    全カテゴリが満たされたら → そのクラスタの canonical が「既存重複」と判定。
+
+    返り値: ヒットした最初のクラスタの dict、なければ None
+    """
+    if not clusters:
+        return None
+    kw_lower = kw.lower()
+    for cluster in clusters:
+        required = cluster.get("match_required", [])
+        if not required:
+            continue
+        all_categories_match = True
+        matched_synonyms = []
+        for category in required:
+            if not isinstance(category, list):
+                continue
+            found_synonym = None
+            for syn in category:
+                if syn.lower() in kw_lower:
+                    found_synonym = syn
+                    break
+            if found_synonym is None:
+                all_categories_match = False
+                break
+            matched_synonyms.append(found_synonym)
+        if all_categories_match:
+            return {
+                "canonical": cluster.get("canonical"),
+                "description": cluster.get("description"),
+                "matched_synonyms": matched_synonyms,
+            }
+    return None
+
+
+def article_cache_key(article):
+    """記事の embedding キャッシュキー: title+description のハッシュ"""
+    raw = f"{article['title']}\n{article['description']}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def load_embedding_cache():
+    """キャッシュをロード。形式: { "cache_key": [embedding floats], ... }"""
+    if not EMBEDDING_CACHE.exists():
+        return {}
+    try:
+        with open(EMBEDDING_CACHE, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"[WARN] embedding cache load failed: {e}", file=sys.stderr)
+        return {}
+
+
+def save_embedding_cache(cache):
+    """キャッシュを保存。"""
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(EMBEDDING_CACHE, "w") as f:
+            json.dump(cache, f)
+    except Exception as e:
+        print(f"[WARN] embedding cache save failed: {e}", file=sys.stderr)
 
 
 def cos_sim(a, b):
@@ -196,10 +281,49 @@ def main():
         print(json.dumps({"kw": kw, "duplicate": False, "top_matches": [], "note": "no articles"}, ensure_ascii=False))
         sys.exit(0)
 
-    # embedding: KW + 全記事の title+description
-    inputs = [kw] + [f"{a['title']}\n{a['description']}" for a in articles]
-    embeddings = embed(inputs, api_key)
-    kw_vec = embeddings[0]
+    # ===== L4: 決定論的 cluster ledger 照合（最優先・API呼び出しなし） =====
+    clusters = load_clusters()
+    cluster_hit = cluster_match(kw, clusters)
+    if cluster_hit:
+        # canonical が articles に存在し is_published=true か確認
+        canonical_slug = cluster_hit["canonical"]
+        canonical_article = next((a for a in articles if a["slug"] == canonical_slug), None)
+        result = {
+            "kw": kw,
+            "duplicate": True,
+            "layer": "L4-cluster-ledger",
+            "cluster_match": cluster_hit,
+            "canonical_article": {
+                "slug": canonical_article["slug"],
+                "title": canonical_article["title"],
+            } if canonical_article else None,
+        }
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        sys.exit(1)
+
+    # ===== L2/L3: embedding (キャッシュ付き) =====
+    # KWは毎回新規だが、article側はキャッシュから再利用
+    cache = load_embedding_cache()
+    cache_keys = [article_cache_key(a) for a in articles]
+    missing_indexes = [i for i, k in enumerate(cache_keys) if k not in cache]
+
+    # KW + 不足記事のみ embed
+    inputs_to_embed = [kw]
+    for i in missing_indexes:
+        inputs_to_embed.append(f"{articles[i]['title']}\n{articles[i]['description']}")
+
+    new_embeddings = embed(inputs_to_embed, api_key)
+    kw_vec = new_embeddings[0]
+
+    # 不足記事 embedding をキャッシュに保存
+    for offset, art_idx in enumerate(missing_indexes):
+        cache[cache_keys[art_idx]] = new_embeddings[1 + offset]
+    if missing_indexes:
+        save_embedding_cache(cache)
+
+    # 全記事 embedding（キャッシュ + 新規）を順序通り構築
+    article_vecs = [cache[k] for k in cache_keys]
+    embeddings = [kw_vec] + article_vecs
 
     # KW を主要ワードに分解（2文字以上のトークン）+ 各トークンの2-3字stem
     # 純数値/年号トークン（2026, 2025等）は除外（汎用すぎて偽陽性の原因）
