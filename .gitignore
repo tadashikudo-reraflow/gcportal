@@ -17,3 +17,6 @@ etl/rs_cache/
 tsconfig.tsbuildinfo
 next-env.d.ts
 .claude/launch.json
+
+# Embedding cache (check_kw_duplicate.py)
+.cache/
