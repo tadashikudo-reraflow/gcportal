@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "slug and title are required" }, { status: 400 });
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // SUPABASE_SECRET_KEY (sb_secret_ 形式) を優先し、なければ旧 SUPABASE_SERVICE_ROLE_KEY にフォールバック
+  const serviceKey = process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) {
     return NextResponse.json({ error: "Service role key not configured" }, { status: 500 });
   }
